@@ -7,12 +7,14 @@ static bool loaded = false;
 
 std::ofstream file;
 
+const std::string MEMORY_LOG_PATH = "Logs/MemoryLog.txt";
+
 
 inline void* operator new(size_t size, const char* filename, int line)
 {
 	if (!loaded)
 	{
-		file.open("Assets/MemoryLog.txt");
+		file.open(MEMORY_LOG_PATH);
 
 		loaded = true;
 	}
@@ -33,7 +35,7 @@ inline void* operator new[](size_t size, const char* filename, int line)
 {
 	if (!loaded)
 	{
-		file.open("Assets/MemoryLog.txt");
+		file.open(MEMORY_LOG_PATH);
 
 		loaded = true;
 	}
