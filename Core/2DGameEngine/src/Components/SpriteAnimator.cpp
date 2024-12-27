@@ -40,7 +40,7 @@ void SpriteAnimator::Update(float dt)
 		return;
 
 	// Increment sprite frame
-	spriteFrame += 1 * dt;
+	spriteFrame += animationProperties.animSpeed * dt;
 
 	if (spriteFrame >= animationProperties.columnCount)
 	{
@@ -64,8 +64,6 @@ void SpriteAnimator::Draw()
 
 	dstRect.x = round(transform->position.x - ((float)dstRect.h * transform->scale.y) / 2);
 	dstRect.y = round(transform->position.y - ((float)dstRect.h * transform->scale.y) / 2);
-
-	std::cout << "row: " << animationProperties.sourceRowNumber << " - frame: " << spriteFrame << std::endl;
 
 	TextureManager::GetInstance()->DrawFrame(spriteTexture, dstRect, transform->scale, animationProperties.sourceRowNumber, spriteFrame, animationProperties.flip);
 }
