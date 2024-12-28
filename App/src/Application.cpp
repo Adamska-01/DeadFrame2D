@@ -321,7 +321,6 @@ void Application::Destroy()
 	AudioManager::GetInstance()->Clean();
 	Input::GetInstance()->Clean();
 	Renderer::GetInstance()->Destroy();
-	Input::GetInstance()->Clean();
 
 	if (menuBackground != nullptr)
 	{
