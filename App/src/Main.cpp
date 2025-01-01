@@ -5,7 +5,7 @@ int main(int argc, char** argv)
 {
 	auto App = new Application();
 
-	App->Update();
+	App->Run();
 
 	delete App;
 	App = nullptr;
