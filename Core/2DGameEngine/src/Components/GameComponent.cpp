@@ -3,5 +3,5 @@
 GameComponent::GameComponent()
 {
 	OwningObject = nullptr;
-	enableDraw = false;
+	enableDraw = true;
 }

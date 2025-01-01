@@ -12,7 +12,7 @@ UIText::UIText(std::string fontPath, std::string text)
 	texture = UpdateText("", 1);
 }
 
-void UIText::Draw(Vector2 scale, bool center)
+void UIText::Draw(Vector2F scale, bool center)
 {
 	if (center)
 	{

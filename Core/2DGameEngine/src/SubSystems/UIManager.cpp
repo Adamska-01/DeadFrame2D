@@ -66,7 +66,7 @@ SDL_Texture* UIManager::LoadText(TTF_Font* font, std::string text, SDL_Color col
 	return textTexture;
 }
 
-void UIManager::DrawText(SDL_Texture* texture, SDL_Rect dest, Vector2 scale)
+void UIManager::DrawText(SDL_Texture* texture, SDL_Rect dest, Vector2F scale)
 {
 	SDL_Rect destRect = { dest.x, dest.y, dest.w * scale.x, dest.h * scale.y };
 

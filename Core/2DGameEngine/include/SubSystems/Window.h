@@ -3,6 +3,7 @@
 #include "Math/Vector2.h"
 #include "SubSystems/Events/Interfaces/IEventProcessor.h"
 #include <string>
+#include <vector>
 
 
 class Window : public IEventProcessor
@@ -10,10 +11,6 @@ class Window : public IEventProcessor
 private:
 	static SDL_Window* window;
 	
-	static int width;
-
-	static int height;
-
 
 public:
 	Window(int width, int height, const char* title);
@@ -26,7 +23,11 @@ public:
 
 	static SDL_Window* GetWindow();
 
-	static Vector2 GetWindowSize();
+	static Vector2I GetResolution();
 
-	static void SetWindowMode(SDL_Window* window, WindowMode mode);
+	static std::vector<SDL_DisplayMode> GetSupportedResolutions();
+
+	static void SetWindowMode(WindowMode mode);
+
+	static bool SetResolution(Vector2I resolution);
 };

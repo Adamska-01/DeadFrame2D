@@ -1,6 +1,5 @@
-#include <Components/Collisions/Circle.h>
-#include <Components/Collisions/CollisionHandler.h>
-#include <Math/Vector2.h>
+#include "Components/Collisions/Circle.h"
+#include "Components/Collisions/CollisionHandler.h"
 #include <SDL.h>
 
 
@@ -38,10 +37,10 @@ bool CollisionHandler::BoxToBoxCollision(const SDL_Rect& A, const SDL_Rect& B)
 	return true; 
 }
 
-bool CollisionHandler::CircleToBoxCollision(const Circle& A, const SDL_Rect& B, Vector2& collisionPoint)
+bool CollisionHandler::CircleToBoxCollision(const Circle& A, const SDL_Rect& B, Vector2F& collisionPoint)
 {
 	// Closest points on collision box
-	Vector2 closestPoint;
+	Vector2F closestPoint;
 
 	// Find closest x offset
 	if (A.position.x < B.x)
@@ -79,7 +78,7 @@ bool CollisionHandler::CircleToCircleCollision(const Circle& A, const Circle& B)
 	return false; 
 }
 
-bool CollisionHandler::PointInCircle(const Vector2& point, const Circle& circle)
+bool CollisionHandler::PointInCircle(const Vector2F& point, const Circle& circle)
 {
 	auto dx = point.x - circle.position.x;
 	auto dy = point.y - circle.position.y;

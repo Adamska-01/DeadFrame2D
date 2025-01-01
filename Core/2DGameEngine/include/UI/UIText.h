@@ -27,7 +27,7 @@ public:
 	~UIText() = default;
 
 
-	void Draw(Vector2 scale, bool center = false);
+	void Draw(Vector2F scale, bool center = false);
 
 	void ChangeColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 	

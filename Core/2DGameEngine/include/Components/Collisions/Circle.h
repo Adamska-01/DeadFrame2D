@@ -1,17 +1,17 @@
 #pragma once
-#include "../../Math/Vector2.h"
+#include "Math/Vector2.h"
 
 
 struct Circle
 {
-	Vector2 position;
+	Vector2F position;
 
 	float radius;
 
 	
 	Circle();
 
-	Circle(const Vector2& pos, float r);
+	Circle(const Vector2F& pos, float r);
 
 
 	float Area() const;

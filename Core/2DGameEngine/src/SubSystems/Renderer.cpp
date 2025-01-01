@@ -29,6 +29,8 @@ Renderer::Renderer(SDL_Window* window)
 #if _DEBUG
 	DBG_ASSERT_MSG(renderer, "Renderer initialisation failed: %s\n", SDL_GetError());
 #endif
+
+	SetResolutionTarget({ ScreenConstants::DEFAULT_RENDERER_X_SIZE, ScreenConstants::DEFAULT_RENDERER_Y_SIZE });
 }
 
 Renderer::~Renderer()
@@ -72,8 +74,11 @@ void Renderer::SetDisplayColour(int r, int g, int b, int a)
 #endif
 }
 
-void Renderer::SetResolution(int width, int height)
+void Renderer::SetResolutionTarget(Vector2I targetResolution)
 {
+	auto width = targetResolution.x;
+	auto height = targetResolution.y;
+
 	if (width <= 0 || height <= 0)
 		return;
 

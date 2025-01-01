@@ -4,11 +4,11 @@
 
 
 Circle::Circle()
-	: position(Vector2::Zero), radius(1.0f)
+	: position(Vector2F::Zero), radius(1.0f)
 {
 }
 
-Circle::Circle(const Vector2& pos, float r) 
+Circle::Circle(const Vector2F& pos, float r) 
 	: position(pos), radius(r) 
 {
 }

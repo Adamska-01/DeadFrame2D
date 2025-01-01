@@ -1,7 +1,7 @@
 #pragma once
+#include "Math/Vector2.h"
 
 
-class Vector2;
 struct Circle;
 struct SDL_Rect;
 
@@ -19,9 +19,9 @@ private:
 public:
 	static bool BoxToBoxCollision(const SDL_Rect& A, const SDL_Rect& B);
 	
-	static bool CircleToBoxCollision(const Circle& A, const SDL_Rect& B, Vector2& P);
+	static bool CircleToBoxCollision(const Circle& A, const SDL_Rect& B, Vector2F& P);
 	
 	static bool CircleToCircleCollision(const Circle& A, const Circle& B);
 
-	static bool PointInCircle(const Vector2& point, const Circle& circle);
+	static bool PointInCircle(const Vector2F& point, const Circle& circle);
 };

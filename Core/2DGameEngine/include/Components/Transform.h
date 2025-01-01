@@ -6,16 +6,16 @@
 class Transform : public GameComponent
 {
 public:
-	Transform(Vector2 position = Vector2::Zero, Vector2 scale = Vector2::One, float angle = 0.0f);
+	Transform(Vector2F position = Vector2F::Zero, Vector2F scale = Vector2F::One, float angle = 0.0f);
 
 	Transform(Transform&& other) = default;
 
 	~Transform() override;
 
 
-	Vector2 position;
+	Vector2F position;
 
-	Vector2 scale;
+	Vector2F scale;
 	
 	float angle;
 
@@ -24,13 +24,13 @@ public:
 	
 	void TranslateY(float y);
 	
-	void Translate(Vector2 v);
+	void Translate(Vector2F v);
 
 	void ScaleX(float x);
 	
 	void ScaleY(float y);
 	
-	void Scale(Vector2 v);
+	void Scale(Vector2F v);
 
 	void RotateBy(float angle);
 

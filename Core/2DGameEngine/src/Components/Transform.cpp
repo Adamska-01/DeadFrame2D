@@ -2,7 +2,7 @@
 #include <Math/MathConstants.h>
 
 
-Transform::Transform(Vector2 position, Vector2 scale, float angle)
+Transform::Transform(Vector2F position, Vector2F scale, float angle)
 	: position(position), scale(scale), angle(angle)
 {
 }
@@ -21,7 +21,7 @@ void Transform::TranslateY(float y)
 	position.y += y;
 }
 
-void Transform::Translate(Vector2 v)
+void Transform::Translate(Vector2F v)
 {
 	position.x += v.x; 
 	position.y += v.y;
@@ -37,7 +37,7 @@ void Transform::ScaleY(float y)
 	scale.y = y;
 }
 
-void Transform::Scale(Vector2 v)
+void Transform::Scale(Vector2F v)
 {
 	scale.x = v.x;
 	scale.y = v.y;

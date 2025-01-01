@@ -32,7 +32,7 @@ void TextureManager::NormalDraw(SDL_Texture* texture)
 	SDL_RenderCopy(Renderer::GetRenderer(), texture, NULL, NULL);
 }
 
-void TextureManager::Draw(SDL_Texture* texture, SDL_Rect dest, Vector2 scale, SDL_RendererFlip flip)
+void TextureManager::Draw(SDL_Texture* texture, SDL_Rect dest, Vector2F scale, SDL_RendererFlip flip)
 {
 	SDL_Rect srcRect = { 0, 0, dest.w, dest.h };
 
@@ -41,7 +41,7 @@ void TextureManager::Draw(SDL_Texture* texture, SDL_Rect dest, Vector2 scale, SD
 	SDL_RenderCopyEx(Renderer::GetRenderer(), texture, &srcRect, &destRect, 0, nullptr, flip);
 }
 
-void TextureManager::DrawPortion(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest, Vector2 scale, SDL_RendererFlip flip)
+void TextureManager::DrawPortion(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest, Vector2F scale, SDL_RendererFlip flip)
 {
 	SDL_Rect srcRect = { src.x, src.y, src.w, src.h };
 
@@ -50,7 +50,7 @@ void TextureManager::DrawPortion(SDL_Texture* texture, SDL_Rect src, SDL_Rect de
 	SDL_RenderCopyEx(Renderer::GetRenderer(), texture, &srcRect, &destRect, 0, nullptr, flip);
 }
 
-void TextureManager::DrawFrame(SDL_Texture* texture, SDL_Rect dest, Vector2 scale, int row, int frame, SDL_RendererFlip flip)
+void TextureManager::DrawFrame(SDL_Texture* texture, SDL_Rect dest, Vector2F scale, int row, int frame, SDL_RendererFlip flip)
 {
 	SDL_Rect srcRect = { dest.w * frame, dest.h * row, dest.w, dest.h };
 
@@ -64,7 +64,7 @@ void TextureManager::DrawTile(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest,
 	SDL_RenderCopyEx(Renderer::GetRenderer(), texture, &src, &dest, 0, nullptr, flip);
 }
 
-void TextureManager::DrawRotate(SDL_Texture* texture, Vector2 pos, Vector2 scale, float angle, SDL_Point rotPoint, SDL_RendererFlip flip)
+void TextureManager::DrawRotate(SDL_Texture* texture, Vector2F pos, Vector2F scale, float angle, SDL_Point rotPoint, SDL_RendererFlip flip)
 {
 	SDL_Rect destRect{ pos.x, pos.y, 0, 0 };
 

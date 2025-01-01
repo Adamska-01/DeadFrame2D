@@ -30,7 +30,7 @@ public:
 
 	static SDL_Texture* LoadText(TTF_Font* font, std::string text, SDL_Color color, unsigned int numRows);
 	
-	static void DrawText(SDL_Texture* texture, SDL_Rect dest, Vector2 scale);
+	static void DrawText(SDL_Texture* texture, SDL_Rect dest, Vector2F scale);
 
 	static void DrawDebugTextBox(Uint8 r, Uint8 g, Uint8 b, Uint8 a, SDL_Rect textRect);
 };

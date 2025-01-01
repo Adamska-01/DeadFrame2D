@@ -26,5 +26,5 @@ public:
 
 	static void SetDisplayColour(int r, int g, int b, int a);
 
-	static void SetResolution(int width, int height);
+	static void SetResolutionTarget(Vector2I targetResolution);
 };
