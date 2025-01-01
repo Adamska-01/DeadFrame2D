@@ -4,46 +4,31 @@
 #include <vector>
 
 
-enum MusicType
-{
-	MUSIC, 
-	SFX
-};
-
-
-
 class AudioManager
 {
 private:
-	AudioManager();
+	AudioManager() = default;
+
+	AudioManager(const AudioManager&) = delete;
+
+	AudioManager(AudioManager&&) = delete;
 
 
-	static AudioManager* Instance;
+	AudioManager& operator=(const AudioManager&) = delete;
 
-
-	std::vector<Mix_Chunk*> Sfx;
-
-	std::vector<Mix_Music*> Music;
-
-	Mix_Music* music;
-
-	Mix_Chunk* sfx;
+	AudioManager& operator=(AudioManager&&) = delete;
 
 
 public:
-	inline static AudioManager* GetInstance() { return Instance = (Instance != nullptr) ? Instance : new AudioManager(); }
+	static Mix_Music* LoadMusic(const char* filepath);
+	
+	static Mix_Chunk* LoadSFX(const char* filepath, int volume);
 
-	
-	// TODO: id is never used. Fucking use it (just return id after loading audio, remove parameter)
-	bool LoadAudio(int id, std::string filename, MusicType audioType, int volume);
-	
-	void PlayMusicTrack(int id, int loopNumber);
-	
-	void PlaySFX(int id, int loopNumber, int channel);
-	
-	void FadeMusicTrack(int id, int loopNumber, int fadeLenght);
+	static bool PlayMusicTrack(Mix_Music* music, int loopNumber);
 
-	void StopMusic();
+	static void PlaySFX(Mix_Chunk* sfx, int loopNumber);
+	
+	static void FadeInMusicTrack(Mix_Music* music, int loopNumber, int fadeLenght);
 
-	void Clean();
+	static void StopMusic();
 };

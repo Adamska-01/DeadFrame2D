@@ -8,29 +8,30 @@
 class TextureManager
 {
 private:
-	TextureManager();
+	TextureManager() = default;
+
+	TextureManager(const TextureManager&) = delete;
+
+	TextureManager(TextureManager&&) = delete;
 
 
-	static TextureManager* Instance;
+	TextureManager& operator=(const TextureManager&) = delete;
+
+	TextureManager& operator=(TextureManager&&) = delete;
 
 
 public:
-	inline static TextureManager* GetInstance() { return Instance = (Instance != nullptr) ? Instance : new TextureManager(); }
+	static SDL_Texture* LoadTexture(std::string filename);
 
-
-	SDL_Texture* LoadTexture(std::string filename);
-
-	void NormalDraw(SDL_Texture* texture);
+	static void NormalDraw(SDL_Texture* texture);
 	
-	void Draw(SDL_Texture* texture, SDL_Rect dest, Vector2 scale, SDL_RendererFlip flip = SDL_FLIP_NONE);
+	static void Draw(SDL_Texture* texture, SDL_Rect dest, Vector2 scale, SDL_RendererFlip flip = SDL_FLIP_NONE);
 	
-	void DrawPortion(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest, Vector2 scale, SDL_RendererFlip flip = SDL_FLIP_NONE);
+	static void DrawPortion(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest, Vector2 scale, SDL_RendererFlip flip = SDL_FLIP_NONE);
 	
-	void DrawFrame(SDL_Texture* texture, SDL_Rect dest, Vector2 scale, int row, int frame, SDL_RendererFlip flip = SDL_FLIP_NONE);
+	static void DrawFrame(SDL_Texture* texture, SDL_Rect dest, Vector2 scale, int row, int frame, SDL_RendererFlip flip = SDL_FLIP_NONE);
 	
-	void DrawTile(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest, int row, int frame, SDL_RendererFlip flip = SDL_FLIP_NONE);
+	static void DrawTile(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest, int row, int frame, SDL_RendererFlip flip = SDL_FLIP_NONE);
 	
-	void DrawRotate(SDL_Texture* texture, Vector2 pos, Vector2 scale, float angle, SDL_Point rotPoint, SDL_RendererFlip flip = SDL_FLIP_NONE);
-
-	void Clean();
+	static void DrawRotate(SDL_Texture* texture, Vector2 pos, Vector2 scale, float angle, SDL_Point rotPoint, SDL_RendererFlip flip = SDL_FLIP_NONE);
 };

@@ -1,4 +1,5 @@
 #pragma once
+#include "Window.h"
 
 
 struct SDL_Window;
@@ -8,29 +9,22 @@ struct SDL_Renderer;
 class Renderer
 {
 private:
-	Renderer();
+	static SDL_Renderer* renderer;
 
-	
-	static Renderer* Instance;
-
-
-	SDL_Window* Window{ nullptr };
-	
-	SDL_Renderer* renderer{ nullptr };
 
 public:
-	inline static Renderer* GetInstance() { return Instance = (Instance != nullptr) ? Instance : new Renderer(); }
+	Renderer(SDL_Window* window);
 
+	~Renderer();
 
-	void SetDisplayColour(int r, int g, int b, int a);
 	
-	void Update();
+	static void ClearBuffer();
 	
-	void ClearAndPresent();
+	static void PresentBuffer();
 	
-	void Delay(float dt);
-	
-	void Destroy();
+	static SDL_Renderer* GetRenderer();
 
-	inline SDL_Renderer* GetRenderer() { return renderer; }
+	static void SetDisplayColour(int r, int g, int b, int a);
+
+	static void SetResolution(int width, int height);
 };

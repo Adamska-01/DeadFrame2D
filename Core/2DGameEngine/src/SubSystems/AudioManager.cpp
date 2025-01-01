@@ -2,120 +2,61 @@
 #include <SubSystems/AudioManager.h>
 
 
-AudioManager* AudioManager::Instance = nullptr;
-
-
-AudioManager::AudioManager()
+Mix_Music* AudioManager::LoadMusic(const char* filepath)
 {
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 512) < 0) 
+	auto music = Mix_LoadMUS(filepath);
+
+	if (music == nullptr) 
 	{
-		std::cerr << "SDL_Mixer could not initialize! SDL_mixer Error: " << Mix_GetError() << std::endl;
+		std::cerr << "Failed to load music: " << Mix_GetError() << std::endl;
 	}
+
+	return music;
 }
 
-bool AudioManager::LoadAudio(int id, std::string filename, MusicType audioType, int volume)
+Mix_Chunk* AudioManager::LoadSFX(const char* filepath, int volume)
 {
-	switch (audioType)
+	auto sfx = Mix_LoadWAV(filepath);
+
+	if (sfx == nullptr)
 	{
-		case MUSIC:
-			music = Mix_LoadMUS(filename.c_str());
-
-			if (!music)
-			{
-				std::cout << "Unable to load music file: " << Mix_GetError() << std::endl;
-				return false;
-			}
-		
-			Mix_VolumeMusic(volume);
-			Music.push_back(music);
-		
-			return true;
-
-		case SFX:
-			sfx = Mix_LoadWAV(filename.c_str());
-		
-			if (!sfx)
-			{
-				std::cout << "Unable to load SFX file: " << Mix_GetError() << std::endl;
-				return false;
-			}
-		
-			Mix_VolumeChunk(sfx, volume);
-			Sfx.push_back(sfx);
-		
-			return true;
-
-		default:
-			std::cout << "Unknown audio type!" << std::endl;
-			return false;
+		std::cerr << "Failed to load music: " << Mix_GetError() << std::endl;
 	}
+
+	Mix_VolumeChunk(sfx, volume);
+
+	return sfx;
 }
 
-void AudioManager::PlayMusicTrack(int id, int loopNumber)
+bool AudioManager::PlayMusicTrack(Mix_Music* music, int loopNumber)
 {
-	Mix_PlayMusic(Music[id], loopNumber);
+	return Mix_PlayMusic(music, loopNumber) == 0;
 }
 
-void AudioManager::PlaySFX(int id, int loopNumber, int channel)
+void AudioManager::PlaySFX(Mix_Chunk* sfx, int loopNumber)
 {
+	auto channel = 0;
+
 	while (Mix_Playing(channel))
 	{
 		++channel;
 	}
 
-	// -1 checking every channel
-	if (!Mix_Playing(channel)) 
-	{
-		// -1 to loop continuously
-		Mix_PlayChannel(channel, Sfx[id], loopNumber); 
-	}
+	Mix_PlayChannel(channel, sfx, loopNumber);
 }
 
-void AudioManager::FadeMusicTrack(int id, int loopNumber, int fadeLenght)
+void AudioManager::FadeInMusicTrack(Mix_Music* music, int loopNumber, int fadeLenght)
 {
-	if (Mix_PlayingMusic())
+	if (Mix_PlayingMusic() != 0)
 	{
 		Mix_FadeOutMusic(fadeLenght);
 	}
 
 	// Fade in milliseconds
-	Mix_FadeInMusic(Music[id], loopNumber, fadeLenght); 
+	Mix_FadeInMusic(music, loopNumber, fadeLenght);
 }
 
 void AudioManager::StopMusic()
 {
 	Mix_HaltMusic();
-}
-
-void AudioManager::Clean()
-{
-	if (&Music != nullptr)
-	{
-		for (auto i = 0; i < Music.size(); i++)
-		{
-			Mix_FreeMusic(Music[i]);
-		}
-
-		Music.clear();
-	}
-	if (&Sfx != nullptr)
-	{
-		for (auto i = 0; i < Sfx.size(); i++)
-		{
-			Mix_FreeChunk(Sfx[i]);
-		}
-		
-		Sfx.clear();
-	}
-
-	//No need to delete the holders
-	music = nullptr;
-	sfx = nullptr;
-
-#if _DEBUG
-	DBG_ASSERT_MSG_EMPTY(Music.size(), "DEBUG_MSG: Music cleaned! \n");
-	DBG_ASSERT_MSG_EMPTY(Sfx.size(), "DEBUG_MSG: SFX cleaned! \n");
-#endif
-
-	Mix_CloseAudio();
 }

@@ -1,43 +1,57 @@
-#include <Constants/ScreenConstants.h>
-#include <Debugging/Debug.h>
+#include "Constants/ScreenConstants.h"
+#include "Debugging/Debug.h"
+#include "SubSystems/Renderer.h"
+#include "SubSystems/Window.h"
 #include <SDL.h>
-#include <SubSystems/Renderer.h>
 
 
-Renderer* Renderer::Instance = nullptr;
+SDL_Renderer* Renderer::renderer = nullptr;
 
 
-Renderer::Renderer()
+Renderer::Renderer(SDL_Window* window)
 {
-	Window = nullptr;
-	renderer = nullptr;
+#if _DEBUG
+	DBG_ASSERT_MSG(window, "Window initialisation failed: %s\n", SDL_GetError());
+#endif
 
 	//startup
-	if(SDL_Init(SDL_INIT_VIDEO) < 0)
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	{
 		SDL_Log("Failed to Initialize SDL_VIDEO: %s\n", SDL_GetError());
-
-	//create the window
-	Window = SDL_CreateWindow(
-		"PuzzleBubbleClone",			//title
-		250,							//initial x pos
-		50,								//initial y pos
-		ScreenConstants::SCREENWIDTH,	//screen width in pixel
-		ScreenConstants::SCREENHEIGHT,	//screen height in pixel 
-		0);								//window behaviour flag (not used "0")
-
-#if _DEBUG
-	DBG_ASSERT_MSG(Window, "Window initialisation failed: %s\n", SDL_GetError());
-#endif
+	}
 
 	//create the renderer
 	renderer = SDL_CreateRenderer(
-		Window,
+		window,
 		-1,
-		0);
+		SDL_RENDERER_ACCELERATED);
 
 #if _DEBUG
 	DBG_ASSERT_MSG(renderer, "Renderer initialisation failed: %s\n", SDL_GetError());
 #endif
+}
+
+Renderer::~Renderer()
+{
+	if (renderer == nullptr)
+		return;
+
+	SDL_DestroyRenderer(renderer);
+}
+
+void Renderer::ClearBuffer()
+{
+	SDL_RenderClear(renderer);
+}
+
+void Renderer::PresentBuffer()
+{
+	SDL_RenderPresent(renderer);
+}
+
+SDL_Renderer* Renderer::GetRenderer()
+{
+	return renderer;
 }
 
 void Renderer::SetDisplayColour(int r, int g, int b, int a)
@@ -58,32 +72,10 @@ void Renderer::SetDisplayColour(int r, int g, int b, int a)
 #endif
 }
 
-void Renderer::Update()
+void Renderer::SetResolution(int width, int height)
 {
-	SDL_RenderClear(renderer);
-	SDL_RenderPresent(renderer);
-}
+	if (width <= 0 || height <= 0)
+		return;
 
-void Renderer::ClearAndPresent()
-{
-	SDL_RenderPresent(renderer);
-	SDL_RenderClear(renderer);
-}
-
-void Renderer::Delay(float dt)
-{
-	SDL_Delay(dt);
-}
-
-void Renderer::Destroy()
-{
-	if (renderer)
-	{
-		SDL_DestroyRenderer(renderer);
-	}
-
-	if (Window)
-	{
-		SDL_DestroyWindow(Window);
-	}
+	SDL_RenderSetLogicalSize(renderer, width, height);
 }

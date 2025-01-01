@@ -1,67 +1,88 @@
 #pragma once
-#include <iostream>
-#include <vector>
-#include <SDL_gamecontroller.h>
+#include "SubSystems//Events/Interfaces/IEventProcessor.h"
+#include <unordered_map>
 
 
-enum Players
+enum InputDeviceFlag
 {
-	PLAYER1,
-	PLAYER2,
-	PLAYER3,
-	PLAYER4
+	DEVICE_KEYBOARD = 1 << 0,
+
+	DEVICE_MOUSE = 1 << 1,
+	
+	DEVICE_CONTROLLER_1 = 1 << 2,
+	
+	DEVICE_CONTROLLER_2 = 1 << 3,
+	
+	DEVICE_CONTROLLER_3 = 1 << 4,
+	
+	DEVICE_CONTROLLER_4 = 1 << 5
 };
 
 
-struct  GamePad {
-	bool buttons[SDL_CONTROLLER_BUTTON_MAX];
-	int axis[SDL_CONTROLLER_AXIS_MAX];
+struct InputState
+{
+	std::unordered_map<int, bool> buttons;
+
+	std::unordered_map<int, float> axes;
 };
 
 
-class Input
+class Input : public IEventProcessor
 {
 private:
-	Input();
+	static std::unordered_map<InputDeviceFlag, InputState> currentInputs;
+
+	static std::unordered_map<InputDeviceFlag, InputState> lastInputs;
+
+	static std::vector<SDL_GameController*> controllers;
 
 
-	static Input* Instance;
+	static void InitialiseControllers();
+
+	static void ProcessControllerEvents(const SDL_Event& controllerEvent);
+
+	static void ProcessKeyboardEvents(const SDL_Event& keyboardEvent);
+
+	static void ProcessMouseEvents(const SDL_Event& mouseEvent);
+
+	static bool IsDeviceValid(InputDeviceFlag deviceFlag);
 
 
-	SDL_GameController* padHolder;
-
-	std::vector<SDL_GameController*> Controllers{ nullptr };
-	
-	std::vector<GamePad> CurrentControllerInputs;
-	
-	std::vector<GamePad> LastControllerInputs;
-
-	int numGamepads;
+	void Cleanup();
 
 
 public:
+	Input();
+
 	~Input();
-	
-
-	inline static Input* GetInstance() { return Instance = (Instance != nullptr) ? Instance : new Input(); }
 
 
-	void InitialiseController();
-	
-	bool Update();
-	
-	bool ButtonPressed(Players controllerID, SDL_GameControllerButton button);
-	
-	bool ButtonHeld(Players controllerID, SDL_GameControllerButton button);
-	
-	float GetControllerAxis(Players controllerID, SDL_GameControllerAxis axis);
+	std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
 
-	bool IsControllerConnected(Players controllerID);
 
-	void Clean();
+	/******************************************************************************
+	 * Takes:
+	 * - SDL_Scancode for keyboard input.<br>\n
+	 * - SDL_GameControllerButton for controller input.
+	 * - Look at 'SDL_mouse.h' for mouse input. (it's just a bunch of macros)
+	 ******************************************************************************/
+	static bool IsButtonPressed(InputDeviceFlag deviceFlag, int button);
 
-	int GetControllersNumber() const;
+	/******************************************************************************
+	 * Takes:
+	 * - SDL_Scancode for keyboard input.<br>\n
+	 * - SDL_GameControllerButton for controller input.
+	 * - Look at 'SDL_mouse.h' for mouse input. (it's just a bunch of macros)
+	 ******************************************************************************/
+	static	bool IsButtonHeld(InputDeviceFlag deviceFlag, int button);
+
+	/******************************************************************************
+	 * Takes:
+	 * - SDL_Scancode for keyboard input.<br>\n
+	 * - SDL_GameControllerButton for controller input.
+	 * - Look at 'SDL_mouse.h' for mouse input. (it's just a bunch of macros)
+	 ******************************************************************************/
+	static float GetAxisValue(InputDeviceFlag deviceFlag, int axis);
+
+	static bool IsControllerConnected(InputDeviceFlag deviceFlag);
 };
-
-//Built on sousage factory games code
-//https://sausage-factory.games/dev-blog/easier-game-controller-input-in-sdl/

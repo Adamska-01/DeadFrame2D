@@ -4,9 +4,11 @@
 #include <UI/UIText.h>
 
 
-UIText::UIText(Fonts font, std::string text)
-	: font(font), Text(text)
+UIText::UIText(std::string fontPath, std::string text)
+	: Text(text)
 {
+	// TODO: Remove magic number (the parameter doesn't seem to make a difference, just make it constant)
+	font = UIManager::LoadFont(fontPath, 20);
 	texture = UpdateText("", 1);
 }
 
@@ -22,20 +24,20 @@ void UIText::Draw(Vector2 scale, bool center)
 			textRect.h 
 		};
 
-		UIManager::GetInstance()->DrawText(texture, dest, scale);
+		UIManager::DrawText(texture, dest, scale);
 
 #if _DEBUG
 		// TODO: Remove magic numbers
-		DrawTextBox(50, 80, 255, 255, dest);
+		UIManager::DrawDebugTextBox(50, 80, 255, 255, dest);
 #endif
 	}
 	else
 	{
 #if _DEBUG
 		// TODO: Remove magic numbers
-		DrawTextBox(50, 80, 255, 255, textRect);
+		UIManager::DrawDebugTextBox(50, 80, 255, 255, textRect);
 #endif
-		UIManager::GetInstance()->DrawText(texture, textRect, scale);
+		UIManager::DrawText(texture, textRect, scale);
 	}
 }
 
@@ -66,7 +68,7 @@ SDL_Texture* UIText::UpdateText(std::string newText, unsigned int numRows)
 
 	Text = newText;
 
-	texture = UIManager::GetInstance()->LoadText(font, Text, color, numRows);
+	texture = UIManager::LoadText(font.get(), Text, color, numRows);
 
 	SDL_QueryTexture(texture, NULL, NULL, &textRect.w, &textRect.h);
 
@@ -76,10 +78,4 @@ SDL_Texture* UIText::UpdateText(std::string newText, unsigned int numRows)
 SDL_Rect UIText::GetTextureDim()
 {
 	return textRect;
-}
-
-void UIText::DrawTextBox(Uint8 r, Uint8 g, Uint8 b, Uint8 a, SDL_Rect textRect)
-{
-	SDL_SetRenderDrawColor(Renderer::GetInstance()->GetRenderer(), r, g, b, a);
-	SDL_RenderDrawRect(Renderer::GetInstance()->GetRenderer(), &textRect);
 }

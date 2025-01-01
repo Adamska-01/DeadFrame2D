@@ -1,241 +1,200 @@
-#include <SDL.h>
-#include <SubSystems/Input.h>
+#include "SubSystems/Events/EventManager.h"
+#include "SubSystems/Input.h"
+#include <iostream>
 
 
-Input* Input::Instance = nullptr;
+std::unordered_map<InputDeviceFlag, InputState> Input::currentInputs = {};
+
+std::unordered_map<InputDeviceFlag, InputState> Input::lastInputs = {};
+
+std::vector<SDL_GameController*> Input::controllers = {};
 
 
 Input::Input()
 {
-	padHolder = nullptr;
-
-	Controllers.clear();
-	CurrentControllerInputs.clear();
-	LastControllerInputs.clear();
-	
-	numGamepads = 0;
-
 	if (SDL_WasInit(SDL_INIT_GAMECONTROLLER) == 0)
 	{
-		if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) != 0)
-		{
-			std::cerr << "Error initializing SDL GameController subsystem: " << SDL_GetError() << std::endl;
-		}
-
-		std::cout << "SDL GameController subsystem initialized successfully." << std::endl;
+		SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
 	}
+
+	EventManager::AddEventProcessor(this);
 }
 
 Input::~Input()
 {
-	Clean();
+	Cleanup();
 }
 
-void Input::InitialiseController()
+void Input::InitialiseControllers()
 {
-	auto nJoysticks = SDL_NumJoysticks();
-
-	numGamepads = 0;
-
-	// Count how many controllers there are
-	for (int i = 0; i < nJoysticks; i++)
+	for (auto i = 0; i < SDL_NumJoysticks(); i++)
 	{
-		if (SDL_IsGameController(i))
-		{
-			numGamepads++;
-		}
-	}
+		if (!SDL_IsGameController(i))
+			continue;
 
-	SDL_GameControllerEventState(SDL_ENABLE);
+		auto pad = SDL_GameControllerOpen(i);
+		if (pad == nullptr)
+			continue;
 
-	// Vectors are empty to begin with, this sets their size
-	Controllers.resize(numGamepads);
-	CurrentControllerInputs.resize(numGamepads);
-	LastControllerInputs.resize(numGamepads);
-
-	// Set the status of the controllers to "nothing is happening"
-	for (int i = 0; i < numGamepads; i++) 
-	{
-		for (int a = 0; a < SDL_CONTROLLER_AXIS_MAX; a++) 
-		{
-			CurrentControllerInputs[i].axis[a] = 0;
-			LastControllerInputs[i].axis[a] = 0;
-		}
-		for (int b = 0; b < SDL_CONTROLLER_BUTTON_MAX; b++) 
-		{
-			CurrentControllerInputs[i].buttons[b] = false;
-			LastControllerInputs[i].buttons[b] = false;
-		}
+		controllers.push_back(pad);
 	}
 }
 
-bool Input::Update()
+void Input::ProcessControllerEvents(const SDL_Event& controllerEvent)
 {
-	//copies the button states from the previous frame into “previous” list.
-	for (int i = 0; i < numGamepads; i++) 
-	{
-		for (int a = 0; a < SDL_CONTROLLER_AXIS_MAX; a++) 
-		{
-			LastControllerInputs[i].axis[a] = CurrentControllerInputs[i].axis[a];
-		}
-		for (int b = 0; b < SDL_CONTROLLER_BUTTON_MAX; b++) {
-			LastControllerInputs[i].buttons[b] = CurrentControllerInputs[i].buttons[b];
-		}
-	}
-
-	SDL_Event event;
-	while (SDL_PollEvent(&event))
-	{
-		switch (event.type) 
-		{
-			case SDL_QUIT:
-				return false;
-				break;
-
-				// This happens when a device is added
-			case SDL_CONTROLLERDEVICEADDED:
-#if _DEBUG
-				std::cout << "DEVICE ADDED = " << event.cdevice.which << std::endl;
-#endif
-				padHolder = SDL_GameControllerOpen(event.cdevice.which);
-
-				if (SDL_GameControllerGetAttached(padHolder) == 1)
-				{
-					Controllers.push_back(padHolder);
-					for (auto i = 0; i < Controllers.size(); i++)
-					{
-						if (Controllers[i] == nullptr)
-						{
-							Controllers.erase(Controllers.begin() + i);
-						}
-					}
-				}
-#if _DEBUG
-				else
-				{
-					fprintf(stderr, "Could not open controller: %s\n", SDL_GetError());
-				}
-#endif
-				InitialiseController();
-				break;
-
-				// If a controller button is pressed
-			case SDL_CONTROLLERBUTTONDOWN:
-				// Cycle through the controllers
-				for (auto i = 0; i < numGamepads; i++) 
-				{
-					// Looking for the button that was pressed
-					if (event.cbutton.which == SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(Controllers[i]))) 
-					{
-						// So the relevant state can be updated
-						CurrentControllerInputs[i].buttons[event.cbutton.button] = true;
-					}
-				}
-				break;
-
-				// Do the same for releasing a button
-			case SDL_CONTROLLERBUTTONUP:
-				for (int i = 0; i < numGamepads; i++) 
-				{
-					if (event.cbutton.which == SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(Controllers[i]))) 
-					{
-						CurrentControllerInputs[i].buttons[event.cbutton.button] = false;
-					}
-				}
-				break;
-
-				// And something similar for axis motion
-			case SDL_CONTROLLERAXISMOTION:
-				for (auto i = 0; i < numGamepads; i++) 
-				{
-					if (event.cbutton.which == SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(Controllers[i]))) 
-					{
-						CurrentControllerInputs[i].axis[event.caxis.axis] = event.caxis.value;
-					}
-				}
-				break;
-
-			case SDL_CONTROLLERDEVICEREMOVED:
-			{
-#if _DEBUG
-				std::cout << "DEVICE REMOVED = " << event.cdevice.which << std::endl;
-#endif
-				SDL_Joystick* joystickToRemove = SDL_JoystickFromInstanceID(event.cdevice.which);
-
-				// Loop thorugh the vector with the controllers
-				for (int i = 0; i < Controllers.size(); i++)
-				{
-					if (SDL_GameControllerGetJoystick(Controllers[i]) == joystickToRemove)
-					{
-						SDL_GameControllerClose(Controllers[i]);
-					}
-				}
-
-				InitialiseController();
-			}
-			break;
-		}
-	}
-
-	return true;
-}
-
-bool Input::ButtonPressed(Players controllerID, SDL_GameControllerButton button)
-{
-	if (!IsControllerConnected(controllerID))
-		return false;
-
-	if (controllerID < 0 || controllerID > numGamepads)
-		return false;
-
-	return CurrentControllerInputs[controllerID].buttons[button] && !LastControllerInputs[controllerID].buttons[button];
-}
-
-bool Input::ButtonHeld(Players controllerID, SDL_GameControllerButton button)
-{
-	if (!IsControllerConnected(controllerID))
-		return false;
-
-	if (controllerID < 0 || controllerID > numGamepads)
-		return false;
-
-	return CurrentControllerInputs[controllerID].buttons[button] && LastControllerInputs[controllerID].buttons[button];
-}
-
-float Input::GetControllerAxis(Players controllerID, SDL_GameControllerAxis axis)
-{
-	if (!IsControllerConnected(controllerID))
-		return 0.0;
-
-	if (controllerID < 0 || controllerID > numGamepads)
-		return 0.0;
-
-	return CurrentControllerInputs[controllerID].axis[axis] / 32768.0f;
-}
-
-bool Input::IsControllerConnected(Players controllerID)
-{
-	if (Controllers.size() > controllerID && SDL_GameControllerGetAttached(Controllers[controllerID]) == 1)
-		return true;
-
-	return false;
-}
-
-void Input::Clean()
-{
-	auto controllerSize = Controllers.size();
-
-	if (Controllers.size() <= 0)
+	if (controllers.size() > controllerEvent.cdevice.which)
 		return;
 
-	for (int i = 0; i < Controllers.size(); i++)
+	auto deviceID = static_cast<InputDeviceFlag>(InputDeviceFlag::DEVICE_CONTROLLER_1 << controllerEvent.cdevice.which);
+	auto& state = currentInputs[deviceID];
+
+	switch (controllerEvent.type)
 	{
-		SDL_GameControllerClose(Controllers[i]);
-		Controllers[i] = nullptr;
+	case SDL_CONTROLLERBUTTONDOWN:
+		state.buttons[controllerEvent.cbutton.button] = true;
+		break;
+
+	case SDL_CONTROLLERBUTTONUP:
+		state.buttons[controllerEvent.cbutton.button] = false;
+		break;
+
+	case SDL_CONTROLLERAXISMOTION:
+		state.axes[controllerEvent.caxis.axis] = controllerEvent.caxis.value / 32768.0f;
+		break;
+
+	default:
+		break;
 	}
 }
 
-int Input::GetControllersNumber() const
-{ 
-	return numGamepads; 
+void Input::ProcessKeyboardEvents(const SDL_Event& keyboardEvent)
+{
+	auto& state = currentInputs[InputDeviceFlag::DEVICE_KEYBOARD];
+
+	switch (keyboardEvent.type)
+	{
+	case SDL_KEYDOWN:
+		state.buttons[keyboardEvent.key.keysym.scancode] = true;
+		break;
+
+	case SDL_KEYUP:
+		state.buttons[keyboardEvent.key.keysym.scancode] = false;
+		break;
+
+	default:
+		break;
+	}
+}
+
+void Input::ProcessMouseEvents(const SDL_Event& mouseEvent)
+{
+	auto& state = currentInputs[InputDeviceFlag::DEVICE_MOUSE];
+
+	switch (mouseEvent.type)
+	{
+	case SDL_MOUSEBUTTONDOWN:
+		state.buttons[mouseEvent.button.button] = true;
+		break;
+
+	case SDL_MOUSEBUTTONUP:
+		state.buttons[mouseEvent.button.button] = false;
+		break;
+
+	case SDL_MOUSEMOTION:
+		state.axes[SDL_CONTROLLER_AXIS_LEFTX] = mouseEvent.motion.xrel;
+		state.axes[SDL_CONTROLLER_AXIS_LEFTY] = mouseEvent.motion.yrel;
+		break;
+
+	default:
+		break;
+	}
+}
+
+bool Input::IsDeviceValid(InputDeviceFlag deviceFlag)
+{
+	return currentInputs.find(deviceFlag) != currentInputs.end();
+}
+
+void Input::Cleanup()
+{
+	for (auto controller : controllers)
+	{
+		SDL_GameControllerClose(controller);
+	}
+
+	controllers.clear();
+
+	SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
+}
+
+std::optional<int> Input::ProcessEvents(const SDL_Event& sdlEvent)
+{
+	switch (sdlEvent.type)
+	{
+	case SDL_CONTROLLERBUTTONDOWN:
+	case SDL_CONTROLLERBUTTONUP:
+	case SDL_CONTROLLERAXISMOTION:
+		lastInputs = currentInputs;
+		ProcessControllerEvents(sdlEvent);
+		break;
+
+	case SDL_KEYDOWN:
+	case SDL_KEYUP:
+		lastInputs = currentInputs;
+		ProcessKeyboardEvents(sdlEvent);
+		break;
+
+	case SDL_MOUSEBUTTONDOWN:
+	case SDL_MOUSEBUTTONUP:
+	case SDL_MOUSEMOTION:
+		lastInputs = currentInputs;
+		ProcessMouseEvents(sdlEvent);
+		break;
+
+	case SDL_CONTROLLERDEVICEADDED:
+	case SDL_CONTROLLERDEVICEREMOVED:
+		Cleanup();
+		InitialiseControllers();
+		break;
+	}
+
+	return std::nullopt;
+}
+
+bool Input::IsButtonPressed(InputDeviceFlag deviceFlag, int button)
+{
+	if (!IsDeviceValid(deviceFlag))
+		return false;
+
+	return currentInputs[deviceFlag].buttons[button] && !lastInputs[deviceFlag].buttons[button];
+}
+
+bool Input::IsButtonHeld(InputDeviceFlag deviceFlag, int button)
+{
+	if (!IsDeviceValid(deviceFlag))
+		return false;
+
+	return currentInputs[deviceFlag].buttons[button];
+}
+
+float Input::GetAxisValue(InputDeviceFlag deviceFlag, int axis)
+{
+	if (!IsDeviceValid(deviceFlag))
+		return 0.0f;
+
+	return currentInputs[deviceFlag].axes[axis];
+}
+
+bool Input::IsControllerConnected(InputDeviceFlag deviceFlag)
+{
+	if (deviceFlag < InputDeviceFlag::DEVICE_CONTROLLER_1 || deviceFlag > InputDeviceFlag::DEVICE_CONTROLLER_4)
+	{
+		std::cerr << "Invalid device flag: " << deviceFlag << std::endl;
+		return false;
+	}
+
+	// Calculate the controller index based on the flag (Normalize)
+	auto controllerIndex = static_cast<int>(log2(deviceFlag >> 2));
+
+	return controllerIndex >= 0 && controllerIndex < controllers.size() && SDL_GameControllerGetAttached(controllers[controllerIndex]);
 }

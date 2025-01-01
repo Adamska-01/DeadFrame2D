@@ -65,7 +65,7 @@ void SpriteAnimator::Draw()
 	dstRect.x = round(transform->position.x - ((float)dstRect.h * transform->scale.y) / 2);
 	dstRect.y = round(transform->position.y - ((float)dstRect.h * transform->scale.y) / 2);
 
-	TextureManager::GetInstance()->DrawFrame(spriteTexture, dstRect, transform->scale, animationProperties.sourceRowNumber, spriteFrame, animationProperties.flip);
+	TextureManager::DrawFrame(spriteTexture, dstRect, transform->scale, animationProperties.sourceRowNumber, spriteFrame, animationProperties.flip);
 }
 
 void SpriteAnimator::SetProp(bool repeat, int row, int frameCount, int rowCount, int speed, SDL_RendererFlip flip)

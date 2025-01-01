@@ -1,39 +1,43 @@
 #include <Debugging/Debug.h>
 #include <Math/Vector2.h>
 #include <SubSystems/Renderer.h>
-#include <SubSystems/UIManager.h>
 #include <SubSystems/TextureManager.h>
+#include <SubSystems/UIManager.h>
 
 
-UIManager* UIManager::Instance = nullptr;
+std::unordered_map<std::pair<std::string, int>, std::shared_ptr<TTF_Font>, PairHash> UIManager::fontCache = {};
 
 
-UIManager::UIManager()
+std::shared_ptr<TTF_Font> UIManager::LoadFont(std::string textPath, int fontsize)
 {
-	if (TTF_Init() < 0)
-	{
-		std::cerr << "Failed to initialize SDL_ttf: " << SDL_GetError() << std::endl;
-	}
-};
+	// Check if the font is already cached
+	auto key = std::make_pair(textPath, fontsize);
+	auto it = fontCache.find(key);
+	
+	if (it != fontCache.end()) 
+		return it->second;
 
-bool UIManager::LoadFont(Fonts id, std::string textPath, int fontsize)
-{
-	fontList[id] = TTF_OpenFont(textPath.c_str(), fontsize);
+	// If the font is not in the cache, load it from the file
+	auto font = std::shared_ptr<TTF_Font>(TTF_OpenFont(textPath.c_str(), fontsize), TTF_CloseFont);
 
+	// Check if the font loaded successfully
 #if _DEBUG
-		DBG_ASSERT_MSG(fontList[id], "Failed to load the text: % s\n", TTF_GetError());
+		DBG_ASSERT_MSG(font, "Failed to load the font: %s\n", TTF_GetError());
 #endif
 
-	return true;
+	// Store the font in the cache (shared_ptr automatically manages the memory)
+	fontCache[key] = font;
+
+	return font;
 }
 
-SDL_Texture* UIManager::LoadText(Fonts font, std::string text, SDL_Color color, unsigned int numRows)
+SDL_Texture* UIManager::LoadText(TTF_Font* font, std::string text, SDL_Color color, unsigned int numRows)
 {
 	if (text.empty())
 		return nullptr;
 
 	auto totalWidth = 0, totalHeight = 0;
-	if (TTF_SizeText(fontList[font], text.c_str(), &totalWidth, &totalHeight) != 0)
+	if (TTF_SizeText(font, text.c_str(), &totalWidth, &totalHeight) != 0)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to calculate text size: %s", TTF_GetError());
 		return nullptr;
@@ -43,13 +47,13 @@ SDL_Texture* UIManager::LoadText(Fonts font, std::string text, SDL_Color color, 
 
 	wrapSize = wrapSize > 0 ? wrapSize : 1;
 
-	auto textSurface = TTF_RenderText_Blended_Wrapped(fontList[font], text.c_str(), color, wrapSize);
+	auto textSurface = TTF_RenderText_Blended_Wrapped(font, text.c_str(), color, wrapSize);
 
 #if _DEBUG
 	DBG_ASSERT_MSG(textSurface, "Failed to load the texture: % s\n", TTF_GetError());
 #endif
 
-	auto textTexture = SDL_CreateTextureFromSurface(Renderer::GetInstance()->GetRenderer(), textSurface);
+	auto textTexture = SDL_CreateTextureFromSurface(Renderer::GetRenderer(), textSurface);
 
 #if _DEBUG
 	DBG_ASSERT_MSG(textTexture, "Failed to create the texture: % s\n", TTF_GetError());
@@ -66,26 +70,11 @@ void UIManager::DrawText(SDL_Texture* texture, SDL_Rect dest, Vector2 scale)
 {
 	SDL_Rect destRect = { dest.x, dest.y, dest.w * scale.x, dest.h * scale.y };
 
-	SDL_RenderCopy(Renderer::GetInstance()->GetRenderer(), texture, NULL, &destRect);
+	SDL_RenderCopy(Renderer::GetRenderer(), texture, NULL, &destRect);
 }
 
-void UIManager::Clean()
+void UIManager::DrawDebugTextBox(Uint8 r, Uint8 g, Uint8 b, Uint8 a, SDL_Rect textRect)
 {
-	for (auto it = fontList.begin(); it != fontList.end(); it++)
-	{
-		TTF_CloseFont(it->second);
-	}
-
-	fontList.clear();
-
-#if _DEBUG
-	DBG_ASSERT_MSG_EMPTY(fontList.size(), "DEBUG_MSG: FontList cleaned! \n");
-#endif
-
-	TTF_Quit();
-}
-
-const std::map<Fonts, TTF_Font*>& UIManager::GetFontList() 
-{ 
-	return fontList;
+	SDL_SetRenderDrawColor(Renderer::GetRenderer(), r, g, b, a);
+	SDL_RenderDrawRect(Renderer::GetRenderer(), &textRect);
 }

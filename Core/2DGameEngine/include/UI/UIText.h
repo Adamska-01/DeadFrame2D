@@ -12,7 +12,7 @@ class UIText
 private:
 	SDL_Texture* texture;
 	
-	Fonts font;
+	std::shared_ptr<TTF_Font> font;
 
 	std::string Text;
 	
@@ -22,7 +22,7 @@ private:
 
 
 public:
-	UIText(Fonts font, std::string text);
+	UIText(std::string fontPath, std::string text);
 	
 	~UIText() = default;
 
@@ -38,6 +38,4 @@ public:
 	SDL_Texture* UpdateText(std::string newText, unsigned int numRows);
 
 	SDL_Rect GetTextureDim();
-
-	void DrawTextBox(Uint8 r, Uint8 g, Uint8 b, Uint8 a, SDL_Rect textRect);
 };
