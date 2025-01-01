@@ -13,11 +13,11 @@ private:
 	BobbleColor color;
 
 
-	void Bounce(Vector2 Normal);
+	void Bounce(Vector2F Normal);
 
 
 public:
-	Bobble(Vector2 startPos, BobbleColor color);
+	Bobble(Vector2F startPos, BobbleColor color);
 
 	~Bobble();
 
