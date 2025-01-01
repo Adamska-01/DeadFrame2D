@@ -1,44 +1,27 @@
 #pragma once
+#include <SubSystems/Events/EventManager.h>
 #include <Utility/FrameTimer.h>
 #include <vector>
 
 
-class UIText;
-class Map;
-class Background;
-class Cannon;
-struct SDL_Texture;
+class SubSystems;
 
 
 class Application
 {
 private:
-	bool running{ false };
+	SubSystems* engineSubSystems;
 
-	bool gameover{ false };
-	
-	bool twoPlayers{ false };
-
-	std::vector<Cannon*> cannon{ nullptr };
-
-	Map* map{ nullptr };
-
-	Background* menuBackground;
-
-	UIText* FPSText;
-	
-	UIText* gameOverText;
+	EventManager eventManager;
 
 	FrameTimer ft;
 
 
-	void MenuUpdate();
-	
-	void Quit();
-	
-	void Destroy();
-	
-	SDL_Texture* EndGameFadeTexture();
+	void Update();
+
+	void Draw();
+
+	void Clean();
 
 
 public:
@@ -47,5 +30,5 @@ public:
 	~Application();
 
 
-	void Update();
+	int Run();
 };
