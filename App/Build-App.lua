@@ -13,10 +13,10 @@ project "App"
 		"include",
 		"../Core/2DGameEngine/include",
 		-- There are a lot of useful sdl structs/classes that the app could use
-		"../Core/SDL/SDL2-2.30.10/include",
-		"../Core/SDL/SDL2_image-2.8.2/include",
-		"../Core/SDL/SDL2_ttf-2.22.0/include",
-		"../Core/SDL/SDL2_mixer-2.8.0/include"
+		"../Core/Dependencies/SDL/SDL2-2.30.10/include",
+		"../Core/Dependencies/SDL/SDL2_image-2.8.2/include",
+		"../Core/Dependencies/SDL/SDL2_ttf-2.22.0/include",
+		"../Core/Dependencies/SDL/SDL2_mixer-2.8.0/include"
 	}
 
 	links

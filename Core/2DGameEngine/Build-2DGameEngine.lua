@@ -20,10 +20,11 @@ project "2DGameEngine"
     includedirs 
     { 
         "include",
-        "../SDL/SDL2-2.30.10/include", 
-        "../SDL/SDL2_image-2.8.2/include", 
-        "../SDL/SDL2_ttf-2.22.0/include", 
-        "../SDL/SDL2_mixer-2.8.0/include" 
+        "../Dependencies/tinyxml2-10.0.0", 
+        "../Dependencies/SDL/SDL2-2.30.10/include", 
+        "../Dependencies/SDL/SDL2_image-2.8.2/include", 
+        "../Dependencies/SDL/SDL2_ttf-2.22.0/include", 
+        "../Dependencies/SDL/SDL2_mixer-2.8.0/include" 
     }
     
      -- Link libraries and set libdirs based on architecture
@@ -31,36 +32,36 @@ project "2DGameEngine"
 		links(sdl_libs)
         libdirs 
         { 
-            "../SDL/SDL2-2.30.10/lib/x86", 
-            "../SDL/SDL2_image-2.8.2/lib/x86", 
-            "../SDL/SDL2_ttf-2.22.0/lib/x86", 
-            "../SDL/SDL2_mixer-2.8.0/lib/x86" 
+            "../Dependencies/SDL/SDL2-2.30.10/lib/x86", 
+            "../Dependencies/SDL/SDL2_image-2.8.2/lib/x86", 
+            "../Dependencies/SDL/SDL2_ttf-2.22.0/lib/x86", 
+            "../Dependencies/SDL/SDL2_mixer-2.8.0/lib/x86" 
         }
         postbuildcommands
         {
             "{MKDIR} ../../Binaries/" .. OutputDir .. "/App/",
-            "{COPY} ../SDL/SDL2-2.30.10/lib/x86/*.dll ../../Binaries/" .. OutputDir .. "/App/",
-            "{COPY} ../SDL/SDL2_image-2.8.2/lib/x86/*.dll ../../Binaries/" .. OutputDir .. "/App/",
-            "{COPY} ../SDL/SDL2_ttf-2.22.0/lib/x86/*.dll ../../Binaries/" .. OutputDir .. "/App/",
-            "{COPY} ../SDL/SDL2_mixer-2.8.0/lib/x86/*.dll ../../Binaries/" .. OutputDir .. "/App/"
+            "{COPY} ../Dependencies/SDL/SDL2-2.30.10/lib/x86/*.dll ../../Binaries/" .. OutputDir .. "/App/",
+            "{COPY} ../Dependencies/SDL/SDL2_image-2.8.2/lib/x86/*.dll ../../Binaries/" .. OutputDir .. "/App/",
+            "{COPY} ../Dependencies/SDL/SDL2_ttf-2.22.0/lib/x86/*.dll ../../Binaries/" .. OutputDir .. "/App/",
+            "{COPY} ../Dependencies/SDL/SDL2_mixer-2.8.0/lib/x86/*.dll ../../Binaries/" .. OutputDir .. "/App/"
         }
 
     filter "platforms:x64"
 		links(sdl_libs)
         libdirs 
         { 
-            "../SDL/SDL2-2.30.10/lib/x64", 
-            "../SDL/SDL2_image-2.8.2/lib/x64", 
-            "../SDL/SDL2_ttf-2.22.0/lib/x64", 
-            "../SDL/SDL2_mixer-2.8.0/lib/x64" 
+            "../Dependencies/SDL/SDL2-2.30.10/lib/x64", 
+            "../Dependencies/SDL/SDL2_image-2.8.2/lib/x64", 
+            "../Dependencies/SDL/SDL2_ttf-2.22.0/lib/x64", 
+            "../Dependencies/SDL/SDL2_mixer-2.8.0/lib/x64" 
         }
         postbuildcommands
         {
 			"{MKDIR} ../../Binaries/" .. OutputDir .. "/App/",
-			"{COPY} ../SDL/SDL2-2.30.10/lib/x64/*.dll ../../Binaries/" .. OutputDir .. "/App/",
-			"{COPY} ../SDL/SDL2_image-2.8.2/lib/x64/*.dll ../../Binaries/" .. OutputDir .. "/App/",
-			"{COPY} ../SDL/SDL2_ttf-2.22.0/lib/x64/*.dll ../../Binaries/" .. OutputDir .. "/App/",
-			"{COPY} ../SDL/SDL2_mixer-2.8.0/lib/x64/*.dll ../../Binaries/" .. OutputDir .. "/App/"
+			"{COPY} ../Dependencies/SDL/SDL2-2.30.10/lib/x64/*.dll ../../Binaries/" .. OutputDir .. "/App/",
+			"{COPY} ../Dependencies/SDL/SDL2_image-2.8.2/lib/x64/*.dll ../../Binaries/" .. OutputDir .. "/App/",
+			"{COPY} ../Dependencies/SDL/SDL2_ttf-2.22.0/lib/x64/*.dll ../../Binaries/" .. OutputDir .. "/App/",
+			"{COPY} ../Dependencies/SDL/SDL2_mixer-2.8.0/lib/x64/*.dll ../../Binaries/" .. OutputDir .. "/App/"
         }
 
     -- Reset filter to avoid affecting future configurations
