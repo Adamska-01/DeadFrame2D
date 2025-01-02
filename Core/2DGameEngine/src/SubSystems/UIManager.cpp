@@ -8,6 +8,27 @@
 std::unordered_map<std::pair<std::string, int>, std::shared_ptr<TTF_Font>, PairHash> UIManager::fontCache = {};
 
 
+UIManager::UIManager()
+{
+	if (TTF_Init() < 0)
+	{
+		std::cerr << "Failed to initialize SDL_TTF: " << SDL_GetError() << std::endl;
+
+		return;
+	}
+
+	std::cout << "[Info] SDL_TTF successfully initialized." << std::endl;
+}
+
+UIManager::~UIManager()
+{
+	fontCache.clear();
+
+	TTF_Quit();
+
+	std::cout << "[Info] SDL_TTF subsystem successfully quit." << std::endl;
+}
+
 std::shared_ptr<TTF_Font> UIManager::LoadFont(std::string textPath, int fontsize)
 {
 	// Check if the font is already cached

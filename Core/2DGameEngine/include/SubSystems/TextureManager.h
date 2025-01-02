@@ -7,8 +7,13 @@
 
 class TextureManager
 {
+	friend class SubSystems;
+
+
 private:
-	TextureManager() = default;
+	TextureManager();
+
+	~TextureManager();
 
 	TextureManager(const TextureManager&) = delete;
 

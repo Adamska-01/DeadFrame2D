@@ -6,8 +6,13 @@
 
 class AudioManager
 {
+	friend class SubSystems;
+
+
 private:
-	AudioManager() = default;
+	AudioManager();
+
+	~AudioManager();
 
 	AudioManager(const AudioManager&) = delete;
 

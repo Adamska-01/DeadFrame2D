@@ -23,15 +23,23 @@ Window::Window(int width, int height, const char* title)
 	DBG_ASSERT_MSG(window, "Window initialisation failed: %s\n", SDL_GetError());
 #endif
 
+	std::cout << "[Info] Window successfully initialized." << std::endl;
+
 	EventManager::AddEventProcessor(this);
 }
 
 Window::~Window()
 {
-	if (window == nullptr)
+	if (window == nullptr) 
+	{
+		std::cout << "[Info] Window is already nullptr, nothing to destroy." << std::endl;
+
 		return;
+	}
 
 	SDL_DestroyWindow(window);
+	
+	std::cout << "[Info] Window successfully destroyed." << std::endl;
 }
 
 std::optional<int> Window::ProcessEvents(const SDL_Event& sdlEvent)

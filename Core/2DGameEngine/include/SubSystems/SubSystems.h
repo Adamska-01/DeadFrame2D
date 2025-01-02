@@ -4,20 +4,29 @@
 class Window;
 class Renderer;
 class Input;
+class UIManager;
+class TextureManager;
+class AudioManager;
 
 
 class SubSystems
 {
 private:
-	static Window* window;
+	Window* window;
 
-	static Renderer* renderer;
+	Renderer* renderer;
 
-	static Input* input;
+	Input* input;
+
+	UIManager* uiManager;
+
+	TextureManager* textureManager;
+
+	AudioManager* audioManager;
 
 
 public:
-	SubSystems() = default;
+	SubSystems();
 	
 	~SubSystems();
 

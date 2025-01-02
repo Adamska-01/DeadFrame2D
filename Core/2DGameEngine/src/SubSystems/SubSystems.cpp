@@ -1,7 +1,10 @@
 #include "Constants/ScreenConstants.h"
+#include "SubSystems/AudioManager.h"
 #include "SubSystems/Input.h"
 #include "SubSystems/Renderer.h"
 #include "SubSystems/SubSystems.h"
+#include "SubSystems/TextureManager.h"
+#include "SubSystems/UIManager.h"
 #include "SubSystems/Window.h"
 #include <SDL.h>
 #include <SDL_image.h>
@@ -9,12 +12,15 @@
 #include <SDL_ttf.h>
 
 
-Window* SubSystems::window = nullptr;
-
-Renderer* SubSystems::renderer = nullptr;
-
-Input* SubSystems::input = nullptr;
-
+SubSystems::SubSystems()
+{
+	renderer = nullptr;
+	window = nullptr;
+	input = nullptr;
+	textureManager = nullptr;
+	uiManager = nullptr;
+	audioManager = nullptr;
+}
 
 SubSystems::~SubSystems()
 {
@@ -27,14 +33,20 @@ SubSystems::~SubSystems()
 	delete input;
 	input = nullptr;
 
-	SDL_Quit();
-	IMG_Quit();
-	TTF_Quit();
-	Mix_CloseAudio();
+	delete textureManager;
+	textureManager = nullptr;
+
+	delete uiManager;
+	uiManager = nullptr;
+
+	delete audioManager;
+	audioManager = nullptr;
 }
 
 void SubSystems::InitializeSubSystems()
 {
+	// TODO: Create a config file to set the default values for window and renderer 
+
 	window = new Window(
 		ScreenConstants::DEFAULT_SCREENWIDTH,
 		ScreenConstants::DEFAULT_SCREENHEIGHT,
@@ -44,22 +56,9 @@ void SubSystems::InitializeSubSystems()
 
 	input = new Input();
 
-	// SDL_Image
-	auto initFlags = IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
-	if ((initFlags & (IMG_INIT_PNG | IMG_INIT_JPG)) != (IMG_INIT_PNG | IMG_INIT_JPG))
-	{
-		std::cerr << "Failed to initialize SDL_image with PNG/JPG support! Error: " << IMG_GetError() << std::endl;
-	}
+	textureManager = new TextureManager();
 
-	// SDL_TTF
-	if (TTF_Init() < 0)
-	{
-		std::cerr << "Failed to initialize SDL_ttf: " << SDL_GetError() << std::endl;
-	}
+	uiManager = new UIManager();
 
-	// SDL_Mixer
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 512) < 0)
-	{
-		std::cerr << "SDL_Mixer could not initialize! SDL_mixer Error: " << Mix_GetError() << std::endl;
-	}
+	audioManager = new AudioManager();
 }

@@ -9,8 +9,13 @@ struct SDL_Texture;
 
 class UIManager
 {
+	friend class SubSystems;
+
+
 private:
-	UIManager() = default;
+	UIManager();
+
+	~UIManager();
 
 	UIManager(const UIManager&) = delete;
 	

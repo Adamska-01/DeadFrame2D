@@ -8,16 +8,28 @@ struct SDL_Renderer;
 
 class Renderer
 {
+	friend class SubSystems;
+
+
 private:
-	static SDL_Renderer* renderer;
-
-
-public:
 	Renderer(SDL_Window* window);
 
 	~Renderer();
 
-	
+	Renderer(const Renderer&) = delete;
+
+	Renderer(Renderer&&) = delete;
+
+
+	Renderer& operator=(const Renderer&) = delete;
+
+	Renderer& operator=(Renderer&&) = delete;
+
+
+	static SDL_Renderer* renderer;
+
+
+public:
 	static void ClearBuffer();
 	
 	static void PresentBuffer();

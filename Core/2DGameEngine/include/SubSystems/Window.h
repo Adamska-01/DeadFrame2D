@@ -8,16 +8,28 @@
 
 class Window : public IEventProcessor
 {
-private:
-	static SDL_Window* window;
-	
+	friend class SubSystems;
 
-public:
+
+private:
 	Window(int width, int height, const char* title);
 
 	~Window();
 
+	Window(const Window&) = delete;
 
+	Window(Window&&) = delete;
+
+
+	Window& operator=(const Window&) = delete;
+
+	Window& operator=(Window&&) = delete;
+
+
+	static SDL_Window* window;
+	
+
+public:
 	std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
 
 

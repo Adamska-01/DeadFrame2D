@@ -17,7 +17,7 @@ Renderer::Renderer(SDL_Window* window)
 	//startup
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
-		SDL_Log("Failed to Initialize SDL_VIDEO: %s\n", SDL_GetError());
+		std::cerr << "Failed to Initialize SDL_VIDEO: " << SDL_GetError() << std::endl;
 	}
 
 	//create the renderer
@@ -31,14 +31,24 @@ Renderer::Renderer(SDL_Window* window)
 #endif
 
 	SetResolutionTarget({ ScreenConstants::DEFAULT_RENDERER_X_SIZE, ScreenConstants::DEFAULT_RENDERER_Y_SIZE });
+
+	std::cout << "[Info] SDL_VIDEO successfully initialized." << std::endl;
 }
 
 Renderer::~Renderer()
 {
-	if (renderer == nullptr)
+	if (renderer == nullptr) 
+	{
+		std::cout << "[Info] Renderer is already null, no need to destroy." << std::endl;
+	
 		return;
+	}
 
 	SDL_DestroyRenderer(renderer);
+
+	SDL_Quit();
+
+	std::cout << "[Info] Renderer successfully destroyed and SDL_VIDEO successfully quit." << std::endl;
 }
 
 void Renderer::ClearBuffer()

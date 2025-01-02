@@ -12,9 +12,20 @@ std::vector<SDL_GameController*> Input::controllers = {};
 
 Input::Input()
 {
-	if (SDL_WasInit(SDL_INIT_GAMECONTROLLER) == 0)
+	if (SDL_WasInit(SDL_INIT_GAMECONTROLLER) == 0) 
 	{
-		SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
+		if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) < 0) 
+		{
+			std::cerr << "[Error] Failed to initialize SDL_GAMECONTROLLER subsystem: " << SDL_GetError() << std::endl;
+			
+			return;
+		}
+
+		std::cout << "[Info] SDL_GAMECONTROLLER subsystem successfully initialized." << std::endl;
+	}
+	else 
+	{
+		std::cout << "[Info] SDL_GAMECONTROLLER subsystem already initialized." << std::endl;
 	}
 
 	EventManager::AddEventProcessor(this);
@@ -23,6 +34,17 @@ Input::Input()
 Input::~Input()
 {
 	Cleanup();
+
+	if (SDL_WasInit(SDL_INIT_GAMECONTROLLER) != 0) 
+	{
+		SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
+	
+		std::cout << "[Info] SDL_GAMECONTROLLER subsystem successfully shut down." << std::endl;
+	}
+	else 
+	{
+		std::cout << "[Info] SDL_GAMECONTROLLER subsystem was not initialized, no need to shut down." << std::endl;
+	}
 }
 
 void Input::InitialiseControllers()
@@ -123,8 +145,6 @@ void Input::Cleanup()
 	}
 
 	controllers.clear();
-
-	SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
 }
 
 std::optional<int> Input::ProcessEvents(const SDL_Event& sdlEvent)

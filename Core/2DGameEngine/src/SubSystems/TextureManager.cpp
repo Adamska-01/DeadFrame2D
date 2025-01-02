@@ -7,6 +7,29 @@
 #include <sstream>
 
 
+TextureManager::TextureManager()
+{
+	auto initFlags = IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
+	if ((initFlags & (IMG_INIT_PNG | IMG_INIT_JPG)) != (IMG_INIT_PNG | IMG_INIT_JPG))
+	{
+		std::cerr << "Failed to initialize SDL_image with PNG/JPG support! Error: " << IMG_GetError() << std::endl;
+
+		return;
+	}
+
+	std::cout << "[Info] SDL_image successfully initialized." << std::endl;
+}
+
+TextureManager::~TextureManager()
+{
+	// TODO: Implementing a texture cache is a good idea (std::map<string, std::shared_ptr<SDL_Texture>> textureCache)
+	// textureCache.clear();
+
+	IMG_Quit();
+
+	std::cout << "[Info] SDL_image subsystem successfully quit." << std::endl;
+}
+
 SDL_Texture* TextureManager::LoadTexture(std::string filename)
 {
 	auto tempSurface = IMG_Load(filename.c_str());

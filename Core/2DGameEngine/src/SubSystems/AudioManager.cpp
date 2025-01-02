@@ -2,6 +2,27 @@
 #include <SubSystems/AudioManager.h>
 
 
+AudioManager::AudioManager()
+{
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 512) < 0)
+	{
+		std::cerr << "SDL_Mixer could not initialize! SDL_mixer Error: " << Mix_GetError() << std::endl;
+
+		return;
+	}
+
+	std::cout << "[Info] SDL_Mixer successfully initialized." << std::endl;
+}
+
+AudioManager::~AudioManager()
+{
+	// TODO: Implementing a music/sfx cache is a good idea (use shared_ptr)
+
+	Mix_CloseAudio();
+
+	std::cout << "[Info] SDL_Mixer subsystem successfully quit." << std::endl;
+}
+
 Mix_Music* AudioManager::LoadMusic(const char* filepath)
 {
 	auto music = Mix_LoadMUS(filepath);
