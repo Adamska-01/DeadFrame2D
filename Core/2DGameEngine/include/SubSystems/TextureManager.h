@@ -3,6 +3,7 @@
 #include <Math/Vector2.h>
 #include <SDL_image.h>
 #include <string>
+#include <unordered_map>
 
 
 class TextureManager
@@ -25,8 +26,11 @@ private:
 	TextureManager& operator=(TextureManager&&) = delete;
 
 
+	static std::unordered_map<std::string, std::weak_ptr<SDL_Texture>> textureCache;
+
+
 public:
-	static SDL_Texture* LoadTexture(std::string filename);
+	static std::shared_ptr<SDL_Texture> LoadTexture(std::string filename);
 
 	static void NormalDraw(SDL_Texture* texture);
 	

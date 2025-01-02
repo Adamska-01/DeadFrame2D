@@ -1,7 +1,8 @@
 #pragma once
 #include "GameComponent.h"
-#include <string>
+#include <memory>
 #include <SDL.h>
+#include <string>
 
 
 class Transform;
@@ -11,7 +12,7 @@ struct SDL_Texture;
 class Sprite : public GameComponent
 {
 private :
-	SDL_Texture* spriteTexture;
+	std::shared_ptr<SDL_Texture> spriteTexture;
 
 	Transform* transform;
 

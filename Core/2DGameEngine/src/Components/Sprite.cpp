@@ -8,7 +8,6 @@
 
 Sprite::Sprite(std::string texturePath)
 {
-	spriteTexture = nullptr;
 	transform = nullptr;
 	destRect = { 0, 0, 0, 0 };
 
@@ -37,7 +36,7 @@ void Sprite::Draw()
 	if (!enableDraw)
 		return;
 
-	TextureManager::Draw(spriteTexture, destRect, transform->scale);
+	TextureManager::Draw(spriteTexture.get(), destRect, transform->scale);
 
 #if _DEBUG //Prints the bobble's radius (line)
 	//Vector2 norm(transform->position.x + circleCollider.GetCircle().radius * cos(5 * MathConstants::PI / 3), transform->position.y + circleCollider.GetCircle().radius * sin(5 * MathConstants::PI / 3));
@@ -51,19 +50,14 @@ void Sprite::LoadSprite(std::string texturePath)
 
 	spriteTexture = TextureManager::LoadTexture(texturePath);
 
-	SDL_QueryTexture(spriteTexture, NULL, NULL, &destRect.w, &destRect.h);
+	SDL_QueryTexture(spriteTexture.get(), NULL, NULL, &destRect.w, &destRect.h);
 }
 
 SDL_Texture* Sprite::GetTexture()
 {
-	return spriteTexture;
+	return spriteTexture.get();
 }
 
 void Sprite::Clean()
 {
-	if (spriteTexture == nullptr)
-		return;
-
-	SDL_DestroyTexture(spriteTexture);
-	spriteTexture = nullptr;
 }

@@ -3,8 +3,12 @@
 #include <Debugging/Debug.h>
 #include <fstream>
 #include <Math/Vector2.h>
+#include <memory>
 #include <SDL_ttf.h>
 #include <sstream>
+
+
+std::unordered_map<std::string, std::weak_ptr<SDL_Texture>> TextureManager::textureCache = {};
 
 
 TextureManager::TextureManager()
@@ -22,16 +26,23 @@ TextureManager::TextureManager()
 
 TextureManager::~TextureManager()
 {
-	// TODO: Implementing a texture cache is a good idea (std::map<string, std::shared_ptr<SDL_Texture>> textureCache)
-	// textureCache.clear();
+	textureCache.clear();
 
 	IMG_Quit();
 
 	std::cout << "[Info] SDL_image subsystem successfully quit." << std::endl;
 }
 
-SDL_Texture* TextureManager::LoadTexture(std::string filename)
+std::shared_ptr<SDL_Texture> TextureManager::LoadTexture(std::string filename)
 {
+	auto it = textureCache.find(filename);
+
+	if (it != textureCache.end())
+	{
+		if (auto sharedPtr = it->second.lock())
+			return sharedPtr;
+	}
+
 	auto tempSurface = IMG_Load(filename.c_str());
 
 #if _DEBUG
@@ -39,7 +50,7 @@ SDL_Texture* TextureManager::LoadTexture(std::string filename)
 #endif
 
 	auto texture = SDL_CreateTextureFromSurface(Renderer::GetRenderer(), tempSurface);
-		
+
 #if _DEBUG
 	DBG_ASSERT_MSG(texture, "Failed to create the texture: %s\n", SDL_GetError());
 #endif
@@ -47,7 +58,16 @@ SDL_Texture* TextureManager::LoadTexture(std::string filename)
 	SDL_FreeSurface(tempSurface);
 	tempSurface = nullptr;
 
-	return texture;
+	auto sharedPtr = std::shared_ptr<SDL_Texture>(texture, [filename](SDL_Texture* texture) 
+		{
+			SDL_DestroyTexture(texture);
+
+			TextureManager::textureCache.erase(filename);
+		});
+
+	textureCache[filename] = sharedPtr;
+
+	return sharedPtr;
 }
 
 void TextureManager::NormalDraw(SDL_Texture* texture)
