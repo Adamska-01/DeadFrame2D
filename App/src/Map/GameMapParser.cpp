@@ -1,5 +1,5 @@
 #include "Map/GameMap.h"
-#include "Map/MapParser.h"
+#include "Map/GameMapParser.h"
 #include <sstream>
 #include <tinyxml2.h>
 
@@ -7,7 +7,7 @@
 using namespace tinyxml2;
 
 
-TileSet MapParser::ParseTileSet(XMLElement* xmlTileset)
+TileSet GameMapParser::ParseTileSet(XMLElement* xmlTileset)
 {
 	auto name = xmlTileset->Attribute("name");
 
@@ -29,7 +29,7 @@ TileSet MapParser::ParseTileSet(XMLElement* xmlTileset)
 	return TileSet(firstID, lastID, rowCount, culumnCount, tileCount, tileSize, name, source);
 }
 
-std::shared_ptr<TileLayer> MapParser::ParseTileLayer(XMLElement* xmlLayer, TileSetList tilesets, int tilesize, int rowcount, int colcount)
+std::shared_ptr<TileLayer> GameMapParser::ParseTileLayer(XMLElement* xmlLayer, TileSetList tilesets, int tilesize, int rowcount, int colcount)
 {
 	// Get data (actual map)
 	XMLElement* data{ nullptr };
@@ -68,7 +68,7 @@ std::shared_ptr<TileLayer> MapParser::ParseTileLayer(XMLElement* xmlLayer, TileS
 	return std::shared_ptr<TileLayer>(new TileLayer(tilesize, rowcount, colcount, tilemap, tilesets));
 }
 
-std::vector<std::shared_ptr<TileLayer>> MapParser::Parse(std::string source)
+std::vector<std::shared_ptr<TileLayer>> GameMapParser::Parse(std::string source)
 {
 	XMLDocument xml;
 	
