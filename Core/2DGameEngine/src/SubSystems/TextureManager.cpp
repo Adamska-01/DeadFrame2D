@@ -102,7 +102,7 @@ void TextureManager::DrawFrame(SDL_Texture* texture, SDL_Rect dest, Vector2F sca
 	SDL_RenderCopyEx(Renderer::GetRenderer(), texture, &srcRect, &destRect, 0, NULL, flip);
 }
 
-void TextureManager::DrawTile(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest, int row, int frame, SDL_RendererFlip flip)
+void TextureManager::DrawTile(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest, SDL_RendererFlip flip)
 {
 	SDL_RenderCopyEx(Renderer::GetRenderer(), texture, &src, &dest, 0, nullptr, flip);
 }
