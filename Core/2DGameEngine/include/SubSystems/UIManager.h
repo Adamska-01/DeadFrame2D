@@ -1,5 +1,5 @@
 #pragma once
-#include "Utility/PairHash.h"
+#include "Tools/PairHash.h"
 #include <map>
 #include <SDL_ttf.h>
 
