@@ -24,6 +24,9 @@ Bobble::Bobble(Vector2F startPos, BobbleColor color)
 
 Bobble::~Bobble()
 {
+	GameObject::Clean();
+	
+	Clean();
 }
 
 void Bobble::Bounce(Vector2F Normal)
