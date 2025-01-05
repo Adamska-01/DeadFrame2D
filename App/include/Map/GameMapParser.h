@@ -1,4 +1,5 @@
 #pragma once
+#include "Map/Properties/GameMapProperties.h"
 #include "Tools/XML_Parser.h"
 #include <memory>
 #include <TileEditor/TileLayer.h>
@@ -26,14 +27,16 @@ Example XML map structure:
 */
 
 
-class GameMapParser : public XML_Parser<std::vector<std::shared_ptr<TileLayer>>>
+class GameMapParser : public XML_Parser<std::vector<std::shared_ptr<TileLayer<GameMapProperties>>>>
 {
 private:
 	TileSet ParseTileSet(tinyxml2::XMLElement* xmlTileset);
 
-	std::shared_ptr<TileLayer> ParseTileLayer(tinyxml2::XMLElement* xmlLayer, TileSetList tilesets, int tilesize, int rowcount, int colcount);
+	TileMap ParseTileMap(tinyxml2::XMLElement* xmlLayer, int rowcount, int colcount);
+
+	std::optional<GameMapProperties> ParseTileProperties(tinyxml2::XMLElement* xmlLayer);
 
 
 public:
-	virtual std::vector<std::shared_ptr<TileLayer>> Parse(std::string source) override;
+	virtual std::vector<std::shared_ptr<TileLayer<GameMapProperties>>> Parse(std::string source) override;
 };

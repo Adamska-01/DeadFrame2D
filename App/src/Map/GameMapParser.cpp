@@ -10,69 +10,56 @@ using namespace tinyxml2;
 
 TileSet GameMapParser::ParseTileSet(XMLElement* xmlTileset)
 {
-	auto name = xmlTileset->Attribute("name");
-
-	auto firstID = xmlTileset->IntAttribute("firstgid");
-
-	auto tileCount = xmlTileset->IntAttribute("tilecount");
-	
-	// Allow using more than 1 tileset
-	auto lastID = (firstID + tileCount) - 1;
-
-	auto culumnCount = xmlTileset->IntAttribute("columns");
-	
-	auto rowCount = tileCount / culumnCount;
-
-	auto tileSize = xmlTileset->IntAttribute("tilewidth");
-
-	std::filesystem::path source = xmlTileset->FirstChildElement()->Attribute("source");
-	
-	auto fullPath = "Assets/Sprites/" + source.filename().string();
-
-	return TileSet(firstID, lastID, rowCount, culumnCount, tileCount, tileSize, name, fullPath);
+	return TileSet(
+		xmlTileset->IntAttribute("firstgid"),
+		xmlTileset->IntAttribute("firstgid") + xmlTileset->IntAttribute("tilecount") - 1,
+		xmlTileset->IntAttribute("tilecount") / xmlTileset->IntAttribute("columns"),
+		xmlTileset->IntAttribute("columns"),
+		xmlTileset->IntAttribute("tilecount"),
+		xmlTileset->IntAttribute("tilewidth"),
+		xmlTileset->Attribute("name"),
+		"Assets/Sprites/" + std::filesystem::path(xmlTileset->FirstChildElement()->Attribute("source")).filename().string()
+	);
 }
 
-std::shared_ptr<TileLayer> GameMapParser::ParseTileLayer(XMLElement* xmlLayer, TileSetList tilesets, int tilesize, int rowcount, int colcount)
+TileMap GameMapParser::ParseTileMap(tinyxml2::XMLElement* xmlLayer, int rowCount, int colCount)
 {
-	// Get data (actual map)
-	XMLElement* data{ nullptr };
-	for (auto i = xmlLayer->FirstChildElement(); i != nullptr; i = i->NextSiblingElement())
+	auto data = xmlLayer->FirstChildElement("data");
+	auto properties = xmlLayer->FirstChildElement("properties");
+
+	// Parse the tile map data
+	TileMap tilemap(rowCount, std::vector<int>(colCount, 0));
+	if (data != nullptr)
 	{
-		// Enforce string comparison
-		if (i->Value() == std::string("data"))
+		std::istringstream iss(data->GetText());
+		std::string id;
+
+		for (auto row = 0; row < rowCount; ++row)
 		{
-			data = i;
-			break;
+			for (auto col = 0; col < colCount; ++col)
+			{
+				if (!std::getline(iss, id, ','))
+					break;
+
+				tilemap[row][col] = std::stoi(id);
+			}
 		}
 	}
 
-	// Parse through tile map
-	std::string matrix(data->GetText());
-	std::istringstream iss(matrix);
-	std::string id;
-
-	TileMap tilemap(rowcount, std::vector<int>(colcount, 0));
-	for (auto row = 0; row < rowcount; row++)
-	{
-		for (auto col = 0; col < colcount; col++)
-		{
-			// Discards ','
-			std::getline(iss, id, ','); 
-
-			std::stringstream convertor(id);
-			convertor >> tilemap[row][col];
-
-			if (!iss.good())
-				break;
-		}
-	}
-	
-	iss.clear();
-
-	return std::shared_ptr<TileLayer>(new TileLayer(tilesize, rowcount, colcount, tilemap, tilesets));
+	return tilemap;
 }
 
-std::vector<std::shared_ptr<TileLayer>> GameMapParser::Parse(std::string source)
+std::optional<GameMapProperties> GameMapParser::ParseTileProperties(tinyxml2::XMLElement* xmlLayer)
+{
+	auto properties = xmlLayer->FirstChildElement("properties");
+	
+	if (properties != nullptr && properties->FirstChildElement())
+		return GameMapProperties(properties->FirstChildElement()->FloatAttribute("value"));
+
+	return std::nullopt;
+}
+
+std::vector<std::shared_ptr<TileLayer<GameMapProperties>>> GameMapParser::Parse(std::string source)
 {
 	XMLDocument xml;
 	
@@ -90,25 +77,23 @@ std::vector<std::shared_ptr<TileLayer>> GameMapParser::Parse(std::string source)
 	auto tileSize = root->IntAttribute("tilewidth", 0);
 
 	// Parse tilesets
-	TileSetList tilesets;
-	for (auto i = root->FirstChildElement(); i != nullptr; i = i->NextSiblingElement())
+	TileSetList tileSets;
+	for (auto elem = root->FirstChildElement("tileset"); elem; elem = elem->NextSiblingElement("tileset"))
 	{
-		// Enforce string comparison
-		if (i->Value() == std::string("tileset"))
-		{
-			tilesets.push_back(ParseTileSet(i));
-		}
+		tileSets.push_back(ParseTileSet(elem));
 	}
 
 	// Parse Layers
-	std::vector<std::shared_ptr<TileLayer>> layers = {};
-	for (auto i = root->FirstChildElement(); i != nullptr; i = i->NextSiblingElement())
+	std::vector<std::shared_ptr<TileLayer<GameMapProperties>>> layers;
+	for (auto elem = root->FirstChildElement("layer"); elem; elem = elem->NextSiblingElement("layer"))
 	{
-		// Enforce string comparison
-		if (i->Value() == std::string("layer"))
-		{
-			layers.push_back(ParseTileLayer(i, tilesets, tileSize, rowCount, colCount));
-		}
+		layers.push_back(std::make_shared<TileLayer<GameMapProperties>>(
+			tileSize,
+			rowCount,
+			colCount,
+			ParseTileMap(elem, rowCount, colCount),
+			tileSets,
+			ParseTileProperties(elem)));
 	}
 
 	return layers;
