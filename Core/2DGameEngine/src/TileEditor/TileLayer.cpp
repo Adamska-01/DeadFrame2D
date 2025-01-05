@@ -1,3 +1,4 @@
+#include "SubSystems/Renderer.h"
 #include "SubSystems/TextureManager.h"
 #include "TileEditor/TileLayer.h"
 
@@ -9,6 +10,7 @@ TileLayer::TileLayer(int tileSize, int rowCount, int colCount, TileMap tileMap, 
 	tileMap(tileMap),
 	tileSets(tileSets)
 {
+	Renderer::SetResolutionTarget({ columnCount * tileSize, rowCount * tileSize });
 }
 
 void TileLayer::Update(float dt)
@@ -28,31 +30,30 @@ void TileLayer::Draw()
 
 			auto index = 0;
 
-			if (tileSets.size() > 1)
+			// If there is more than 1 TileSet, normalize the tileID and get the TileSet index
+			for (auto i = 1; i < tileSets.size(); i++)
 			{
-				for (auto i = 0; i < tileSets.size(); i++)
-				{
-					if (tileID >= tileSets[i].firstID && tileID <= tileSets[i].lastID)
-					{
-						tileID = tileID + tileSets[i].tileCount - tileSets[i].lastID;
-						index = i;
-						break;
-					}
-				}
+				if (tileID < tileSets[i].firstID || tileID > tileSets[i].lastID)
+					continue;
+
+				tileID = tileID + tileSets[i].tileCount - tileSets[i].lastID;
+				index = i;
+					
+				break;
 			}
 
-			auto ts = tileSets[index];
+			const auto& ts = tileSets[index];
 			auto tileRow = tileID / ts.culumnCount;
 			auto tileCol = tileID - tileRow * ts.culumnCount - 1;
 
-			// if this tile is on the last column
+			// If this tile is on the last column
 			if (tileID % ts.culumnCount == 0)
 			{
 				tileRow--;
 				tileCol = ts.culumnCount - 1;
 			}
 
-			auto src = SDL_Rect { ts.tileSize, ts.tileSize, tileRow * ts.tileSize, tileCol * ts.tileSize };
+			auto src = SDL_Rect { tileCol * ts.tileSize, tileRow * ts.tileSize, ts.tileSize, ts.tileSize };
 			auto dest = SDL_Rect{ j * ts.tileSize, i * ts.tileSize, ts.tileSize, ts.tileSize };
 
 			TextureManager::DrawTile(ts.tileSetTexture.get(), src, dest);
