@@ -13,17 +13,17 @@ GameMap::~GameMap()
 
 void GameMap::Update(float dt)
 {
-	for (auto i = 0; i < mapLayers.size(); i++)
+	for (const auto& layer : mapLayers)
 	{
-		mapLayers[i]->Update(dt);
+		layer->Update(dt);
 	}
 }
 
 void GameMap::Draw()
 {
-	for (auto i = 0; i < mapLayers.size(); i++)
+	for (const auto& layer : mapLayers)
 	{
-		mapLayers[i]->Draw();
+		layer->Draw();
 	}
 }
 
@@ -32,7 +32,7 @@ void GameMap::Clean()
 	mapLayers.clear();
 }
 
-const std::vector<std::shared_ptr<TileLayer>>& GameMap::GetMapLayers()
+const std::vector<std::shared_ptr<TileLayer<GameMapProperties>>>& GameMap::GetMapLayers()
 {
 	return mapLayers;
 }
