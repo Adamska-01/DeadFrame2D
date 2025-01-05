@@ -2,6 +2,7 @@
 #include "Map/GameMapParser.h"
 #include <sstream>
 #include <tinyxml2.h>
+#include <filesystem>
 
 
 using namespace tinyxml2;
@@ -24,9 +25,11 @@ TileSet GameMapParser::ParseTileSet(XMLElement* xmlTileset)
 
 	auto tileSize = xmlTileset->IntAttribute("tilewidth");
 
-	auto source = xmlTileset->FirstChildElement()->Attribute("source");
+	std::filesystem::path source = xmlTileset->FirstChildElement()->Attribute("source");
+	
+	auto fullPath = "Assets/Sprites/" + source.filename().string();
 
-	return TileSet(firstID, lastID, rowCount, culumnCount, tileCount, tileSize, name, source);
+	return TileSet(firstID, lastID, rowCount, culumnCount, tileCount, tileSize, name, fullPath);
 }
 
 std::shared_ptr<TileLayer> GameMapParser::ParseTileLayer(XMLElement* xmlLayer, TileSetList tilesets, int tilesize, int rowcount, int colcount)
@@ -35,7 +38,8 @@ std::shared_ptr<TileLayer> GameMapParser::ParseTileLayer(XMLElement* xmlLayer, T
 	XMLElement* data{ nullptr };
 	for (auto i = xmlLayer->FirstChildElement(); i != nullptr; i = i->NextSiblingElement())
 	{
-		if (i->Value() == "data")
+		// Enforce string comparison
+		if (i->Value() == std::string("data"))
 		{
 			data = i;
 			break;
@@ -89,7 +93,8 @@ std::vector<std::shared_ptr<TileLayer>> GameMapParser::Parse(std::string source)
 	TileSetList tilesets;
 	for (auto i = root->FirstChildElement(); i != nullptr; i = i->NextSiblingElement())
 	{
-		if (i->Value() == "tileset")
+		// Enforce string comparison
+		if (i->Value() == std::string("tileset"))
 		{
 			tilesets.push_back(ParseTileSet(i));
 		}
@@ -99,6 +104,7 @@ std::vector<std::shared_ptr<TileLayer>> GameMapParser::Parse(std::string source)
 	std::vector<std::shared_ptr<TileLayer>> layers = {};
 	for (auto i = root->FirstChildElement(); i != nullptr; i = i->NextSiblingElement())
 	{
+		// Enforce string comparison
 		if (i->Value() == std::string("layer"))
 		{
 			layers.push_back(ParseTileLayer(i, tilesets, tileSize, rowCount, colCount));
