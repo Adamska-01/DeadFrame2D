@@ -1,23 +1,38 @@
 #pragma once
-#include <Components/Collisions/Circle.h>
+#include "Components/Collisions/Circle.h"
+#include "Components/GameComponent.h"
 #include <Math/Vector2.h>
 
 
-class CircleCollider2D
+class Transform;
+
+
+class CircleCollider2D : GameComponent
 {
 private:
 	Circle collider;
 
+	Transform* transform;
+
 
 public:
-	CircleCollider2D() {};
+	CircleCollider2D(Circle collider);
 
-	~CircleCollider2D() {};
+	~CircleCollider2D() = default;
 
 	
-	inline Circle GetCircle() { return collider; }
+	Circle GetCircle();
 
-	inline void SetPos(Vector2 p_pos) { collider.position = p_pos; }
+	void SetPos(Vector2F p_pos);
 	
-	inline void SetSize(float p_value) { collider.radius = p_value; }
+	void SetSize(float p_value);
+
+
+	virtual void Init() override;
+
+	virtual void Update(float dt) override;
+
+	virtual void Draw() override;
+
+	virtual void Clean() override;
 };
