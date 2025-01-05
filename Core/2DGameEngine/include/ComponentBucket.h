@@ -37,6 +37,12 @@ private:
 
 	template<typename T, typename... TArgs>
 	T& AddComponent(GameObject* owner, TArgs&& ...args);
+
+
+public:
+	ComponentBucket() = default;
+
+	~ComponentBucket();
 };
 
 
