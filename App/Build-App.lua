@@ -5,13 +5,19 @@ project "App"
 	targetdir "Binaries/%{cfg.buildcfg}"
 	staticruntime "off"
 
-	files { "include/**.h", "src/**.cpp" }
+	files 
+	{ 
+		"include/**.h", 
+		"src/**.cpp", 
+		"../Core/Dependencies/tinyxml2-10.0.0/**.cpp" 
+	}
 
 	includedirs
 	{
 		-- Include Core
 		"include",
 		"../Core/2DGameEngine/include",
+        "../Core/Dependencies/tinyxml2-10.0.0", 
 		-- There are a lot of useful sdl structs/classes that the app could use
 		"../Core/Dependencies/SDL/SDL2-2.30.10/include",
 		"../Core/Dependencies/SDL/SDL2_image-2.8.2/include",
