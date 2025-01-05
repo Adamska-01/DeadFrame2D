@@ -1,4 +1,4 @@
-#include "GameMap.h"
+#include "Map/GameMap.h"
 
 
 GameMap::GameMap(std::string mapSource)
