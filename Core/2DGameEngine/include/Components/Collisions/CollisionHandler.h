@@ -9,11 +9,18 @@ struct SDL_Rect;
 class CollisionHandler
 {
 private:
-	CollisionHandler() = delete;
-	
-	CollisionHandler(const CollisionHandler& other) = delete;
+	CollisionHandler() = default;
 
-	~CollisionHandler() = delete;
+	~CollisionHandler() = default;
+
+	CollisionHandler(const CollisionHandler&) = delete;
+
+	CollisionHandler(CollisionHandler&&) = delete;
+
+
+	CollisionHandler& operator=(const CollisionHandler&) = delete;
+
+	CollisionHandler& operator=(CollisionHandler&&) = delete;
 
 
 public:
