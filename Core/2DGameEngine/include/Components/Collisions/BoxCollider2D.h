@@ -1,36 +1,43 @@
 #pragma once
+#include "Components/GameComponent.h"
+#include "SubSystems/Renderer.h"
 #include <SDL.h>
-#include <SubSystems/Renderer.h>
 
 
-class BoxCollider2D
+class Transform;
+
+
+class BoxCollider2D : GameComponent
 {
 private:
-	SDL_Rect Box;
+	SDL_Rect box;
 
-	SDL_Rect Buffer;
+	SDL_Rect cropOffset;
+
+	Transform* transform;
 
 
 public:
-	inline SDL_Rect GetBox() { return Box; }
+	BoxCollider2D(SDL_Rect box, SDL_Rect cropOffset);
 
-	inline void SetBuffer(int x, int y, int w, int h) { Buffer = { x, y, w, h }; } 
+	~BoxCollider2D() = default;
 
-	inline void SetBox(int x, int y, int w, int h) 
-	{
-		Box = 
-		{
-			x - Buffer.x,
-			y - Buffer.y,
-			w - Buffer.w,
-			h - Buffer.h
-		};
-	}
 
-	//For debug
-	inline void DrawBox(Uint8 r, Uint8 g, Uint8 b, Uint8 a) 
-	{
-		SDL_SetRenderDrawColor(Renderer::GetInstance()->GetRenderer(), r, g, b, a);
-		SDL_RenderDrawRect(Renderer::GetInstance()->GetRenderer(), &Box);
-	}
+	SDL_Rect GetCollisionBox();
+
+	void SetBuffer(int x, int y, int w, int h);
+
+	void SetBox(int x, int y, int w, int h);
+
+	// TODO: Make a damn factory for this, and draw the bow only when running on debug
+	void DrawBox(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+
+
+	virtual void Init() override;
+
+	virtual void Update(float dt) override;
+
+	virtual void Draw() override;
+
+	virtual void Clean() override;
 };
