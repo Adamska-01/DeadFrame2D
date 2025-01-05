@@ -7,3 +7,8 @@ size_t ComponentBucket::GetComponentID() const
 
 	return lastID++;
 }
+
+ComponentBucket::~ComponentBucket()
+{
+	components.clear();
+}
