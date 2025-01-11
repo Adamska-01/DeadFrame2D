@@ -16,6 +16,9 @@ public:
 	~MulticastDelegate() = default;
 
 
+	bool IsEmpty();
+
+
 	template<typename U>
 	MulticastDelegate& operator += (const U& func);
 
@@ -29,6 +32,12 @@ public:
 	void operator() (Args... params);
 };
 
+
+template<typename ...Args>
+inline bool MulticastDelegate<Args...>::IsEmpty()
+{
+	return listeners.empty();
+}
 
 template<typename ...Args>
 template<typename U>
