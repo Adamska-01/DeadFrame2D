@@ -1,20 +1,15 @@
 #pragma once
-#include "Components/GameComponent.h"
+#include "Components/Collisions/Collider2D.h"
 #include "SubSystems/Renderer.h"
 #include <SDL.h>
 
 
-class Transform;
-
-
-class BoxCollider2D : GameComponent
+class BoxCollider2D : Collider2D
 {
 private:
 	SDL_Rect box;
 
 	SDL_Rect cropOffset;
-
-	Transform* transform;
 
 
 public:
@@ -23,7 +18,7 @@ public:
 	~BoxCollider2D() = default;
 
 
-	SDL_Rect GetCollisionBox();
+	SDL_Rect GetCollisionBox() const;
 
 	void SetBuffer(int x, int y, int w, int h);
 
@@ -40,4 +35,7 @@ public:
 	virtual void Draw() override;
 
 	virtual void Clean() override;
+
+
+	virtual bool CollideWith(const Collider2D& other) const override;
 };

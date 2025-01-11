@@ -1,4 +1,6 @@
 #include "Components/Collisions/BoxCollider2D.h"
+#include "Components/Collisions/CircleCollider2D.h"
+#include "Components/Collisions/CollisionHandler.h"
 #include "Components/Transform.h"
 #include "GameObject.h"
 
@@ -8,7 +10,7 @@ BoxCollider2D::BoxCollider2D(SDL_Rect box, SDL_Rect cropOffset)
 {
 }
 
-inline SDL_Rect BoxCollider2D::GetCollisionBox()
+SDL_Rect BoxCollider2D::GetCollisionBox() const
 {
 	return box;
 }
@@ -45,7 +47,7 @@ void BoxCollider2D::DrawBox(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 
 void BoxCollider2D::Init()
 {
-	transform = &OwningObject->GetComponent<Transform>();
+	Collider2D::Init();
 }
 
 void BoxCollider2D::Update(float dt)
@@ -58,4 +60,16 @@ void BoxCollider2D::Draw()
 
 void BoxCollider2D::Clean()
 {
+}
+
+bool BoxCollider2D::CollideWith(const Collider2D& other) const
+{
+	auto collisionPoint = Vector2F();
+
+	if (auto box = dynamic_cast<const BoxCollider2D*>(&other))
+		return CollisionHandler::BoxToBoxCollision(*this, *box);
+	else if (auto circle = dynamic_cast<const CircleCollider2D*>(&other))
+		return CollisionHandler::CircleToBoxCollision(*circle, *this, collisionPoint);
+
+	return false;
 }
