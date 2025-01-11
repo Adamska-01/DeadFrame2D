@@ -6,6 +6,8 @@
 class DispatchableEvent
 {
 public:
+	DispatchableEvent() = default;
+
 	virtual ~DispatchableEvent() = default;
 
 
