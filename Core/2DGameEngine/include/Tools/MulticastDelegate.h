@@ -19,13 +19,7 @@ public:
 	bool IsEmpty();
 
 
-	template<typename U>
-	MulticastDelegate& operator += (const U& func);
-
 	MulticastDelegate& operator += (const std::function<void(Args...)> func);
-	
-	template<typename U>
-	MulticastDelegate& operator -= (const U& func);
 	
 	MulticastDelegate& operator -= (const std::function<void(Args...)> func);
 
@@ -40,15 +34,6 @@ inline bool MulticastDelegate<Args...>::IsEmpty()
 }
 
 template<typename ...Args>
-template<typename U>
-inline MulticastDelegate<Args...>& MulticastDelegate<Args...>::operator+=(const U& func)
-{
-	listeners.push_back(std::function<void(Args...)>(func));
-
-	return *this;
-}
-
-template<typename ...Args>
 inline MulticastDelegate<Args...>& MulticastDelegate<Args...>::operator+=(const std::function<void(Args...)> func)
 {
 	listeners.push_back(func);
@@ -59,21 +44,10 @@ inline MulticastDelegate<Args...>& MulticastDelegate<Args...>::operator+=(const 
 template<typename ...Args>
 inline MulticastDelegate<Args...>& MulticastDelegate<Args...>::operator-=(const std::function<void(Args...)> func)
 {
-	auto it = std::find(listeners.begin(), listeners.end(), func);
-
-	if (it != listeners.end())
-	{
-		listeners.erase(it);
-	}
-
-	return *this;
-}
-
-template<typename ...Args>
-template<typename U>
-inline MulticastDelegate<Args...>& MulticastDelegate<Args...>::operator-=(const U& func)
-{
-	auto it = std::find(listeners.begin(), listeners.end(), func);
+	auto it = std::find_if(listeners.begin(), listeners.end(), [&func](const std::function<void(Args...)>& f) 
+		{
+			return f.target<void(Args...)>() == func.target<void(Args...)>();
+		});
 
 	if (it != listeners.end())
 	{
