@@ -1,18 +1,13 @@
 #pragma once
 #include "Components/Collisions/Circle.h"
-#include "Components/GameComponent.h"
+#include "Components/Collisions/Collider2D.h"
 #include <Math/Vector2.h>
 
 
-class Transform;
-
-
-class CircleCollider2D : GameComponent
+class CircleCollider2D : Collider2D
 {
 private:
 	Circle collider;
-
-	Transform* transform;
 
 
 public:
@@ -21,7 +16,7 @@ public:
 	~CircleCollider2D() = default;
 
 	
-	Circle GetCircle();
+	Circle GetCircle() const;
 
 	void SetPos(Vector2F p_pos);
 	
@@ -35,4 +30,7 @@ public:
 	virtual void Draw() override;
 
 	virtual void Clean() override;
+
+
+	virtual bool CollideWith(const Collider2D& other) const override;
 };
