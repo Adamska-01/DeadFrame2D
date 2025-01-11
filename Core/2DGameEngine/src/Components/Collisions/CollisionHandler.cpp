@@ -1,10 +1,14 @@
-#include "Components/Collisions/Circle.h"
+#include "Components/Collisions/BoxCollider2D.h"
+#include "Components/Collisions/CircleCollider2D.h"
 #include "Components/Collisions/CollisionHandler.h"
 #include <SDL.h>
 
 
-bool CollisionHandler::BoxToBoxCollision(const SDL_Rect& A, const SDL_Rect& B)
+bool CollisionHandler::BoxToBoxCollision(const BoxCollider2D& colliderA, const BoxCollider2D& colliderB)
 {
+	auto A = colliderA.GetCollisionBox();
+	auto B = colliderB.GetCollisionBox();
+
 	// Sides of the rectangle 
 	float leftA, leftB;
 	float rightA, rightB;
@@ -37,8 +41,11 @@ bool CollisionHandler::BoxToBoxCollision(const SDL_Rect& A, const SDL_Rect& B)
 	return true; 
 }
 
-bool CollisionHandler::CircleToBoxCollision(const Circle& A, const SDL_Rect& B, Vector2F& collisionPoint)
+bool CollisionHandler::CircleToBoxCollision(const CircleCollider2D& colliderA, const BoxCollider2D& colliderB, Vector2F& collisionPoint)
 {
+	auto A = colliderA.GetCircle();
+	auto B = colliderB.GetCollisionBox();
+
 	// Closest points on collision box
 	Vector2F closestPoint;
 
@@ -68,8 +75,11 @@ bool CollisionHandler::CircleToBoxCollision(const Circle& A, const SDL_Rect& B, 
 	return false; 
 }
 
-bool CollisionHandler::CircleToCircleCollision(const Circle& A, const Circle& B)
+bool CollisionHandler::CircleToCircleCollision(const CircleCollider2D& colliderA, const CircleCollider2D& colliderB)
 {
+	auto A = colliderA.GetCircle();
+	auto B = colliderB.GetCircle();
+
 	// Check if the point is touching the circle
 	if (A.position.Distance(B.position) <= A.radius + B.radius)
 		return true;
@@ -78,8 +88,10 @@ bool CollisionHandler::CircleToCircleCollision(const Circle& A, const Circle& B)
 	return false; 
 }
 
-bool CollisionHandler::PointInCircle(const Vector2F& point, const Circle& circle)
+bool CollisionHandler::PointInCircle(const Vector2F& point, const CircleCollider2D& collider)
 {
+	auto circle = collider.GetCircle();
+
 	auto dx = point.x - circle.position.x;
 	auto dy = point.y - circle.position.y;
 

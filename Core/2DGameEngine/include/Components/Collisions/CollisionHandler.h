@@ -2,8 +2,8 @@
 #include "Math/Vector2.h"
 
 
-struct Circle;
-struct SDL_Rect;
+struct BoxCollider2D;
+struct CircleCollider2D;
 
 
 class CollisionHandler
@@ -24,11 +24,11 @@ private:
 
 
 public:
-	static bool BoxToBoxCollision(const SDL_Rect& A, const SDL_Rect& B);
+	static bool BoxToBoxCollision(const BoxCollider2D& colliderA, const BoxCollider2D& colliderB);
 	
-	static bool CircleToBoxCollision(const Circle& A, const SDL_Rect& B, Vector2F& P);
+	static bool CircleToBoxCollision(const CircleCollider2D& colliderA, const BoxCollider2D& colliderB, Vector2F& collisionPoint);
 	
-	static bool CircleToCircleCollision(const Circle& A, const Circle& B);
+	static bool CircleToCircleCollision(const CircleCollider2D& colliderA, const CircleCollider2D& colliderB);
 
-	static bool PointInCircle(const Vector2F& point, const Circle& circle);
+	static bool PointInCircle(const Vector2F& point, const CircleCollider2D& circle);
 };
