@@ -21,9 +21,9 @@ private:
 
 
 public:
-	static void RegisterEventHandler(const std::type_index& eventType, const EventHandler& handler);
+	static void RegisterEventHandler(const std::type_index& eventType, const std::function<void(std::shared_ptr<DispatchableEvent>)>& handler);
 
-	static void DeregisterEventHandler(const std::type_index& eventType, const EventHandler& handler);
+	static void DeregisterEventHandler(const std::type_index& eventType, const std::function<void(std::shared_ptr<DispatchableEvent>)>& handler);
 	
 	static void SendEvent(std::shared_ptr<DispatchableEvent> event);
 };

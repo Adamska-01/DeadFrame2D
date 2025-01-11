@@ -2,30 +2,30 @@
 #include <iostream>
 
 
-void EventDispatcher::RegisterEventHandler(const std::type_index& eventType, const EventHandler& handler)
+void EventDispatcher::RegisterEventHandler(const std::type_index& eventType, const std::function<void(std::shared_ptr<DispatchableEvent>)>& handler)
 {
 	if (eventHandlers.find(eventType) == eventHandlers.end())
 	{
-		eventHandlers[eventType] = handler;
+		eventHandlers[eventType] = EventHandler();
 	}
-	else
-	{
-		eventHandlers[eventType] += handler;
-	}
+	
+	eventHandlers[eventType] += handler;
 }
 
-void EventDispatcher::DeregisterEventHandler(const std::type_index& eventType, const EventHandler& handler)
+void EventDispatcher::DeregisterEventHandler(const std::type_index& eventType, const std::function<void(std::shared_ptr<DispatchableEvent>)>& handler)
 {
-	auto it = eventHandlers.find(eventType);
-
-	if (it == eventHandlers.end())
-		return;
-
-	it->second -= handler;
-
-	if (it->second.IsEmpty())
+	if (eventHandlers.find(eventType) == eventHandlers.end())
 	{
-		eventHandlers.erase(it);
+		std::cout << "No handler registered for event type: " << eventType.name() << std::endl;
+
+		return;
+	}
+	
+	eventHandlers[eventType] -= handler;
+	
+	if (eventHandlers[eventType].IsEmpty())
+	{
+		eventHandlers.erase(eventType);
 	}
 }
 
