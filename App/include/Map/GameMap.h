@@ -1,11 +1,11 @@
 #pragma once
 #include "GameMapParser.h"
 #include "Properties/GameMapProperties.h"
-#include <IObject.h>
+#include <GameObject.h>
 #include <vector>
 
 
-class GameMap : IObject
+class GameMap : GameObject
 {
 private:
 	GameMapParser gameMapParser;
