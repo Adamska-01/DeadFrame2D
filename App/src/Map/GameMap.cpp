@@ -32,7 +32,7 @@ void GameMap::Clean()
 	mapLayers.clear();
 }
 
-const std::vector<std::shared_ptr<TileLayer<GameMapProperties>>>& GameMap::GetMapLayers()
+const std::vector<std::shared_ptr<TiledCompatibleLayer>>& GameMap::GetMapLayers()
 {
 	return mapLayers;
 }

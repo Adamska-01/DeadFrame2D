@@ -1,16 +1,16 @@
 #pragma once
-#include "GameMapParser.h"
-#include "Properties/GameMapProperties.h"
 #include <GameObject.h>
+#include <TileEditor/Parsers/Tiled/TiledCompatibleLayer.h>
+#include <TileEditor/Parsers/Tiled/TiledMapParser.h>
 #include <vector>
 
 
 class GameMap : GameObject
 {
 private:
-	GameMapParser gameMapParser;
+	TiledMapParser gameMapParser;
 
-	std::vector<std::shared_ptr<TileLayer<GameMapProperties>>> mapLayers;
+	std::vector<std::shared_ptr<TiledCompatibleLayer>> mapLayers;
 
 
 public:
@@ -25,5 +25,5 @@ public:
 
 	virtual void Clean() override;
 	
-	const std::vector<std::shared_ptr<TileLayer<GameMapProperties>>>& GetMapLayers();
+	const std::vector<std::shared_ptr<TiledCompatibleLayer>>& GetMapLayers();
 };
