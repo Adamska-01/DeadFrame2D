@@ -1,10 +1,15 @@
+#include <EventSystem/EventDispatcher.h>
 #include <Components/Transform.h>
 #include <GameObject.h>
+#include <EventSystem/Events/GameObjectEvents/GameObjectDestroyedEvent.h>
+#include <EventSystem/Events/GameObjectEvents/GameObjectCreatedEvent.h>
 
 
 GameObject::GameObject()
 {
 	transform = &AddComponent<Transform>();
+
+	EventDispatcher::SendEvent(std::make_shared<GameObjectCreatedEvent>(this));
 }
 
 GameObject::~GameObject()
@@ -32,7 +37,11 @@ void GameObject::Draw()
 	}
 }
 
+void GameObject::Destroy()
+{
+	EventDispatcher::SendEvent(std::make_shared<GameObjectDestroyedEvent>(this));
+}
+
 void GameObject::Clean()
 {
-	// Components will auto clean up
 }

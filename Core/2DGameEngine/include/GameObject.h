@@ -10,6 +10,15 @@ class Transform;
 
 class GameObject : public IObject
 {
+protected:
+	Transform* transform;
+
+	ComponentBucket componentBucket;
+
+
+	virtual void Clean() override;
+
+
 public:
 	GameObject();
 
@@ -31,13 +40,7 @@ public:
 	T& AddComponent(TArgs&& ...args);
 	
 
-protected:
-	Transform* transform;
-
-	ComponentBucket componentBucket;
-
-	
-	virtual void Clean() override;
+	void Destroy();
 };
 
 
