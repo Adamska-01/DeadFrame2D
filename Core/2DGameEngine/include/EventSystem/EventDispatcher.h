@@ -1,7 +1,6 @@
 #pragma once
 #include "DispatchableEvent.h"
 #include "Tools/MulticastDelegate.h"
-#include <functional>
 #include <memory>
 #include <typeindex>
 #include <unordered_map>

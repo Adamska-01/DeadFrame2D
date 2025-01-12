@@ -2,6 +2,9 @@
 #include <iostream>
 
 
+std::unordered_map<std::type_index, EventHandler> EventDispatcher::eventHandlers;
+
+
 void EventDispatcher::RegisterEventHandler(const std::type_index& eventType, const std::function<void(std::shared_ptr<DispatchableEvent>)>& handler)
 {
 	if (eventHandlers.find(eventType) == eventHandlers.end())
