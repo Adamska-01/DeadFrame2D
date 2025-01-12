@@ -5,31 +5,31 @@
 class FrameTimer
 {
 private:
-	static constexpr int FPS = 60;
-	
-	static constexpr float FRAMETIME = (double)1000 / FPS; //millisecond
-	
-	static int currentFPS;
-	
 	static float deltaTime;
+
+	static int currentFPS;
 
 
 	std::chrono::system_clock::time_point start;
 
 	std::chrono::system_clock::time_point end;
-	
-	std::chrono::duration<float, std::milli> workTime;
+
+	std::chrono::duration<float> workTime;
 
 	int countedFrames;
-	
+
 	float counterDelay;
 
-	
-	void CalculateFPS();
+	float frameTime;
+
+	bool isFpsLocked;
 
 
 public:
 	FrameTimer();
+
+
+	void CalculateFPS();
 
 	void StartClock();
 
@@ -37,7 +37,12 @@ public:
 
 	void DelayByFrameTime();
 
-	static float DeltaTime() { return deltaTime; }
-	
-	static int Frames() { return currentFPS; }
+	void SetTargetFramerate(unsigned int fps);
+
+	void UnlockFramerate();
+
+
+	static float DeltaTime();
+
+	static int Framerate();
 };
