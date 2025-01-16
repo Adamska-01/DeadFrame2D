@@ -1,7 +1,7 @@
 #pragma once
 #include <GameObject.h>
-#include <TileEditor/Parsers/Tiled/TiledCompatibleLayer.h>
-#include <TileEditor/Parsers/Tiled/TiledMapParser.h>
+#include <TileEditors/Tiled/Parsers/TiledMapParser.h>
+#include <TileEditors/Tiled/TiledMapCompatibleRenderer.h>
 #include <vector>
 
 
@@ -10,7 +10,8 @@ class GameMap : GameObject
 private:
 	TiledMapParser gameMapParser;
 
-	std::vector<std::shared_ptr<TiledCompatibleLayer>> mapLayers;
+	// TODO: Make this a GameComponennt
+	std::shared_ptr<TiledMapCompatibleRenderer> tiledMapCompatibleRenderer;
 
 
 public:
@@ -24,6 +25,4 @@ public:
 	virtual void Draw() override;
 
 	virtual void Clean() override;
-	
-	const std::vector<std::shared_ptr<TiledCompatibleLayer>>& GetMapLayers();
 };

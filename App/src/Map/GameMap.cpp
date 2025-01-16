@@ -3,7 +3,9 @@
 
 GameMap::GameMap(std::string mapSource)
 {
-	mapLayers = gameMapParser.Parse(mapSource);
+	auto parsedMap = gameMapParser.Parse(mapSource);
+
+	tiledMapCompatibleRenderer = std::make_shared<TiledMapCompatibleRenderer>(parsedMap, true);
 }
 
 GameMap::~GameMap()
@@ -13,26 +15,14 @@ GameMap::~GameMap()
 
 void GameMap::Update(float dt)
 {
-	for (const auto& layer : mapLayers)
-	{
-		layer->Update(dt);
-	}
+	tiledMapCompatibleRenderer->Update(dt);
 }
 
 void GameMap::Draw()
 {
-	for (const auto& layer : mapLayers)
-	{
-		layer->Draw();
-	}
+	tiledMapCompatibleRenderer->Draw();
 }
 
 void GameMap::Clean()
 {
-	mapLayers.clear();
-}
-
-const std::vector<std::shared_ptr<TiledCompatibleLayer>>& GameMap::GetMapLayers()
-{
-	return mapLayers;
 }
