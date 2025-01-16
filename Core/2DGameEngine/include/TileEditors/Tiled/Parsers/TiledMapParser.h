@@ -1,10 +1,7 @@
 #pragma once
-#include "TiledCompatibleLayer.h"
-#include "TileEditor/Parsers/Tiled/Models/TiledMapWallProperties.h"
-#include "TileEditor/Parsers/Tiled/Models/TiledSetModel.h"
+#include "TileEditors/Tiled/Models/TiledMap.h"
 #include "Tools/XML_Parser.h"
 #include <memory>
-#include <TileEditor/TileLayer.h>
 #include <tinyxml2.h>
 
 
@@ -29,16 +26,19 @@ Example XML map structure:
 */
 
 
-class TiledMapParser : public XML_Parser<std::vector<std::shared_ptr<TiledCompatibleLayer>>>
+class TiledMapParser : public XML_Parser<std::shared_ptr<TiledMap>>
 {
 private:
-	TiledSetModel ParseTileSet(tinyxml2::XMLElement* xmlTileset);
+	TiledTileSet ParseTileSet(tinyxml2::XMLElement* xmlTileset);
 
-	std::vector<std::vector<int>> ParseTileMap(tinyxml2::XMLElement* xmlLayer, int rowcount, int colcount);
-
-	std::optional<TiledMapWallProperties> ParseTileProperties(tinyxml2::XMLElement* xmlLayer);
+	TiledLayer ParseLayers(tinyxml2::XMLElement* xmlLayer, int rowcount, int colcount);
 
 
 public:
-	virtual std::vector<std::shared_ptr<TiledCompatibleLayer>> Parse(std::string source) override;
+	TiledMapParser() = default;
+	
+	~TiledMapParser() = default;
+
+
+	virtual std::shared_ptr<TiledMap> Parse(std::string source) override;
 };
