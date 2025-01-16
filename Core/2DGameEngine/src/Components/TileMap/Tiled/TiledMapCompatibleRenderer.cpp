@@ -1,11 +1,11 @@
-#include "TileEditors/Tiled/TiledMapCompatibleRenderer.h"
+#include "Components/TileMap/Tiled/TiledMapCompatibleRenderer.h"
 #include <SubSystems/Renderer.h>
 #include <SubSystems/TextureManager.h>
 
 
-TiledMapCompatibleRenderer::TiledMapCompatibleRenderer(std::shared_ptr<TiledMap> tileMap, bool extendMapToRenderTarget)
+TiledMapCompatibleRenderer::TiledMapCompatibleRenderer(const char* mapSource, bool extendMapToRenderTarget)
 {
-	this->tileMap = tileMap;
+	this->tileMap = gameMapParser.Parse(mapSource);
 
 	for (auto i = 0; i < tileMap->tileSets.size(); i++)
 	{
@@ -19,6 +19,10 @@ TiledMapCompatibleRenderer::TiledMapCompatibleRenderer(std::shared_ptr<TiledMap>
 		return;
 
 	Renderer::SetResolutionTarget({ tileMap->width * tileMap->tileSize, tileMap->height * tileMap->tileSize });
+}
+
+void TiledMapCompatibleRenderer::Init()
+{
 }
 
 void TiledMapCompatibleRenderer::Update(float dt)
