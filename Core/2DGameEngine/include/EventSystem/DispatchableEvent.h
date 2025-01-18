@@ -5,9 +5,11 @@
 
 class DispatchableEvent
 {
-public:
+protected:
 	DispatchableEvent() = default;
 
+
+public:
 	virtual ~DispatchableEvent() = default;
 
 
