@@ -6,15 +6,9 @@
 
 
 GameObject::GameObject()
+	: isDestroyed(false)
 {
 	transform = &AddComponent<Transform>();
-
-	EventDispatcher::SendEvent(std::make_shared<GameObjectCreatedEvent>(this));
-}
-
-GameObject::~GameObject()
-{
-	Clean();
 }
 
 void GameObject::Update(float dt)
@@ -39,9 +33,10 @@ void GameObject::Draw()
 
 void GameObject::Destroy()
 {
-	EventDispatcher::SendEvent(std::make_shared<GameObjectDestroyedEvent>(this));
-}
+	if (isDestroyed)
+		return;
 
-void GameObject::Clean()
-{
+	isDestroyed = true;
+
+	EventDispatcher::SendEvent(std::make_shared<GameObjectDestroyedEvent>(this));
 }

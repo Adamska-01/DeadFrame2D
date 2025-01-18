@@ -10,19 +10,21 @@ class Transform;
 
 class GameObject : public IObject
 {
+private:
+	bool isDestroyed;
+
+
 protected:
+	GameObject();
+
+
 	Transform* transform;
 
 	ComponentBucket componentBucket;
 
 
-	virtual void Clean() override;
-
-
 public:
-	GameObject();
-
-	~GameObject();
+	virtual ~GameObject() = default;
 
 	
 	virtual void Update(float dt) override;
@@ -38,6 +40,9 @@ public:
 	
 	template<typename T, typename... TArgs>
 	T& AddComponent(TArgs&& ...args);
+
+	template<typename T, typename ...Args>
+	static std::weak_ptr<T> Instantiate(Args && ...args);
 	
 
 	void Destroy();
@@ -45,19 +50,31 @@ public:
 
 
 template<typename T>
-bool GameObject::ContainsComponent() const
+inline bool GameObject::ContainsComponent() const
 {
 	return componentBucket.ContainsComponent<T>();
 }
 
 template<typename T>
-T& GameObject::GetComponent() const
+inline T& GameObject::GetComponent() const
 {
 	return componentBucket.GetComponent<T>();
 }
 
 template<typename T, typename... TArgs>
-T& GameObject::AddComponent(TArgs&& ...args)
+inline T& GameObject::AddComponent(TArgs&& ...args)
 {
 	return componentBucket.AddComponent<T>(this, std::forward<TArgs>(args)...);
+}
+
+template<typename T, typename ...Args>
+inline std::weak_ptr<T> GameObject::Instantiate(Args && ...args)
+{
+	static_assert(std::is_base_of<GameObject, T>::value, "T must derive from GameObject");
+
+	auto obj = std::make_shared<T>(std::forward<Args>(args)...);
+
+	EventDispatcher::SendEvent(std::make_shared<GameObjectCreatedEvent>(obj));
+
+	return obj;
 }
