@@ -1,5 +1,7 @@
 #pragma once
 #include "ComponentBucket.h"
+#include "EventSystem/EventDispatcher.h"
+#include "EventSystem/Events/GameObjectEvents/GameObjectCreatedEvent.h"
 #include "IObject.h"
 #include <memory>
 #include <vector>

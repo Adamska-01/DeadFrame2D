@@ -1,8 +1,6 @@
-#include <EventSystem/EventDispatcher.h>
-#include <Components/Transform.h>
-#include <GameObject.h>
-#include <EventSystem/Events/GameObjectEvents/GameObjectDestroyedEvent.h>
-#include <EventSystem/Events/GameObjectEvents/GameObjectCreatedEvent.h>
+#include "Components/Transform.h"
+#include "EventSystem/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
+#include "GameObject.h"
 
 
 GameObject::GameObject()
