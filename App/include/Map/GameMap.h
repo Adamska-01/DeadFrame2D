@@ -4,10 +4,10 @@
 #include <vector>
 
 
-class GameMap : GameObject
+class GameMap : public GameObject
 {
 public:
 	GameMap(const char* mapSource, bool extendMapToRenderTarget = false);
 
-	~GameMap() = default;
+	virtual ~GameMap() = default;
 };
