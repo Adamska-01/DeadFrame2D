@@ -1,7 +1,7 @@
 #pragma once
+#include "Generic/Bobble/BobbleColor.h"
+#include "Generic/Bobble/BobbleNeighbors.h"
 #include <GameObject.h>
-#include <Generic/Bobble/BobbleColor.h>
-#include <Generic/Bobble/BobbleNeighbors.h>
 #include <Math/Vector2.h>
 
 
@@ -16,10 +16,8 @@ private:
 	void Bounce(Vector2F Normal);
 
 
-protected:
-	Bobble(Vector2F startPos, BobbleColor color);
-
-
 public:
+	Bobble(Vector2F startPos, BobbleColor color);
+	
 	virtual ~Bobble() = default;
 };
