@@ -1,34 +1,29 @@
 #pragma once
+#include <Engine/Engine.h>
 #include <SubSystems/Events/EventManager.h>
-#include <Utility/FrameTimer.h>
+#include <Tools/FrameTimer.h>
 #include <vector>
 
 
-class SubSystems;
+class Bobble;
+class GameMap;
 
 
 class Application
 {
 private:
-	SubSystems* engineSubSystems;
+	std::unique_ptr<Engine> engine;
 
-	EventManager eventManager;
+	std::weak_ptr<Bobble> bobble;
 
-	FrameTimer ft;
-
-
-	void Update();
-
-	void Draw();
-
-	void Clean();
+	std::weak_ptr<GameMap> gameMap;
 
 
 public:
 	Application();
 
-	~Application();
+	~Application() = default;
 
 
-	int Run();
+	std::optional<int> Run();
 };

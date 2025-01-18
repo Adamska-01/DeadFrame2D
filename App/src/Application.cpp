@@ -1,59 +1,30 @@
 #include "Application.h"
+#include "Prefabs/Bobble.h"
+#include <Map/GameMap.h>
 #include <SubSystems/AudioManager.h>
 #include <SubSystems/Input.h>
-#include <SubSystems/Renderer.h>
-#include <SubSystems/SubSystems.h>
 #include <SubSystems/TextureManager.h>
 #include <SubSystems/UIManager.h>
+#include <EventSystem/EventDispatcher.h>
+#include <EventSystem/Events/GameObjectEvents/GameObjectDestroyedEvent.h>
 
 
 Application::Application()
 {
-	engineSubSystems = new SubSystems();
+	engine = std::make_unique<Engine>();
 
-	engineSubSystems->InitializeSubSystems();
+	bobble = GameObject::Instantiate<Bobble>(Vector2F{ 100, 100 }, BobbleColor::Blue);
+
+	UIManager::LoadFont("Assets/Fonts/consola.ttf", 20);
+	UIManager::LoadFont("Assets/Fonts/consola.ttf", 21);
+
+	auto ptr = TextureManager::LoadTexture("Assets/Sprites/Arrow.png");
+	auto ptr1 = TextureManager::LoadTexture("Assets/Sprites/Arrow.png");
+
+	gameMap = GameObject::Instantiate<GameMap>("Assets/Maps/SingleplayerMap.tmx", true);
 }
 
-Application::~Application()
+std::optional<int> Application::Run()
 {
-	Clean();
-}
-
-int Application::Run()
-{
-	while (true)
-	{
-		ft.StartClock();
-		
-		//Looks for messages and return optional if QUIT
-		if (const auto ecode = eventManager.ProcessEvents())
-			return *ecode;
-
-		Update();
-		Draw();
-
-		//FPS and delay
-		ft.EndClock();
-		ft.DelayByFrameTime();
-	}
-}
-
-void Application::Update()
-{
-	// Update All GameObjects
-	
-}
-
-void Application::Draw()
-{
-	// Render all GameObjects before before clearing the buffer
-
-
-	Renderer::PresentBuffer();
-}
-
-void Application::Clean()
-{
-	delete engineSubSystems;
-	engineSubSystems = nullptr;
+	return engine->Run();
 }
