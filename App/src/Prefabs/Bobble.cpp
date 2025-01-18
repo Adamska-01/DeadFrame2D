@@ -22,31 +22,6 @@ Bobble::Bobble(Vector2F startPos, BobbleColor color)
 	transform->Scale({ 3, 3 });
 }
 
-Bobble::~Bobble()
-{
-	GameObject::Clean();
-	
-	Clean();
-}
-
 void Bobble::Bounce(Vector2F Normal)
 {
-}
-
-void Bobble::Update(float dt)
-{
-	GameObject::Update(dt);
-
-}
-
-void Bobble::Draw()
-{
-	GameObject::Draw();
-
-}
-
-void Bobble::Clean()
-{
-	GameObject::Clean();
-
 }

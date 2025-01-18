@@ -16,15 +16,10 @@ private:
 	void Bounce(Vector2F Normal);
 
 
-public:
+protected:
 	Bobble(Vector2F startPos, BobbleColor color);
 
-	~Bobble();
 
-
-	void Update(float dt) override;
-
-	void Draw() override;
-
-	void Clean() override;
+public:
+	virtual ~Bobble() = default;
 };
