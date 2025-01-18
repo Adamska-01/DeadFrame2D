@@ -1,6 +1,8 @@
 #pragma once
 #include "EventSystem/DispatchableEvent.h"
-#include "GameObject.h"
+
+
+class GameObject;
 
 
 class GameObjectCreatedEvent : public DispatchableEvent
