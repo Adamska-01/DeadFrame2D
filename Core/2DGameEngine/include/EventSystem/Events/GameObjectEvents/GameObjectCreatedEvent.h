@@ -6,8 +6,8 @@
 class GameObjectCreatedEvent : public DispatchableEvent
 {
 public:
-	GameObject* gameObjectCreated;
+	std::shared_ptr<GameObject> gameObjectCreated;
 
 
-	GameObjectCreatedEvent(GameObject* gameObjectDestroyed);
+	GameObjectCreatedEvent(std::shared_ptr<GameObject> gameObjectDestroyed);
 };
