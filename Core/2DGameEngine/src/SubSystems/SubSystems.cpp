@@ -1,15 +1,11 @@
 #include "Constants/ScreenConstants.h"
 #include "SubSystems/AudioManager.h"
-#include "SubSystems/Input.h"
+#include "SubSystems/Input/Input.h"
 #include "SubSystems/Renderer.h"
 #include "SubSystems/SubSystems.h"
 #include "SubSystems/TextureManager.h"
 #include "SubSystems/UIManager.h"
 #include "SubSystems/Window.h"
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_mixer.h>
-#include <SDL_ttf.h>
 
 
 SubSystems::SubSystems()
