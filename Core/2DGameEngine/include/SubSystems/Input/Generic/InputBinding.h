@@ -1,7 +1,6 @@
 #pragma once
 #include "InputDeviceType.h"
-#include <SDL.h>
-#include <string>
+#include <SDL_stdinc.h>
 
 
 struct InputBinding
