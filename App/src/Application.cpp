@@ -1,12 +1,8 @@
 #include "Application.h"
 #include "Prefabs/Bobble.h"
 #include <Map/GameMap.h>
-#include <SubSystems/AudioManager.h>
-#include <SubSystems/Input.h>
 #include <SubSystems/TextureManager.h>
 #include <SubSystems/UIManager.h>
-#include <EventSystem/EventDispatcher.h>
-#include <EventSystem/Events/GameObjectEvents/GameObjectDestroyedEvent.h>
 
 
 Application::Application()

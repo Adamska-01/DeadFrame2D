@@ -1,8 +1,5 @@
 #pragma once
 #include <Engine/Engine.h>
-#include <SubSystems/Events/EventManager.h>
-#include <Tools/FrameTimer.h>
-#include <vector>
 
 
 class Bobble;
