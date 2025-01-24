@@ -20,4 +20,7 @@ public:
 	Bobble(Vector2F startPos, BobbleColor color);
 	
 	virtual ~Bobble() = default;
+
+
+	virtual void Update(float deltaTime) override;
 };
