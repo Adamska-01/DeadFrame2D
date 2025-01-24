@@ -8,7 +8,22 @@
 
 class Input : public IEventProcessor
 {
+	friend class SubSystems;
+
+
 private:
+	Input();
+
+	~Input();
+
+	Input(Input&&) = delete;
+
+
+	Input& operator=(const Input&) = delete;
+
+	Input& operator=(Input&&) = delete;
+
+
 	static std::unique_ptr<InputDevice> keyboardDevice;
 	
 	static std::unique_ptr<InputDevice> mouseDevice;
@@ -20,11 +35,6 @@ private:
 
 
 public:
-	Input();
-
-	~Input();
-
-
 	std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
 
 
