@@ -2,6 +2,9 @@
 #include <iostream>
 
 
+std::unordered_map<std::string, std::vector<InputBinding>> InputControls::inputActions;
+
+
 void InputControls::AddOrOverrideAction(const std::string& actionName, const std::vector<InputBinding>& bindings)
 {
 	inputActions[actionName] = bindings;
