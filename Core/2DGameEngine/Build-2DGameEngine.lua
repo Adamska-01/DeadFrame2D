@@ -20,6 +20,7 @@ project "2DGameEngine"
     includedirs 
     { 
         "include",
+        "../Dependencies/nlohmann-3.11.3/nlohmann", 
         "../Dependencies/tinyxml2-10.0.0", 
         "../Dependencies/SDL/SDL2-2.30.10/include", 
         "../Dependencies/SDL/SDL2_image-2.8.2/include", 
