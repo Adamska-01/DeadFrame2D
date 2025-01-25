@@ -14,9 +14,9 @@ public:
 
 	GameComponent();
 
-	GameComponent(GameComponent&& other) = default;
-
 	virtual ~GameComponent() = default;
+
+	GameComponent(GameComponent&& other) = default;
 
 
 	virtual void Init() = 0;

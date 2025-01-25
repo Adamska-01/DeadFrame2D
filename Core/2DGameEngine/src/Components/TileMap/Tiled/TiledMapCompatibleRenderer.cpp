@@ -1,19 +1,11 @@
 #include "Components/TileMap/Tiled/TiledMapCompatibleRenderer.h"
-#include <SubSystems/Renderer.h>
-#include <SubSystems/TextureManager.h>
+#include "SubSystems/Renderer.h"
+#include "SubSystems/TextureManager.h"
 
 
 TiledMapCompatibleRenderer::TiledMapCompatibleRenderer(const char* mapSource, bool extendMapToRenderTarget)
 {
 	this->tileMap = gameMapParser.Parse(mapSource);
-
-	for (auto i = 0; i < tileMap->tileSets.size(); i++)
-	{
-		for (auto id = tileMap->tileSets[i].firstID; id <= tileMap->tileSets[i].lastID; id++)
-		{
-			tileIDToTileSet[id] = i;
-		}
-	}
 
 	if (!extendMapToRenderTarget)
 		return;
@@ -23,6 +15,13 @@ TiledMapCompatibleRenderer::TiledMapCompatibleRenderer(const char* mapSource, bo
 
 void TiledMapCompatibleRenderer::Init()
 {
+	for (auto i = 0; i < tileMap->tileSets.size(); i++)
+	{
+		for (auto id = tileMap->tileSets[i].firstID; id <= tileMap->tileSets[i].lastID; id++)
+		{
+			tileIDToTileSet[id] = i;
+		}
+	}
 }
 
 void TiledMapCompatibleRenderer::Update(float dt)

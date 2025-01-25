@@ -84,10 +84,10 @@ void Input::DisconnectControllerHandler(std::shared_ptr<DispatchableEvent> dispa
 			return device.get() == target;
 		});
 
-	if (it != controllerDevices.end())
-	{
-		controllerDevices.erase(it, controllerDevices.end());
-	}
+	if (it == controllerDevices.end())
+		return;
+
+	controllerDevices.erase(it, controllerDevices.end());
 }
 
 std::optional<int> Input::ProcessEvents(const SDL_Event& sdlEvent)

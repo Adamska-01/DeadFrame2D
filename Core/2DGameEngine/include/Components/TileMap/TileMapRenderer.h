@@ -10,6 +10,9 @@ protected:
 
 
 public:
+	virtual ~TileMapRenderer() = default;
+
+
 	virtual void Init() = 0;
 
 	virtual void Update(float dt) = 0;

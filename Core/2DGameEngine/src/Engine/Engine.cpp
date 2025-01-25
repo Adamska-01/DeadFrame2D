@@ -1,5 +1,6 @@
 #include "Engine/Engine.h"
 #include "SubSystems/Renderer.h"
+#include <SubSystems/Input/InputControls.h>
 
 
 Engine::Engine()
@@ -10,6 +11,8 @@ Engine::Engine()
 	gameObjectRegistry = std::make_unique<GameObjectRegistry>();
 
 	ft.SetTargetFramerate(60);
+
+	InputControls::Deserialize("../Core/2DGameEngine/include/InputControls.json");
 }
 
 void Engine::Update(float deltaTime)
