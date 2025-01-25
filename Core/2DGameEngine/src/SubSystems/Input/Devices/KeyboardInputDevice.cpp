@@ -1,5 +1,4 @@
 #include "SubSystems/Input/Devices/KeyboardInputDevice.h"
-#include <SDL.h>
 
 
 KeyboardInputDevice::KeyboardInputDevice()
@@ -9,7 +8,6 @@ KeyboardInputDevice::KeyboardInputDevice()
 void KeyboardInputDevice::ProcessEvent(const SDL_Event& eventType)
 {
 	lastInputStates = currentInputStates;
-	lastMouseInputStates = currentMouseInputStates;
 
 	switch (eventType.type)
 	{
