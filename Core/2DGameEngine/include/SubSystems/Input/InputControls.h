@@ -12,6 +12,10 @@ private:
 
 
 public:
+	static void Deserialize(const char* filePath);
+
+	// TODO: Delete all this shit..
+
 	static void AddOrOverrideAction(const std::string& actionName, const std::vector<InputBinding>& bindings);
 
 	static bool RemoveAction(const std::string& actionName);

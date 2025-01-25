@@ -1,9 +1,15 @@
 #include "SubSystems/Input/InputControls.h"
+#include "Tools/JsonSerializer.h"
 #include <iostream>
 
 
 std::unordered_map<std::string, std::vector<InputBinding>> InputControls::inputActions;
 
+
+void InputControls::Deserialize(const char* filePath)
+{
+	inputActions = JsonSerializer::DeserializeFromFile<std::unordered_map<std::string, std::vector<InputBinding>>>(filePath);
+}
 
 void InputControls::AddOrOverrideAction(const std::string& actionName, const std::vector<InputBinding>& bindings)
 {
