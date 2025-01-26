@@ -18,16 +18,11 @@ SpriteAnimator::SpriteAnimator()
 
 void SpriteAnimator::Init()
 {
-	transform = &OwningObject->GetComponent<Transform>();
+	transform = OwningObject->GetComponent<Transform>();
+	sprite = OwningObject->GetComponent<Sprite>();
 
-	if (OwningObject->ContainsComponent<Sprite>())
-	{
-		sprite = &OwningObject->GetComponent<Sprite>();
-	}
-	else
-	{
-		//TODO: throw error, sprite component is required
-	}
+	if (sprite == nullptr)
+		return;
 
 	sprite->enableDraw = false;
 }

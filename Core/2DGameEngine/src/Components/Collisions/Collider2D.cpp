@@ -10,7 +10,7 @@ Collider2D::Collider2D()
 
 void Collider2D::Init()
 {
-	transform = &OwningObject->GetComponent<Transform>();
+	transform = OwningObject->GetComponent<Transform>();
 }
 
 void Collider2D::Update(float dt)

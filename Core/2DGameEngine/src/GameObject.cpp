@@ -6,14 +6,14 @@
 GameObject::GameObject()
 	: isDestroyed(false)
 {
-	transform = &AddComponent<Transform>();
+	transform = AddComponent<Transform>();
 }
 
 void GameObject::Update(float dt)
 {
 	transform->Update(dt);
 
-	for (auto& component : componentBucket.components)
+	for (auto& component : componentBucket.GetComponents())
 	{
 		component->Update(dt);
 	}
@@ -23,7 +23,7 @@ void GameObject::Draw()
 {
 	transform->Draw();
 
-	for (auto& component : componentBucket.components)
+	for (auto& component : componentBucket.GetComponents())
 	{
 		component->Draw();
 	}

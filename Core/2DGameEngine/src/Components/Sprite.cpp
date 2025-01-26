@@ -21,7 +21,7 @@ Sprite::~Sprite()
 
 void Sprite::Init()
 {
-	transform = &OwningObject->GetComponent<Transform>();
+	transform = OwningObject->GetComponent<Transform>();
 }
 
 void Sprite::Update(float dt)

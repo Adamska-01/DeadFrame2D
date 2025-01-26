@@ -35,13 +35,11 @@ public:
 
 
 	template <typename T>
-	bool ContainsComponent() const;
-
-	template <typename T>
-	T& GetComponent() const;
+	T* GetComponent() const;
 	
 	template<typename T, typename... TArgs>
-	T& AddComponent(TArgs&& ...args);
+	T* AddComponent(TArgs&& ...args);
+
 
 	template<typename T, typename ...Args>
 	static std::weak_ptr<T> Instantiate(Args && ...args);
@@ -52,19 +50,13 @@ public:
 
 
 template<typename T>
-inline bool GameObject::ContainsComponent() const
-{
-	return componentBucket.ContainsComponent<T>();
-}
-
-template<typename T>
-inline T& GameObject::GetComponent() const
+inline T* GameObject::GetComponent() const
 {
 	return componentBucket.GetComponent<T>();
 }
 
 template<typename T, typename... TArgs>
-inline T& GameObject::AddComponent(TArgs&& ...args)
+inline T* GameObject::AddComponent(TArgs&& ...args)
 {
 	return componentBucket.AddComponent<T>(this, std::forward<TArgs>(args)...);
 }
