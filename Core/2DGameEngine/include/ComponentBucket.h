@@ -1,8 +1,5 @@
 #pragma once
-#include <array>
-#include <bitset>
-#include <Components/GameComponent.h>
-#include <Constants/ComponentBucketConstants.h>
+#include "Components/GameComponent.h"
 #include <memory>
 #include <vector>
 
@@ -12,65 +9,54 @@ class GameObject;
 
 class ComponentBucket
 {
-	friend class GameObject;
-
-
 private:
 	std::vector<std::unique_ptr<GameComponent>> components;
-
-	std::bitset<ComponentConstants::MAX_COMPONENTS> componentBitSet;
-
-	std::array<GameComponent*, ComponentConstants::MAX_COMPONENTS> componentArray;
-
-
-	size_t GetComponentID() const;
-
-
-	template <typename T>
-	size_t GetComponentTypeID() const;
-
-	template <typename T>
-	bool ContainsComponent() const;
-
-	template <typename T>
-	T& GetComponent() const;
-
-	template<typename T, typename... TArgs>
-	T& AddComponent(GameObject* owner, TArgs&& ...args);
 
 
 public:
 	ComponentBucket() = default;
 
 	~ComponentBucket();
+	
+	
+	template <typename T>
+	T* GetComponent() const;
+
+	template<typename T, typename... TArgs>
+	T* AddComponent(GameObject* owner, TArgs&& ...args);
+
+
+	const std::vector<std::unique_ptr<GameComponent>>& GetComponents();
 };
 
 
-template <typename T>
-size_t ComponentBucket::GetComponentTypeID() const
+inline ComponentBucket::~ComponentBucket()
 {
-	static size_t typeID = GetComponentID();
-
-	return typeID;
+	components.clear();
 }
 
 template<typename T>
-bool ComponentBucket::ContainsComponent() const
+T* ComponentBucket::GetComponent() const
 {
-	return componentBitSet[GetComponentTypeID<T>()];
-}
+	for (const auto& component : components)
+	{
+		T* castedComponent = dynamic_cast<T*>(component.get());
+		
+		if (castedComponent != nullptr) 
+			return castedComponent;
+	}
 
-template<typename T>
-T& ComponentBucket::GetComponent() const
-{
-	return *static_cast<T*>(componentArray[GetComponentTypeID<T>()]);
+	// No matching component found
+	return nullptr;
 }
 
 template<typename T, typename ...TArgs>
-T& ComponentBucket::AddComponent(GameObject* owner, TArgs&& ...args)
+T* ComponentBucket::AddComponent(GameObject* owner, TArgs&& ...args)
 {
-	if (ContainsComponent<T>())
-		return GetComponent<T>();
+	auto existingComponent = GetComponent<T>();
+
+	if (existingComponent != nullptr)
+		return existingComponent;
 
 	T* component = new T(std::forward<TArgs>(args)...);
 
@@ -83,12 +69,12 @@ T& ComponentBucket::AddComponent(GameObject* owner, TArgs&& ...args)
 
 	components.emplace_back(std::move(uniquePtr));
 
-	auto typeID = GetComponentTypeID<T>();
-
-	componentArray[typeID] = component;
-	componentBitSet[typeID] = true;
-
 	component->Init();
 
-	return *component;
+	return component;
+}
+
+inline const std::vector<std::unique_ptr<GameComponent>>& ComponentBucket::GetComponents()
+{
+	return components;
 }
