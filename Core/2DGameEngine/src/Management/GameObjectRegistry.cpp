@@ -1,13 +1,14 @@
 #include "EventSystem/Events/GameObjectEvents/GameObjectCreatedEvent.h"
 #include "EventSystem/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
 #include "Management/GameObjectRegistry.h"
-#include <EventSystem/EventDispatcher.h>
-#include <Tools/Helpers/EventHelpers.h>
+#include "EventSystem/EventDispatcher.h"
+#include "Tools/Helpers/EventHelpers.h"
 
 
 GameObjectRegistry::GameObjectRegistry()
 {
 	gameObjects.clear();
+	colliders.clear();
 
 	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &GameObjectRegistry::GameObjectCreatedHandler));
 	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &GameObjectRegistry::GameObjectDestroyedHandler));
@@ -16,6 +17,7 @@ GameObjectRegistry::GameObjectRegistry()
 GameObjectRegistry::~GameObjectRegistry()
 {
 	gameObjects.clear();
+	colliders.clear();
 
 	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &GameObjectRegistry::GameObjectCreatedHandler));
 	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &GameObjectRegistry::GameObjectDestroyedHandler));
@@ -44,7 +46,16 @@ void GameObjectRegistry::GameObjectCreatedHandler(std::shared_ptr<DispatchableEv
 	if (gameObjEvent == nullptr || gameObjEvent->gameObjectCreated == nullptr)
 		return;
 
-	gameObjects.push_back(std::move(gameObjEvent->gameObjectCreated));
+	auto& target = gameObjEvent->gameObjectCreated;
+
+	gameObjects.push_back(std::move(target));
+
+	auto collider = gameObjects.back()->GetComponent<Collider2D>();
+
+	if (collider == nullptr)
+		return;
+
+	colliders.push_back(collider);
 }
 
 void GameObjectRegistry::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
@@ -55,8 +66,24 @@ void GameObjectRegistry::GameObjectDestroyedHandler(std::shared_ptr<Dispatchable
 		return;
 
 	auto target = gameObjEvent->gameObjectDestroyed;
+	auto targetCollider = target->GetComponent<Collider2D>();
 
-	auto it = std::remove_if(
+	// Find and remove the collider reference associated with the target
+	auto colliderIt = std::remove_if(
+		colliders.begin(),
+		colliders.end(),
+		[targetCollider](Collider2D* collider)
+		{
+			return targetCollider == collider;
+		});
+
+	if (colliderIt != colliders.end())
+	{
+		colliders.erase(colliderIt, colliders.end());
+	}
+
+	// Now remove the target from gameObjects
+	auto objIt = std::remove_if(
 		gameObjects.begin(),
 		gameObjects.end(),
 		[target](std::shared_ptr<GameObject>& gameObject)
@@ -64,8 +91,8 @@ void GameObjectRegistry::GameObjectDestroyedHandler(std::shared_ptr<Dispatchable
 			return gameObject.get() == target;
 		});
 
-	if (it != gameObjects.end())
+	if (objIt != gameObjects.end())
 	{
-		gameObjects.erase(it, gameObjects.end());
+		gameObjects.erase(objIt, gameObjects.end());
 	}
 }
