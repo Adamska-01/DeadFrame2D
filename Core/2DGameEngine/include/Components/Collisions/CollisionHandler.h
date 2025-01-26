@@ -1,9 +1,7 @@
 #pragma once
+#include "Components/Collisions/BoxCollider2D.h"
+#include "Components/Collisions/CircleCollider2D.h"
 #include "Math/Vector2.h"
-
-
-struct BoxCollider2D;
-struct CircleCollider2D;
 
 
 class CollisionHandler

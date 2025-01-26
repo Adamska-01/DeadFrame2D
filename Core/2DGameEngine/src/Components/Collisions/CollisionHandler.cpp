@@ -1,7 +1,4 @@
-#include "Components/Collisions/BoxCollider2D.h"
-#include "Components/Collisions/CircleCollider2D.h"
 #include "Components/Collisions/CollisionHandler.h"
-#include <SDL.h>
 
 
 bool CollisionHandler::BoxToBoxCollision(const BoxCollider2D& colliderA, const BoxCollider2D& colliderB)
