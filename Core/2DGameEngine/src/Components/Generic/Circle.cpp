@@ -1,4 +1,4 @@
-#include "Components/Collisions/Circle.h"
+#include "Components/Generic/Circle.h"
 #include "Math/MathConstants.h"
 #include "Math/Vector2.h"
 
