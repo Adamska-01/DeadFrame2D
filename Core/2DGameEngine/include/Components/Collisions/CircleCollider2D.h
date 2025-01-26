@@ -1,5 +1,5 @@
 #pragma once
-#include "Components/Collisions/Circle.h"
+#include "Components/Generic/Circle.h"
 #include "Components/Collisions/Collider2D.h"
 #include <Math/Vector2.h>
 
