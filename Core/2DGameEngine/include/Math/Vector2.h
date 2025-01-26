@@ -32,7 +32,7 @@ public:
 
 	T Magnitude() const
 	{
-		return std::sqrt(std::pow(x, 2) + std::pow(y, 2));
+		return std::sqrt(x * x + y * y);
 	}
 	
 	Vector2<T>& Normalize()
