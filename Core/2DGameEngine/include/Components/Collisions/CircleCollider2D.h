@@ -4,7 +4,7 @@
 #include <Math/Vector2.h>
 
 
-class CircleCollider2D : Collider2D
+class CircleCollider2D : public Collider2D
 {
 private:
 	Circle collider;

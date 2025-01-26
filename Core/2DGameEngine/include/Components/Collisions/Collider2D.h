@@ -5,7 +5,7 @@
 class Transform;
 
 
-class Collider2D : GameComponent
+class Collider2D : public GameComponent
 {
 	friend class CollisionHandler;
 
@@ -17,16 +17,16 @@ protected:
 public:
 	Collider2D();
 
-	~Collider2D() = default;
+	virtual ~Collider2D() = default;
 
 
 	virtual void Init() override;
 
-	virtual void Update(float dt) override;
+	virtual void Update(float dt) = 0;
 
-	virtual void Draw() override;
+	virtual void Draw() = 0;
 
-	virtual void Clean() override;
+	virtual void Clean() = 0;
 
 
 	virtual bool CollideWith(const Collider2D& other) const = 0;

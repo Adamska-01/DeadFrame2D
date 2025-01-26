@@ -4,7 +4,7 @@
 #include <SDL.h>
 
 
-class BoxCollider2D : Collider2D
+class BoxCollider2D : public Collider2D
 {
 private:
 	SDL_Rect box;
