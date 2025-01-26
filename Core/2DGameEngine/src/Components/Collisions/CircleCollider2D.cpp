@@ -1,7 +1,5 @@
 #include "Components/Collisions/CircleCollider2D.h"
 #include "Components/Collisions/CollisionHandler.h"
-#include "Components/Transform.h"
-#include "GameObject.h"
 #include <Components/Collisions/BoxCollider2D.h>
 
 
