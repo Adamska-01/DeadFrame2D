@@ -9,7 +9,10 @@ protected:
 	TRenderer* tileMapRenderer;
 	
 	
-	TileCollider2D() = default;
+	TileCollider2D()
+		: tileMapRenderer(nullptr)
+	{
+	}
 
 
 public:
