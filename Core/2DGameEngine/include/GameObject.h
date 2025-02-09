@@ -4,7 +4,6 @@
 #include "EventSystem/Events/GameObjectEvents/GameObjectCreatedEvent.h"
 #include "IObject.h"
 #include <memory>
-#include <vector>
 
 
 class Transform;
@@ -13,6 +12,8 @@ class Transform;
 class GameObject : public IObject
 {
 private:
+	bool isInitialized;
+
 	bool isDestroyed;
 
 
@@ -29,6 +30,8 @@ public:
 	virtual ~GameObject() = default;
 
 	
+	virtual void Init() override;
+
 	virtual void Update(float dt) override;
 	
 	virtual void Draw() override;
@@ -58,7 +61,7 @@ inline T* GameObject::GetComponent() const
 template<typename T, typename... TArgs>
 inline T* GameObject::AddComponent(TArgs&& ...args)
 {
-	return componentBucket.AddComponent<T>(this, std::forward<TArgs>(args)...);
+	return componentBucket.AddComponent<T>(this, isInitialized, std::forward<TArgs>(args)...);
 }
 
 template<typename T, typename ...Args>
@@ -67,6 +70,8 @@ inline std::weak_ptr<T> GameObject::Instantiate(Args && ...args)
 	static_assert(std::is_base_of<GameObject, T>::value, "T must derive from GameObject");
 
 	auto obj = std::make_shared<T>(std::forward<Args>(args)...);
+
+	obj->Init();
 
 	EventDispatcher::SendEvent(std::make_shared<GameObjectCreatedEvent>(obj));
 

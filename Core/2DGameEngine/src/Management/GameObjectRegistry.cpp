@@ -29,6 +29,11 @@ void GameObjectRegistry::Update(float deltaTime)
 	{
 		obj->Update(deltaTime);
 	}
+
+	for (const auto& obj : colliders)
+	{
+		//if (obj->CollideWith())
+	}
 }
 
 void GameObjectRegistry::Draw()

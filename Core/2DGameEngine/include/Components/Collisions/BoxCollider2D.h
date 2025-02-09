@@ -1,7 +1,6 @@
 #pragma once
 #include "Components/Collisions/Collider2D.h"
-#include "SubSystems/Renderer.h"
-#include <SDL.h>
+#include <SDL_rect.h>
 
 
 class BoxCollider2D : public Collider2D
@@ -37,5 +36,5 @@ public:
 	virtual void Clean() override;
 
 
-	virtual bool CollideWith(const Collider2D& other) const override;
+	virtual bool Accept(class ColliderVisitor& visitor, Collider2D& other) override;
 };

@@ -29,5 +29,5 @@ public:
 	virtual void Clean() = 0;
 
 
-	virtual bool CollideWith(const Collider2D& other) const = 0;
+	virtual bool Accept(class ColliderVisitor& visitor, Collider2D& other) = 0;
 };

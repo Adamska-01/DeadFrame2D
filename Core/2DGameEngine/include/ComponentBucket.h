@@ -23,7 +23,7 @@ public:
 	T* GetComponent() const;
 
 	template<typename T, typename... TArgs>
-	T* AddComponent(GameObject* owner, TArgs&& ...args);
+	T* AddComponent(GameObject* owner, bool canInitialize, TArgs&& ...args);
 
 
 	const std::vector<std::unique_ptr<GameComponent>>& GetComponents();
@@ -51,7 +51,7 @@ T* ComponentBucket::GetComponent() const
 }
 
 template<typename T, typename ...TArgs>
-T* ComponentBucket::AddComponent(GameObject* owner, TArgs&& ...args)
+T* ComponentBucket::AddComponent(GameObject* owner, bool canInitialize, TArgs&& ...args)
 {
 	auto existingComponent = GetComponent<T>();
 
@@ -69,7 +69,10 @@ T* ComponentBucket::AddComponent(GameObject* owner, TArgs&& ...args)
 
 	components.emplace_back(std::move(uniquePtr));
 
-	component->Init();
+	if (canInitialize)
+	{
+		component->Init();
+	}
 
 	return component;
 }

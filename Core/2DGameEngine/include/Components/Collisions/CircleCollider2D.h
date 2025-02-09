@@ -32,5 +32,5 @@ public:
 	virtual void Clean() override;
 
 
-	virtual bool CollideWith(const Collider2D& other) const override;
+	virtual bool Accept(class ColliderVisitor& visitor, Collider2D& other) override;
 };

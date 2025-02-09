@@ -4,9 +4,23 @@
 
 
 GameObject::GameObject()
-	: isDestroyed(false)
+	: isDestroyed(false),
+	isInitialized(false)
 {
 	transform = AddComponent<Transform>();
+}
+
+void GameObject::Init()
+{
+	if (isInitialized)
+		return;
+
+	for (auto& component : componentBucket.GetComponents())
+	{
+		component->Init();
+	}
+
+	isInitialized = true;
 }
 
 void GameObject::Update(float dt)

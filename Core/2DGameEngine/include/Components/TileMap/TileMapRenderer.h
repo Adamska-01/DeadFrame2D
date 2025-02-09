@@ -9,6 +9,10 @@ protected:
 	TMap tileMap;
 
 
+protected:
+	TileMapRenderer() = default;
+
+
 public:
 	virtual ~TileMapRenderer() = default;
 

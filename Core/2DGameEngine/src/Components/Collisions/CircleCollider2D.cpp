@@ -1,6 +1,5 @@
 #include "Components/Collisions/CircleCollider2D.h"
-#include "Components/Collisions/CollisionHandler.h"
-#include <Components/Collisions/BoxCollider2D.h>
+#include "Tools/Collisions/ColliderVisitor.h"
 
 
 CircleCollider2D::CircleCollider2D(Circle collider)
@@ -40,14 +39,7 @@ void CircleCollider2D::Clean()
 {
 }
 
-bool CircleCollider2D::CollideWith(const Collider2D& other) const
+bool CircleCollider2D::Accept(ColliderVisitor& visitor, Collider2D& other)
 {
-	auto collisionPoint = Vector2F();
-
-	if (auto circle = dynamic_cast<const CircleCollider2D*>(&other))
-		return CollisionHandler::CircleToCircleCollision(*this, *circle);
-	else if (auto box = dynamic_cast<const BoxCollider2D*>(&other))
-		return CollisionHandler::CircleToBoxCollision(*this, *box, collisionPoint);
-
-	return false;
+	return visitor.Visit(*this, other);
 }
