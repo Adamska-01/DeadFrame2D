@@ -1,7 +1,7 @@
 #include "Prefabs/Bobble.h"
-#include "Components/Transform.h"
 #include <Components/Sprite.h>
 #include <Components/SpriteAnimator.h>
+#include <Components/Transform.h>
 #include <SubSystems/Input/Input.h>
 
 
@@ -17,7 +17,7 @@ Bobble::Bobble(Vector2F startPos, BobbleColor color)
 	this->color = color;
 
 	AddComponent<Sprite>(IDLE_BOBBLE_PATH);
-	auto animator = &AddComponent<SpriteAnimator>();
+	auto animator = AddComponent<SpriteAnimator>();
 
 	animator->SetProp(true, (int)color, 10, (int)BobbleColor::ALL_COLOURS, 5);
 	transform->Scale({ 3, 3 });
