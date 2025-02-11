@@ -20,13 +20,13 @@ public:
 	virtual ~Collider2D() = default;
 
 
-	virtual void Init() override;
+	virtual void Init();
 
-	virtual void Update(float dt) = 0;
+	virtual void Update(float dt);
 
-	virtual void Draw() = 0;
+	virtual void Draw();
 
-	virtual void Clean() = 0;
+	virtual void Clean();
 
 
 	virtual bool Accept(class ColliderVisitor& visitor, Collider2D& other) = 0;
