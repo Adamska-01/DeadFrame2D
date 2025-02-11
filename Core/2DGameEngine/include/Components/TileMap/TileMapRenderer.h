@@ -24,4 +24,14 @@ public:
 	virtual void Draw() = 0;
 	
 	virtual void Clean() = 0;
+
+	
+	const TMap& GetTileMap() const;
 };
+
+
+template<typename TMap>
+inline const TMap& TileMapRenderer<TMap>::GetTileMap() const
+{
+	return tileMap;
+}
