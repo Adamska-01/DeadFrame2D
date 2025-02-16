@@ -9,6 +9,7 @@ GameObjectRegistry::GameObjectRegistry()
 {
 	gameObjects.clear();
 	colliders.clear();
+	collisionHandler = CollisionHandler();
 
 	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &GameObjectRegistry::GameObjectCreatedHandler));
 	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &GameObjectRegistry::GameObjectDestroyedHandler));
@@ -30,9 +31,15 @@ void GameObjectRegistry::Update(float deltaTime)
 		obj->Update(deltaTime);
 	}
 
-	for (const auto& obj : colliders)
+	for (const auto colliderA : colliders)
 	{
-		//if (obj->CollideWith())
+		for (const auto colliderB : colliders)
+		{
+			if (colliderA == colliderB)
+				continue;
+
+			colliderA->Accept(collisionHandler, colliderB);
+		}
 	}
 }
 
