@@ -36,5 +36,11 @@ public:
 	virtual void Clean() override;
 
 
-	virtual bool Accept(class ColliderVisitor& visitor, Collider2D& other) override;
+	virtual bool Accept(ICollisionVisitor& visitor, Collider2D* other) override;
+
+	virtual bool AcceptDispatch(BoxCollider2D* other, ICollisionVisitor& visitor) override;
+
+	virtual bool AcceptDispatch(CircleCollider2D* other, ICollisionVisitor& visitor) override;
+
+	virtual bool AcceptDispatch(TiledMapCompatibleCollider2D* other, ICollisionVisitor& visitor) override;
 };

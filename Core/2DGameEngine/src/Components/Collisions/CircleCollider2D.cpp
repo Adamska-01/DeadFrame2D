@@ -1,5 +1,6 @@
 #include "Components/Collisions/CircleCollider2D.h"
-#include "Tools/Collisions/ColliderVisitor.h"
+#include "Components/Transform.h"
+#include "Tools/Collisions/ICollisionVisitor.h"
 
 
 CircleCollider2D::CircleCollider2D(Circle collider)
@@ -29,6 +30,12 @@ void CircleCollider2D::Init()
 
 void CircleCollider2D::Update(float dt)
 {
+	Collider2D::Update(dt);
+
+	const auto& pos = transform->position;
+
+	collider.position.x = previousPosition.x;
+	collider.position.y = previousPosition.y;
 }
 
 void CircleCollider2D::Draw()
@@ -39,7 +46,22 @@ void CircleCollider2D::Clean()
 {
 }
 
-bool CircleCollider2D::Accept(ColliderVisitor& visitor, Collider2D& other)
+bool CircleCollider2D::Accept(ICollisionVisitor& visitor, Collider2D* other)
 {
-	return visitor.Visit(*this, other);
+	return other->AcceptDispatch(this, visitor);
+}
+
+bool CircleCollider2D::AcceptDispatch(BoxCollider2D* other, ICollisionVisitor& visitor)
+{
+	return visitor.Visit(this, other);
+}
+
+bool CircleCollider2D::AcceptDispatch(CircleCollider2D* other, ICollisionVisitor& visitor)
+{
+	return visitor.Visit(this, other);
+}
+
+bool CircleCollider2D::AcceptDispatch(TiledMapCompatibleCollider2D* other, ICollisionVisitor& visitor)
+{
+	return visitor.Visit(this, other);
 }

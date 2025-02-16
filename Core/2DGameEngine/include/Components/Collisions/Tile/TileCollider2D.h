@@ -19,5 +19,5 @@ public:
 	virtual ~TileCollider2D() = default;
 
 
-	virtual bool Accept(class ColliderVisitor& visitor, Collider2D& other) = 0;
+	virtual bool Accept(ICollisionVisitor& visitor, Collider2D* other) override = 0;
 };

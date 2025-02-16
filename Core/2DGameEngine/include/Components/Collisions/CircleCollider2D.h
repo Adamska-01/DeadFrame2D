@@ -1,6 +1,6 @@
 #pragma once
-#include "Components/Generic/Circle.h"
 #include "Components/Collisions/Collider2D.h"
+#include "Components/Generic/Circle.h"
 #include <Math/Vector2.h>
 
 
@@ -32,5 +32,11 @@ public:
 	virtual void Clean() override;
 
 
-	virtual bool Accept(class ColliderVisitor& visitor, Collider2D& other) override;
+	virtual bool Accept(ICollisionVisitor& visitor, Collider2D* other) override;
+
+	virtual bool AcceptDispatch(BoxCollider2D* other, ICollisionVisitor& visitor);
+
+	virtual bool AcceptDispatch(CircleCollider2D* other, ICollisionVisitor& visitor);
+
+	virtual bool AcceptDispatch(TiledMapCompatibleCollider2D* other, ICollisionVisitor& visitor);
 };
