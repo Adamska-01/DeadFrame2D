@@ -1,17 +1,21 @@
 #pragma once
 #include "Components/GameComponent.h"
+#include "Math/Vector2.h"
+#include "Tools/Collisions/ICollisionVisitable.h"
 
 
 class Transform;
 
 
-class Collider2D : public GameComponent
+class Collider2D : public GameComponent, public ICollisionVisitable
 {
 	friend class CollisionHandler;
 
 
 protected:
 	Transform* transform;
+
+	Vector2F previousPosition;
 
 
 public:
@@ -21,7 +25,7 @@ public:
 
 
 	virtual void Init();
-
+	
 	virtual void Update(float dt);
 
 	virtual void Draw();
@@ -29,5 +33,5 @@ public:
 	virtual void Clean();
 
 
-	virtual bool Accept(class ColliderVisitor& visitor, Collider2D& other) = 0;
+	virtual bool Accept(ICollisionVisitor& visitor, Collider2D* other) override = 0;
 };

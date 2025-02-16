@@ -4,7 +4,7 @@
 
 
 Collider2D::Collider2D()
-	: transform(nullptr)
+	: transform(nullptr), previousPosition(Vector2F::Zero)
 {
 }
 
@@ -15,6 +15,8 @@ void Collider2D::Init()
 
 void Collider2D::Update(float dt)
 {
+	previousPosition.x = transform->position.x;
+	previousPosition.y = transform->position.y;
 }
 
 void Collider2D::Draw()
