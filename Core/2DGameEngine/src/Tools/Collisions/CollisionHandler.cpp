@@ -4,6 +4,7 @@
 #include "Tools/Collisions/CollisionHandler.h"
 
 
+
 bool CollisionHandler::PointInCircle(const Vector2F& point, const CircleCollider2D& collider)
 {
 	auto circle = collider.GetCircle();
@@ -14,25 +15,10 @@ bool CollisionHandler::PointInCircle(const Vector2F& point, const CircleCollider
 	return (dx * dx + dy * dy) <= (circle.radius * circle.radius);
 }
 
-bool CollisionHandler::Visit(BoxCollider2D& box, Collider2D& other)
+bool CollisionHandler::Visit(const BoxCollider2D* box, const BoxCollider2D* other)
 {
-	return other.Accept(*this, box);
-}
-
-bool CollisionHandler::Visit(CircleCollider2D& circle, Collider2D& other)
-{
-	return other.Accept(*this, circle);
-}
-
-bool CollisionHandler::Visit(TiledMapCompatibleCollider2D& tile, Collider2D& other)
-{
-	return other.Accept(*this, tile);
-}
-
-bool CollisionHandler::Visit(BoxCollider2D& box, BoxCollider2D& other)
-{
-	auto A = box.GetCollisionBox();
-	auto B = other.GetCollisionBox();
+	auto A = box->GetCollisionBox();
+	auto B = other->GetCollisionBox();
 
 	// Sides of the rectangle 
 	float leftA, leftB;
@@ -66,10 +52,10 @@ bool CollisionHandler::Visit(BoxCollider2D& box, BoxCollider2D& other)
 	return true;
 }
 
-bool CollisionHandler::Visit(BoxCollider2D& box, CircleCollider2D& other)
+bool CollisionHandler::Visit(const BoxCollider2D* box, const CircleCollider2D* other)
 {
-	auto A = other.GetCircle();
-	auto B = box.GetCollisionBox();
+	auto A = other->GetCircle();
+	auto B = box->GetCollisionBox();
 
 	// Closest points on collision box
 	Vector2F closestPoint;
@@ -100,14 +86,12 @@ bool CollisionHandler::Visit(BoxCollider2D& box, CircleCollider2D& other)
 	return false;
 }
 
-bool CollisionHandler::Visit(BoxCollider2D& box, TiledMapCompatibleCollider2D& other)
+bool CollisionHandler::Visit(const BoxCollider2D* box, const TiledMapCompatibleCollider2D* other)
 {
-	auto colliderRect = box.GetCollisionBox();
-
-	// Replace these with the real values
-	auto tilesize = 32;
-	auto rowCount = 20;
-	auto colCount = 60;
+	auto colliderRect = box->GetCollisionBox();
+	const auto& collisionLayers = other->GetCollisionLayers();
+	const auto& tilesize = other->GetTileSize();
+	const auto& tileMapDimension = other->GetTileMapDimensions();
 
 	auto left_tile = colliderRect.x / tilesize;
 	auto right_tile = (colliderRect.x + colliderRect.w) / tilesize;
@@ -118,39 +102,51 @@ bool CollisionHandler::Visit(BoxCollider2D& box, TiledMapCompatibleCollider2D& o
 	if (top_tile < 0)
 		top_tile = 0;
 
-	if (right_tile > colCount)
-		right_tile = colCount;
+	if (right_tile > tileMapDimension.x)
+		right_tile = tileMapDimension.x;
 
 	if (top_tile < 0)
 		top_tile = 0;
 
-	if (bottom_tile > rowCount)
-		bottom_tile = rowCount;
+	if (bottom_tile > tileMapDimension.y)
+		bottom_tile = tileMapDimension.y;
 
 	for (auto i = left_tile; i <= right_tile; i++)
 	{
 		for (auto j = top_tile; j <= bottom_tile; j++)
 		{
-			auto withinBounds = i >= 0 && i < colCount && j >= 0 && j < rowCount;
-			//auto isSolidTile = collisionTileMap[j][i] > 0;
+			auto withinBounds = i >= 0 && i < tileMapDimension.x && j >= 0 && j < tileMapDimension.y;
+			
+			if (!withinBounds)
+				continue;
 
-			//if (withinBounds && isSolidTile)
-			//	return true;
+			auto isSolidTile = false;
+		
+			for (const auto& layer : collisionLayers)
+			{
+				isSolidTile = layer.Data[j][i] > 0;
+
+				if (isSolidTile)
+					break;
+			}
+
+			if (isSolidTile)
+				return true;
 		}
 	}
 
 	return false;
 }
 
-bool CollisionHandler::Visit(CircleCollider2D& circle, BoxCollider2D& other)
+bool CollisionHandler::Visit(const CircleCollider2D* circle, const BoxCollider2D* other)
 {
 	return Visit(other, circle);
 }
 
-bool CollisionHandler::Visit(CircleCollider2D& circle, CircleCollider2D& other)
+bool CollisionHandler::Visit(const CircleCollider2D* circle, const CircleCollider2D* other)
 {
-	auto A = circle.GetCircle();
-	auto B = other.GetCircle();
+	auto A = circle->GetCircle();
+	auto B = other->GetCircle();
 
 	// Check if the point is touching the circle
 	if (A.position.Distance(B.position) <= A.radius + B.radius)
@@ -160,22 +156,79 @@ bool CollisionHandler::Visit(CircleCollider2D& circle, CircleCollider2D& other)
 	return false;
 }
 
-bool CollisionHandler::Visit(CircleCollider2D& circle, TiledMapCompatibleCollider2D& other)
+bool CollisionHandler::Visit(const CircleCollider2D* circle, const TiledMapCompatibleCollider2D* other)
 {
+	auto collisionLayers = other->GetCollisionLayers();
+	auto colliderCircle = circle->GetCircle();
+	auto circleCenter = colliderCircle.position;
+	auto circleRadius = colliderCircle.radius;
+
+	// Replace these with the real values
+	auto tilesize = 32;
+	auto rowCount = 20;
+	auto colCount = 60;
+
+	// We need to iterate over the tiles within the circle's radius
+	// Find the bounding box of the circle in terms of tiles (like how we did for the BoxCollider2D)
+	int left_tile = (circleCenter.x - circleRadius) / tilesize;
+	int right_tile = (circleCenter.x + circleRadius) / tilesize;
+	int top_tile = (circleCenter.y - circleRadius) / tilesize;
+	int bottom_tile = (circleCenter.y + circleRadius) / tilesize;
+
+	// Clamping to bounds
+	if (left_tile < 0) left_tile = 0;
+	if (right_tile > colCount) right_tile = colCount;
+	if (top_tile < 0) top_tile = 0;
+	if (bottom_tile > rowCount) bottom_tile = rowCount;
+
+	// Check all tiles within the circle's bounding box
+	for (auto i = left_tile; i <= right_tile; i++)
+	{
+		for (auto j = top_tile; j <= bottom_tile; j++)
+		{
+			// Check if the tile is within the circle's area
+			auto withinBounds = i >= 0 && i < colCount && j >= 0 && j < rowCount;
+
+			if (withinBounds)
+			{
+				// Get the tile center position
+				Vector2F tileCenter(i * tilesize + tilesize / 2, j * tilesize + tilesize / 2);
+
+				// Check if the tile's center is within the circle's radius
+				auto dx = tileCenter.x - circleCenter.x;
+				auto dy = tileCenter.y - circleCenter.y;
+				auto distanceSquared = dx * dx + dy * dy;
+
+				std::cout << "Distance Squared: " << distanceSquared << std::endl;
+
+				if (distanceSquared <= circleRadius * circleRadius)
+				{
+					// If the tile is within the circle's radius, check if it's a solid tile
+					auto isSolidTile = false;
+					for (const auto& layer : collisionLayers)
+					{
+						isSolidTile = layer.Data[j][i] > 0;
+						
+						if (isSolidTile) 
+							break;
+					}
+
+					if (isSolidTile)
+						return true;
+				}
+			}
+		}
+	}
+
 	return false;
 }
 
-bool CollisionHandler::Visit(TiledMapCompatibleCollider2D& tile, BoxCollider2D& other)
+bool CollisionHandler::Visit(const TiledMapCompatibleCollider2D* tile, const BoxCollider2D* other)
 {
 	return Visit(other, tile);
 }
 
-bool CollisionHandler::Visit(TiledMapCompatibleCollider2D& tile, CircleCollider2D& other)
+bool CollisionHandler::Visit(const TiledMapCompatibleCollider2D* tile, const CircleCollider2D* other)
 {
 	return Visit(other, tile);
-}
-
-bool CollisionHandler::Visit(TiledMapCompatibleCollider2D& tile, TiledMapCompatibleCollider2D& other)
-{
-	return false;
 }
