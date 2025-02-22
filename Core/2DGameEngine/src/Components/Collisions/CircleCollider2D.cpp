@@ -13,9 +13,10 @@ Circle CircleCollider2D::GetCircle() const
 	return collider;
 }
 
-void CircleCollider2D::SetPos(Vector2F p_pos)
+void CircleCollider2D::SetPos(const Vector2F& pos)
 {
-	collider.position = p_pos;
+	collider.position.x = pos.x;
+	collider.position.y = pos.y;
 }
 
 void CircleCollider2D::SetSize(float p_value)
@@ -32,10 +33,7 @@ void CircleCollider2D::Update(float dt)
 {
 	Collider2D::Update(dt);
 
-	const auto& pos = transform->position;
-
-	collider.position.x = previousPosition.x;
-	collider.position.y = previousPosition.y;
+	SetPos(previousPosition);
 }
 
 void CircleCollider2D::Draw()
@@ -48,6 +46,8 @@ void CircleCollider2D::Clean()
 
 bool CircleCollider2D::Accept(ICollisionVisitor& visitor, Collider2D* other)
 {
+	SetPos(transform->position);
+
 	return other->AcceptDispatch(this, visitor);
 }
 

@@ -3,6 +3,9 @@
 #include <SDL_rect.h>
 
 
+struct CollisionInfo;
+
+
 class BoxCollider2D : public Collider2D
 {
 private:
@@ -11,13 +14,16 @@ private:
 	SDL_Rect cropOffset;
 
 
+	void CollisionHandler(const CollisionInfo& collisionInfo);
+
+
 public:
 	BoxCollider2D(SDL_Rect box, SDL_Rect cropOffset);
 
-	~BoxCollider2D() = default;
+	virtual ~BoxCollider2D() override;
 
 
-	SDL_Rect GetCollisionBox() const;
+	const SDL_Rect& GetCollisionBox() const;
 
 	void SetBuffer(int x, int y, int w, int h);
 

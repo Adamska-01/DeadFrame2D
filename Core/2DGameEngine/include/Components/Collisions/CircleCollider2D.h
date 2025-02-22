@@ -18,7 +18,7 @@ public:
 	
 	Circle GetCircle() const;
 
-	void SetPos(Vector2F p_pos);
+	void SetPos(const Vector2F& pos);
 	
 	void SetSize(float p_value);
 

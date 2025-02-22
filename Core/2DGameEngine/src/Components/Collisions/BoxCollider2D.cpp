@@ -1,7 +1,10 @@
 #include "Components/Collisions/BoxCollider2D.h"
 #include "Components/Transform.h"
+#include "Data/Collision/CollisionInfo.h"
 #include "SubSystems/Renderer.h"
 #include "Tools/Collisions/ICollisionVisitor.h"
+#include "Tools/FrameTimer.h"
+#include "Tools/Helpers/EventHelpers.h"
 
 
 BoxCollider2D::BoxCollider2D(SDL_Rect box, SDL_Rect cropOffset)
@@ -9,7 +12,12 @@ BoxCollider2D::BoxCollider2D(SDL_Rect box, SDL_Rect cropOffset)
 {
 }
 
-SDL_Rect BoxCollider2D::GetCollisionBox() const
+BoxCollider2D::~BoxCollider2D()
+{
+	OnCollision -= EventHelpers::BindFunction(this, &BoxCollider2D::CollisionHandler);
+}
+
+const SDL_Rect& BoxCollider2D::GetCollisionBox() const
 {
 	return box;
 }
@@ -49,13 +57,13 @@ void BoxCollider2D::DrawBox(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 void BoxCollider2D::Init()
 {
 	Collider2D::Init();
+
+	OnCollision += EventHelpers::BindFunction(this, &BoxCollider2D::CollisionHandler);
 }
 
 void BoxCollider2D::Update(float dt)
 {
 	Collider2D::Update(dt);
-
-	SetBox(previousPosition.x - (box.w / 2), previousPosition.y - (box.h / 2), box.w, box.h);
 }
 
 void BoxCollider2D::Draw()
@@ -67,8 +75,34 @@ void BoxCollider2D::Clean()
 {
 }
 
+void BoxCollider2D::CollisionHandler(const CollisionInfo& collisionInfo)
+{
+	// Calculate sliding vector
+	auto velocity = transform->position - previousPosition;
+
+	// Reset to previous position
+	transform->position = previousPosition;
+
+	auto dotProduct = velocity.Dot(collisionInfo.normal);
+
+	// Project velocity onto the collision normal and subtract it to get sliding velocity
+	auto slideVelocity = Vector2F
+	{
+		velocity.x - dotProduct * collisionInfo.normal.x,
+		velocity.y - dotProduct * collisionInfo.normal.y
+	};
+
+	std::cout << slideVelocity;	
+
+	// Apply sliding velocity
+	transform->position.x += slideVelocity.x * FrameTimer::DeltaTime() * 200.0f;
+	transform->position.y += slideVelocity.y * FrameTimer::DeltaTime() * 200.0f;
+}
+
 bool BoxCollider2D::Accept(ICollisionVisitor& visitor, Collider2D* other)
 {
+	SetBox(transform->position.x - (box.w / 2), transform->position.y - (box.h / 2), box.w, box.h);
+
 	return other->AcceptDispatch(this, visitor);
 }
 
