@@ -1,7 +1,9 @@
 #pragma once
 #include "Components/GameComponent.h"
+#include "Data/Collision/CollisionInfo.h"
 #include "Math/Vector2.h"
 #include "Tools/Collisions/ICollisionVisitable.h"
+#include "Tools/MulticastDelegate.h"
 
 
 class Transform;
@@ -16,6 +18,8 @@ protected:
 	Transform* transform;
 
 	Vector2F previousPosition;
+
+	MulticastDelegate<const CollisionInfo&> OnCollision;
 
 
 public:
@@ -34,4 +38,11 @@ public:
 
 
 	virtual bool Accept(ICollisionVisitor& visitor, Collider2D* other) override = 0;
+
+
+	void OnCollisionCallback(const CollisionInfo& collisionInfo);
+
+	void RegisterCollisionHandler(const std::function<void(const CollisionInfo&)>& handler);
+	
+	void DeregisterEventHandler(const std::function<void(const CollisionInfo&)>& handler);
 };
