@@ -10,21 +10,21 @@ class TiledMapCompatibleCollider2D;
 class ICollisionVisitor
 {
 public:
-	virtual bool Visit(const BoxCollider2D* box, const BoxCollider2D* other) = 0;
+	virtual bool Visit(BoxCollider2D* box, BoxCollider2D* other) = 0;
 
-	virtual bool Visit(const BoxCollider2D* box, const CircleCollider2D* other) = 0;
+	virtual bool Visit(BoxCollider2D* box, CircleCollider2D* other) = 0;
 
-	virtual bool Visit(const BoxCollider2D* box, const TiledMapCompatibleCollider2D* other) = 0;
-
-
-	virtual bool Visit(const CircleCollider2D* circle, const BoxCollider2D* other) = 0;
-
-	virtual bool Visit(const CircleCollider2D* circle, const CircleCollider2D* other) = 0;
-
-	virtual bool Visit(const CircleCollider2D* circle, const TiledMapCompatibleCollider2D* other) = 0;
+	virtual bool Visit(BoxCollider2D* box, TiledMapCompatibleCollider2D* other) = 0;
 
 
-	virtual bool Visit(const TiledMapCompatibleCollider2D* tile, const BoxCollider2D* other) = 0;
+	virtual bool Visit(CircleCollider2D* circle, BoxCollider2D* other) = 0;
 
-	virtual bool Visit(const TiledMapCompatibleCollider2D* tile, const CircleCollider2D* other) = 0;
+	virtual bool Visit(CircleCollider2D* circle, CircleCollider2D* other) = 0;
+
+	virtual bool Visit(CircleCollider2D* circle, TiledMapCompatibleCollider2D* other) = 0;
+
+
+	virtual bool Visit(TiledMapCompatibleCollider2D* tile, BoxCollider2D* other) = 0;
+
+	virtual bool Visit(TiledMapCompatibleCollider2D* tile, CircleCollider2D* other) = 0;
 };
