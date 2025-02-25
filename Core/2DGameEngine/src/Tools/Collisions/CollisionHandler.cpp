@@ -6,24 +6,28 @@
 
 
 
-bool CollisionHandler::PointVsBox(const Vector2F& point, BoxCollider2D* collider)
+bool CollisionHandler::PointVsBox(const Vector2F& point, const SDL_Rect* box)
 {
-	const auto& box = collider->GetCollisionBox();
-
-	return point.x >= box.x 
-		&& point.y >= box.y 
-		&& point.x < box.x + box.w 
-		&& point.y < box.y + box.h;
+	return point.x >= box->x 
+		&& point.y >= box->y 
+		&& point.x < box->x + box->w 
+		&& point.y < box->y + box->h;
 }
 
-bool CollisionHandler::PointVsCircle(const Vector2F& point, CircleCollider2D* collider)
+bool CollisionHandler::PointVsCircle(const Vector2F& point, const Circle* circle)
 {
-	auto circle = collider->GetCircle();
+	auto dx = point.x - circle->position.x;
+	auto dy = point.y - circle->position.y;
 
-	auto dx = point.x - circle.position.x;
-	auto dy = point.y - circle.position.y;
+	return (dx * dx + dy * dy) <= (circle->radius * circle->radius);
+}
 
-	return (dx * dx + dy * dy) <= (circle.radius * circle.radius);
+bool CollisionHandler::RectVsRect(const SDL_Rect* boxA, const SDL_Rect* boxB)
+{
+	return boxA->x < boxB->x + boxB->w 
+		&& boxB->x < boxA->x + boxA->w
+		&& boxA->y < boxB->y + boxB->h 
+		&& boxB->y < boxA->y + boxA->h;
 }
 
 bool CollisionHandler::Visit(BoxCollider2D* box, BoxCollider2D* other)
