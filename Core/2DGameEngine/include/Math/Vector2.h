@@ -163,8 +163,6 @@ template <typename T>
 const Vector2<T> Vector2<T>::One = Vector2<T>(1, 1);
 
 
-// Vector2f - Specialization for float
+// Specializations
 using Vector2F = Vector2<float>;
-
-// Vector2i - Specialization for int
 using Vector2I = Vector2<int>;
