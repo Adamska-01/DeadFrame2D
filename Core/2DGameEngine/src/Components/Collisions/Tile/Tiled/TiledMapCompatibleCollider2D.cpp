@@ -52,7 +52,7 @@ const Vector2I& TiledMapCompatibleCollider2D::GetTileMapDimensions() const
 	return tileMapDimension;
 }
 
-const int& TiledMapCompatibleCollider2D::GetTileSize() const
+int TiledMapCompatibleCollider2D::GetTileSize() const
 {
 	return tileSize;
 }

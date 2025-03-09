@@ -39,5 +39,5 @@ public:
 	
 	const Vector2I& GetTileMapDimensions() const;
 
-	const int& GetTileSize() const;
+	int GetTileSize() const;
 };
