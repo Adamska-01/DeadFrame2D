@@ -4,7 +4,6 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
-#include <SDL.h>
 
 
 ControllerInputDevice::ControllerInputDevice(int deviceID)
