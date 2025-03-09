@@ -8,6 +8,7 @@
 #include "SubSystems/Input/InputControls.h"
 #include "Tools/Helpers/EventHelpers.h"
 #include <iostream>
+#include <unordered_set>
 
 
 std::unique_ptr<InputDevice> Input::keyboardDevice;
@@ -116,7 +117,33 @@ std::optional<int> Input::ProcessEvents(const SDL_Event& sdlEvent)
 		break;
 		
 	case SDL_EventType::SDL_CONTROLLERDEVICEADDED:
-		controllerDevices.push_back(std::make_unique<ControllerInputDevice>((int)sdlEvent.cdevice.which));
+		// THIS LOGIC IS TEMPORARY
+		auto newController = new ControllerInputDevice((int)sdlEvent.cdevice.which);
+
+		auto playerAssigned = PlayerInputSlot::NONE;
+		std::unordered_set<PlayerInputSlot> assignedSlots;
+
+		for (const auto& controller : controllerDevices)
+		{
+			assignedSlots.insert(controller->GetAssignedPlayer());
+		}
+
+		// Find first unassigned slot
+		for (int i = (int)PlayerInputSlot::PLAYER_1; i <= (int)PlayerInputSlot::PLAYER_4; i++)
+		{
+			auto currentSlot = static_cast<PlayerInputSlot>(i);
+			
+			if (assignedSlots.contains(currentSlot))
+				continue;
+
+			playerAssigned = currentSlot;
+
+			break;
+		}
+
+		newController->AssignedPlayer(playerAssigned);
+
+		controllerDevices.push_back(std::unique_ptr<ControllerInputDevice>(std::move(newController)));
 		break;
 	}
 
