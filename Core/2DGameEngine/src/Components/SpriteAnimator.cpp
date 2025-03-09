@@ -24,7 +24,7 @@ void SpriteAnimator::Init()
 	if (sprite == nullptr)
 		return;
 
-	sprite->enableDraw = false;
+	sprite->SetEnableDraw(false);
 }
 
 void SpriteAnimator::Update(float dt)

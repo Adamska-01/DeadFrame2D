@@ -9,12 +9,18 @@ struct CollisionInfo;
 class BoxCollider2D : public Collider2D
 {
 private:
+	SDL_Rect previousBox;
+
 	SDL_Rect box;
 
 	SDL_Rect cropOffset;
 
 
 	void CollisionHandler(const CollisionInfo& collisionInfo);
+
+	void UpdatePreviousBox(float x, float y);
+
+	void SetBox(SDL_Rect& collisionBox, int x, int y, int w, int h);
 
 
 public:
@@ -24,6 +30,8 @@ public:
 
 
 	const SDL_Rect& GetCollisionBox() const;
+
+	const SDL_Rect& GetPreviousBox() const;
 
 	void SetBuffer(int x, int y, int w, int h);
 
@@ -38,8 +46,6 @@ public:
 	virtual void Update(float dt) override;
 
 	virtual void Draw() override;
-
-	virtual void Clean() override;
 
 
 	virtual bool Accept(ICollisionVisitor& visitor, Collider2D* other) override;

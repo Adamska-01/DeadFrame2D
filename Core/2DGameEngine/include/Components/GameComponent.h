@@ -6,12 +6,16 @@ class GameObject;
 
 class GameComponent
 {
-public:
+	friend class ComponentBucket;
+
+
+protected:
 	GameObject* OwningObject;
 
 	bool enableDraw;
 
 
+public:
 	GameComponent();
 
 	virtual ~GameComponent() = default;
@@ -26,6 +30,9 @@ public:
 	virtual void Draw() = 0;
 
 
-protected:
-	virtual void Clean() = 0;
+	GameObject* GetGameObject() const;
+
+	bool IsDrawEnabled() const;
+
+	void SetEnableDraw(bool value);
 };

@@ -1,10 +1,6 @@
 #pragma once
 #include "Generic/SpriteAnimationProperties.h"
 #include <Components/GameComponent.h>
-#include <map>
-#include <SDL.h>
-#include <string>
-#include <SubSystems/TextureManager.h>
 
 
 class Transform;
@@ -43,8 +39,4 @@ public:
 	SDL_Rect GetFrameRect();
 	
 	const SpriteAnimationProperties& GetProp();
-
-
-protected:
-	virtual void Clean() override {};
 };

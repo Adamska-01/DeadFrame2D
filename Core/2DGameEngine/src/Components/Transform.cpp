@@ -59,7 +59,3 @@ void Transform::Update(float dt)
 void Transform::Draw()
 {
 }
-
-void Transform::Clean()
-{
-}

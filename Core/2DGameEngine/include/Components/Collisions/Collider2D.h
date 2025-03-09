@@ -11,13 +11,10 @@ class Transform;
 
 class Collider2D : public GameComponent, public ICollisionVisitable
 {
-	friend class CollisionHandler;
-
-
 protected:
 	Transform* transform;
 
-	Vector2F previousPosition;
+	Vector2F startFramePosition;
 
 	MulticastDelegate<const CollisionInfo&> OnCollision;
 
@@ -34,8 +31,6 @@ public:
 
 	virtual void Draw();
 
-	virtual void Clean();
-
 
 	virtual bool Accept(ICollisionVisitor& visitor, Collider2D* other) override = 0;
 
@@ -45,4 +40,9 @@ public:
 	void RegisterCollisionHandler(const std::function<void(const CollisionInfo&)>& handler);
 	
 	void DeregisterEventHandler(const std::function<void(const CollisionInfo&)>& handler);
+
+
+	Transform* GetTranform() const;
+
+	Vector2F GetStartFramePosition() const;
 };

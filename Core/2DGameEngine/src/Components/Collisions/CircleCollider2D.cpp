@@ -33,14 +33,10 @@ void CircleCollider2D::Update(float dt)
 {
 	Collider2D::Update(dt);
 
-	SetPos(previousPosition);
+	SetPos(startFramePosition);
 }
 
 void CircleCollider2D::Draw()
-{
-}
-
-void CircleCollider2D::Clean()
 {
 }
 

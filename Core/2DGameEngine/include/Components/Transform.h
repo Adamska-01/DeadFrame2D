@@ -46,8 +46,4 @@ public:
 	{
 		std::cout << msg << "(X Y) = (" << position.x << " " << position.y << ")" << std::endl;
 	}
-
-
-protected:
-	virtual void Clean() override;
 };

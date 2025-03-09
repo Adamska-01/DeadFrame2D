@@ -29,8 +29,6 @@ public:
 
 	virtual void Draw() override;
 
-	virtual void Clean() override;
-
 
 	virtual bool Accept(ICollisionVisitor& visitor, Collider2D* other) override;
 
