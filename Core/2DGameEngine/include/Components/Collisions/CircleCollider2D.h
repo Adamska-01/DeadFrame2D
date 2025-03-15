@@ -1,13 +1,21 @@
 #pragma once
 #include "Components/Collisions/Collider2D.h"
 #include "Components/Generic/Circle.h"
+#include "Factories/Abstractions/Debugging/IDebugColliderDrawer.h"
 #include <Math/Vector2.h>
 
 
 class CircleCollider2D : public Collider2D
 {
 private:
-	Circle collider;
+	Circle circle;
+
+	Circle startFrameCircle;
+	
+	std::unique_ptr<IDebugColliderDrawer<CircleCollider2D>> debugCollisionDrawer;
+
+	
+	void SetCirclePos(Circle& collisionCircle, const Vector2F& newPos);
 
 
 public:
@@ -16,11 +24,13 @@ public:
 	~CircleCollider2D() = default;
 
 	
-	Circle GetCircle() const;
+	const Circle& GetCircle() const;
+
+	const Circle& GetStartFrameCircle() const;
 
 	void SetPos(const Vector2F& pos);
 	
-	void SetSize(float p_value);
+	void SetSize(float newRadius);
 
 
 	virtual void Init() override;

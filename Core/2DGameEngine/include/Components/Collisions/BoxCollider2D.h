@@ -1,5 +1,6 @@
 #pragma once
 #include "Components/Collisions/Collider2D.h"
+#include "Factories/Abstractions/Debugging/IDebugColliderDrawer.h"
 #include <SDL_rect.h>
 
 
@@ -14,6 +15,8 @@ private:
 	SDL_Rect box;
 
 	SDL_Rect cropOffset;
+
+	std::unique_ptr<IDebugColliderDrawer<BoxCollider2D>> debugCollisionDrawer;
 
 
 	void CollisionHandler(const CollisionInfo& collisionInfo);
@@ -37,13 +40,8 @@ public:
 
 	void SetBox(int x, int y, int w, int h);
 
-	// TODO: Make a damn factory for this, and draw the bow only when running on debug
-	void DrawBox(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
-
 
 	virtual void Init() override;
-
-	virtual void Update(float dt) override;
 
 	virtual void Draw() override;
 

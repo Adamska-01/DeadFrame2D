@@ -1,7 +1,8 @@
 #include "Components/Collisions/BoxCollider2D.h"
 #include "Components/Transform.h"
+#include "Constants/CommonColors.h"
 #include "Data/Collision/CollisionInfo.h"
-#include "SubSystems/Renderer.h"
+#include "Factories/Concretions/Debugging/DebugBoxColliderDrawerFactory.h"
 #include "Tools/Collisions/ICollisionVisitor.h"
 #include "Tools/FrameTimer.h"
 #include "Tools/Helpers/EventHelpers.h"
@@ -10,6 +11,7 @@
 BoxCollider2D::BoxCollider2D(SDL_Rect box, SDL_Rect cropOffset)
 	: previousBox(box), box(box), cropOffset(cropOffset)
 {
+	debugCollisionDrawer = std::unique_ptr<IDebugColliderDrawer<BoxCollider2D>>(std::move(DebugBoxColliderDrawerFactory().CreateProduct(this)));
 }
 
 BoxCollider2D::~BoxCollider2D()
@@ -80,20 +82,6 @@ void BoxCollider2D::SetBox(int x, int y, int w, int h)
 	SetBox(box, x, y, w, h);
 }
 
-void BoxCollider2D::DrawBox(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
-{
-	SDL_Renderer* renderer = Renderer::GetRenderer();
-
-	Uint8 oldR, oldG, oldB, oldA;
-	SDL_GetRenderDrawColor(renderer, &oldR, &oldG, &oldB, &oldA);
-
-	SDL_SetRenderDrawColor(renderer, r, g, b, a);
-
-	SDL_RenderDrawRect(renderer, &box);
-
-	SDL_SetRenderDrawColor(renderer, oldR, oldG, oldB, oldA);
-}
-
 void BoxCollider2D::Init()
 {
 	Collider2D::Init();
@@ -101,16 +89,13 @@ void BoxCollider2D::Init()
 	OnCollision += EventHelpers::BindFunction(this, &BoxCollider2D::CollisionHandler);
 }
 
-void BoxCollider2D::Update(float dt)
-{
-	Collider2D::Update(dt);
-
-
-}
-
 void BoxCollider2D::Draw()
 {
-	DrawBox(255, 255, 255, 255);
+	Collider2D::Draw();
+	
+	SetBox(transform->position.x - (box.w / 2), transform->position.y - (box.h / 2), box.w, box.h);
+	
+	debugCollisionDrawer->DrawCollider(CommonColors::WHITE);
 }
 
 bool BoxCollider2D::Accept(ICollisionVisitor& visitor, Collider2D* other)
