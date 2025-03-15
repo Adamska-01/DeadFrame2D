@@ -66,7 +66,15 @@ SDL_Renderer* Renderer::GetRenderer()
 	return renderer;
 }
 
-void Renderer::SetDisplayColour(int r, int g, int b, int a)
+SDL_Color Renderer::GetDisplayColor()
+{
+	Uint8 r, g, b, a;
+	SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
+
+	return SDL_Color(r, g, b, a);
+}
+
+void Renderer::SetDisplayColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
 	if (renderer == nullptr)
 		return;

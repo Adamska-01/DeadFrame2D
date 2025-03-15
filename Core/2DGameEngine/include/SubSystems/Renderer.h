@@ -1,5 +1,6 @@
 #pragma once
 #include "Window.h"
+#include <cstdint>
 
 
 struct SDL_Window;
@@ -36,7 +37,9 @@ public:
 	
 	static SDL_Renderer* GetRenderer();
 
-	static void SetDisplayColour(int r, int g, int b, int a);
+	static SDL_Color GetDisplayColor();
+
+	static void SetDisplayColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 
 	static void SetResolutionTarget(Vector2I targetResolution);
 };
