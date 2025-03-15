@@ -25,42 +25,48 @@ public:
 	virtual	~Vector2() = default;
 
 
-	T Distance(const Vector2<T>& other) const;
+	constexpr T Distance(const Vector2<T>& other) const;
 
-	T Magnitude() const;
+	constexpr T Magnitude() const;
 	
-	T AngleBetween(const Vector2<T> other) const;
+	constexpr T AngleBetween(const Vector2<T> other) const;
 
-	T Dot(const Vector2<T>& other) const;	
+	constexpr T Dot(const Vector2<T>& other) const;
 
-	T Cross(const Vector2<T>& other) const;
-
-	Vector2<T>& Normalize();
+	constexpr T Cross(const Vector2<T>& other) const;
 	
-	bool IsZero() const;
+	constexpr Vector2<T> Min(const Vector2<T>& other) const;
+	
+	constexpr Vector2<T> Max(const Vector2<T>& other) const;
+
+	constexpr Vector2<T>& Normalize();
+	
+	constexpr bool IsZero() const;
 
 
-	Vector2<T>& operator=(const Vector2<T>& other);
+	constexpr Vector2<T>& operator=(const Vector2<T>& other);
 
-	Vector2<T> operator+(const Vector2<T>& other) const;
-	
-	Vector2<T> operator-(const Vector2<T>& other) const;
-	
-	Vector2<T> operator*(const Vector2<T>& other) const;
-	
-	Vector2<T> operator/(const Vector2<T>& other) const;
+	constexpr Vector2<T> operator+(const Vector2<T>& other) const;
 
-	Vector2<T> operator*(const T& scalar) const;
+	constexpr Vector2<T> operator-(const Vector2<T>& other) const;
 
-	Vector2<T>& operator+=(const Vector2<T>& other);
-	
-	Vector2<T>& operator-=(const Vector2<T>& other);
-	
-	Vector2<T>& operator*=(const Vector2<T>& other);
-	
-	Vector2<T>& operator/=(const Vector2<T>& other);
+	constexpr Vector2<T> operator*(const Vector2<T>& other) const;
 
-	bool operator==(const Vector2<T>& other) const;
+	constexpr Vector2<T> operator/(const Vector2<T>& other) const;
+
+	constexpr Vector2<T> operator*(const T& scalar) const;
+
+	constexpr Vector2<T> operator/(const T& scalar) const;
+
+	constexpr Vector2<T>& operator+=(const Vector2<T>& other);
+
+	constexpr Vector2<T>& operator-=(const Vector2<T>& other);
+
+	constexpr Vector2<T>& operator*=(const Vector2<T>& other);
+
+	constexpr Vector2<T>& operator/=(const Vector2<T>& other);
+
+	constexpr bool operator==(const Vector2<T>& other) const;
 
 
 	inline friend std::ostream& operator<<(std::ostream& out, const Vector2<T>& v)
@@ -86,19 +92,19 @@ using Vector2I = Vector2<int>;
 
 
 template<typename T>
-inline T Vector2<T>::Distance(const Vector2<T>& other) const
+inline constexpr T Vector2<T>::Distance(const Vector2<T>& other) const
 {
 	return std::sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
 }
 
 template<typename T>
-inline T Vector2<T>::Magnitude() const
+inline constexpr T Vector2<T>::Magnitude() const
 {
 	return std::sqrt(x * x + y * y);
 }
 
 template<typename T>
-inline T Vector2<T>::AngleBetween(const Vector2<T> other) const
+inline constexpr T Vector2<T>::AngleBetween(const Vector2<T> other) const
 {
 	auto angle = atan2(y - other.y, x - other.x) * (MathConstants::PI / 180);
 
@@ -106,19 +112,31 @@ inline T Vector2<T>::AngleBetween(const Vector2<T> other) const
 }
 
 template<typename T>
-inline T Vector2<T>::Dot(const Vector2<T>& other) const
+inline constexpr T Vector2<T>::Dot(const Vector2<T>& other) const
 {
 	return (x * other.x) + (y * other.y);
 }
 
 template<typename T>
-inline T Vector2<T>::Cross(const Vector2<T>& other) const
+inline constexpr T Vector2<T>::Cross(const Vector2<T>& other) const
 {
 	return (x * other.y) - (y * other.x);
 }
 
 template<typename T>
-inline Vector2<T>& Vector2<T>::Normalize()
+inline constexpr Vector2<T> Vector2<T>::Min(const Vector2<T>& other) const
+{
+	return Vector2<T>(std::min(x, other.x), std::min(y, other.y));
+}
+
+template<typename T>
+inline constexpr Vector2<T> Vector2<T>::Max(const Vector2<T>& other) const
+{
+	return Vector2<T>(std::max(x, other.x), std::max(y, other.y));
+}
+
+template<typename T>
+inline constexpr Vector2<T>& Vector2<T>::Normalize()
 {
 	auto magnitude = Magnitude();
 
@@ -133,13 +151,13 @@ inline Vector2<T>& Vector2<T>::Normalize()
 }
 
 template<typename T>
-inline bool Vector2<T>::IsZero() const
+inline constexpr bool Vector2<T>::IsZero() const
 {
-	return (x == 0 && y == 0) ? true : false;
+	return *this == Vector2<T>::Zero;
 }
 
 template<typename T>
-inline Vector2<T>& Vector2<T>::operator=(const Vector2<T>& other)
+inline constexpr Vector2<T>& Vector2<T>::operator=(const Vector2<T>& other)
 {
 	x = other.x;
 	y = other.y;
@@ -148,37 +166,43 @@ inline Vector2<T>& Vector2<T>::operator=(const Vector2<T>& other)
 }
 
 template<typename T>
-inline Vector2<T> Vector2<T>::operator+(const Vector2<T>& other) const
+inline constexpr Vector2<T> Vector2<T>::operator+(const Vector2<T>& other) const
 {
 	return Vector2<T>(x + other.x, y + other.y);
 }
 
 template<typename T>
-inline Vector2<T> Vector2<T>::operator-(const Vector2<T>& other) const
+inline constexpr Vector2<T> Vector2<T>::operator-(const Vector2<T>& other) const
 {
 	return Vector2<T>(x - other.x, y - other.y);
 }
 
 template<typename T>
-inline Vector2<T> Vector2<T>::operator*(const Vector2<T>& other) const
+inline constexpr Vector2<T> Vector2<T>::operator*(const Vector2<T>& other) const
 {
 	return Vector2<T>(x * other.x, y * other.y);
 }
 
 template<typename T>
-inline Vector2<T> Vector2<T>::operator/(const Vector2<T>& other) const
+inline constexpr Vector2<T> Vector2<T>::operator/(const Vector2<T>& other) const
 {
 	return Vector2<T>(x / other.x, y / other.y);
 }
 
 template<typename T>
-inline Vector2<T> Vector2<T>::operator*(const T& scalar) const
+inline constexpr Vector2<T> Vector2<T>::operator*(const T& scalar) const
 {
 	return Vector2<T>(x * scalar, y * scalar);
 }
 
 template<typename T>
-inline Vector2<T>& Vector2<T>::operator+=(const Vector2<T>& other)
+inline constexpr Vector2<T> Vector2<T>::operator/(const T& scalar) const
+{
+	return Vector2<T>(x / scalar, y / scalar);
+}
+
+template<typename T>
+inline constexpr Vector2<T>& Vector2<T>::operator+=(const Vector2<T>& other)
 {
 	x += other.x;
 	y += other.y;
@@ -187,7 +211,7 @@ inline Vector2<T>& Vector2<T>::operator+=(const Vector2<T>& other)
 }
 
 template<typename T>
-inline Vector2<T>& Vector2<T>::operator-=(const Vector2<T>& other)
+inline constexpr Vector2<T>& Vector2<T>::operator-=(const Vector2<T>& other)
 {
 	x -= other.x;
 	y -= other.y;
@@ -196,7 +220,7 @@ inline Vector2<T>& Vector2<T>::operator-=(const Vector2<T>& other)
 }
 
 template<typename T>
-inline Vector2<T>& Vector2<T>::operator*=(const Vector2<T>& other)
+inline constexpr Vector2<T>& Vector2<T>::operator*=(const Vector2<T>& other)
 {
 	x *= other.x;
 	y *= other.y;
@@ -205,7 +229,7 @@ inline Vector2<T>& Vector2<T>::operator*=(const Vector2<T>& other)
 }
 
 template<typename T>
-inline Vector2<T>& Vector2<T>::operator/=(const Vector2<T>& other)
+inline constexpr Vector2<T>& Vector2<T>::operator/=(const Vector2<T>& other)
 {
 	x /= other.x;
 	y /= other.y;
@@ -214,7 +238,7 @@ inline Vector2<T>& Vector2<T>::operator/=(const Vector2<T>& other)
 }
 
 template<typename T>
-inline bool Vector2<T>::operator==(const Vector2<T>& other) const
+inline constexpr bool Vector2<T>::operator==(const Vector2<T>& other) const
 {
 	if (this->x == other.x && this->y == other.y)
 		return true;
