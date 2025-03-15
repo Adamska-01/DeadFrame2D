@@ -4,6 +4,7 @@
 #include <SDL_image.h>
 #include <string>
 #include <unordered_map>
+#include "Components/Generic/Circle.h"
 
 
 class TextureManager
@@ -31,6 +32,11 @@ private:
 
 public:
 	static std::shared_ptr<SDL_Texture> LoadTexture(std::string filename);
+
+
+	static void DrawRect(SDL_Rect rect, SDL_Color color, bool filled);
+
+	static void DrawCircle(Circle circle, SDL_Color color, bool filled);
 
 	static void NormalDraw(SDL_Texture* texture);
 	

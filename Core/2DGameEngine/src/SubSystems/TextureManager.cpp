@@ -70,6 +70,88 @@ std::shared_ptr<SDL_Texture> TextureManager::LoadTexture(std::string filename)
 	return sharedPtr;
 }
 
+void TextureManager::DrawRect(SDL_Rect rect, SDL_Color color, bool filled)
+{
+	auto renderer = Renderer::GetRenderer();
+	auto oldRenderColor = Renderer::GetDisplayColor();
+
+	Renderer::SetDisplayColor(color.r, color.g, color.b, color.a);
+
+	if (filled)
+	{
+		SDL_RenderFillRect(renderer, &rect);
+	}
+	else
+	{
+		SDL_RenderDrawRect(renderer, &rect);
+	}
+
+	// Reset Display Color
+	Renderer::SetDisplayColor(oldRenderColor.r, oldRenderColor.g, oldRenderColor.b, oldRenderColor.a);
+}
+
+void TextureManager::DrawCircle(Circle circle, SDL_Color color, bool filled)
+{
+	auto radius = circle.radius;
+	auto position = circle.position;
+
+	auto oldRenderColor = Renderer::GetDisplayColor();
+	
+	Renderer::SetDisplayColor(color.r, color.g, color.b, color.a);
+
+	SDL_Renderer* renderer = Renderer::GetRenderer();
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+
+	const int diameter = (radius * 2);
+
+	int x = radius - 1;
+	int y = 0;
+	int tx = 1;
+	int ty = 1;
+	int error = (tx - diameter);
+
+	while (x >= y)
+	{
+		if (filled)
+		{
+			// Draw horizontal lines between points to fill the circle
+			SDL_RenderDrawLine(renderer, position.x - x, position.y - y, position.x + x, position.y - y);
+			SDL_RenderDrawLine(renderer, position.x - x, position.y + y, position.x + x, position.y + y);
+			SDL_RenderDrawLine(renderer, position.x - y, position.y - x, position.x + y, position.y - x);
+			SDL_RenderDrawLine(renderer, position.x - y, position.y + x, position.x + y, position.y + x);
+		}
+		else
+		{
+			// Draw outline points
+			SDL_RenderDrawPoint(renderer, position.x + x, position.y - y);
+			SDL_RenderDrawPoint(renderer, position.x + x, position.y + y);
+			SDL_RenderDrawPoint(renderer, position.x - x, position.y - y);
+			SDL_RenderDrawPoint(renderer, position.x - x, position.y + y);
+			SDL_RenderDrawPoint(renderer, position.x + y, position.y - x);
+			SDL_RenderDrawPoint(renderer, position.x + y, position.y + x);
+			SDL_RenderDrawPoint(renderer, position.x - y, position.y - x);
+			SDL_RenderDrawPoint(renderer, position.x - y, position.y + x);
+		}
+
+		if (error <= 0)
+		{
+			y++;
+			error += ty;
+			ty += 2;
+		}
+
+		if (error > 0)
+		{
+			x--;
+			tx += 2;
+			error += (tx - diameter);
+		}
+	}
+
+	// Reset Display Color
+	Renderer::SetDisplayColor(oldRenderColor.r, oldRenderColor.g, oldRenderColor.b, oldRenderColor.a);
+}
+
 void TextureManager::NormalDraw(SDL_Texture* texture)
 {
 	SDL_RenderCopy(Renderer::GetRenderer(), texture, NULL, NULL);
