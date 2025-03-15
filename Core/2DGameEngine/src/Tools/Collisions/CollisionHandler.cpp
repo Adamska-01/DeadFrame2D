@@ -261,77 +261,66 @@ bool CollisionHandler::Visit(CircleCollider2D* circle, CircleCollider2D* other)
 
 bool CollisionHandler::Visit(CircleCollider2D* circle, TiledMapCompatibleCollider2D* other)
 {
-	auto collisionLayers = other->GetCollisionLayers();
-	auto colliderCircle = circle->GetCircle();
-	auto circleCenter = colliderCircle.position;
-	auto circleRadius = colliderCircle.radius;
+	const auto& collisionLayers = other->GetCollisionLayers();
+	const auto& tileMapDimension = other->GetTileMapDimensions();
+	const auto tileSize = other->GetTileSize();
+	const auto& startFrameCircle = circle->GetStartFrameCircle();
+	const auto radius = circle->GetCircle().radius;
+	auto circleEndFramePosition = circle->GetCircle().position;
 
-	// Replace these with the real values
-	auto tileSize = other->GetTileSize();
-	auto rowCount = 20;
-	auto colCount = 60;
+	auto velocity = circleEndFramePosition - startFrameCircle.position;
+	if (velocity.IsZero())
+		return false;
 
-	// We need to iterate over the tiles within the circle's radius
-	// Find the bounding box of the circle in terms of tiles (like how we did for the BoxCollider2D)
-	int left_tile = (circleCenter.x - circleRadius) / tileSize;
-	int right_tile = (circleCenter.x + circleRadius) / tileSize;
-	int top_tile = (circleCenter.y - circleRadius) / tileSize;
-	int bottom_tile = (circleCenter.y + circleRadius) / tileSize;
+	// Compute tile bounds in which to check collisions (inclusive)
+	auto left_tile = std::max(0, static_cast<int>((std::min(startFrameCircle.position.x, circleEndFramePosition.x) - radius) / tileSize));
+	auto right_tile = std::min(tileMapDimension.x - 1, static_cast<int>((std::max(startFrameCircle.position.x, circleEndFramePosition.x) + radius) / tileSize));
+	auto top_tile = std::max(0, static_cast<int>((std::min(startFrameCircle.position.y, circleEndFramePosition.y) - radius) / tileSize));
+	auto bottom_tile = std::min(tileMapDimension.y - 1, static_cast<int>((std::max(startFrameCircle.position.y, circleEndFramePosition.y) + radius) / tileSize));
 
-	// Clamping to bounds
-	if (left_tile < 0) 
-		left_tile = 0;
-	
-	if (right_tile > colCount) 
-		right_tile = colCount;
-	
-	if (top_tile < 0) 
-		top_tile = 0;
-
-	if (bottom_tile > rowCount) 
-		bottom_tile = rowCount;
-
-	// Check all tiles within the circle's bounding box
-	for (auto i = left_tile; i <= right_tile; i++)
+	for (auto j = top_tile; j <= bottom_tile; j++)
 	{
-		for (auto j = top_tile; j <= bottom_tile; j++)
+		for (auto i = left_tile; i <= right_tile; i++)
 		{
-			// Check if the tile is within the circle's area
-			auto withinBounds = i >= 0 && i < colCount && j >= 0 && j < rowCount;
-
-			if (withinBounds)
+			auto isSolidTile = false;
+			for (const auto& layer : collisionLayers)
 			{
-				// Get the tile center position
-				Vector2F tileCenter(i * tileSize + tileSize / 2, j * tileSize + tileSize / 2);
+				isSolidTile = layer.Data[j][i] > 0;
 
-				// Check if the tile's center is within the circle's radius
-				auto dx = tileCenter.x - circleCenter.x;
-				auto dy = tileCenter.y - circleCenter.y;
-				auto distanceSquared = dx * dx + dy * dy;
+				if (isSolidTile) 
+					break;
+			}
 
-				std::cout << "Distance Squared: " << distanceSquared << std::endl;
+			if (!isSolidTile) 
+				continue;
 
-				if (distanceSquared <= circleRadius * circleRadius)
-				{
-					// If the tile is within the circle's radius, check if it's a solid tile
-					auto isSolidTile = false;
-					for (const auto& layer : collisionLayers)
-					{
-						isSolidTile = layer.Data[j][i] > 0;
-						
-						if (isSolidTile) 
-							break;
-					}
+			// Find the nearest point on the tile's AABB to the circle center
+			Vector2F nearestPoint
+			{
+				std::max(float(i * tileSize), std::min(circleEndFramePosition.x, float((i + 1) * tileSize))),
+				std::max(float(j * tileSize), std::min(circleEndFramePosition.y, float((j + 1) * tileSize)))
+			};
 
-					if (isSolidTile)
-						return true;
-				}
+			// Vector from circle to nearest point
+			auto delta = nearestPoint - circleEndFramePosition;
+			auto distance = delta.Magnitude();
+			auto overlap = radius - distance;
+
+			// Check overlap
+			if (overlap > 0 && distance > 0.0001f)
+			{
+				circleEndFramePosition -= (delta / distance) * overlap;
 			}
 		}
 	}
 
-	return false;
+	circle->GetTranform()->position = circleEndFramePosition;
+
+	///box->OnCollisionCallback(CollisionInfo(normal, other->OwningObject));
+	
+	return true;
 }
+
 
 bool CollisionHandler::Visit(TiledMapCompatibleCollider2D* tile, BoxCollider2D* other)
 {
