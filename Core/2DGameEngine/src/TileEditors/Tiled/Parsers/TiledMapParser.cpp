@@ -47,7 +47,7 @@ TiledLayer TiledMapParser::ParseLayers(tinyxml2::XMLElement* xmlLayer, int rowCo
 	auto properties = xmlLayer->FirstChildElement("properties");
 	if (properties != nullptr)
 	{
-		for (auto elem = properties->FirstChildElement("property"); elem; elem = properties->NextSiblingElement("property"))
+		for (auto elem = properties->FirstChildElement("property"); elem; elem = elem->NextSiblingElement("property"))
 		{
 			TiledProperty property;
 
