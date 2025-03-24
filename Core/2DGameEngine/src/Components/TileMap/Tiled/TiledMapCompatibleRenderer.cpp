@@ -3,14 +3,14 @@
 #include "SubSystems/TextureManager.h"
 
 
-TiledMapCompatibleRenderer::TiledMapCompatibleRenderer(const char* mapSource, bool extendMapToRenderTarget)
+TiledMapCompatibleRenderer::TiledMapCompatibleRenderer(std::shared_ptr<TiledMap> tileMap, bool extendMapToRenderTarget)
 {
-	this->tileMap = gameMapParser.Parse(mapSource);
+	this->tileMap = tileMap;
 
 	if (!extendMapToRenderTarget)
 		return;
 
-	Renderer::SetResolutionTarget({ tileMap->width * tileMap->tileSize, tileMap->height * tileMap->tileSize });
+	Renderer::SetResolutionTarget({ tileMap->width * tileMap->tileSize + 32, tileMap->height * tileMap->tileSize });
 }
 
 void TiledMapCompatibleRenderer::Init()
@@ -32,7 +32,6 @@ void TiledMapCompatibleRenderer::Draw()
 {
 	const auto& tileSets = tileMap->tileSets;
 	
-
 	for (const auto& layer : tileMap->layers)
 	{
 		for (auto i = 0; i < tileMap->height; ++i)
@@ -65,8 +64,4 @@ void TiledMapCompatibleRenderer::Draw()
 			}
 		}
 	}
-}
-
-void TiledMapCompatibleRenderer::Clean()
-{
 }

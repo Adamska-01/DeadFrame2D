@@ -14,7 +14,7 @@ private:
 
 
 public:
-	TiledMapCompatibleRenderer(const char* mapSource, bool extendMapToRenderTarget = false);
+	TiledMapCompatibleRenderer(std::shared_ptr<TiledMap> tileMap, bool extendMapToRenderTarget = false);
 
 
 	virtual void Init() override;
@@ -22,6 +22,4 @@ public:
 	virtual void Update(float dt) override;
 
 	virtual void Draw() override;
-
-	virtual void Clean() override;
 };
