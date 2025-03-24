@@ -10,7 +10,7 @@
 class GameObjectRegistry
 {
 private:
-	std::vector<std::shared_ptr<GameObject>> gameObjects;
+	static std::vector<std::shared_ptr<GameObject>> gameObjects;
 
 	std::vector<Collider2D*> colliders;
 
@@ -31,4 +31,22 @@ public:
 	void Update(float deltaTime);
 
 	void Draw();
+
+	template <typename T>
+	static T* FindObjectOfType();
 };
+
+
+template<typename T>
+inline T* GameObjectRegistry::FindObjectOfType()
+{
+	for (auto object : gameObjects)
+	{
+		auto component = object->GetComponent<T>();
+
+		if (component == nullptr)
+			continue;
+
+		return component;
+	}
+}
