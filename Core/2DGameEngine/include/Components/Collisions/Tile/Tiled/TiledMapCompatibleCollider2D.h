@@ -2,11 +2,6 @@
 #include "Components/Collisions/Tile/TileCollider2D.h"
 #include "Components/TileMap/Tiled/TiledMapCompatibleRenderer.h"
 #include "Math/Vector2.h"
-#include "TileEditors/Tiled/Models/TiledMap.h"
-#include <functional>
-
-
-using TiledMapDelegate = std::function<std::vector<TiledLayer>(std::weak_ptr<TiledMap>)>;
 
 
 class TiledMapCompatibleCollider2D : public TileCollider2D<TiledMapCompatibleRenderer>
@@ -14,15 +9,13 @@ class TiledMapCompatibleCollider2D : public TileCollider2D<TiledMapCompatibleRen
 private:
 	std::vector<TiledLayer> collisionLayers;
 
-	TiledMapDelegate collisionMapChecker;
-
 	Vector2I tileMapDimension;
 
 	int tileSize;
 
 
 public:
-	TiledMapCompatibleCollider2D(TiledMapDelegate collisionMapChecker);
+	TiledMapCompatibleCollider2D(std::vector<TiledLayer> collisionLayers);
 
 
 	virtual void Init() override;

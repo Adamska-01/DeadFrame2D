@@ -3,10 +3,11 @@
 #include "Tools/Collisions/ICollisionVisitor.h"
 
 
-TiledMapCompatibleCollider2D::TiledMapCompatibleCollider2D(TiledMapDelegate collisionMapChecker)
-	: collisionMapChecker(collisionMapChecker), tileMapDimension(Vector2I::Zero), tileSize(0)
+TiledMapCompatibleCollider2D::TiledMapCompatibleCollider2D(std::vector<TiledLayer> collisionLayers)
+	: collisionLayers(collisionLayers)
 {
-	collisionLayers.clear();
+	tileSize = 0;
+	tileMapDimension = Vector2I::Zero;
 }
 
 void TiledMapCompatibleCollider2D::Init()
@@ -15,6 +16,7 @@ void TiledMapCompatibleCollider2D::Init()
 
 	tileMapRenderer = OwningObject->GetComponent<TiledMapCompatibleRenderer>();
 
+	// Shouldn't have a tile colliderr without a tile renderer
 	if (tileMapRenderer == nullptr)
 		throw std::runtime_error("Failed to get TiledMapCompatibleRenderer from OwningObject.");
 
@@ -23,8 +25,6 @@ void TiledMapCompatibleCollider2D::Init()
 	tileSize = tileMap->tileSize;
 
 	tileMapDimension = Vector2I(tileMap->width, tileMap->height);
-
-	collisionLayers = collisionMapChecker(tileMap);
 }
 
 bool TiledMapCompatibleCollider2D::Accept(ICollisionVisitor& visitor, Collider2D* other)
