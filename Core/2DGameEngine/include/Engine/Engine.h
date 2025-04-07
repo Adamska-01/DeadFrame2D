@@ -1,4 +1,5 @@
 #pragma once
+#include "EventSystem/DispatchableEvent.h"
 #include "Management/GameObjectRegistry.h"
 #include "SubSystems/Events/EventManager.h"
 #include "SubSystems/SubSystems.h"
@@ -8,6 +9,15 @@
 class Engine
 {
 private:
+	bool isRunning;
+
+	std::vector<std::shared_ptr<GameObject>> gameObjectsToInitialize;
+
+	
+	void GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
+
+
+protected:
 	std::unique_ptr<SubSystems> engineSubSystems;
 
 	std::unique_ptr<GameObjectRegistry> gameObjectRegistry;
@@ -17,15 +27,15 @@ private:
 	FrameTimer ft;
 
 
-	void Update(float deltaTime);
+	virtual void Update(float deltaTime);
 
-	void Draw();
+	virtual void Draw();
 
 
 public:
 	Engine();
 	
-	~Engine() = default;
+	virtual ~Engine() = default;
 
 
 	std::optional<int> Run();
