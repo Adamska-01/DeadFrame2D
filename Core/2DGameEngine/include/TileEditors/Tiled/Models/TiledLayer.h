@@ -13,9 +13,9 @@ struct TiledLayer
 	std::vector<std::vector<int>> Data;
 
 
-	std::optional<TiledProperty> GetProperty(const std::string& key) const 
+	std::optional<TiledProperty> GetProperty(std::string_view key) const
 	{
-		auto it = Properties.find(key);
+		auto it = Properties.find(std::string(key));
 		
 		if (it != Properties.end()) 
 			return it->second;
