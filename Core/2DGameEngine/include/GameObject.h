@@ -71,8 +71,6 @@ inline std::weak_ptr<T> GameObject::Instantiate(Args && ...args)
 
 	auto obj = std::make_shared<T>(std::forward<Args>(args)...);
 
-	obj->Init();
-
 	EventDispatcher::SendEvent(std::make_shared<GameObjectCreatedEvent>(obj));
 
 	return obj;
