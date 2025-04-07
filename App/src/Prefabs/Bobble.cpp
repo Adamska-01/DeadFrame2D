@@ -1,4 +1,5 @@
 #include "Prefabs/Bobble.h"
+#include <Components/Collisions/CircleCollider2D.h>
 #include <Components/Sprite.h>
 #include <Components/SpriteAnimator.h>
 #include <Components/Transform.h>
@@ -17,10 +18,10 @@ Bobble::Bobble(Vector2F startPos, BobbleColor color)
 	this->color = color;
 
 	AddComponent<Sprite>(IDLE_BOBBLE_PATH);
-	auto animator = AddComponent<SpriteAnimator>();
-
-	animator->SetProp(true, (int)color, 10, (int)BobbleColor::ALL_COLOURS, 5);
-	transform->Scale({ 3, 3 });
+	AddComponent<CircleCollider2D>(Circle(Vector2F::Zero, 16));
+	AddComponent<SpriteAnimator>()->SetProp(true, (int)color, 10, (int)BobbleColor::ALL_COLOURS, 5);
+	
+	transform->Scale({ 2, 2 });
 }
 
 void Bobble::Update(float deltaTime)
@@ -46,7 +47,9 @@ void Bobble::Update(float deltaTime)
 		direction.x = 1;
 	}
 
-	transform->Translate(direction.Normalize() * deltaTime * 250.0f);
+	auto movement = direction.Normalize() * deltaTime * 250.0f;
+
+	transform->Translate(movement);
 }
 
 void Bobble::Bounce(Vector2F Normal)
