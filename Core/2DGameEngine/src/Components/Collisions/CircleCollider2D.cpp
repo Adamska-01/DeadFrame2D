@@ -54,8 +54,6 @@ void CircleCollider2D::Draw()
 {
 	Collider2D::Draw();
 
-	SetCirclePos(circle, transform->position);
-
 	debugCollisionDrawer->DrawCollider(CommonColors::WHITE);
 }
 
