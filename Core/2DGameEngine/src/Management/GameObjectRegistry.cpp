@@ -35,14 +35,15 @@ void GameObjectRegistry::Update(float deltaTime)
 		obj->Update(deltaTime);
 	}
 
-	for (const auto colliderA : colliders)
+	for (size_t i = 0; i < colliders.size(); ++i)
 	{
-		for (const auto colliderB : colliders)
+		for (size_t j = i + 1; j < colliders.size(); ++j)
 		{
-			if (colliderA == colliderB)
-				continue;
+			auto colliderA = colliders[i];
+			auto colliderB = colliders[j];
 
 			colliderA->Accept(collisionHandler, colliderB);
+			colliderB->Accept(collisionHandler, colliderA);
 		}
 	}
 }
