@@ -71,7 +71,7 @@ public:
 
 	inline friend std::ostream& operator<<(std::ostream& out, const Vector2<T>& v)
 	{
-		out << "(" << v.x << ", " << v.y << ")" << std::endl;
+		out << "(" << v.x << ", " << v.y << ")";
 
 		return out;
 	}
