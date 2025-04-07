@@ -4,23 +4,21 @@
 
 class Bobble;
 class GameMap;
+class BobbleGrid;
 
 
-class Application
+class Application : public Engine
 {
 private:
-	std::unique_ptr<Engine> engine;
-
 	std::weak_ptr<Bobble> bobble;
 
 	std::weak_ptr<GameMap> gameMap;
+	
+	std::weak_ptr<BobbleGrid> bobbleGrid;
 
 
 public:
 	Application();
 
 	~Application() = default;
-
-
-	std::optional<int> Run();
 };
