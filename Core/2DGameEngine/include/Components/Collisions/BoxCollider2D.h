@@ -19,8 +19,6 @@ private:
 	std::unique_ptr<IDebugColliderDrawer<BoxCollider2D>> debugCollisionDrawer;
 
 
-	void CollisionHandler(const CollisionInfo& collisionInfo);
-
 	void UpdatePreviousBox(float x, float y);
 
 	void SetBox(SDL_Rect& collisionBox, int x, int y, int w, int h);
@@ -28,8 +26,6 @@ private:
 
 public:
 	BoxCollider2D(SDL_Rect box, SDL_Rect cropOffset);
-
-	virtual ~BoxCollider2D() override;
 
 
 	const SDL_Rect& GetCollisionBox() const;
@@ -40,8 +36,6 @@ public:
 
 	void SetBox(int x, int y, int w, int h);
 
-
-	virtual void Init() override;
 
 	virtual void Draw() override;
 
