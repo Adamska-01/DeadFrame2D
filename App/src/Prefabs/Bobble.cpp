@@ -18,8 +18,8 @@ Bobble::Bobble(Vector2F startPos, BobbleColor color)
 	this->color = color;
 
 	AddComponent<Sprite>(IDLE_BOBBLE_PATH);
-	AddComponent<CircleCollider2D>(Circle(Vector2F::Zero, 16));
 	AddComponent<SpriteAnimator>()->SetProp(true, (int)color, 10, (int)BobbleColor::ALL_COLOURS, 5);
+	AddComponent<CircleCollider2D>(Circle(Vector2F::Zero, 16));
 	
 	transform->Scale({ 2, 2 });
 }
