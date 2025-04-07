@@ -236,9 +236,9 @@ bool CollisionHandler::Visit(BoxCollider2D* box, TiledMapCompatibleCollider2D* o
 
 	boxTransform->position = boxStartFramePosition + velocity;
 	
-	///box->OnCollisionCallback(CollisionInfo(normal, other->OwningObject));
+	//box->OnCollisionCallback(CollisionInfo(normal, other->OwningObject));
 	
-	return false;
+	return true;
 }
 
 bool CollisionHandler::Visit(CircleCollider2D* circle, BoxCollider2D* other)
@@ -278,6 +278,8 @@ bool CollisionHandler::Visit(CircleCollider2D* circle, TiledMapCompatibleCollide
 	auto top_tile = std::max(0, static_cast<int>((std::min(startFrameCircle.position.y, circleEndFramePosition.y) - radius) / tileSize));
 	auto bottom_tile = std::min(tileMapDimension.y - 1, static_cast<int>((std::max(startFrameCircle.position.y, circleEndFramePosition.y) + radius) / tileSize));
 
+	auto requiresAdjustments = false;
+
 	for (auto j = top_tile; j <= bottom_tile; j++)
 	{
 		for (auto i = left_tile; i <= right_tile; i++)
@@ -310,10 +312,17 @@ bool CollisionHandler::Visit(CircleCollider2D* circle, TiledMapCompatibleCollide
 			if (overlap > 0 && distance > 0.0001f)
 			{
 				circleEndFramePosition -= (delta / distance) * overlap;
+
+				requiresAdjustments = true;
 			}
 		}
 	}
 
+	if (!requiresAdjustments)
+		return false;
+
+	// Assuming the circle position is the same as the transform position (TODO: Add an offset buffer to the circle collider) 
+	circle->SetPos(circleEndFramePosition);
 	circle->GetTranform()->position = circleEndFramePosition;
 
 	///box->OnCollisionCallback(CollisionInfo(normal, other->OwningObject));
