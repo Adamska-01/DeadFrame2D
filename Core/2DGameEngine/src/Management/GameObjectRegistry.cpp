@@ -1,8 +1,12 @@
+#include "EventSystem/EventDispatcher.h"
 #include "EventSystem/Events/GameObjectEvents/GameObjectCreatedEvent.h"
 #include "EventSystem/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
+#include "GameObject.h"
 #include "Management/GameObjectRegistry.h"
-#include "EventSystem/EventDispatcher.h"
 #include "Tools/Helpers/EventHelpers.h"
+
+
+std::vector<std::shared_ptr<GameObject>> GameObjectRegistry::gameObjects;
 
 
 GameObjectRegistry::GameObjectRegistry()
@@ -60,7 +64,7 @@ void GameObjectRegistry::GameObjectCreatedHandler(std::shared_ptr<DispatchableEv
 
 	auto& target = gameObjEvent->gameObjectCreated;
 
-	gameObjects.push_back(std::move(target));
+	gameObjects.push_back(target);
 
 	auto collider = gameObjects.back()->GetComponent<Collider2D>();
 

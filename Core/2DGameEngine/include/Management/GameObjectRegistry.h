@@ -2,9 +2,11 @@
 #include "Components/Collisions/Collider2D.h"
 #include "Tools/Collisions/CollisionHandler.h"
 #include "EventSystem/DispatchableEvent.h"
-#include "GameObject.h"
 #include <memory>
 #include <vector>
+
+
+class GameObject;
 
 
 class GameObjectRegistry
@@ -31,6 +33,7 @@ public:
 	void Update(float deltaTime);
 
 	void Draw();
+
 
 	template <typename T>
 	static T* FindObjectOfType();
