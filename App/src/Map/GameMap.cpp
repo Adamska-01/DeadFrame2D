@@ -60,3 +60,17 @@ std::vector<TiledLayer> GameMap::RetrieveCollisionMap()
 
 	return colliderMap;
 }
+
+std::optional<TiledObjectGroup> GameMap::RetrieveObjectGroup(std::string_view groupName)
+{
+	auto it = std::find_if(fullTileMap->objectGroups.begin(), fullTileMap->objectGroups.end(),
+		[&groupName](const auto& group) 
+		{
+			return group.name == groupName;
+		});
+
+	if (it != fullTileMap->objectGroups.end())
+		return *it;
+	else
+		return std::nullopt;
+}

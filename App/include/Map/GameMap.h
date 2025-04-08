@@ -1,10 +1,12 @@
 #pragma once
 #include <GameObject.h>
+#include <optional>
 #include <vector>
 
 
 struct TiledMap;
 struct TiledLayer;
+struct TiledObjectGroup;
 class TiledMapCompatibleRenderer;
 class TiledMapCompatibleCollider2D;
 
@@ -28,4 +30,7 @@ public:
 	GameMap(const char* mapSource, bool extendMapToRenderTarget = false);
 
 	virtual ~GameMap() = default;
+
+
+	std::optional<TiledObjectGroup> RetrieveObjectGroup(std::string_view groupName);
 };
