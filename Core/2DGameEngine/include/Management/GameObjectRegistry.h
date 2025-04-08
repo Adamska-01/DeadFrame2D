@@ -43,7 +43,9 @@ public:
 template<typename T>
 inline T* GameObjectRegistry::FindObjectOfType()
 {
-	for (auto object : gameObjects)
+	static_assert(std::is_base_of<GameComponent, T>::value, "T must derive from GameComponent");
+
+	for (const auto& object : gameObjects)
 	{
 		auto component = object->GetComponent<T>();
 
