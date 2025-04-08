@@ -47,5 +47,5 @@ public:
 	~TiledMapParser() = default;
 
 
-	virtual std::shared_ptr<TiledMap> Parse(std::string source) override;
+	virtual std::shared_ptr<TiledMap> Parse(std::string_view source) override;
 };

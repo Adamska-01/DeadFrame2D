@@ -105,11 +105,11 @@ TiledObjectGroup TiledMapParser::ParseObjectGroup(tinyxml2::XMLElement* xmlObjec
 	return group;
 }
 
-std::shared_ptr<TiledMap> TiledMapParser::Parse(std::string source)
+std::shared_ptr<TiledMap> TiledMapParser::Parse(std::string_view source)
 {
 	XMLDocument xml;
 	
-	if (xml.LoadFile(source.c_str()) != XMLError::XML_SUCCESS)
+	if (xml.LoadFile(std::string(source).c_str()) != XMLError::XML_SUCCESS)
 	{
 		std::cerr << "Failed to load: " << source << std::endl;
 
