@@ -6,7 +6,7 @@
 
 struct TiledObjectGroup
 {
-	std::string Name;
+	std::string name;
 	
-	std::vector<Vector2F> Points;
+	std::vector<Vector2F> points;
 };
