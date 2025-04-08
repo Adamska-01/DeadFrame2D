@@ -1,6 +1,7 @@
 #pragma once
 #include "TiledLayer.h"
 #include "TiledTileSet.h"
+#include "TiledObjectGroup.h"
 
 
 struct TiledMap
@@ -14,4 +15,6 @@ struct TiledMap
 	std::vector<TiledTileSet> tileSets;
 
 	std::vector<TiledLayer> layers;
+
+	std::vector<TiledObjectGroup> objectGroups;
 };

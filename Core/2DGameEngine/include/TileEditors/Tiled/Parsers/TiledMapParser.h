@@ -22,6 +22,11 @@ Example XML map structure:
 		0,0,1,2,0,0,4,3,0,0
 		</data>
 	</layer>
+	<objectgroup id="5" name="Player_Position">
+		<object id="6" x="640" y="672">
+			<point/>
+		</object>
+	</objectgroup>
 </map>
 */
 
@@ -32,6 +37,8 @@ private:
 	TiledTileSet ParseTileSet(tinyxml2::XMLElement* xmlTileset);
 
 	TiledLayer ParseLayers(tinyxml2::XMLElement* xmlLayer, int rowcount, int colcount);
+
+	TiledObjectGroup ParseObjectGroup(tinyxml2::XMLElement* xmlObjectGroup);
 
 
 public:

@@ -80,6 +80,31 @@ TiledLayer TiledMapParser::ParseLayers(tinyxml2::XMLElement* xmlLayer, int rowCo
 	return layer;
 }
 
+TiledObjectGroup TiledMapParser::ParseObjectGroup(tinyxml2::XMLElement* xmlObjectGroup)
+{
+	TiledObjectGroup group;
+
+	group.name = xmlObjectGroup->Attribute("name");
+
+	for (auto objElem = xmlObjectGroup->FirstChildElement("object"); objElem; objElem = objElem->NextSiblingElement("object"))
+	{
+		if (objElem->FirstChildElement("point"))
+		{
+			group.points.push_back(Vector2F
+			{
+				objElem->FloatAttribute("x"),
+				objElem->FloatAttribute("y")
+			});
+		}
+		// Could also add support for other objects
+		//else if (objElem->FirstChildElement("ellipse"))
+		//{
+		//}
+	}
+
+	return group;
+}
+
 std::shared_ptr<TiledMap> TiledMapParser::Parse(std::string source)
 {
 	XMLDocument xml;
@@ -111,6 +136,12 @@ std::shared_ptr<TiledMap> TiledMapParser::Parse(std::string source)
 	for (auto elem = root->FirstChildElement("layer"); elem; elem = elem->NextSiblingElement("layer"))
 	{
 		tileMap->layers.push_back(ParseLayers(elem, tileMap->height, tileMap->width));
+	}
+
+	// Parse object groups
+	for (auto elem = root->FirstChildElement("objectgroup"); elem; elem = elem->NextSiblingElement("objectgroup"))
+	{
+		tileMap->objectGroups.push_back(ParseObjectGroup(elem));
 	}
 
 	return tileMap;
