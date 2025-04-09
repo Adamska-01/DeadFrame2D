@@ -1,11 +1,8 @@
 #include "SubSystems/Renderer.h"
 #include "SubSystems/TextureManager.h"
 #include <Debugging/Debug.h>
-#include <fstream>
 #include <Math/Vector2.h>
 #include <memory>
-#include <SDL_ttf.h>
-#include <sstream>
 
 
 std::unordered_map<std::string, std::weak_ptr<SDL_Texture>> TextureManager::textureCache = {};
@@ -152,51 +149,55 @@ void TextureManager::DrawCircle(Circle circle, SDL_Color color, bool filled)
 	Renderer::SetDisplayColor(oldRenderColor.r, oldRenderColor.g, oldRenderColor.b, oldRenderColor.a);
 }
 
-void TextureManager::NormalDraw(SDL_Texture* texture)
+void TextureManager::DrawTexture(
+	SDL_Texture* texture, 
+	const SDL_Rect* srcRect, 
+	const SDL_Rect* dstRect, 
+	float angle,
+	SDL_Point* rotationOrigin, 
+	SDL_RendererFlip flip, 
+	Uint8 alpha, 
+	SDL_Color colorMod)
 {
-	SDL_RenderCopy(Renderer::GetRenderer(), texture, NULL, NULL);
-}
+	auto renderer = Renderer::GetRenderer();
 
-void TextureManager::Draw(SDL_Texture* texture, SDL_Rect dest, Vector2F scale, SDL_RendererFlip flip)
-{
-	SDL_Rect srcRect = { 0, 0, dest.w, dest.h };
+	if (renderer == nullptr || texture == nullptr)
+		return;
 
-	SDL_Rect destRect = { dest.x, dest.y, dest.w * scale.x, dest.h * scale.y };
+	if (dstRect == NULL)
+	{
+		auto localDst = SDL_Rect{ 0, 0, 0, 0 };
+		
+		SDL_QueryTexture(texture, nullptr, nullptr, &localDst.w, &localDst.h);
 
-	SDL_RenderCopyEx(Renderer::GetRenderer(), texture, &srcRect, &destRect, 0, nullptr, flip);
-}
+		dstRect = &localDst;
+	}
 
-void TextureManager::DrawPortion(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest, Vector2F scale, SDL_RendererFlip flip)
-{
-	SDL_Rect srcRect = { src.x, src.y, src.w, src.h };
+	// Backup current texture state
+	Uint8 oldAlpha, oldR, oldG, oldB;
+	SDL_GetTextureAlphaMod(texture, &oldAlpha);
+	SDL_GetTextureColorMod(texture, &oldR, &oldG, &oldB);
 
-	SDL_Rect destRect = { 0, 0, dest.w * scale.x, dest.h * scale.y };
+	// Apply new modulation
+	SDL_SetTextureAlphaMod(texture, alpha);
+	SDL_SetTextureColorMod(texture, colorMod.r, colorMod.g, colorMod.b);
 
-	SDL_RenderCopyEx(Renderer::GetRenderer(), texture, &srcRect, &destRect, 0, nullptr, flip);
-}
+	// Default to center if NULL
+	auto rotationOriginFallback = SDL_Point
+	{
+		static_cast<int>(dstRect->w * 0.5f),
+		static_cast<int>(dstRect->h * 0.5f)
+	};
 
-void TextureManager::DrawFrame(SDL_Texture* texture, SDL_Rect dest, Vector2F scale, int row, int frame, SDL_RendererFlip flip)
-{
-	SDL_Rect srcRect = { dest.w * frame, dest.h * row, dest.w, dest.h };
+	if (rotationOrigin == NULL)
+	{
+		rotationOrigin = &rotationOriginFallback;
+	}
 
-	SDL_Rect destRect = { dest.x, dest.y, dest.w * scale.x, dest.h * scale.y };
+	// Render
+	SDL_RenderCopyEx(renderer, texture, srcRect, dstRect, angle, rotationOrigin, flip);
 
-	SDL_RenderCopyEx(Renderer::GetRenderer(), texture, &srcRect, &destRect, 0, NULL, flip);
-}
-
-void TextureManager::DrawTile(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest, SDL_RendererFlip flip)
-{
-	SDL_RenderCopyEx(Renderer::GetRenderer(), texture, &src, &dest, 0, nullptr, flip);
-}
-
-void TextureManager::DrawRotate(SDL_Texture* texture, Vector2F pos, Vector2F scale, float angle, SDL_Point rotPoint, SDL_RendererFlip flip)
-{
-	SDL_Rect destRect{ pos.x, pos.y, 0, 0 };
-
-	SDL_QueryTexture(texture, NULL, NULL, &destRect.w, &destRect.h);
-
-	destRect.w *= scale.x;
-	destRect.h *= scale.y;
-
-	SDL_RenderCopyEx(Renderer::GetRenderer(), texture, NULL, &destRect, angle, &rotPoint, flip);
+	// Restore previous modulation
+	SDL_SetTextureAlphaMod(texture, oldAlpha);
+	SDL_SetTextureColorMod(texture, oldR, oldG, oldB);
 }
