@@ -24,7 +24,7 @@ public:
 	
 	Sprite(Sprite&& other) = default;
 
-	~Sprite() override;
+	virtual ~Sprite() override = default;
 
 
 	void Init();
@@ -37,8 +37,4 @@ public:
 	void LoadSprite(std::string texturePath);
 	
 	SDL_Texture* GetTexture();
-
-
-protected:
-	virtual void Clean();
 };

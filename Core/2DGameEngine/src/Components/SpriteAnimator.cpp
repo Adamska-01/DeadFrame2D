@@ -57,10 +57,21 @@ void SpriteAnimator::Draw()
 {
 	auto dstRect = GetFrameRect();
 
-	dstRect.x = round(transform->position.x - ((float)dstRect.h * transform->scale.y) / 2);
+	dstRect.x = round(transform->position.x - ((float)dstRect.w * transform->scale.x) / 2);
 	dstRect.y = round(transform->position.y - ((float)dstRect.h * transform->scale.y) / 2);
 
-	TextureManager::DrawFrame(spriteTexture, dstRect, transform->scale, animationProperties.sourceRowNumber, spriteFrame, animationProperties.flip);
+	auto srcRect = SDL_Rect
+	{
+		dstRect.w * (int)spriteFrame,
+		dstRect.h * animationProperties.sourceRowNumber,
+		dstRect.w,
+		dstRect.h
+	};
+
+	dstRect.w *= transform->scale.x;
+	dstRect.h *= transform->scale.y;
+
+	TextureManager::DrawTexture(spriteTexture, &srcRect, &dstRect, 0.0f, NULL, animationProperties.flip);
 }
 
 void SpriteAnimator::SetProp(bool repeat, int row, int frameCount, int rowCount, int speed, SDL_RendererFlip flip)
