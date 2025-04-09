@@ -32,7 +32,9 @@ public:
 	
 	void Scale(Vector2F v);
 
-	void RotateBy(float angle);
+	void RotateByRadians(float radian);
+
+	void RotateByDegrees(float degreeAngle);
 
 
 	void Init() override;

@@ -43,9 +43,14 @@ void Transform::Scale(Vector2F v)
 	scale.y = v.y;
 }
 
-void Transform::RotateBy(float angle)
-{ 
-	this->angle += angle * (MathConstants::PI / 180.0f);
+void Transform::RotateByRadians(float radian)
+{
+	this->angle += radian * (180.0f / MathConstants::PI);
+}
+
+void Transform::RotateByDegrees(float degreeAngle)
+{
+	this->angle += degreeAngle;
 }
 
 void Transform::Init()
