@@ -13,4 +13,5 @@ workspace "Project"
 
    -- Include Core build script
    include "Core/2DGameEngine/Build-2DGameEngine.lua"
+   include "Shared/Build-Shared.lua" 
    include "App/Build-App.lua" 
