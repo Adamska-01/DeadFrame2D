@@ -2,9 +2,12 @@ project "App"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++20"
-	targetdir "Binaries/%{cfg.buildcfg}"
+	targetdir ("./Binaries/" .. OutputDir)
+	objdir ("./Binaries/Intermediates/" .. OutputDir)
+	dependson { "2DGameEngine", "Shared" }
 	staticruntime "off"
-
+	debugdir "../"
+	
 	files 
 	{ 
 		"include/**.h", 
@@ -30,31 +33,29 @@ project "App"
 		"2DGameEngine"
 	}
 
-	-- Copy entire Assets folder in the target dir
+	-- Copy Assets and Shared files in the target dir
     postbuildcommands
     {
-        '{COPY} "./Assets/" "%{cfg.targetdir}/Assets/"'
+		'{COPY} "../Shared/Configurations/" "%{cfg.targetdir}/Shared/Configurations/"',
+        '{COPY} "./Assets/" "%{cfg.targetdir}/App/Assets/"'
     }
 
-	-- Ensure the app depends on the 2DGameEngine project
-	dependson { "2DGameEngine" }
-	
-	targetdir ("./Binaries/" .. OutputDir)
-	objdir ("./Binaries/Intermediates/" .. OutputDir)
-
+	-- Filters
 	filter "configurations:Debug"
 		defines { "DEBUG" }
 		runtime "Debug"
+		kind "ConsoleApp"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines { "RELEASE" }
 		runtime "Release"
 		optimize "On"
-		symbols "On"
+		kind "WindowedApp"
+		symbols "Off"
 
 	filter "platforms:x86"
 		architecture "x86"
-
+		
 	filter "platforms:x64"
 		architecture "x64"

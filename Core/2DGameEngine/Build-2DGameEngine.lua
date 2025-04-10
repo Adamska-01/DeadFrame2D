@@ -2,10 +2,16 @@ project "2DGameEngine"
     kind "StaticLib"
     language "C++"
     cppdialect "C++20"
-    targetdir "Binaries/%{cfg.buildcfg}"
+    targetdir ("./Binaries/" .. OutputDir)
+    objdir ("./Binaries/Intermediates/" .. OutputDir)
     staticruntime "off"
-
-    files { "include/**.h", "src/**.cpp" }
+    debugdir "../../"
+    
+    files 
+    { 
+        "include/**.h", 
+        "src/**.cpp" 
+    }
 
     -- Include paths
     includedirs 
@@ -32,6 +38,7 @@ project "2DGameEngine"
 
      -- Link libraries and set libdirs based on architecture
     filter "platforms:x86"
+        architecture "x86"
 		links(sdl_libs)
         libdirs 
         { 
@@ -50,6 +57,7 @@ project "2DGameEngine"
         }
 
     filter "platforms:x64"
+        architecture "x64"
 		links(sdl_libs)
         libdirs 
         { 
@@ -66,12 +74,9 @@ project "2DGameEngine"
 			"{COPY} ../../Vendor/SDL/SDL2_ttf-2.22.0/lib/x64/*.dll " .. copyDir,
 			"{COPY} ../../Vendor/SDL/SDL2_mixer-2.8.0/lib/x64/*.dll " .. copyDir
         }
-
-    -- Reset filter to avoid affecting future configurations
+        
+    -- Reset filter (The following applies to every platform)
     filter {}
-    targetdir ("./Binaries/" .. OutputDir)
-    objdir ("./Binaries/Intermediates/" .. OutputDir)
-
     filter "configurations:Debug"
         defines { "DEBUG" }
         runtime "Debug"
@@ -81,10 +86,4 @@ project "2DGameEngine"
         defines { "RELEASE" }
         runtime "Release"
         optimize "On"
-        symbols "On"
-        
-    filter "platforms:x86"
-        architecture "x86"
-
-    filter "platforms:x64"
-        architecture "x64"
+        symbols "Off"
