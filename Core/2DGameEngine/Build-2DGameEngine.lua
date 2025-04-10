@@ -7,15 +7,6 @@ project "2DGameEngine"
 
     files { "include/**.h", "src/**.cpp" }
 
-	local sdl_libs = 
-	{
-        "SDL2.lib",
-        "SDL2main.lib",
-        "SDL2_Image.lib",
-        "SDL2_ttf.lib",
-        "SDL2_mixer.lib"
-    }
-
     -- Include paths
     includedirs 
     { 
@@ -28,6 +19,17 @@ project "2DGameEngine"
         "../Dependencies/SDL/SDL2_mixer-2.8.0/include" 
     }
     
+    local sdl_libs = 
+	{
+        "SDL2.lib",
+        "SDL2main.lib",
+        "SDL2_Image.lib",
+        "SDL2_ttf.lib",
+        "SDL2_mixer.lib"
+    }
+
+    local copyDir = path.join("../../App/Binaries", OutputDir)
+
      -- Link libraries and set libdirs based on architecture
     filter "platforms:x86"
 		links(sdl_libs)
@@ -40,11 +42,11 @@ project "2DGameEngine"
         }
         postbuildcommands
         {
-            "{MKDIR} ../../Binaries/" .. OutputDir .. "/App/",
-            "{COPY} ../Dependencies/SDL/SDL2-2.30.10/lib/x86/*.dll ../../Binaries/" .. OutputDir .. "/App/",
-            "{COPY} ../Dependencies/SDL/SDL2_image-2.8.2/lib/x86/*.dll ../../Binaries/" .. OutputDir .. "/App/",
-            "{COPY} ../Dependencies/SDL/SDL2_ttf-2.22.0/lib/x86/*.dll ../../Binaries/" .. OutputDir .. "/App/",
-            "{COPY} ../Dependencies/SDL/SDL2_mixer-2.8.0/lib/x86/*.dll ../../Binaries/" .. OutputDir .. "/App/"
+            "{MKDIR} " .. copyDir,
+            "{COPY} ../Dependencies/SDL/SDL2-2.30.10/lib/x86/*.dll " .. copyDir,
+            "{COPY} ../Dependencies/SDL/SDL2_image-2.8.2/lib/x86/*.dll " .. copyDir,
+            "{COPY} ../Dependencies/SDL/SDL2_ttf-2.22.0/lib/x86/*.dll " .. copyDir,
+            "{COPY} ../Dependencies/SDL/SDL2_mixer-2.8.0/lib/x86/*.dll " .. copyDir
         }
 
     filter "platforms:x64"
@@ -58,17 +60,17 @@ project "2DGameEngine"
         }
         postbuildcommands
         {
-			"{MKDIR} ../../Binaries/" .. OutputDir .. "/App/",
-			"{COPY} ../Dependencies/SDL/SDL2-2.30.10/lib/x64/*.dll ../../Binaries/" .. OutputDir .. "/App/",
-			"{COPY} ../Dependencies/SDL/SDL2_image-2.8.2/lib/x64/*.dll ../../Binaries/" .. OutputDir .. "/App/",
-			"{COPY} ../Dependencies/SDL/SDL2_ttf-2.22.0/lib/x64/*.dll ../../Binaries/" .. OutputDir .. "/App/",
-			"{COPY} ../Dependencies/SDL/SDL2_mixer-2.8.0/lib/x64/*.dll ../../Binaries/" .. OutputDir .. "/App/"
+            "{MKDIR} " .. copyDir,
+			"{COPY} ../Dependencies/SDL/SDL2-2.30.10/lib/x64/*.dll " .. copyDir,
+			"{COPY} ../Dependencies/SDL/SDL2_image-2.8.2/lib/x64/*.dll " .. copyDir,
+			"{COPY} ../Dependencies/SDL/SDL2_ttf-2.22.0/lib/x64/*.dll " .. copyDir,
+			"{COPY} ../Dependencies/SDL/SDL2_mixer-2.8.0/lib/x64/*.dll " .. copyDir
         }
 
     -- Reset filter to avoid affecting future configurations
     filter {}
-    targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")
-    objdir ("../Binaries/Intermediates/" .. OutputDir .. "/%{prj.name}")
+    targetdir ("./Binaries/" .. OutputDir)
+    objdir ("./Binaries/Intermediates/" .. OutputDir)
 
     filter "configurations:Debug"
         defines { "DEBUG" }

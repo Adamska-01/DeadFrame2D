@@ -27,14 +27,20 @@ project "App"
 
 	links
 	{
-		"../Core/Binaries/" .. OutputDir .. "/2DGameEngine/2DGameEngine.lib"
+		"../Core/2DGameEngine/Binaries/" .. OutputDir .. "/2DGameEngine.lib"
 	}
+
+	-- Copy entire Assets folder in the target dir
+    postbuildcommands
+    {
+        '{COPY} "./Assets/" "%{cfg.targetdir}/Assets/"'
+    }
 
 	-- Ensure the app depends on the 2DGameEngine project
 	dependson { "2DGameEngine" }
 	
-	targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")
-	objdir ("../Binaries/Intermediates/" .. OutputDir .. "/%{prj.name}")
+	targetdir ("./Binaries/" .. OutputDir)
+	objdir ("./Binaries/Intermediates/" .. OutputDir)
 
 	filter "configurations:Debug"
 		defines { "DEBUG" }
