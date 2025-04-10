@@ -5,7 +5,7 @@
 class Cannon : public GameObject
 {
 public:
-	Cannon() = default;
+	Cannon();
 
 
 	virtual void Init() override;

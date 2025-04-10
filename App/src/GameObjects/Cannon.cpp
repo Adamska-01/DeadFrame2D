@@ -1,10 +1,19 @@
 #include "Constants/TiledObjectGroupNames.h"
 #include "GameObjects/Cannon.h"
 #include <Components/GameMapParser.h>
+#include <Components/Sprite.h>
 #include <Components/Transform.h>
 #include <Management/GameObjectRegistry.h>
 #include <TileEditors/Tiled/Models/TiledObjectGroup.h>
 
+
+const std::string ARROW_IMAGE_PATH = "App/Assets/Sprites/Arrow.png";
+
+
+Cannon::Cannon()
+{
+	AddComponent<Sprite>(ARROW_IMAGE_PATH);
+}
 
 void Cannon::Init()
 {
@@ -23,4 +32,6 @@ void Cannon::Init()
 		return;
 
 	transform->position = groupObject.value().points.front();
+	
+	transform->Scale(Vector2F(2.0f, 2.0f));
 }
