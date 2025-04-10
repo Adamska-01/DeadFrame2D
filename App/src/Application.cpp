@@ -9,6 +9,7 @@
 
 Application::Application()
 {
+	gameMap = GameObject::Instantiate<GameMap>("App/Assets/Maps/SingleplayerMap.tmx", true);
 	bobble = GameObject::Instantiate<Bobble>(Vector2F{ 100, 100 }, BobbleColor::Blue);
 	bobbleGrid = GameObject::Instantiate<BobbleGrid>();
 

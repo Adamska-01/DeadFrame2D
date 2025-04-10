@@ -16,7 +16,7 @@ Engine::Engine()
 
 	ft.SetTargetFramerate(60);
 
-	InputControls::Deserialize("../Core/2DGameEngine/include/InputControls.json");
+	InputControls::Deserialize("Shared/Configurations/InputControls.json");
 
 	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &Engine::GameObjectCreatedHandler));
 }

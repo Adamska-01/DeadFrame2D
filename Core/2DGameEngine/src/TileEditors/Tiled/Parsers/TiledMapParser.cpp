@@ -16,7 +16,7 @@ TiledTileSet TiledMapParser::ParseTileSet(XMLElement* xmlTileset)
 		xmlTileset->IntAttribute("columns"),
 		xmlTileset->IntAttribute("tilecount"),
 		xmlTileset->IntAttribute("tilewidth"),
-		"Assets/Sprites/" + std::filesystem::path(xmlTileset->FirstChildElement()->Attribute("source")).filename().string());
+		"App/Assets/Sprites/" + std::filesystem::path(xmlTileset->FirstChildElement()->Attribute("source")).filename().string());
 }
 
 TiledLayer TiledMapParser::ParseLayers(tinyxml2::XMLElement* xmlLayer, int rowCount, int colCount)

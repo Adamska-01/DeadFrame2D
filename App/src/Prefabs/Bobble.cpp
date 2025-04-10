@@ -6,9 +6,9 @@
 #include <SubSystems/Input/Input.h>
 
 
-const std::string IDLE_BOBBLE_PATH = "Assets/Sprites/IdleBobbles.png";
+const std::string IDLE_BOBBLE_PATH = "App/Assets/Sprites/IdleBobbles.png";
 
-const std::string BLOW_BOBBLE_PATH = "Assets/Sprites/BlowBobbles.png";
+const std::string BLOW_BOBBLE_PATH = "App/Assets/Sprites/BlowBobbles.png";
 
 
 Bobble::Bobble(Vector2F startPos, BobbleColor color)
