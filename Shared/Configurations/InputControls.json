@@ -1,0 +1,71 @@
+// Input Keys:
+// Keyboard -> SDL_Scancode (https://wiki.libsdl.org/SDL2/SDL_Scancode)
+// Mouse -> SDL_MouseButtonFlags (https://wiki.libsdl.org/SDL3/SDL_MouseButtonFlags)
+// Controller -> SDL_GameControllerButton (https://wiki.libsdl.org/SDL2/SDL_GameControllerButton)
+
+{
+	"Left": [
+		{
+			"inputDeviceType": "KEYBOARD",
+			"inputKey": 4
+		},
+		{
+			"inputDeviceType": "CONTROLLER",
+			"inputKey": 13
+		}
+	],
+	"Right": [
+		{
+			"inputDeviceType": "KEYBOARD",
+			"inputKey": 7
+		},
+		{
+			"inputDeviceType": "CONTROLLER",
+			"inputKey": 14
+		}
+	],
+	"Up": [
+		{
+			"inputDeviceType": "KEYBOARD",
+			"inputKey": 26
+		},
+		{
+			"inputDeviceType": "CONTROLLER",
+			"inputKey": 11
+		}
+	],
+	"Down": [
+		{
+			"inputDeviceType": "KEYBOARD",
+			"inputKey": 22
+		},
+		{
+			"inputDeviceType": "CONTROLLER",
+			"inputKey": 12
+		}
+	],
+	"Left2": [
+		{
+			"inputDeviceType": "KEYBOARD",
+			"inputKey": 80
+		}
+	],
+	"Right2": [
+		{
+			"inputDeviceType": "KEYBOARD",
+			"inputKey": 79
+		}
+	],
+	"Up2": [
+		{
+			"inputDeviceType": "KEYBOARD",
+			"inputKey": 82
+		}
+	],
+	"Down2": [
+		{
+			"inputDeviceType": "KEYBOARD",
+			"inputKey": 81
+		}
+	]
+}
