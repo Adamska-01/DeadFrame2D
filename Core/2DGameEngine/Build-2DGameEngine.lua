@@ -11,12 +11,12 @@ project "2DGameEngine"
     includedirs 
     { 
         "include",
-        "../Dependencies/nlohmann-3.11.3", 
-        "../Dependencies/tinyxml2-10.0.0", 
-        "../Dependencies/SDL/SDL2-2.30.10/include", 
-        "../Dependencies/SDL/SDL2_image-2.8.2/include", 
-        "../Dependencies/SDL/SDL2_ttf-2.22.0/include", 
-        "../Dependencies/SDL/SDL2_mixer-2.8.0/include" 
+        "../../Vendor/nlohmann-3.11.3", 
+        "../../Vendor/tinyxml2-10.0.0", 
+        "../../Vendor/SDL/SDL2-2.30.10/include", 
+        "../../Vendor/SDL/SDL2_image-2.8.2/include", 
+        "../../Vendor/SDL/SDL2_ttf-2.22.0/include", 
+        "../../Vendor/SDL/SDL2_mixer-2.8.0/include" 
     }
     
     local sdl_libs = 
@@ -35,36 +35,36 @@ project "2DGameEngine"
 		links(sdl_libs)
         libdirs 
         { 
-            "../Dependencies/SDL/SDL2-2.30.10/lib/x86", 
-            "../Dependencies/SDL/SDL2_image-2.8.2/lib/x86", 
-            "../Dependencies/SDL/SDL2_ttf-2.22.0/lib/x86", 
-            "../Dependencies/SDL/SDL2_mixer-2.8.0/lib/x86" 
+            "../../Vendor/SDL/SDL2-2.30.10/lib/x86", 
+            "../../Vendor/SDL/SDL2_image-2.8.2/lib/x86", 
+            "../../Vendor/SDL/SDL2_ttf-2.22.0/lib/x86", 
+            "../../Vendor/SDL/SDL2_mixer-2.8.0/lib/x86" 
         }
         postbuildcommands
         {
             "{MKDIR} " .. copyDir,
-            "{COPY} ../Dependencies/SDL/SDL2-2.30.10/lib/x86/*.dll " .. copyDir,
-            "{COPY} ../Dependencies/SDL/SDL2_image-2.8.2/lib/x86/*.dll " .. copyDir,
-            "{COPY} ../Dependencies/SDL/SDL2_ttf-2.22.0/lib/x86/*.dll " .. copyDir,
-            "{COPY} ../Dependencies/SDL/SDL2_mixer-2.8.0/lib/x86/*.dll " .. copyDir
+            "{COPY} ../../Vendor/SDL/SDL2-2.30.10/lib/x86/*.dll " .. copyDir,
+            "{COPY} ../../Vendor/SDL/SDL2_image-2.8.2/lib/x86/*.dll " .. copyDir,
+            "{COPY} ../../Vendor/SDL/SDL2_ttf-2.22.0/lib/x86/*.dll " .. copyDir,
+            "{COPY} ../../Vendor/SDL/SDL2_mixer-2.8.0/lib/x86/*.dll " .. copyDir
         }
 
     filter "platforms:x64"
 		links(sdl_libs)
         libdirs 
         { 
-            "../Dependencies/SDL/SDL2-2.30.10/lib/x64", 
-            "../Dependencies/SDL/SDL2_image-2.8.2/lib/x64", 
-            "../Dependencies/SDL/SDL2_ttf-2.22.0/lib/x64", 
-            "../Dependencies/SDL/SDL2_mixer-2.8.0/lib/x64" 
+            "../../Vendor/SDL/SDL2-2.30.10/lib/x64", 
+            "../../Vendor/SDL/SDL2_image-2.8.2/lib/x64", 
+            "../../Vendor/SDL/SDL2_ttf-2.22.0/lib/x64", 
+            "../../Vendor/SDL/SDL2_mixer-2.8.0/lib/x64" 
         }
         postbuildcommands
         {
             "{MKDIR} " .. copyDir,
-			"{COPY} ../Dependencies/SDL/SDL2-2.30.10/lib/x64/*.dll " .. copyDir,
-			"{COPY} ../Dependencies/SDL/SDL2_image-2.8.2/lib/x64/*.dll " .. copyDir,
-			"{COPY} ../Dependencies/SDL/SDL2_ttf-2.22.0/lib/x64/*.dll " .. copyDir,
-			"{COPY} ../Dependencies/SDL/SDL2_mixer-2.8.0/lib/x64/*.dll " .. copyDir
+			"{COPY} ../../Vendor/SDL/SDL2-2.30.10/lib/x64/*.dll " .. copyDir,
+			"{COPY} ../../Vendor/SDL/SDL2_image-2.8.2/lib/x64/*.dll " .. copyDir,
+			"{COPY} ../../Vendor/SDL/SDL2_ttf-2.22.0/lib/x64/*.dll " .. copyDir,
+			"{COPY} ../../Vendor/SDL/SDL2_mixer-2.8.0/lib/x64/*.dll " .. copyDir
         }
 
     -- Reset filter to avoid affecting future configurations
