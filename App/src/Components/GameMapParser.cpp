@@ -30,7 +30,6 @@ std::shared_ptr<TiledMap> GameMapParser::RetrieveRenderMap()
 
 	for (const auto& layer : fullTileMap->layers)
 	{
-		// TODO: Replace property name with a constant
 		auto renderEnabled = layer.GetProperty(TiledPropertyNames::RENDER_ENABLED);
 
 		if (!renderEnabled.has_value() || !std::get<bool>(renderEnabled.value().Value))
@@ -56,7 +55,6 @@ std::vector<TiledLayer> GameMapParser::RetrieveCollisionMap()
 
 	for (const auto& layer : fullTileMap->layers)
 	{
-		// TODO: Replace property name with a constant
 		auto isSolid = layer.GetProperty(TiledPropertyNames::IS_SOLID);
 
 		if (!isSolid.has_value() || !std::get<bool>(isSolid.value().Value))
