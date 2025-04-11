@@ -32,4 +32,6 @@ public:
 	std::vector<TiledLayer> RetrieveCollisionMap();
 
 	std::optional<TiledObjectGroup> RetrieveObjectGroup(std::string_view groupName);
+
+	int GetTileSize() const;
 };

@@ -81,3 +81,8 @@ std::optional<TiledObjectGroup> GameMapParser::RetrieveObjectGroup(std::string_v
 	else
 		return std::nullopt;
 }
+
+int GameMapParser::GetTileSize() const
+{
+	return fullTileMap->tileSize;
+}
