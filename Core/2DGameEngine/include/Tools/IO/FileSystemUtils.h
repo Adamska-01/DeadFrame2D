@@ -3,17 +3,17 @@
 #include <string>
 #include <vector>
 
-
-/// <summary>
-/// Utility functions related to filesystem operations.
-/// </summary>
+/**
+ * Utility functions related to filesystem operations.
+ */
 namespace FileSystemUtils
 {
-	/// <summary>
-	/// Retrieves all regular file paths from a given folder.
-	/// </summary>
-	/// <param name="folderPath">Path to the folder to scan.</param>
-	/// <returns>A vector containing the full paths of all regular files in the folder.</returns>
+	/**
+	 * Retrieves all regular file paths from a given folder.
+	 * 
+	 * @param folderPath Path to the folder to scan.
+	 * @return A vector containing the full paths of all regular files in the folder.
+	 */
 	std::vector<std::string> GetFilesInFolder(std::string_view folderPath)
 	{
 		std::vector<std::string> filePaths;
