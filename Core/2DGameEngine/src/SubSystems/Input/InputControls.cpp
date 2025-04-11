@@ -6,7 +6,7 @@
 std::unordered_map<std::string, std::vector<InputBinding>> InputControls::inputActions;
 
 
-void InputControls::Deserialize(const char* filePath)
+void InputControls::Deserialize(std::string_view filePath)
 {
 	inputActions = JsonSerializer::DeserializeFromFile<std::unordered_map<std::string, std::vector<InputBinding>>>(filePath);
 }

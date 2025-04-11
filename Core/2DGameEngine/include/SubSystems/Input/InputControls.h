@@ -12,7 +12,7 @@ private:
 
 
 public:
-	static void Deserialize(const char* filePath);
+	static void Deserialize(std::string_view filePath);
 
 	// TODO: Delete all this shit..
 

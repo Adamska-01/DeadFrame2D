@@ -35,12 +35,14 @@ namespace JsonSerializer
 	}
 
 	template <typename T>
-	T DeserializeFromFile(const std::string& filename)
+	T DeserializeFromFile(std::string_view filename)
 	{
-		std::ifstream inFile(filename);
+		auto filePathString = std::string(filename);
+
+		std::ifstream inFile(filePathString);
 
 		if (!inFile.is_open())
-			throw std::runtime_error("Failed to open file: " + filename);
+			throw std::runtime_error("Failed to open file: " + filePathString);
 
 		std::string jsonContent((std::istreambuf_iterator<char>(inFile)), std::istreambuf_iterator<char>());
 
