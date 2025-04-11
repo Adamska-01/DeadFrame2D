@@ -10,7 +10,8 @@ project "2DGameEngine"
     files 
     { 
         "include/**.h", 
-        "src/**.cpp" 
+        "src/**.cpp",
+		"../../Vendor/tinyxml2-10.0.0/**.cpp" 
     }
 
     -- Include paths
