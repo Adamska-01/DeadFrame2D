@@ -5,6 +5,10 @@
 
 class Transform : public GameComponent
 {
+private:
+	Vector2F startFramePosition;
+
+
 public:
 	Transform(Vector2F position = Vector2F::Zero, Vector2F scale = Vector2F::One, float angle = 0.0f);
 
@@ -42,6 +46,9 @@ public:
 	void Update(float dt) override;
 
 	void Draw() override;
+
+
+	Vector2F GetStartFramePosition() const;
 
 	
 	inline void Log(std::string msg = "") const

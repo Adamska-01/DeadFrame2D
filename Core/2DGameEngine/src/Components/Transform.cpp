@@ -59,8 +59,14 @@ void Transform::Init()
 
 void Transform::Update(float dt)
 {
+	startFramePosition = position;
 }
 
 void Transform::Draw()
 {
+}
+
+Vector2F Transform::GetStartFramePosition() const
+{
+	return startFramePosition;
 }
