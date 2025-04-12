@@ -25,8 +25,6 @@ void GameObject::Init()
 
 void GameObject::Update(float dt)
 {
-	transform->Update(dt);
-
 	for (auto& component : componentBucket.GetComponents())
 	{
 		component->Update(dt);
