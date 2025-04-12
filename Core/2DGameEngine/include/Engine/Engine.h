@@ -11,7 +11,7 @@ class Engine
 private:
 	bool isRunning;
 
-	std::vector<std::shared_ptr<GameObject>> gameObjectsToInitialize;
+	std::vector<std::weak_ptr<GameObject>> gameObjectsToInitialize;
 
 	
 	void GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);

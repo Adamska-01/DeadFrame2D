@@ -66,21 +66,28 @@ std::optional<int> Engine::Run()
 
 	for (const auto& toInitialize : currentToInitialize)
 	{
-		if (toInitialize == nullptr)
+		auto toInitPtr = toInitialize.lock();
+
+		if (toInitPtr == nullptr)
 			continue;
 
-		toInitialize->Init();
+		toInitPtr->Init();
 	}
 
 	isRunning = true;
 
 	for (const auto& toInitialize : gameObjectsToInitialize)
 	{
-		if (toInitialize == nullptr)
+		auto toInitPtr = toInitialize.lock();
+
+		if (toInitPtr == nullptr)
 			continue;
 
-		toInitialize->Init();
+		toInitPtr->Init();
 	}
+
+	currentToInitialize.clear();
+	gameObjectsToInitialize.clear();
 
 	while (isRunning)
 	{
