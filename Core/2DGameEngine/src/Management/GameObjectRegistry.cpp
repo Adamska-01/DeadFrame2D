@@ -30,14 +30,17 @@ GameObjectRegistry::~GameObjectRegistry()
 
 void GameObjectRegistry::Update(float deltaTime)
 {
-	for (const auto& obj : gameObjects)
+	auto gameobjectSize = gameObjects.size();
+	auto colliderSize = colliders.size();
+
+	for (size_t i = 0; i < gameobjectSize; i++)
 	{
-		obj->Update(deltaTime);
+		gameObjects[i]->Update(deltaTime);
 	}
 
-	for (size_t i = 0; i < colliders.size(); ++i)
+	for (size_t i = 0; i < colliderSize; ++i)
 	{
-		for (size_t j = i + 1; j < colliders.size(); ++j)
+		for (size_t j = i + 1; j < colliderSize; ++j)
 		{
 			auto colliderA = colliders[i];
 			auto colliderB = colliders[j];
