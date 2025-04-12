@@ -2,23 +2,20 @@
 #include <Engine/Engine.h>
 
 
-class Cannon;
-class Bobble;
+class Player;
 class GameMap;
-class BobbleGrid;
+class LevelManagerObject;
 
 
 class Application : public Engine
 {
 private:
-	std::weak_ptr<Cannon> cannon;
-
-	std::weak_ptr<Bobble> bobble;
+	std::weak_ptr<Player> player;
 
 	std::weak_ptr<GameMap> gameMap;
-	
-	std::weak_ptr<BobbleGrid> bobbleGrid;
 
+	std::weak_ptr<LevelManagerObject> levelManager;
+	
 
 public:
 	Application();

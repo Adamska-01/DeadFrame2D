@@ -1,14 +1,13 @@
 #include "Application.h"
-#include "GameObjects/BobbleGrid.h"
-#include "GameObjects/Cannon.h"
-#include "Prefabs/Bobble.h"
-#include <Map/GameMap.h>
+#include "Constants/AssetPaths.h"
+#include "Prefabs/GameMap.h"
+#include "Prefabs/LevelManagerObject.h"
+#include "Prefabs/Player.h"
 
 
 Application::Application()
 {
-	gameMap = GameObject::Instantiate<GameMap>("App/Assets/Maps/SingleplayerMap.tmx", true);
-	bobble = GameObject::Instantiate<Bobble>(Vector2F{ 100, 100 }, BobbleColor::Blue);
-	cannon = GameObject::Instantiate<Cannon>();
-	bobbleGrid = GameObject::Instantiate<BobbleGrid>();
+	gameMap = GameObject::Instantiate<GameMap>(AssetPaths::SINGLEPLAYER_MAP_PATH, true);
+	player = GameObject::Instantiate<Player>(PlayerIdentifier::PLAYER_1, Vector2F(2.0f, 2.0f));
+	levelManager = GameObject::Instantiate<LevelManagerObject>(GameMode::SINGLE_PLAYER);
 }
