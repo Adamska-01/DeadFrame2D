@@ -32,7 +32,7 @@ public:
 	
 	virtual void Init() override;
 
-	virtual void Update(float dt) override;
+	virtual void Update(float deltaTime) override;
 	
 	virtual void Draw() override;
 
@@ -42,7 +42,6 @@ public:
 	
 	template<typename T, typename... TArgs>
 	T* AddComponent(TArgs&& ...args);
-
 
 	template<typename T, typename ...Args>
 	static std::weak_ptr<T> Instantiate(Args && ...args);
@@ -69,7 +68,7 @@ inline std::weak_ptr<T> GameObject::Instantiate(Args && ...args)
 {
 	static_assert(std::is_base_of<GameObject, T>::value, "T must derive from GameObject");
 
-	auto obj = std::make_shared<T>(std::forward<Args>(args)...);
+	auto obj = std::shared_ptr<T>(new T(std::forward<Args>(args)...));
 
 	EventDispatcher::SendEvent(std::make_shared<GameObjectCreatedEvent>(obj));
 
