@@ -30,9 +30,11 @@ TextureManager::~TextureManager()
 	std::cout << "[Info] SDL_image subsystem successfully quit." << std::endl;
 }
 
-std::shared_ptr<SDL_Texture> TextureManager::LoadTexture(std::string filename)
+std::shared_ptr<SDL_Texture> TextureManager::LoadTexture(std::string_view filename)
 {
-	auto it = textureCache.find(filename);
+	auto filenameString = std::string(filename);
+
+	auto it = textureCache.find(filenameString);
 
 	if (it != textureCache.end())
 	{
@@ -40,7 +42,7 @@ std::shared_ptr<SDL_Texture> TextureManager::LoadTexture(std::string filename)
 			return sharedPtr;
 	}
 
-	auto tempSurface = IMG_Load(filename.c_str());
+	auto tempSurface = IMG_Load(filenameString.c_str());
 
 #if _DEBUG
 	DBG_ASSERT_MSG(tempSurface, "Failed to load the surface: % s\n", SDL_GetError());
@@ -55,14 +57,14 @@ std::shared_ptr<SDL_Texture> TextureManager::LoadTexture(std::string filename)
 	SDL_FreeSurface(tempSurface);
 	tempSurface = nullptr;
 
-	auto sharedPtr = std::shared_ptr<SDL_Texture>(texture, [filename](SDL_Texture* texture) 
+	auto sharedPtr = std::shared_ptr<SDL_Texture>(texture, [filenameString](SDL_Texture* texture)
 		{
 			SDL_DestroyTexture(texture);
 
-			TextureManager::textureCache.erase(filename);
+			TextureManager::textureCache.erase(filenameString);
 		});
 
-	textureCache[filename] = sharedPtr;
+	textureCache[filenameString] = sharedPtr;
 
 	return sharedPtr;
 }

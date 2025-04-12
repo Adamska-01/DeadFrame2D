@@ -29,7 +29,7 @@ private:
 
 
 public:
-	static std::shared_ptr<SDL_Texture> LoadTexture(std::string filename);
+	static std::shared_ptr<SDL_Texture> LoadTexture(std::string_view filename);
 
 
 	static void DrawRect(SDL_Rect rect, SDL_Color color, bool filled);

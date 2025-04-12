@@ -4,7 +4,7 @@
 #include "SubSystems/TextureManager.h"
 
 
-Sprite::Sprite(std::string texturePath)
+Sprite::Sprite(std::string_view texturePath)
 {
 	transform = nullptr;
 	destRect = { 0, 0, 0, 0 };
@@ -17,7 +17,7 @@ void Sprite::Init()
 	transform = OwningObject->GetComponent<Transform>();
 }
 
-void Sprite::Update(float dt)
+void Sprite::Update(float deltaTime)
 {
 	destRect.x = round(transform->position.x - (destRect.w * transform->scale.x) / 2);
 	destRect.y = round(transform->position.y - (destRect.h * transform->scale.y) / 2);
@@ -40,7 +40,7 @@ void Sprite::Draw()
 #endif
 }
 
-void Sprite::LoadSprite(std::string texturePath)
+void Sprite::LoadSprite(std::string_view texturePath)
 {
 	spriteTexture = TextureManager::LoadTexture(texturePath);
 

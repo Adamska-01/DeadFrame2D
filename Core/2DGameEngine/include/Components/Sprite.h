@@ -20,21 +20,21 @@ private :
 
 
 public:
-	Sprite(std::string texturePath);
+	Sprite(std::string_view texturePath);
 	
 	Sprite(Sprite&& other) = default;
 
 	virtual ~Sprite() override = default;
 
 
-	void Init();
+	virtual void Init() override;
 
-	void Update(float dt);
+	virtual void Update(float deltaTime) override;
 
-	void Draw();
+	virtual void Draw() override;
 
 
-	void LoadSprite(std::string texturePath);
+	void LoadSprite(std::string_view texturePath);
 	
 	SDL_Texture* GetTexture();
 };
