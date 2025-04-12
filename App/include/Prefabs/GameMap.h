@@ -18,7 +18,7 @@ private:
 
 
 public:
-	GameMap(const char* mapSource, bool extendMapToRenderTarget = false);
+	GameMap(std::string_view mapSource, bool extendMapToRenderTarget = false);
 
 	virtual ~GameMap() = default;
 };

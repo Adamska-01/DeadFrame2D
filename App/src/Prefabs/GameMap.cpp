@@ -1,10 +1,10 @@
 #include "Components/GameMapParser.h"
-#include "Map/GameMap.h"
+#include "Prefabs/GameMap.h"
 #include <Components/Collisions/Tile/Tiled/TiledMapCompatibleCollider2D.h>
 #include <Components/TileMap/Tiled/TiledMapCompatibleRenderer.h>
 
 
-GameMap::GameMap(const char* mapSource, bool extendMapToRenderTarget)
+GameMap::GameMap(std::string_view mapSource, bool extendMapToRenderTarget)
 {
 	gameMapParser = AddComponent<GameMapParser>(mapSource);
 
