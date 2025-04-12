@@ -15,8 +15,7 @@ void Collider2D::Init()
 
 void Collider2D::Update(float dt)
 {
-	startFramePosition.x = transform->position.x;
-	startFramePosition.y = transform->position.y;
+	startFramePosition = transform->GetStartFramePosition();
 }
 
 void Collider2D::Draw()
