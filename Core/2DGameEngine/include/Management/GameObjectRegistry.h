@@ -1,27 +1,12 @@
 #pragma once
-#include "Components/Collisions/Collider2D.h"
-#include "EventSystem/DispatchableEvent.h"
-#include "Tools/Collisions/CollisionHandler.h"
+#include "GameScene.h"
 #include <memory>
-#include <vector>
-
-
-class GameObject;
 
 
 class GameObjectRegistry
 {
 private:
-	static std::vector<std::shared_ptr<GameObject>> gameObjects;
-
-	std::vector<Collider2D*> colliders;
-
-	CollisionHandler collisionHandler;
-
-
-	void GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
-
-	void GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
+	static std::unique_ptr<GameScene> currentGameScene;
 
 
 public:
@@ -30,28 +15,20 @@ public:
 	~GameObjectRegistry();
 
 
-	void Update(float deltaTime);
+	void Update(float deltaTime) const;
 
-	void Draw();
+	void Draw() const;
 
 
 	template <typename T>
 	static T* FindObjectOfType();
+	
+	static void LoadScene(std::unique_ptr<GameScene> newGameScene);
 };
 
 
 template<typename T>
 inline T* GameObjectRegistry::FindObjectOfType()
 {
-	static_assert(std::is_base_of<GameComponent, T>::value, "T must derive from GameComponent");
-
-	for (const auto& object : gameObjects)
-	{
-		auto component = object->GetComponent<T>();
-
-		if (component == nullptr)
-			continue;
-
-		return component;
-	}
+	return currentGameScene->FindObjectOfType<T>();
 }
