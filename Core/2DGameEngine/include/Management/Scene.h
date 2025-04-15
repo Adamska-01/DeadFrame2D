@@ -13,6 +13,8 @@ private:
 
 	std::vector<std::weak_ptr<GameObject>> gameObjectsToInitialize;
 
+	std::vector<const GameObject*> objectsPendingDestroy;
+
 
 protected:
 	std::vector<std::shared_ptr<GameObject>> gameObjects;
@@ -25,6 +27,9 @@ protected:
 	void GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
 
 	void GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
+
+
+	void CleanupDestroyedObjects();
 
 
 public:

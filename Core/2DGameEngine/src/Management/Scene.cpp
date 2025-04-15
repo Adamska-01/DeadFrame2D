@@ -62,39 +62,48 @@ void Scene::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispat
 {
 	auto gameObjEvent = DispatchableEvent::SafeCast<GameObjectDestroyedEvent>(dispatchableEvent);
 
-	if (gameObjEvent == nullptr || gameObjEvent->gameObjectDestroyed == nullptr)
+	if (!gameObjEvent || !gameObjEvent->gameObjectDestroyed)
 		return;
 
-	auto target = gameObjEvent->gameObjectDestroyed;
-	auto targetCollider = target->GetComponent<Collider2D>();
+	// Mark for destruction
+	objectsPendingDestroy.push_back(gameObjEvent->gameObjectDestroyed);
+}
 
-	// Find and remove the collider reference associated with the target
-	auto colliderIt = std::remove_if(
-		colliders.begin(),
-		colliders.end(),
-		[targetCollider](Collider2D* collider)
-		{
-			return targetCollider == collider;
-		});
-	
-	if (colliderIt != colliders.end())
+void Scene::CleanupDestroyedObjects()
+{
+	if (objectsPendingDestroy.empty())
+		return;
+
+	for (const auto& target : objectsPendingDestroy)
 	{
-		colliders.erase(colliderIt, colliders.end());
-	}
+		if (!target)
+			continue;
 
-	// Now remove the target from gameObjects
-	auto objIt = std::remove_if(
-		gameObjects.begin(),
-		gameObjects.end(),
-		[target](std::shared_ptr<GameObject>& gameObject)
+		// Remove collider if it exists
+		auto targetCollider = target->GetComponent<Collider2D>();
+		if (targetCollider != nullptr)
 		{
-			return gameObject.get() == target;
-		});
+			auto colliderIt = std::remove(
+				colliders.begin(), 
+				colliders.end(), 
+				targetCollider);
+			
+			colliders.erase(colliderIt, colliders.end());
+		}
 
-	if (objIt != gameObjects.end())
-	{
+		// Remove GameObject
+		auto objIt = std::remove_if(
+			gameObjects.begin(), 
+			gameObjects.end(),
+			[target](const std::shared_ptr<GameObject>& obj)
+			{
+				return obj.get() == target;
+			});
+		
 		gameObjects.erase(objIt, gameObjects.end());
 	}
+
+	objectsPendingDestroy.clear();
 }
 
 void Scene::Exit()
@@ -158,6 +167,8 @@ void Scene::Update(float deltaTime)
 			colliderB->Accept(collisionHandler, colliderA);
 		}
 	}
+
+	CleanupDestroyedObjects();
 }
 
 void Scene::Draw()
