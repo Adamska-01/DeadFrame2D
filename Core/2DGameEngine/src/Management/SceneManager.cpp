@@ -36,6 +36,8 @@ void SceneManager::LoadScene(std::unique_ptr<Scene> newGameScene)
 	if (currentGameScene != nullptr)
 	{
 		currentGameScene->Exit();
+	
+		currentGameScene.reset();
 	}
 
 	currentGameScene = std::move(newGameScene);

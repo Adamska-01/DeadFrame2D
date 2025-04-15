@@ -42,10 +42,10 @@ void Scene::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatch
 
 	auto collider = gameObjects.back()->GetComponent<Collider2D>();
 
-	if (collider == nullptr)
-		return;
-
-	colliders.push_back(collider);
+	if (collider != nullptr)
+	{
+		colliders.push_back(collider);
+	}
 
 	if (isRunning)
 	{
@@ -76,7 +76,7 @@ void Scene::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispat
 		{
 			return targetCollider == collider;
 		});
-
+	
 	if (colliderIt != colliders.end())
 	{
 		colliders.erase(colliderIt, colliders.end());
@@ -97,6 +97,10 @@ void Scene::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispat
 	}
 }
 
+void Scene::Exit()
+{
+	gameObjects.clear();
+}
 
 void Scene::Init()
 {
