@@ -1,7 +1,7 @@
 #include "Components/LevelManager.h"
 #include <Components/GameMapParser.h>
 #include <Constants/TiledObjectGroupNames.h>
-#include <Management/GameObjectRegistry.h>
+#include <Management/SceneManager.h>
 #include <TileEditors/Tiled/Models/TiledObjectGroup.h>
 #include <Tools/IO/FileSystemUtils.h>
 
@@ -28,7 +28,7 @@ LevelManager::~LevelManager()
 
 void LevelManager::Init()
 {
-	auto gameMapParser = GameObjectRegistry::FindObjectOfType<GameMapParser>();
+	auto gameMapParser = SceneManager::FindObjectOfType<GameMapParser>();
 
 	if (gameMapParser == nullptr)
 	{

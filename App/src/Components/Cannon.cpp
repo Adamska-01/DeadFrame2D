@@ -4,7 +4,7 @@
 #include <Components/GameMapParser.h>
 #include <Components/Sprite.h>
 #include <Components/Transform.h>
-#include <Management/GameObjectRegistry.h>
+#include <Management/SceneManager.h>
 #include <TileEditors/Tiled/Models/TiledObjectGroup.h>
 
 

@@ -6,7 +6,7 @@
 #include <Components/Sprite.h>
 #include <Components/Transform.h>
 #include <Constants/TiledObjectGroupNames.h>
-#include <Management/GameObjectRegistry.h>
+#include <Management/SceneManager.h>
 #include <TileEditors/Tiled/Models/TiledObjectGroup.h>
 
 
@@ -27,7 +27,7 @@ void Player::Init()
 {
 	GameObject::Init();
 
-	auto gameMapObject = GameObjectRegistry::FindObjectOfType<GameMapParser>();
+	auto gameMapObject = SceneManager::FindObjectOfType<GameMapParser>();
 
 	if (gameMapObject == nullptr)
 	{
