@@ -2,31 +2,34 @@
 #include "EventSystem/EventDispatcher.h"
 #include "EventSystem/Events/GameObjectEvents/GameObjectCreatedEvent.h"
 #include "EventSystem/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
-#include "Management/GameScene.h"
+#include "Management/Scene.h"
+#include "SubSystems/Renderer.h"
 #include "Tools/Helpers/EventHelpers.h"
 
 
-GameScene::GameScene()
+Scene::Scene()
 {
+	isRunning = false;
+
 	gameObjects.clear();
 	colliders.clear();
 
 	collisionHandler = CollisionHandler();
 
-	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &GameScene::GameObjectCreatedHandler));
-	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &GameScene::GameObjectDestroyedHandler));
+	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &Scene::GameObjectCreatedHandler));
+	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &Scene::GameObjectDestroyedHandler));
 }
 
-GameScene::~GameScene()
+Scene::~Scene()
 {
 	gameObjects.clear();
 	colliders.clear();
 
-	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &GameScene::GameObjectCreatedHandler));
-	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &GameScene::GameObjectDestroyedHandler));
+	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &Scene::GameObjectCreatedHandler));
+	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &Scene::GameObjectDestroyedHandler));
 }
 
-void GameScene::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
+void Scene::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
 {
 	auto gameObjEvent = DispatchableEvent::SafeCast<GameObjectCreatedEvent>(dispatchableEvent);
 
@@ -43,9 +46,19 @@ void GameScene::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> disp
 		return;
 
 	colliders.push_back(collider);
+
+	if (isRunning)
+	{
+		target->Init();
+
+		return;
+	}
+
+	// Store for late-initialization
+	gameObjectsToInitialize.push_back(target);
 }
 
-void GameScene::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
+void Scene::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
 {
 	auto gameObjEvent = DispatchableEvent::SafeCast<GameObjectDestroyedEvent>(dispatchableEvent);
 
@@ -85,7 +98,42 @@ void GameScene::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> di
 }
 
 
-void GameScene::Update(float deltaTime)
+void Scene::Init()
+{
+	// Some game objects might create other game objects in their Init function.
+	// However, we want to ensure that only the game objects in the current
+	// initialization queue are considered part of this initial phase. 
+	// All the game objects created after this step are initalised at creation-time.
+	auto currentToInitialize = gameObjectsToInitialize;
+	gameObjectsToInitialize.clear();
+
+	for (const auto& toInitialize : currentToInitialize)
+	{
+		auto toInitPtr = toInitialize.lock();
+
+		if (toInitPtr == nullptr)
+			continue;
+
+		toInitPtr->Init();
+	}
+
+	isRunning = true;
+
+	for (const auto& toInitialize : gameObjectsToInitialize)
+	{
+		auto toInitPtr = toInitialize.lock();
+
+		if (toInitPtr == nullptr)
+			continue;
+
+		toInitPtr->Init();
+	}
+
+	currentToInitialize.clear();
+	gameObjectsToInitialize.clear();
+}
+
+void Scene::Update(float deltaTime)
 {
 	auto gameobjectSize = gameObjects.size();
 	auto colliderSize = colliders.size();
@@ -108,10 +156,14 @@ void GameScene::Update(float deltaTime)
 	}
 }
 
-void GameScene::Draw()
+void Scene::Draw()
 {
+	Renderer::ClearBuffer();
+
 	for (const auto& obj : gameObjects)
 	{
 		obj->Draw();
 	}
+
+	Renderer::PresentBuffer();
 }

@@ -6,8 +6,14 @@
 #include <vector>
 
 
-class GameScene
+class Scene
 {
+private:
+	bool isRunning;
+
+	std::vector<std::weak_ptr<GameObject>> gameObjectsToInitialize;
+
+
 protected:
 	std::vector<std::shared_ptr<GameObject>> gameObjects;
 
@@ -22,14 +28,17 @@ protected:
 
 
 public:
-	GameScene();
+	Scene();
 
-	virtual ~GameScene();
+	virtual ~Scene();
 
 
 	virtual void Enter() = 0;
-	
+
 	virtual void Exit() = 0;
+	
+
+	void Init();
 
 
 	virtual void Update(float deltaTime);
@@ -43,7 +52,7 @@ public:
 
 
 template<typename T>
-inline T* GameScene::FindObjectOfType()
+inline T* Scene::FindObjectOfType()
 {
 	static_assert(std::is_base_of_v<GameComponent, T>, "T must derive from GameComponent");
 
