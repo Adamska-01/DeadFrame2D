@@ -10,9 +10,9 @@ class GameComponent
 
 
 protected:
-	GameObject* OwningObject;
+	bool isActive;
 
-	bool enableDraw;
+	GameObject* OwningObject;
 
 
 public:
@@ -32,7 +32,7 @@ public:
 
 	GameObject* GetGameObject() const;
 
-	bool IsDrawEnabled() const;
+	bool IsActive() const;
 
-	void SetEnableDraw(bool value);
+	void SetActive(bool value);
 };

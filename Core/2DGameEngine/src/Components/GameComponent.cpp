@@ -4,7 +4,7 @@
 GameComponent::GameComponent()
 {
 	OwningObject = nullptr;
-	enableDraw = true;
+	isActive = true;
 }
 
 GameObject* GameComponent::GetGameObject() const
@@ -12,12 +12,12 @@ GameObject* GameComponent::GetGameObject() const
 	return OwningObject;
 }
 
-bool GameComponent::IsDrawEnabled() const
+bool GameComponent::IsActive() const
 {
-	return enableDraw;
+	return isActive;
 }
 
-void GameComponent::SetEnableDraw(bool value)
+void GameComponent::SetActive(bool value)
 {
-	enableDraw = value;
+	isActive = value;
 }

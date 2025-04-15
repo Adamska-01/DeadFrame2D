@@ -1,9 +1,9 @@
-#include "Components/SpriteAnimator.h"
 #include "Components/Sprite.h"
+#include "Components/SpriteAnimator.h"
 #include "Components/Transform.h"
+#include "GameObject.h"
 #include "Math/Vector2.h"
 #include "SubSystems/TextureManager.h"
-#include "GameObject.h"
 
 
 SpriteAnimator::SpriteAnimator()
@@ -24,7 +24,7 @@ void SpriteAnimator::Init()
 	if (sprite == nullptr)
 		return;
 
-	sprite->SetEnableDraw(false);
+	sprite->SetActive(false);
 }
 
 void SpriteAnimator::Update(float dt)

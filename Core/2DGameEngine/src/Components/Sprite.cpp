@@ -25,7 +25,7 @@ void Sprite::Update(float deltaTime)
 
 void Sprite::Draw()
 {
-	if (!enableDraw)
+	if (!isActive)
 		return;
 
 	auto scaledDest = destRect;
