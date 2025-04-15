@@ -36,5 +36,5 @@ public:
 
 	void LoadSprite(std::string_view texturePath);
 	
-	SDL_Texture* GetTexture();
+	std::shared_ptr<SDL_Texture> GetTexture();
 };

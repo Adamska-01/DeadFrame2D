@@ -32,7 +32,7 @@ void Sprite::Draw()
 	scaledDest.w *= transform->scale.x;
 	scaledDest.h *= transform->scale.y;
 
-	TextureManager::DrawTexture(spriteTexture.get(), NULL, &scaledDest, transform->angle);
+	TextureManager::DrawTexture(spriteTexture, NULL, &scaledDest, transform->angle);
 
 #if _DEBUG 
 	//Vector2 norm(transform->position.x + circleCollider.GetCircle().radius * cos(5 * MathConstants::PI / 3), transform->position.y + circleCollider.GetCircle().radius * sin(5 * MathConstants::PI / 3));
@@ -47,7 +47,7 @@ void Sprite::LoadSprite(std::string_view texturePath)
 	SDL_QueryTexture(spriteTexture.get(), NULL, NULL, &destRect.w, &destRect.h);
 }
 
-SDL_Texture* Sprite::GetTexture()
+std::shared_ptr<SDL_Texture> Sprite::GetTexture()
 {
-	return spriteTexture.get();
+	return spriteTexture;
 }

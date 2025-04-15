@@ -1,6 +1,7 @@
 #pragma once
 #include "Generic/SpriteAnimationProperties.h"
 #include <Components/GameComponent.h>
+#include <memory>
 
 
 class Transform;
@@ -16,7 +17,7 @@ protected:
 
 	SpriteAnimationProperties animationProperties;
 
-	SDL_Texture* spriteTexture;
+	std::shared_ptr<SDL_Texture> spriteTexture;
 
 	Transform* transform;
 

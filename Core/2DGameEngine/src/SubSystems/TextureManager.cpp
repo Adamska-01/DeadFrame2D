@@ -152,7 +152,7 @@ void TextureManager::DrawCircle(Circle circle, SDL_Color color, bool filled)
 }
 
 void TextureManager::DrawTexture(
-	SDL_Texture* texture, 
+	std::shared_ptr<SDL_Texture> texture,
 	const SDL_Rect* srcRect, 
 	const SDL_Rect* dstRect, 
 	float angle,
@@ -166,23 +166,25 @@ void TextureManager::DrawTexture(
 	if (renderer == nullptr || texture == nullptr)
 		return;
 
+	auto texturePtr = texture.get();
+
 	if (dstRect == NULL)
 	{
 		auto localDst = SDL_Rect{ 0, 0, 0, 0 };
 		
-		SDL_QueryTexture(texture, nullptr, nullptr, &localDst.w, &localDst.h);
+		SDL_QueryTexture(texturePtr, nullptr, nullptr, &localDst.w, &localDst.h);
 
 		dstRect = &localDst;
 	}
 
 	// Backup current texture state
 	Uint8 oldAlpha, oldR, oldG, oldB;
-	SDL_GetTextureAlphaMod(texture, &oldAlpha);
-	SDL_GetTextureColorMod(texture, &oldR, &oldG, &oldB);
+	SDL_GetTextureAlphaMod(texturePtr, &oldAlpha);
+	SDL_GetTextureColorMod(texturePtr, &oldR, &oldG, &oldB);
 
 	// Apply new modulation
-	SDL_SetTextureAlphaMod(texture, alpha);
-	SDL_SetTextureColorMod(texture, colorMod.r, colorMod.g, colorMod.b);
+	SDL_SetTextureAlphaMod(texturePtr, alpha);
+	SDL_SetTextureColorMod(texturePtr, colorMod.r, colorMod.g, colorMod.b);
 
 	// Default to center if NULL
 	auto rotationOriginFallback = SDL_Point
@@ -197,9 +199,9 @@ void TextureManager::DrawTexture(
 	}
 
 	// Render
-	SDL_RenderCopyEx(renderer, texture, srcRect, dstRect, angle, rotationOrigin, flip);
+	SDL_RenderCopyEx(renderer, texturePtr, srcRect, dstRect, angle, rotationOrigin, flip);
 
 	// Restore previous modulation
-	SDL_SetTextureAlphaMod(texture, oldAlpha);
-	SDL_SetTextureColorMod(texture, oldR, oldG, oldB);
+	SDL_SetTextureAlphaMod(texturePtr, oldAlpha);
+	SDL_SetTextureColorMod(texturePtr, oldR, oldG, oldB);
 }

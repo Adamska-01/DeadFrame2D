@@ -37,7 +37,7 @@ public:
 	static void DrawCircle(Circle circle, SDL_Color color, bool filled);
 
 	static void DrawTexture(
-		SDL_Texture* texture, 
+		std::shared_ptr<SDL_Texture> texture,
 		const SDL_Rect* srcRect = NULL, 
 		const SDL_Rect* dstRect = NULL, 
 		float angle = 0.0f, 

@@ -90,7 +90,7 @@ void SpriteAnimator::SetProp(bool repeat, int row, int frameCount, int rowCount,
 SDL_Rect SpriteAnimator::GetFrameRect()
 {
 	SDL_Rect srcRect;
-	SDL_QueryTexture(sprite->GetTexture(), NULL, NULL, &srcRect.w, &srcRect.h);
+	SDL_QueryTexture(sprite->GetTexture().get(), NULL, NULL, &srcRect.w, &srcRect.h);
 
 	//Get the size of a single frame in a sprite sheet
 	srcRect.w = static_cast<int>(round((float)srcRect.w / animationProperties.columnCount));
