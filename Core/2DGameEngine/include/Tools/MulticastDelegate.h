@@ -27,6 +27,9 @@ public:
 };
 
 
+using MultiCastVoid = MulticastDelegate<>;
+
+
 template<typename ...Args>
 inline bool MulticastDelegate<Args...>::IsEmpty()
 {
