@@ -28,3 +28,13 @@ void EventManager::AddEventProcessor(IEventProcessor* eventProcessor)
 {
 	eventProcessors.push_back(eventProcessor);
 }
+
+void EventManager::RemoveEventProcessor(IEventProcessor* eventProcessor)
+{
+	auto it = std::remove(
+		eventProcessors.begin(), 
+		eventProcessors.end(), 
+		eventProcessor);
+
+	eventProcessors.erase(it, eventProcessors.end());
+}

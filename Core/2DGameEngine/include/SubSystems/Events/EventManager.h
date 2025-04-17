@@ -24,4 +24,6 @@ public:
 
 
 	static void AddEventProcessor(IEventProcessor* eventProcessor);
+
+	static void RemoveEventProcessor(IEventProcessor* eventProcessor);
 };
