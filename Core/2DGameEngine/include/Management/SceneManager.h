@@ -5,19 +5,22 @@
 
 class SceneManager
 {
+	friend class Engine;
+
+
 private:
 	static std::unique_ptr<Scene> currentGameScene;
+
+
+	void UpdateScene(float deltaTime) const;
+
+	void DrawScene() const;
 
 
 public:
 	SceneManager();
 
 	~SceneManager();
-
-
-	void UpdateScene(float deltaTime) const;
-
-	void DrawScene() const;
 
 
 	static void LoadScene(std::unique_ptr<Scene> newGameScene);
