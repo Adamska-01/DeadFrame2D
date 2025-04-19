@@ -15,7 +15,7 @@ SceneManager::~SceneManager()
 	currentGameScene.reset();
 }
 
-void SceneManager::Update(float deltaTime) const
+void SceneManager::UpdateScene(float deltaTime) const
 {
 	if (currentGameScene == nullptr)
 		return;
@@ -23,7 +23,7 @@ void SceneManager::Update(float deltaTime) const
 	currentGameScene->Update(deltaTime);
 }
 
-void SceneManager::Draw() const
+void SceneManager::DrawScene() const
 {
 	if (currentGameScene == nullptr)
 		return;

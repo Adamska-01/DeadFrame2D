@@ -15,9 +15,9 @@ public:
 	~SceneManager();
 
 
-	void Update(float deltaTime) const;
+	void UpdateScene(float deltaTime) const;
 
-	void Draw() const;
+	void DrawScene() const;
 
 
 	static void LoadScene(std::unique_ptr<Scene> newGameScene);

@@ -24,8 +24,8 @@ std::optional<int> Engine::Run()
 		if (const auto ecode = eventManager.ProcessEvents())
 			return *ecode;
 
-		sceneManager->Update(ft.DeltaTime());
-		sceneManager->Draw();
+		sceneManager->UpdateScene(ft.DeltaTime());
+		sceneManager->DrawScene();
 
 		//FPS and delay
 		ft.EndClock();
