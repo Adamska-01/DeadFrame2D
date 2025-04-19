@@ -7,7 +7,7 @@ Engine::Engine()
 	engineSubSystems = std::make_unique<SubSystems>();
 	engineSubSystems->InitializeSubSystems();
 
-	gameObjectRegistry = std::make_unique<SceneManager>();
+	sceneManager = std::make_unique<SceneManager>();
 
 	ft.SetTargetFramerate(60);
 
@@ -24,8 +24,8 @@ std::optional<int> Engine::Run()
 		if (const auto ecode = eventManager.ProcessEvents())
 			return *ecode;
 
-		gameObjectRegistry->Update(ft.DeltaTime());
-		gameObjectRegistry->Draw();
+		sceneManager->Update(ft.DeltaTime());
+		sceneManager->Draw();
 
 		//FPS and delay
 		ft.EndClock();

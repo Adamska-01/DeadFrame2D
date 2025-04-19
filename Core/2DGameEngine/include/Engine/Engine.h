@@ -11,7 +11,7 @@ class Engine
 protected:
 	std::unique_ptr<SubSystems> engineSubSystems;
 
-	std::unique_ptr<SceneManager> gameObjectRegistry;
+	std::unique_ptr<SceneManager> sceneManager;
 
 	EventManager eventManager;
 
