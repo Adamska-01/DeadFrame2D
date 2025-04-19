@@ -2,47 +2,60 @@
 #include "Management/SceneManager.h"
 
 
-std::unique_ptr<Scene> SceneManager::currentGameScene;
+std::unique_ptr<Scene> SceneManager::currentScene;
+std::unique_ptr<Scene> SceneManager::newLoadedScene;
 
 
 SceneManager::SceneManager()
 {
-	currentGameScene = nullptr;
+	currentScene = nullptr;
+	newLoadedScene = nullptr;
 }
 
 SceneManager::~SceneManager()
 {
-	currentGameScene.reset();
+	currentScene.reset();
 }
 
 void SceneManager::UpdateScene(float deltaTime) const
 {
-	if (currentGameScene == nullptr)
+	if (currentScene == nullptr)
 		return;
 
-	currentGameScene->Update(deltaTime);
+	currentScene->Update(deltaTime);
 }
 
 void SceneManager::DrawScene() const
 {
-	if (currentGameScene == nullptr)
+	if (currentScene == nullptr)
 		return;
 
-	currentGameScene->Draw();
+	currentScene->Draw();
+}
+
+void SceneManager::LoadNewSceneIfAvailable()
+{
+	if (newLoadedScene == nullptr)
+		return;
+
+	if (currentScene != nullptr)
+	{
+		currentScene->Exit();
+
+		currentScene.reset();
+	}
+
+	currentScene = std::move(newLoadedScene);
+
+	currentScene->Enter();
+
+	currentScene->Init();
+
+	newLoadedScene.reset();
 }
 
 void SceneManager::LoadScene(std::unique_ptr<Scene> newGameScene)
 {
-	if (currentGameScene != nullptr)
-	{
-		currentGameScene->Exit();
-	
-		currentGameScene.reset();
-	}
-
-	currentGameScene = std::move(newGameScene);
-	
-	currentGameScene->Enter();
-
-	currentGameScene->Init();
+	// Store new scene for later loading (at the end of the current frame)
+	newLoadedScene = std::move(newGameScene);
 }

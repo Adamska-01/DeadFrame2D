@@ -9,12 +9,16 @@ class SceneManager
 
 
 private:
-	static std::unique_ptr<Scene> currentGameScene;
+	static std::unique_ptr<Scene> currentScene;
+
+	static std::unique_ptr<Scene> newLoadedScene;
 
 
 	void UpdateScene(float deltaTime) const;
 
 	void DrawScene() const;
+
+	void LoadNewSceneIfAvailable();
 
 
 public:
@@ -33,5 +37,5 @@ public:
 template<typename T>
 inline T* SceneManager::FindObjectOfType()
 {
-	return currentGameScene->FindObjectOfType<T>();
+	return currentScene->FindObjectOfType<T>();
 }

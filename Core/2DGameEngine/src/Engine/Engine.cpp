@@ -27,6 +27,8 @@ std::optional<int> Engine::Run()
 		sceneManager->UpdateScene(ft.DeltaTime());
 		sceneManager->DrawScene();
 
+		sceneManager->LoadNewSceneIfAvailable();
+		
 		//FPS and delay
 		ft.EndClock();
 		ft.DelayByFrameTime();
