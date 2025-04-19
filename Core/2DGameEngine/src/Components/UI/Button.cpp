@@ -2,6 +2,7 @@
 #include "Components/UI/Button.h"
 #include "GameObject.h"
 #include "SubSystems/Events/EventManager.h"
+#include "SubSystems/UIManager.h"
 #include "Tools/Collisions/CollisionHandler.h"
 
 
@@ -10,6 +11,7 @@ Button::Button(
 	std::string_view idleButtonSource, 
 	std::string_view hoveredButtonSource, 
 	std::string_view pressedButtonSource, 
+	std::string buttonText,
 	Vector2F size)
 {
 	isPressed = false;
@@ -18,6 +20,8 @@ Button::Button(
 
 	destRect.w = static_cast<int>(size.x);
 	destRect.h = static_cast<int>(size.y);
+
+	text = buttonText;
 
 	AddPressedCallback(onPressedHandler);
 	SetButtonImageSources(idleButtonSource, hoveredButtonSource, pressedButtonSource);
@@ -37,7 +41,7 @@ std::optional<int> Button::ProcessEvents(const SDL_Event& sdlEvent)
 	case SDL_MOUSEBUTTONDOWN:
 		if (sdlEvent.button.button == SDL_BUTTON_LEFT)
 		{
-			Vector2F mousePos{
+			auto mousePos = Vector2F{
 				static_cast<float>(sdlEvent.button.x),
 				static_cast<float>(sdlEvent.button.y)
 			};
@@ -52,7 +56,7 @@ std::optional<int> Button::ProcessEvents(const SDL_Event& sdlEvent)
 	case SDL_MOUSEBUTTONUP:
 		if (sdlEvent.button.button == SDL_BUTTON_LEFT)
 		{
-			Vector2F mousePos{
+			auto mousePos = Vector2F{
 				static_cast<float>(sdlEvent.button.x),
 				static_cast<float>(sdlEvent.button.y)
 			};
@@ -106,6 +110,18 @@ void Button::Update(float deltaTime)
 void Button::Draw()
 {
 	TextureManager::DrawTexture(currentButtonImage, NULL, &destRect);
+
+	// This is not final. just testing text
+	auto font = UIManager::LoadFont("App/Assets/Fonts/consola.ttf", 100);
+	auto texture = UIManager::LoadText(font.get(), text, SDL_Color(216, 139, 13, 255), 1);
+	TTF_SetFontStyle(font.get(), TTF_STYLE_BOLD);
+	auto textDest = destRect;
+
+	textDest.w = static_cast<int>(textDest.w * 0.5f);
+	textDest.h = static_cast<int>(textDest.h * 0.5f);
+	textDest.x = static_cast<int>(transfom->position.x - (textDest.w / 2.0f));
+	textDest.y = static_cast<int>(transfom->position.y - (textDest.h / 2.0f));
+	TextureManager::DrawTexture(std::shared_ptr<SDL_Texture>(texture, SDL_DestroyTexture), NULL, &textDest);
 }
 
 void Button::AddPressedCallback(std::function<void()> onPressedHandler)
@@ -144,7 +160,7 @@ void Button::OnPointerExit()
 
 	if (!isPressed)
 	{
-		currentButtonImage = buttonHoveredImage;
+		currentButtonImage = buttonIdleImage;
 	}
 }
 

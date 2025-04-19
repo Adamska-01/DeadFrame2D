@@ -20,6 +20,8 @@ private:
 
 	SDL_Rect destRect;
 
+	std::string text;
+
 	Transform* transfom;
 
 	MultiCastVoid onPressedCallback;
@@ -39,6 +41,7 @@ public:
 		std::string_view idleButtonSource,
 		std::string_view hoveredButtonSource,
 		std::string_view pressedButtonSource,
+		std::string buttonText,
 		Vector2F size);
 
 	virtual ~Button() override;
