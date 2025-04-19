@@ -1,8 +1,8 @@
 #include "Application.h"
-#include <Scenes/GameScene.h>
+#include "Scenes/MainMenuScene.h"
 
 
 Application::Application()
 {
-	SceneManager::LoadScene(std::make_unique<GameScene>());
+	SceneManager::LoadScene(std::make_unique<MainMenuScene>());
 }
