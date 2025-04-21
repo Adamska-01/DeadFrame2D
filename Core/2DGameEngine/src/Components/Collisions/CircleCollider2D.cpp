@@ -59,7 +59,7 @@ void CircleCollider2D::Draw()
 
 bool CircleCollider2D::Accept(ICollisionVisitor& visitor, Collider2D* other)
 {
-	SetCirclePos(circle, transform->position);
+	SetCirclePos(circle, transform->GetWorldPosition());
 	SetCirclePos(startFrameCircle, startFramePosition);
 
 	return other->AcceptDispatch(this, visitor);

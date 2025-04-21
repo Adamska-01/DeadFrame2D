@@ -175,7 +175,7 @@ bool CollisionHandler::Visit(BoxCollider2D* box, TiledMapCompatibleCollider2D* o
 	auto bottom_tile = std::min(tileMapDimension.y, std::max(previousRect.y + previousRect.h, colliderRect.y + colliderRect.h) / tileSize);
 	
 	auto startOrigin = Vector2F(previousRect.x + previousRect.w / 2.0f, previousRect.y + previousRect.h / 2.0f);
-	auto velocity = boxTransform->position - boxStartFramePosition;
+	auto velocity = boxTransform->GetWorldPosition() - boxStartFramePosition;
 
 	if (velocity.IsZero())
 		return false;
@@ -234,7 +234,7 @@ bool CollisionHandler::Visit(BoxCollider2D* box, TiledMapCompatibleCollider2D* o
 		}
 	}
 
-	boxTransform->position = boxStartFramePosition + velocity;
+	boxTransform->SetWorldPosition(boxStartFramePosition + velocity);
 	
 	//box->OnCollisionCallback(CollisionInfo(normal, other->OwningObject));
 	
@@ -323,7 +323,7 @@ bool CollisionHandler::Visit(CircleCollider2D* circle, TiledMapCompatibleCollide
 
 	// Assuming the circle position is the same as the transform position (TODO: Add an offset buffer to the circle collider) 
 	circle->SetPos(circleEndFramePosition);
-	circle->GetTranform()->position = circleEndFramePosition;
+	circle->GetTranform()->SetWorldPosition(circleEndFramePosition);
 
 	///box->OnCollisionCallback(CollisionInfo(normal, other->OwningObject));
 	

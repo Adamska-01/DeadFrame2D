@@ -56,9 +56,11 @@ void SpriteAnimator::Update(float dt)
 void SpriteAnimator::Draw()
 {
 	auto dstRect = GetFrameRect();
+	auto currentPosition = transform->GetWorldPosition();
+	auto currentScale = transform->GetWorldScale();
 
-	dstRect.x = round(transform->position.x - ((float)dstRect.w * transform->scale.x) / 2);
-	dstRect.y = round(transform->position.y - ((float)dstRect.h * transform->scale.y) / 2);
+	dstRect.x = round(currentPosition.x - ((float)dstRect.w * currentScale.x) / 2);
+	dstRect.y = round(currentPosition.y - ((float)dstRect.h * currentScale.y) / 2);
 
 	auto srcRect = SDL_Rect
 	{
@@ -68,8 +70,8 @@ void SpriteAnimator::Draw()
 		dstRect.h
 	};
 
-	dstRect.w *= transform->scale.x;
-	dstRect.h *= transform->scale.y;
+	dstRect.w *= currentScale.x;
+	dstRect.h *= currentScale.y;
 
 	TextureManager::DrawTexture(spriteTexture, &srcRect, &dstRect, 0.0f, NULL, animationProperties.flip);
 }

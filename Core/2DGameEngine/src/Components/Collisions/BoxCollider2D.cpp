@@ -58,7 +58,9 @@ void BoxCollider2D::Draw()
 
 bool BoxCollider2D::Accept(ICollisionVisitor& visitor, Collider2D* other)
 {
-	SetBox(transform->position.x - (box.w / 2), transform->position.y - (box.h / 2), box.w, box.h);
+	auto worldPosition = transform->GetWorldPosition();
+
+	SetBox(worldPosition.x - (box.w / 2), worldPosition.y - (box.h / 2), box.w, box.h);
 	UpdatePreviousBox(startFramePosition.x - (box.w / 2), startFramePosition.y - (box.h / 2));
 
 	return other->AcceptDispatch(this, visitor);

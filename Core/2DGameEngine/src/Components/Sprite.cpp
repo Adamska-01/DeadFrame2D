@@ -19,25 +19,26 @@ void Sprite::Init()
 
 void Sprite::Update(float deltaTime)
 {
-	destRect.x = round(transform->position.x - (destRect.w * transform->scale.x) / 2);
-	destRect.y = round(transform->position.y - (destRect.h * transform->scale.y) / 2);
+	auto worldPosition = transform->GetWorldPosition();
+	auto worldScale = transform->GetWorldScale();
+
+	destRect.x = round(worldPosition.x - (destRect.w * worldScale.x) / 2);
+	destRect.y = round(worldPosition.y - (destRect.h * worldScale.y) / 2);
 }
 
 void Sprite::Draw()
 {
 	if (!isActive)
 		return;
+	
+	auto worldScale = transform->GetWorldScale();
+	auto worldRotation = transform->GetWorldRotation();
 
 	auto scaledDest = destRect;
-	scaledDest.w *= transform->scale.x;
-	scaledDest.h *= transform->scale.y;
+	scaledDest.w *= worldScale.x;
+	scaledDest.h *= worldScale.y;
 
-	TextureManager::DrawTexture(spriteTexture, NULL, &scaledDest, transform->angle);
-
-#if _DEBUG 
-	//Vector2 norm(transform->position.x + circleCollider.GetCircle().radius * cos(5 * MathConstants::PI / 3), transform->position.y + circleCollider.GetCircle().radius * sin(5 * MathConstants::PI / 3));
-	//SDL_RenderDrawLine(Renderer::GetInstance()->GetRenderer(), transform->position.x, transform->position.y, norm.x, norm.y);
-#endif
+	TextureManager::DrawTexture(spriteTexture, NULL, &scaledDest, worldRotation);
 }
 
 void Sprite::LoadSprite(std::string_view texturePath)
