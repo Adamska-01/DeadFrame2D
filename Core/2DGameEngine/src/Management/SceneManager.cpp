@@ -3,13 +3,13 @@
 
 
 std::unique_ptr<Scene> SceneManager::currentScene;
-std::unique_ptr<Scene> SceneManager::newLoadedScene;
+std::function<std::unique_ptr<Scene>()> SceneManager::newSceneFactory;
 
 
 SceneManager::SceneManager()
 {
 	currentScene = nullptr;
-	newLoadedScene = nullptr;
+	newSceneFactory = nullptr;
 }
 
 SceneManager::~SceneManager()
@@ -35,7 +35,7 @@ void SceneManager::DrawScene() const
 
 void SceneManager::LoadNewSceneIfAvailable()
 {
-	if (newLoadedScene == nullptr)
+	if (newSceneFactory == nullptr)
 		return;
 
 	if (currentScene != nullptr)
@@ -45,17 +45,11 @@ void SceneManager::LoadNewSceneIfAvailable()
 		currentScene.reset();
 	}
 
-	currentScene = std::move(newLoadedScene);
+	currentScene = newSceneFactory();
 
 	currentScene->Enter();
 
 	currentScene->Init();
 
-	newLoadedScene.reset();
-}
-
-void SceneManager::LoadScene(std::unique_ptr<Scene> newGameScene)
-{
-	// Store new scene for later loading (at the end of the current frame)
-	newLoadedScene = std::move(newGameScene);
+	newSceneFactory = nullptr;
 }

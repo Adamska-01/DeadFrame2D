@@ -11,7 +11,7 @@ class SceneManager
 private:
 	static std::unique_ptr<Scene> currentScene;
 
-	static std::unique_ptr<Scene> newLoadedScene;
+	static std::function<std::unique_ptr<Scene>()> newSceneFactory;
 
 
 	void UpdateScene(float deltaTime) const;
@@ -27,12 +27,28 @@ public:
 	~SceneManager();
 
 
-	static void LoadScene(std::unique_ptr<Scene> newGameScene);
+	template<typename TScene, typename... Args>
+	static void LoadScene(Args&&... args);
 
 	template <typename T>
 	static T* FindObjectOfType();
 };
 
+
+template<typename TScene, typename ...Args>
+inline void SceneManager::LoadScene(Args && ...args)
+{
+	static_assert(std::is_base_of_v<Scene, TScene>, "TScene must derive from Scene");
+
+	newSceneFactory = [argsTuple = std::make_tuple(std::forward<Args>(args)...)]() mutable 
+		{
+			return std::apply([](auto&&... unpackedArgs) 
+				{
+					return std::make_unique<TScene>(std::forward<decltype(unpackedArgs)>(unpackedArgs)...);
+				}, 
+				std::move(argsTuple));
+		};
+}
 
 template<typename T>
 inline T* SceneManager::FindObjectOfType()
