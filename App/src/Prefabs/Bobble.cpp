@@ -13,7 +13,7 @@ const std::string BLOW_BOBBLE_PATH = "App/Assets/Sprites/BlowBobbles.png";
 
 Bobble::Bobble(Vector2F startPos, BobbleColor color)
 {
-	transform->position = startPos;
+	transform->SetWorldPosition(startPos);
 
 	this->color = color;
 

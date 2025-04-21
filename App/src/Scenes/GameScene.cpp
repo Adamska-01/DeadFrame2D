@@ -1,8 +1,8 @@
-#include "Scenes/GameScene.h"
 #include "Constants/AssetPaths.h"
 #include "Prefabs/GameMap.h"
 #include "Prefabs/LevelManagerObject.h"
 #include "Prefabs/Player.h"
+#include "Scenes/GameScene.h"
 
 
 void GameScene::Enter()

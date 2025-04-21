@@ -4,5 +4,5 @@
 
 Application::Application()
 {
-	SceneManager::LoadScene(std::make_unique<MainMenuScene>());
+	SceneManager::LoadScene<MainMenuScene>();
 }

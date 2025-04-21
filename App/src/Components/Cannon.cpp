@@ -1,11 +1,6 @@
 #include "Components/Cannon.h"
-#include "Constants/TiledObjectGroupNames.h"
 #include "Prefabs/Bobble.h"
-#include <Components/GameMapParser.h>
-#include <Components/Sprite.h>
 #include <Components/Transform.h>
-#include <Management/SceneManager.h>
-#include <TileEditors/Tiled/Models/TiledObjectGroup.h>
 
 
 Cannon::Cannon()
@@ -35,7 +30,7 @@ void Cannon::Update(float deltaTime)
 	if (bobblePtr == nullptr)
 	{
 		// TODO: The color needs to be set based on the available boobles in the grid
-		loadedBobble = GameObject::Instantiate<Bobble>(transform->position, BobbleColor::Blue);
+		loadedBobble = GameObject::Instantiate<Bobble>(transform->GetWorldPosition(), BobbleColor::Blue);
 	}
 }
 

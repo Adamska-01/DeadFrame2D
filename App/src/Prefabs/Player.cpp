@@ -41,11 +41,11 @@ void Player::Init()
 
 	if (playerID == PlayerIdentifier::PLAYER_1)
 	{
-		transform->position = groupObject.value().points.front();
+		transform->SetWorldPosition(groupObject.value().points.front());
 	}
 	else if (playerID == PlayerIdentifier::PLAYER_2)
 	{
-		transform->position = groupObject.value().points.back();
+		transform->SetWorldPosition(groupObject.value().points.back());
 	}
 
 	transform->Scale(Vector2F(2.0f, 2.0f));

@@ -27,10 +27,10 @@ void PlayerInput::ProcessRotationInput(float deltaTime)
 
 	transform->RotateByDegrees(rotationDirection * PlayerInputConstants::CANNON_ROTATION_SPEED * deltaTime);
 
-	transform->angle = std::clamp(
-		transform->angle, 
+	transform->SetLocalRotation(std::clamp(
+		transform->GetLocalRotation(),
 		PlayerInputConstants::CANNON_MIN_ROTATION, 
-		PlayerInputConstants::CANNON_MAX_ROTATION);
+		PlayerInputConstants::CANNON_MAX_ROTATION));
 }
 
 void PlayerInput::ProcessFireInput()
