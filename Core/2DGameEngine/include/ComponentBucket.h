@@ -14,7 +14,7 @@ private:
 
 
 public:
-	ComponentBucket() = default;
+	ComponentBucket();
 
 	~ComponentBucket();
 	
@@ -29,6 +29,11 @@ public:
 	const std::vector<std::unique_ptr<GameComponent>>& GetComponents();
 };
 
+
+inline ComponentBucket::ComponentBucket()
+{
+	components.clear();
+}
 
 inline ComponentBucket::~ComponentBucket()
 {
