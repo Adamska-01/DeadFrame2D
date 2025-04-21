@@ -13,6 +13,8 @@ Scene::Scene()
 
 	gameObjects.clear();
 	colliders.clear();
+	gameObjectsToInitialize.clear();
+	objectsPendingDestroy.clear();
 
 	collisionHandler = CollisionHandler();
 
@@ -24,6 +26,8 @@ Scene::~Scene()
 {
 	gameObjects.clear();
 	colliders.clear();
+	gameObjectsToInitialize.clear();
+	objectsPendingDestroy.clear();
 
 	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &Scene::GameObjectCreatedHandler));
 	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &Scene::GameObjectDestroyedHandler));
@@ -109,6 +113,9 @@ void Scene::CleanupDestroyedObjects()
 void Scene::Exit()
 {
 	gameObjects.clear();
+	colliders.clear();
+	gameObjectsToInitialize.clear();
+	objectsPendingDestroy.clear();
 }
 
 void Scene::Init()
