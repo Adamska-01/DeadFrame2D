@@ -1,7 +1,7 @@
 #pragma once
+#include "Math/MathConstants.h"
 #include <cmath>
 #include <iostream>
-#include <Math/MathConstants.h>
 
 
 template <typename T>
@@ -38,6 +38,8 @@ public:
 	constexpr Vector2<T> Min(const Vector2<T>& other) const;
 	
 	constexpr Vector2<T> Max(const Vector2<T>& other) const;
+	
+	constexpr Vector2<T> Rotated(float angleInDegrees) const;
 
 	constexpr Vector2<T>& Normalize();
 	
@@ -133,6 +135,18 @@ template<typename T>
 inline constexpr Vector2<T> Vector2<T>::Max(const Vector2<T>& other) const
 {
 	return Vector2<T>(std::max(x, other.x), std::max(y, other.y));
+}
+
+template<typename T>
+inline constexpr Vector2<T> Vector2<T>::Rotated(float angleInDegrees) const
+{
+	float radians = angleInDegrees * MathConstants::PI / 180.0f;
+	float cosA = std::cos(radians);
+	float sinA = std::sin(radians);
+
+	return Vector2<T>(
+		static_cast<T>(x * cosA - y * sinA),
+		static_cast<T>(x * sinA + y * cosA));
 }
 
 template<typename T>
