@@ -46,8 +46,6 @@ Input::Input()
 	mouseDevice = std::make_unique<MouseInputDevice>();
 
 	EventDispatcher::RegisterEventHandler(std::type_index(typeid(ControllerDisconnectedEvent)), EventHelpers::BindFunction(this, &Input::DisconnectControllerHandler));
-
-	EventManager::AddEventProcessor(this);
 }
 
 Input::~Input()

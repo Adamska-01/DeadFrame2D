@@ -44,7 +44,7 @@ public:
 		std::string buttonText,
 		Vector2F size);
 
-	virtual ~Button() override;
+	virtual ~Button() override = default;
 
 
 	virtual std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;

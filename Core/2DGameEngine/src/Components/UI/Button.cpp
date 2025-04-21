@@ -25,13 +25,6 @@ Button::Button(
 
 	AddPressedCallback(onPressedHandler);
 	SetButtonImageSources(idleButtonSource, hoveredButtonSource, pressedButtonSource);
-
-	EventManager::AddEventProcessor(this);
-}
-
-Button::~Button()
-{
-	EventManager::RemoveEventProcessor(this);
 }
 
 std::optional<int> Button::ProcessEvents(const SDL_Event& sdlEvent)
@@ -103,13 +96,17 @@ void Button::Init()
 
 void Button::Update(float deltaTime)
 {
-	destRect.x = static_cast<int>(transfom->position.x - (destRect.w / 2.0f));
-	destRect.y = static_cast<int>(transfom->position.y - (destRect.h / 2.0f));
+	auto currentPosition = transfom->GetWorldPosition();
+
+	destRect.x = static_cast<int>(currentPosition.x - (destRect.w / 2.0f));
+	destRect.y = static_cast<int>(currentPosition.y - (destRect.h / 2.0f));
 }
 
 void Button::Draw()
 {
 	TextureManager::DrawTexture(currentButtonImage, NULL, &destRect);
+
+	auto currentPosition = transfom->GetWorldPosition();
 
 	// This is not final. just testing text
 	auto font = UIManager::LoadFont("App/Assets/Fonts/consola.ttf", 100);
@@ -119,8 +116,8 @@ void Button::Draw()
 
 	textDest.w = static_cast<int>(textDest.w * 0.5f);
 	textDest.h = static_cast<int>(textDest.h * 0.5f);
-	textDest.x = static_cast<int>(transfom->position.x - (textDest.w / 2.0f));
-	textDest.y = static_cast<int>(transfom->position.y - (textDest.h / 2.0f));
+	textDest.x = static_cast<int>(currentPosition.x - (textDest.w / 2.0f));
+	textDest.y = static_cast<int>(currentPosition.y - (textDest.h / 2.0f));
 	TextureManager::DrawTexture(std::shared_ptr<SDL_Texture>(texture, SDL_DestroyTexture), NULL, &textDest);
 }
 

@@ -24,8 +24,6 @@ Window::Window(int width, int height, const char* title)
 #endif
 
 	std::cout << "[Info] Window successfully initialized." << std::endl;
-
-	EventManager::AddEventProcessor(this);
 }
 
 Window::~Window()
