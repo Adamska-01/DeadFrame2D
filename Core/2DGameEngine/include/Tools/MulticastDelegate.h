@@ -47,7 +47,7 @@ inline MulticastDelegate<Args...>& MulticastDelegate<Args...>::operator+=(const 
 template<typename ...Args>
 inline MulticastDelegate<Args...>& MulticastDelegate<Args...>::operator-=(const std::function<void(Args...)> func)
 {
-	using FunctionType = void(Args...); // alias fixes Clang/GCC issues
+	using FunctionType = void(Args...);
 
 	auto it = std::find_if(listeners.begin(), listeners.end(), [&func](const std::function<FunctionType>& f)
 		{
