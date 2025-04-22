@@ -1,5 +1,6 @@
 #pragma once
 #include "Components/Generic/Circle.h"
+#include <memory>
 #include <SDL_image.h>
 #include <string>
 #include <unordered_map>
