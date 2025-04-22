@@ -1,7 +1,6 @@
 #include <Debugging/Debug.h>
 #include <Math/Vector2.h>
 #include <SubSystems/Renderer.h>
-#include <SubSystems/TextureManager.h>
 #include <SubSystems/UIManager.h>
 
 
@@ -89,7 +88,13 @@ SDL_Texture* UIManager::LoadText(TTF_Font* font, std::string text, SDL_Color col
 
 void UIManager::DrawText(SDL_Texture* texture, SDL_Rect dest, Vector2F scale)
 {
-	SDL_Rect destRect = { dest.x, dest.y, dest.w * scale.x, dest.h * scale.y };
+	auto destRect = SDL_Rect
+	{
+		dest.x,
+		dest.y,
+		static_cast<int>(dest.w * scale.x),
+		static_cast<int>(dest.h * scale.y)
+	};
 
 	SDL_RenderCopy(Renderer::GetRenderer(), texture, NULL, &destRect);
 }
