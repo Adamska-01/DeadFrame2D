@@ -1,4 +1,5 @@
 #include "SubSystems/Events/EventManager.h"
+#include <algorithm>
 #include <SDL.h>
 
 
