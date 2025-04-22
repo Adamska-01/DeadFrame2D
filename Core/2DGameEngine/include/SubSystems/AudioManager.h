@@ -1,7 +1,5 @@
 #pragma once
-#include <iostream>
 #include <SDL_mixer.h>
-#include <vector>
 
 
 class AudioManager
