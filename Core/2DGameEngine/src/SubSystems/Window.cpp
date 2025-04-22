@@ -1,7 +1,5 @@
-#include "Subsystems/Events/EventManager.h"
-#include "Subsystems/Window.h"
-#include <Constants/ScreenConstants.h>
-#include <Debugging/Debug.h>
+#include "Debugging/Debug.h"
+#include "SubSystems/Window.h"
 #include <set>
 
 

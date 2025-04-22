@@ -1,6 +1,7 @@
 #include "TileEditors/Tiled/Parsers/TiledMapParser.h"
 #include <filesystem>
 #include <iostream>
+#include <sstream>
 #include <tinyxml2.h>
 
 
