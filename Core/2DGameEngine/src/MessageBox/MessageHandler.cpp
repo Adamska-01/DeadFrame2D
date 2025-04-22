@@ -1,5 +1,5 @@
-#include <MessageBox/MessageBoxConfig.h>
-#include <MessageBox/MessageHandler.h>
+#include "MessageBox/MessageBoxConfig.h"
+#include "MessageBox/MessageHandler.h"
 
 
 int MessageHandler::ShowMessageBox(const MessageBoxConfig& config)
@@ -11,7 +11,7 @@ int MessageHandler::ShowMessageBox(const MessageBoxConfig& config)
 		nullptr,
 		config.title.c_str(),
 		config.message.c_str(),
-		buttons.size(),
+		static_cast<int>(buttons.size()),
 		buttons.empty() ? nullptr : buttons.data(),
 		nullptr 
 	};
