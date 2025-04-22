@@ -49,10 +49,7 @@ inline MulticastDelegate<Args...>& MulticastDelegate<Args...>::operator-=(const 
 {
 	auto it = std::find_if(listeners.begin(), listeners.end(), [&func](const std::function<void(Args...)>& f) 
 		{
-			auto f_target = f.target<void(Args...)>();
-			auto func_target = func.target<void(Args...)>();
-			
-			return f_target && func_target && f_target == func_target;
+			return f.target<void(Args...)>() == func.target<void(Args...)>();
 		});
 
 	if (it != listeners.end())
