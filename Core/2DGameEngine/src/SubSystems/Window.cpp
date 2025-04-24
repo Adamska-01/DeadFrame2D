@@ -1,5 +1,6 @@
 #include "Debugging/Debug.h"
 #include "SubSystems/Window.h"
+#include <algorithm>
 #include <set>
 
 
