@@ -1,9 +1,10 @@
 #pragma once
 #include "Devices/InputDevice.h"
 #include "EventSystem/DispatchableEvent.h"
-#include "SubSystems//Events/Interfaces/IEventProcessor.h"
+#include "SubSystems/Events/Interfaces/IEventProcessor.h"
 #include "SubSystems/Input/Generic/PlayerInputSlot.h"
 #include <memory>
+#include <vector>
 
 
 class Input : public IEventProcessor
