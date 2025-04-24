@@ -13,3 +13,6 @@ Makefile
 
 # Exclude
 !Vendor/Binaries
+
+# Ignore all Linux lib folders for SDL libs
+Vendor/SDL/**/lib/Linux/
