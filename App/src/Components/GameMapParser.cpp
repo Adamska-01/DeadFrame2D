@@ -1,4 +1,5 @@
 #include "Components/GameMapParser.h"
+#include <algorithm>
 #include <Constants/TiledPropertyNames.h>
 #include <TileEditors/Tiled/Models/TiledMap.h>
 #include <TileEditors/Tiled/Parsers/TiledMapParser.h>
