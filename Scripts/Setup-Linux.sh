@@ -2,16 +2,18 @@
 
 set -e
 
+cd .. 
+
 # Config
 PREMAKE_PATH="Vendor/Premake/Linux/premake5"
-HOOK_PATH="../.git/hooks/post-checkout"
+HOOK_PATH=".git/hooks/post-checkout"
+SDL_AUTOMATION_SCRIPT_PATH="Vendor/SDL/Linux_SDL_Libs_Automation.sh"
 
 
 # Run Premake
 echo Generating project files...
-pushd ..
+chmod +x "$PREMAKE_PATH"
 $PREMAKE_PATH --cc=clang --file=Build.lua gmake2
-popd
 echo Project files generated!
 
 
@@ -24,3 +26,9 @@ $PREMAKE_PATH --cc=clang --file=Build.lua gmake2
 EOF
 chmod +x "$HOOK_PATH"
 echo "Hook installed at $HOOK_PATH"
+
+
+# Install SDL Libs 
+echo "Building SDL Libs..."
+chmod +x $SDL_AUTOMATION_SCRIPT_PATH
+bash "$SDL_AUTOMATION_SCRIPT_PATH"
