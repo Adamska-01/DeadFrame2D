@@ -14,15 +14,17 @@ SDL_AUTOMATION_SCRIPT_PATH="Vendor/SDL/Linux_SDL_Libs_Automation.sh"
 echo Generating project files...
 chmod +x "$PREMAKE_PATH"
 $PREMAKE_PATH --cc=clang --file=Build.lua gmake2
+chmod -x "$PREMAKE_PATH"
 echo Project files generated!
 
 
 # Install Git post-checkout hook
-echo "Installing Git post-checkout hook..."
-cat > "$HOOK_PATH" << 'EOF'
+cat > "$HOOK_PATH" << EOF
 #!/bin/sh
 echo "Regenerating project files with Premake..."
+chmod +x "$PREMAKE_PATH"
 $PREMAKE_PATH --cc=clang --file=Build.lua gmake2
+chmod -x "$PREMAKE_PATH"
 EOF
 chmod +x "$HOOK_PATH"
 echo "Hook installed at $HOOK_PATH"
