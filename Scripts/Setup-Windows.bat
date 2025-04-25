@@ -1,8 +1,8 @@
 @echo off
 
 # Config
-set "PREMAKE_PATH=Vendor\Premake\Windows\premake5.exe"
-set "HOOK_PATH=..\.git\hooks\post-checkout"
+set "PREMAKE_PATH=Vendor/Premake/Windows/premake5.exe"
+set "HOOK_PATH=../.git/hooks/post-checkout"
 
 
 :: Run Premake
