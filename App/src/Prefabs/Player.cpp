@@ -18,7 +18,7 @@ Player::Player(PlayerIdentifier playerID, Vector2F scale)
 
 	transform->Scale(scale);
 
-	AddComponent<Sprite>(AssetPaths::ARROW_IMAGE_PATH);
+	AddComponent<Sprite>(AssetPaths::Sprites::ARROW_IMAGE_PATH);
 	AddComponent<Cannon>();
 	AddComponent<PlayerInput>();
 }
