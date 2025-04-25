@@ -4,9 +4,20 @@
 
 namespace AssetPaths
 {
-	inline constexpr std::string_view SINGLEPLAYER_MAP_PATH = "App/Assets/Maps/SingleplayerMap.tmx";
-	
-	inline constexpr std::string_view MULTIPLAYER_MAP_PATH = "App/Assets/Maps/MultiplayerMap.tmx";
+	namespace Maps
+	{
+		inline constexpr std::string_view SINGLEPLAYER_MAP_PATH = "App/Assets/Maps/SingleplayerMap.tmx";
+		
+		inline constexpr std::string_view MULTIPLAYER_MAP_PATH = "App/Assets/Maps/MultiplayerMap.tmx";
+	}
 
-	inline constexpr std::string_view ARROW_IMAGE_PATH = "App/Assets/Sprites/Arrow.png";
+	namespace Sprites
+	{
+		inline constexpr std::string_view ARROW_IMAGE_PATH = "App/Assets/Sprites/Arrow.png";
+	}
+
+	namespace Fonts
+	{
+		inline constexpr std::string_view CONSOLAS_FONT_PATH = "App/Assets/Fonts/consola.ttf";
+	}
 }
