@@ -21,7 +21,6 @@ echo Project files generated!
 echo "Installing Git post-checkout hook..."
 cat > "$HOOK_PATH" << 'EOF'
 #!/bin/sh
-cd ..
 echo "Regenerating project files with Premake..."
 $PREMAKE_PATH --cc=clang --file=Build.lua gmake2
 EOF
