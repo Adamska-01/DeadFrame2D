@@ -16,9 +16,10 @@ echo Project files generated!
 :: Install Git hook (post-checkout)
 echo Installing Git post-checkout hook...
 (
-    echo #!/bin/sh
-    echo echo "Regenerating project files with Premake..."
-    echo %PREMAKE_PATH% --file=Build.lua vs2022
+	echo #!/bin/sh
+	cd ..
+	echo echo "Regenerating project files with Premake..."
+	echo %PREMAKE_PATH% --file=Build.lua vs2022
 ) > %HOOK_PATH%
 echo Hook installed at %HOOK_PATH%
 
