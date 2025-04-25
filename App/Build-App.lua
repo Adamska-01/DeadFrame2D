@@ -9,20 +9,6 @@ project "App"
 	staticruntime "off"
 	debugdir "../"
 	
-	
-	-- Linux
-	filter "system:linux"
-		links { "SDL2", "SDL2_image", "SDL2_ttf", "SDL2_mixer" }
-
-	-- Linux x86
-	filter { "system:linux", "platforms:x86" }
-		libdirs(get_sdl_libdirs("../Vendor/SDL/", "Linux/", "x86/"))
-
-	-- Linux x64
-	filter { "system:linux", "platforms:x64" }
-		libdirs(get_sdl_libdirs("../Vendor/SDL/", "Linux/", "x64/"))
-		
-	-- Apparently Windows can resolve links through 2DGameEngine
 
 	files { 
 		"include/**.h", 
@@ -54,6 +40,22 @@ project "App"
 		'bash -c "cp -rf ../Shared/Configurations/* %{cfg.targetdir}/Shared/Configurations/"',
 		'bash -c "cp -rf ./Assets/* %{cfg.targetdir}/App/Assets/"'
 	}
+
+
+	-- Linux
+	filter "system:linux"
+		links { "SDL2", "SDL2_image", "SDL2_ttf", "SDL2_mixer" }
+
+	-- Linux x86
+	filter { "system:linux", "platforms:x86" }
+		libdirs(get_sdl_libdirs("../Vendor/SDL/", "Linux/", "x86/"))
+
+	-- Linux x64
+	filter { "system:linux", "platforms:x64" }
+		libdirs(get_sdl_libdirs("../Vendor/SDL/", "Linux/", "x64/"))
+		
+	-- Apparently Windows can resolve links through 2DGameEngine
+	
 
 	-- Filters
 	filter "configurations:Debug"
