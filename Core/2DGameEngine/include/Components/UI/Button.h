@@ -17,7 +17,7 @@ private:
 
 	bool isHovered;
 
-	Vector2F size;
+	Vector2F buttonSize;
 
 	Transform* transform;
 
@@ -38,7 +38,7 @@ public:
 		std::string_view idleButtonSource,
 		std::string_view hoveredButtonSource,
 		std::string_view pressedButtonSource,
-		Vector2F size);
+		Vector2F buttonSize);
 
 	virtual ~Button() override = default;
 
