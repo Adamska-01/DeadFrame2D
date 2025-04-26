@@ -8,6 +8,7 @@
 
 
 class Transform;
+struct ButtonComponentModel;
 
 
 class Button : public GameComponent, public IEventProcessor
@@ -33,12 +34,7 @@ private:
 
 
 public:
-	Button(
-		std::function<void()> onPressedHandler,
-		std::string_view idleButtonSource,
-		std::string_view hoveredButtonSource,
-		std::string_view pressedButtonSource,
-		Vector2F buttonSize);
+	Button(const ButtonComponentModel& buttonConfiguration);
 
 	virtual ~Button() override = default;
 

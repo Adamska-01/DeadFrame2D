@@ -1,25 +1,24 @@
 #include "Components/Transform.h"
 #include "Components/UI/Button.h"
 #include "GameObject.h"
+#include "Models/Components/UI/ButtonComponentModel.h"
 #include "SubSystems/TextureManager.h"
 #include "Tools/Collisions/CollisionHandler.h"
 
 
-Button::Button(
-	std::function<void()> onPressedHandler, 
-	std::string_view idleButtonSource, 
-	std::string_view hoveredButtonSource, 
-	std::string_view pressedButtonSource, 
-	Vector2F buttonSize)
+Button::Button(const ButtonComponentModel& buttonConfiguration)
 {
 	isPressed = false;
 	isHovered = false;
 	transform = nullptr;
 
-	this->buttonSize = buttonSize;
+	this->buttonSize = buttonConfiguration.buttonSize;
 
-	AddPressedCallback(onPressedHandler);
-	SetButtonImageSources(idleButtonSource, hoveredButtonSource, pressedButtonSource);
+	AddPressedCallback(buttonConfiguration.onPressedHandler);
+	SetButtonImageSources(
+		buttonConfiguration.idleButtonSource, 
+		buttonConfiguration.hoveredButtonSource, 
+		buttonConfiguration.pressedButtonSource);
 }
 
 std::optional<int> Button::ProcessEvents(const SDL_Event& sdlEvent)
