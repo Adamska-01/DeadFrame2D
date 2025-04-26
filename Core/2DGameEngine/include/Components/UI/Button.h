@@ -1,5 +1,5 @@
 #pragma once
-#include "Components/GameComponent.h"
+#include "Components/UI/Abstractions/IInteractableUI.h"
 #include "Math/Vector2.h"
 #include "SubSystems//Events/Interfaces/IEventProcessor.h"
 #include "Tools/MulticastDelegate.h"
@@ -11,13 +11,9 @@ class Transform;
 struct ButtonComponentModel;
 
 
-class Button : public GameComponent, public IEventProcessor
+class Button : public IInteractableUI, public IEventProcessor
 {
 private:
-	bool isPressed;
-
-	bool isHovered;
-
 	Vector2F buttonSize;
 
 	Transform* transform;
@@ -49,6 +45,20 @@ public:
 	virtual void Draw() override;
 
 
+	virtual void OnPointerEnter() override;
+
+	virtual void OnPointerExit() override;
+
+	virtual void OnPointerDown() override;
+	
+	virtual void OnPointerUp() override;
+
+
+	virtual bool IsPressed() const override;
+
+	virtual bool IsHovered() const override;
+
+
 	void AddPressedCallback(std::function<void()> onPressedHandler);
 	
 	SDL_Rect GetBoundingBox() const;
@@ -56,13 +66,4 @@ public:
 	void SetButtonImageSources(std::string_view idleButtonSource, std::string_view hoveredButtonSource, std::string_view pressedButtonSource);
 
 	void SetButtonSize(Vector2F size);
-
-
-	void OnPointerEnter();
-
-	void OnPointerExit();
-
-	void OnPointerDown();
-	
-	void OnPointerUp();
 };

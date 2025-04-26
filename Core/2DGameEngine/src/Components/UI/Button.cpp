@@ -102,37 +102,6 @@ void Button::Draw()
 	TextureManager::DrawTexture(currentButtonImage, NULL, &destRect, transform->GetWorldRotation());
 }
 
-void Button::AddPressedCallback(std::function<void()> onPressedHandler)
-{
-	this->onPressedCallback += onPressedHandler;
-}
-
-SDL_Rect Button::GetBoundingBox() const
-{
-	auto currentPosition = transform->GetWorldPosition();
-	auto scaledSize = buttonSize * transform->GetWorldScale();
-
-	return SDL_Rect
-	{
-		static_cast<int>(currentPosition.x - ((scaledSize.x) / 2.0f)),
-		static_cast<int>(currentPosition.y - ((scaledSize.y) / 2.0f)),
-		static_cast<int>(scaledSize.x),
-		static_cast<int>(scaledSize.y)
-	};
-}
-
-void Button::SetButtonImageSources(std::string_view idleButtonSource, std::string_view hoveredButtonSource, std::string_view pressedButtonSource)
-{
-	currentButtonImage = buttonIdleImage = TextureManager::LoadTexture(idleButtonSource);
-	buttonHoveredImage = TextureManager::LoadTexture(hoveredButtonSource);
-	buttonPressedImage = TextureManager::LoadTexture(pressedButtonSource);
-}
-
-void Button::SetButtonSize(Vector2F size)
-{
-	this->buttonSize = size;
-}
-
 void Button::OnPointerEnter()
 {
 	isHovered = true;
@@ -171,4 +140,45 @@ void Button::OnPointerUp()
 	{
 		currentButtonImage = buttonPressedImage;
 	}
+}
+
+bool Button::IsPressed() const
+{
+	return isPressed;
+}
+
+bool Button::IsHovered() const
+{
+	return isHovered;
+}
+
+void Button::AddPressedCallback(std::function<void()> onPressedHandler)
+{
+	this->onPressedCallback += onPressedHandler;
+}
+
+SDL_Rect Button::GetBoundingBox() const
+{
+	auto currentPosition = transform->GetWorldPosition();
+	auto scaledSize = buttonSize * transform->GetWorldScale();
+
+	return SDL_Rect
+	{
+		static_cast<int>(currentPosition.x - ((scaledSize.x) / 2.0f)),
+		static_cast<int>(currentPosition.y - ((scaledSize.y) / 2.0f)),
+		static_cast<int>(scaledSize.x),
+		static_cast<int>(scaledSize.y)
+	};
+}
+
+void Button::SetButtonImageSources(std::string_view idleButtonSource, std::string_view hoveredButtonSource, std::string_view pressedButtonSource)
+{
+	currentButtonImage = buttonIdleImage = TextureManager::LoadTexture(idleButtonSource);
+	buttonHoveredImage = TextureManager::LoadTexture(hoveredButtonSource);
+	buttonPressedImage = TextureManager::LoadTexture(pressedButtonSource);
+}
+
+void Button::SetButtonSize(Vector2F size)
+{
+	this->buttonSize = size;
 }
