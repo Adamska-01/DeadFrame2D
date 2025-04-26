@@ -5,7 +5,7 @@ project "2DGameEngine"
 	targetdir ("./Binaries/" .. OutputDir)
 	objdir ("./Binaries/Intermediates/" .. OutputDir)
 	staticruntime "off"
-	debugdir "../../"
+	debugdir "../../" -- Set working directory to the root of the solution
 
 
 	files { 
@@ -16,6 +16,7 @@ project "2DGameEngine"
 
 	includedirs { 
 		"include",
+		"../../Shared/include", 
 		"../../Vendor/nlohmann-3.11.3", 
 		"../../Vendor/tinyxml2-10.0.0", 
 		"../../Vendor/SDL/SDL2-2.30.10/include", 
