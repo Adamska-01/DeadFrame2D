@@ -2,7 +2,6 @@
 #include "Components/GameComponent.h"
 #include "Math/Vector2.h"
 #include "SubSystems//Events/Interfaces/IEventProcessor.h"
-#include "SubSystems/TextureManager.h"
 #include "Tools/MulticastDelegate.h"
 #include <functional>
 #include <string_view>
@@ -18,11 +17,9 @@ private:
 
 	bool isHovered;
 
-	SDL_Rect destRect;
+	Vector2F size;
 
-	std::string text;
-
-	Transform* transfom;
+	Transform* transform;
 
 	MultiCastVoid onPressedCallback;
 
@@ -41,7 +38,6 @@ public:
 		std::string_view idleButtonSource,
 		std::string_view hoveredButtonSource,
 		std::string_view pressedButtonSource,
-		std::string buttonText,
 		Vector2F size);
 
 	virtual ~Button() override = default;
@@ -59,11 +55,11 @@ public:
 
 	void AddPressedCallback(std::function<void()> onPressedHandler);
 	
-	const SDL_Rect& GetBoundingBox() const;
+	SDL_Rect GetBoundingBox() const;
 
 	void SetButtonImageSources(std::string_view idleButtonSource, std::string_view hoveredButtonSource, std::string_view pressedButtonSource);
 
-	void SetButtonSize(int width, int height);
+	void SetButtonSize(Vector2F size);
 
 
 	void OnPointerEnter();
