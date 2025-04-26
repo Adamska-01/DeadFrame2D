@@ -41,8 +41,6 @@ void GameObject::LateUpdate(float deltaTime)
 
 void GameObject::Draw()
 {
-	transform->Draw();
-
 	for (auto& component : componentBucket.GetComponents())
 	{
 		component->Draw();
