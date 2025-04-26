@@ -117,6 +117,11 @@ GameObject* GameObject::GetParent() const
 	return parent;
 }
 
+Transform* GameObject::GetTransform() const
+{
+	return transform;
+}
+
 std::vector<std::weak_ptr<GameObject>> GameObject::GetChildren() const
 {
 	return children;

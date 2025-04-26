@@ -67,6 +67,8 @@ public:
 
 	GameObject* GetParent() const;
 
+	Transform* GetTransform() const;
+
 	std::vector<std::weak_ptr<GameObject>> GetChildren() const;
 };
 
