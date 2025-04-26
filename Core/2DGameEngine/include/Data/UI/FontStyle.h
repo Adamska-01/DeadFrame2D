@@ -2,7 +2,7 @@
 #include <SDL_ttf.h>
 
 
-enum FontStyle : uint8_t
+enum FontStyle
 {
 	NORMAL			= TTF_STYLE_NORMAL,
 	
@@ -14,3 +14,9 @@ enum FontStyle : uint8_t
 	
 	STRIKETHROUGH	= TTF_STYLE_STRIKETHROUGH
 };
+
+
+inline FontStyle operator|(FontStyle lhs, FontStyle rhs)
+{
+	return static_cast<FontStyle>(static_cast<uint8_t>(lhs) | static_cast<uint8_t>(rhs));
+}
