@@ -1,8 +1,9 @@
 #pragma once
 #include "Tools/PairHash.h"
-#include <map>
 #include <memory>
 #include <SDL_ttf.h>
+#include <string>
+#include <unordered_map>
 
 
 struct SDL_Texture;
@@ -32,11 +33,7 @@ private:
 
 
 public:
-	static std::shared_ptr<TTF_Font> LoadFont(std::string textPath, int fontsize);
+	static std::shared_ptr<TTF_Font> LoadFont(std::string_view textSource, int fontsize);
 
-	static SDL_Texture* LoadText(TTF_Font* font, std::string text, SDL_Color color, unsigned int numRows);
-	
-	static void DrawText(SDL_Texture* texture, SDL_Rect dest, Vector2F scale);
-
-	static void DrawDebugTextBox(Uint8 r, Uint8 g, Uint8 b, Uint8 a, SDL_Rect textRect);
+	static std::shared_ptr<SDL_Texture> LoadText(std::shared_ptr<TTF_Font> font, std::string text, SDL_Color color, unsigned int linesNumber);
 };
