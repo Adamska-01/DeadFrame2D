@@ -14,10 +14,11 @@ namespace AssetPaths
 	namespace Sprites
 	{
 		inline constexpr std::string_view ARROW_IMAGE_PATH = "App/Assets/Sprites/Arrow.png";
-	}
 
-	namespace Fonts
-	{
-		inline constexpr std::string_view CONSOLAS_FONT_PATH = "App/Assets/Fonts/consola.ttf";
+		inline constexpr std::string_view BUTTON_IDLE_IMAGE_PATH = "App/Assets/Sprites/Buttons/Button_Idle.png";
+
+		inline constexpr std::string_view BUTTON_HOVERED_IMAGE_PATH = "App/Assets/Sprites/Buttons/Button_Hovered.png";
+
+		inline constexpr std::string_view BUTTON_PRESSED_IMAGE_PATH = "App/Assets/Sprites/Buttons/Button_Pressed.png";
 	}
 }
