@@ -8,6 +8,7 @@
 struct SDL_Texture;
 struct SDL_Color;
 struct SDL_Rect;
+struct TextMeshComponentModel;
 class Transform;
 
 
@@ -32,7 +33,7 @@ private:
 
 
 public:
-	TextMesh(std::string_view fontSource, std::string text, unsigned int fontSize, unsigned int linesNumber);
+	TextMesh(const TextMeshComponentModel& textMeshConfiguration);
 	
 	virtual ~TextMesh() override = default;
 
@@ -46,7 +47,7 @@ public:
 
 	void SetFontSize(unsigned int newFontSize);
 	
-	void SetTextColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+	void SetTextColor(SDL_Color newColor);
 	
 	void SetFontStyle(FontStyle newFontStyle);
 

@@ -1,16 +1,19 @@
 #include "Components/Transform.h"
 #include "Components/UI/TextMesh.h"
 #include "GameObject.h"
+#include "Models/Components/UI/TextMeshComponentModel.h"
 #include "SubSystems/TextureManager.h"
 #include "SubSystems/UIManager.h"
 
 
-TextMesh::TextMesh(std::string_view fontSource, std::string text, unsigned int fontSize, unsigned int linesNumber)
-	: text(text)
+TextMesh::TextMesh(const TextMeshComponentModel& textMeshConfiguration)
+	: text(textMeshConfiguration.text)
 {
-	font = UIManager::LoadFont(fontSource, fontSize);
+	font = UIManager::LoadFont(textMeshConfiguration.fontSource, textMeshConfiguration.fontSize);
 	
-	SetText(text, linesNumber);
+	SetText(text, textMeshConfiguration.linesNumber);
+	SetTextColor(textMeshConfiguration.textColor);
+	SetFontStyle(textMeshConfiguration.fontStyle);
 }
 
 void TextMesh::Init()
@@ -34,12 +37,9 @@ void TextMesh::SetFontSize(unsigned int newFontSize)
 	fontSize = newFontSize;
 }
 
-void TextMesh::SetTextColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+void TextMesh::SetTextColor(SDL_Color newColor)
 {
-	color.r = r;
-	color.g = g;
-	color.b = b;
-	color.a = a;
+	color = newColor;
 
 	textTexture = UIManager::LoadText(font, text, color, 1);
 }
@@ -47,6 +47,8 @@ void TextMesh::SetTextColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 void TextMesh::SetFontStyle(FontStyle newFontStyle)
 {
 	TTF_SetFontStyle(font.get(), newFontStyle);
+
+	textTexture = UIManager::LoadText(font, text, color, 1);
 }
 
 void TextMesh::SetText(std::string newText, unsigned int newLinesNumber)
