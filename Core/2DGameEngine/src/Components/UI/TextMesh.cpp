@@ -36,12 +36,12 @@ void TextMesh::SetFontSize(unsigned int newFontSize)
 
 void TextMesh::SetTextColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
-	auto texture = UIManager::LoadText(font, text, color, 1);
-
 	color.r = r;
 	color.g = g;
 	color.b = b;
 	color.a = a;
+
+	textTexture = UIManager::LoadText(font, text, color, 1);
 }
 
 void TextMesh::SetFontStyle(FontStyle newFontStyle)
