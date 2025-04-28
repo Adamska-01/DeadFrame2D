@@ -3,9 +3,11 @@
 
 enum class WindowMode
 {
-	WINDOWED = 0,
+	WINDOWED,
 
-	BORDERLESS = 1,
+	BORDERLESS,
+
+	WINDOW_FULLSCREEN,
 	
-	FULLSCREEN = 2
+	FULLSCREEN
 };
