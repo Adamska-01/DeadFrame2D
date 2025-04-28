@@ -26,4 +26,6 @@ public:
 	static void AddEventProcessor(IEventProcessor* eventProcessor);
 
 	static void RemoveEventProcessor(IEventProcessor* eventProcessor);
+
+	static void SendSystemEvent(SDL_EventType eventType);
 };
