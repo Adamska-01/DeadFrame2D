@@ -1,5 +1,7 @@
 #include "Constants/ScreenConstants.h"
 #include "Debugging/Debug.h"
+#include "EventSystem/EventDispatcher.h"
+#include "EventSystem/Events/SubSystems/Renderer/RenderTargetSizeChangedEvent.h"
 #include "SubSystems/Renderer.h"
 #include "SubSystems/Window.h"
 #include <SDL.h>
@@ -74,6 +76,19 @@ SDL_Color Renderer::GetDisplayColor()
 	return SDL_Color(r, g, b, a);
 }
 
+Vector2I Renderer::GetResolutionTarget()
+{
+	int width = 0;
+	int height = 0;
+
+	if (renderer != nullptr)
+	{
+		SDL_RenderGetLogicalSize(renderer, &width, &height);
+	}
+
+	return Vector2I(width, height);
+}
+
 void Renderer::SetDisplayColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
 	if (renderer == nullptr)
@@ -101,4 +116,6 @@ void Renderer::SetResolutionTarget(Vector2I targetResolution)
 		return;
 
 	SDL_RenderSetLogicalSize(renderer, width, height);
+
+	EventDispatcher::SendEvent(std::make_shared<RenderTargetSizeChangedEvent>(Vector2I(width, height)));
 }
