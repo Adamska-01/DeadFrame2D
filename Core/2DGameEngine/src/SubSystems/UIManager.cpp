@@ -67,7 +67,7 @@ std::shared_ptr<SDL_Texture> UIManager::LoadText(std::shared_ptr<TTF_Font> font,
 
 	Uint32 wrapSize = totalWidth / linesNumber;
 
-	wrapSize = wrapSize > 0 ? wrapSize : 1;
+	wrapSize = (wrapSize > 0) ? wrapSize : 1;
 
 	auto textSurface = TTF_RenderText_Blended_Wrapped(font.get(), text.c_str(), color, wrapSize);
 
@@ -84,6 +84,6 @@ std::shared_ptr<SDL_Texture> UIManager::LoadText(std::shared_ptr<TTF_Font> font,
 	// Deleting temp surface
 	SDL_FreeSurface(textSurface);
 	textSurface = nullptr;
-	
+
 	return std::shared_ptr<SDL_Texture>(textTexture, SDL_DestroyTexture);
 }
