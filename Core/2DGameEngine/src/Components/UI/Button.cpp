@@ -12,7 +12,7 @@ Button::Button(const ButtonComponentModel& buttonConfiguration)
 	isHovered = false;
 	transform = nullptr;
 
-	this->buttonSize = buttonConfiguration.buttonSize;
+	this->widgetSize = buttonConfiguration.buttonSize;
 
 	AddPressedCallback(buttonConfiguration.onPressedHandler);
 	SetButtonImageSources(
@@ -142,16 +142,6 @@ void Button::OnPointerUp()
 	}
 }
 
-bool Button::IsPressed() const
-{
-	return isPressed;
-}
-
-bool Button::IsHovered() const
-{
-	return isHovered;
-}
-
 void Button::AddPressedCallback(std::function<void()> onPressedHandler)
 {
 	this->onPressedCallback += onPressedHandler;
@@ -160,7 +150,7 @@ void Button::AddPressedCallback(std::function<void()> onPressedHandler)
 SDL_Rect Button::GetBoundingBox() const
 {
 	auto currentPosition = transform->GetWorldPosition();
-	auto scaledSize = buttonSize * transform->GetWorldScale();
+	auto scaledSize = widgetSize * transform->GetWorldScale();
 
 	return SDL_Rect
 	{
@@ -180,5 +170,5 @@ void Button::SetButtonImageSources(std::string_view idleButtonSource, std::strin
 
 void Button::SetButtonSize(Vector2F size)
 {
-	this->buttonSize = size;
+	this->widgetSize = size;
 }

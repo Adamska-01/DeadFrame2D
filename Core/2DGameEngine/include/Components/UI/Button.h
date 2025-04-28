@@ -14,8 +14,6 @@ struct ButtonComponentModel;
 class Button : public IInteractableUI, public IEventProcessor
 {
 private:
-	Vector2F buttonSize;
-
 	Transform* transform;
 
 	MultiCastVoid onPressedCallback;
@@ -52,11 +50,6 @@ public:
 	virtual void OnPointerDown() override;
 	
 	virtual void OnPointerUp() override;
-
-
-	virtual bool IsPressed() const override;
-
-	virtual bool IsHovered() const override;
 
 
 	void AddPressedCallback(std::function<void()> onPressedHandler);
