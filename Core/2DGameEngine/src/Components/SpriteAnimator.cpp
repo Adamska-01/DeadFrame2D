@@ -1,4 +1,4 @@
-#include "Components/Sprite.h"
+#include "Components/Rendering/Sprite.h"
 #include "Components/SpriteAnimator.h"
 #include "Components/Transform.h"
 #include "GameObject.h"
