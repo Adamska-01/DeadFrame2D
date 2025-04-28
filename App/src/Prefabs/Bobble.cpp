@@ -1,6 +1,6 @@
 #include "Prefabs/Bobble.h"
 #include <Components/Collisions/CircleCollider2D.h>
-#include <Components/Sprite.h>
+#include <Components/Rendering/Sprite.h>
 #include <Components/SpriteAnimator.h>
 #include <Components/Transform.h>
 #include <SubSystems/Input/Input.h>
