@@ -1,6 +1,7 @@
 #pragma once
-#include "Components/GameComponent.h"
+#include "Components/UI/Abstractions/UIComponent.h"
 #include "Data/UI/FontStyle.h"
+#include "Math/Vector2.h"
 #include <memory>
 #include <string>
 
@@ -12,10 +13,12 @@ struct TextMeshComponentModel;
 class Transform;
 
 
-class TextMesh : public GameComponent
+class TextMesh : public UIComponent
 {
 private:
 	Transform* transform;
+
+	Vector2F initialObjectScale;
 
 	std::shared_ptr<SDL_Texture> textTexture;
 	

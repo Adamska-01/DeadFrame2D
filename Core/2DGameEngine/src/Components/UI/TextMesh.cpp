@@ -11,6 +11,8 @@ TextMesh::TextMesh(const TextMeshComponentModel& textMeshConfiguration)
 {
 	font = UIManager::LoadFont(textMeshConfiguration.fontSource, textMeshConfiguration.fontSize);
 	
+	initialObjectScale = textMeshConfiguration.textObjectInitialScale;
+
 	SetText(text, textMeshConfiguration.linesNumber);
 	SetTextColor(textMeshConfiguration.textColor);
 	SetFontStyle(textMeshConfiguration.fontStyle);
@@ -19,6 +21,8 @@ TextMesh::TextMesh(const TextMeshComponentModel& textMeshConfiguration)
 void TextMesh::Init()
 {
 	transform = OwningObject->GetComponent<Transform>();
+
+	transform->SetLocalScale(initialObjectScale);
 }
 
 void TextMesh::Update(float deltaTime)
