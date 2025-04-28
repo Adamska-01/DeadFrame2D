@@ -39,3 +39,12 @@ void EventManager::RemoveEventProcessor(IEventProcessor* eventProcessor)
 
 	eventProcessors.erase(it, eventProcessors.end());
 }
+
+void EventManager::SendSystemEvent(SDL_EventType eventType)
+{
+	SDL_Event quitEvent;
+	
+	quitEvent.type = eventType;
+
+	SDL_PushEvent(&quitEvent);
+}
