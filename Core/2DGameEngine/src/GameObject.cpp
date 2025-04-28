@@ -30,6 +30,9 @@ void GameObject::Update(float dt)
 {
 	for (auto& component : componentBucket.GetComponents())
 	{
+		if (!component->IsActive())
+			continue;
+
 		component->Update(dt);
 	}
 }
@@ -43,6 +46,9 @@ void GameObject::Draw()
 {
 	for (auto& component : componentBucket.GetComponents())
 	{
+		if (!component->IsActive())
+			continue;
+
 		component->Draw();
 	}
 }
@@ -55,16 +61,10 @@ void GameObject::AddChildGameObject(std::weak_ptr<GameObject> child)
 
 	// Step 1: Cache world transform before parenting
 	auto transform = childPtr->GetComponent<Transform>();
-	Vector2F worldPos;
-	Vector2F worldScale;
-	float worldRot = 0.0f;
-
-	if (transform)
-	{
-		worldPos = transform->GetWorldPosition();
-		worldScale = transform->GetWorldScale();
-		worldRot = transform->GetWorldRotation();
-	}
+	
+	auto worldPos = transform->GetWorldPosition();
+	auto worldScale = transform->GetWorldScale();
+	auto worldRot = transform->GetWorldRotation();
 
 	// Step 2: Remove from previous parent
 	if (childPtr->parent)
@@ -86,12 +86,27 @@ void GameObject::AddChildGameObject(std::weak_ptr<GameObject> child)
 	children.push_back(child);
 
 	// Step 4: Convert world transform back to local under new parent
-	if (transform)
-	{
-		transform->SetWorldPosition(worldPos);
-		transform->SetWorldScale(worldScale);
-		transform->SetWorldRotation(worldRot);
-	}
+	transform->SetWorldPosition(worldPos);
+	transform->SetWorldScale(worldScale);
+	transform->SetWorldRotation(worldRot);
+}
+
+bool GameObject::IsChildOf(const GameObject* potentialChild, bool recursive) const
+{
+	if (potentialChild == nullptr)
+		return false;
+
+	auto currentParent = parent;
+	if (currentParent == nullptr)
+		return false;
+
+	if (currentParent == potentialChild)
+		return true;
+
+	if (!recursive)
+		return false;
+
+	return currentParent->IsChildOf(potentialChild, true);
 }
 
 void GameObject::Destroy()

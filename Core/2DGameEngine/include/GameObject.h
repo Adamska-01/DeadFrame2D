@@ -57,6 +57,8 @@ public:
 
 	void AddChildGameObject(std::weak_ptr<GameObject> child);
 
+	bool IsChildOf(const GameObject* potentialChild, bool recursive = false) const;
+
 
 	template<typename T, typename ...Args>
 	static std::weak_ptr<T> Instantiate(Args && ...args);
@@ -86,7 +88,7 @@ inline T* GameObject::GetComponentInChildren(bool recursive) const
 	{
 		auto child = weakChild.lock();
 
-		if (child == nullptr)
+		if (child == nullptr || child->isDestroyed)
 			continue;
 
 		if (T* comp = child->GetComponent<T>())
@@ -111,7 +113,7 @@ inline std::vector<T*> GameObject::GetComponentsInChildren(bool recursive) const
 	{
 		auto child = weakChild.lock();
 
-		if (child == nullptr)
+		if (child == nullptr || child->isDestroyed)
 			continue;
 
 		if (T* comp = child->GetComponent<T>())
