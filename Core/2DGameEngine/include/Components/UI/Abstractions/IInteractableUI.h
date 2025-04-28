@@ -1,11 +1,12 @@
 #pragma once
-#include "Components/GameComponent.h"
+#include "Components/UI/Abstractions/INavigableUI.h"
+#include "Components/UI/Abstractions/UIComponent.h"
 
 
 /**
  * @brief Represents the interactable status of a UI element.
  */
-class IInteractableUI : public GameComponent
+class IInteractableUI : public UIComponent, public INavigableUI
 {
 protected:
 	bool isPressed;
@@ -37,16 +38,25 @@ public:
 	 */
 	virtual void OnPointerUp() = 0;
 
-
+	
 	/**
 	 * @brief Checks if the UI element is currently pressed.
 	 * @return True if pressed, false otherwise.
 	 */
-	virtual bool IsPressed() const = 0;
+	virtual bool IsPressed() const;
 
 	/**
 	 * @brief Checks if the UI element is currently hovered.
 	 * @return True if hovered, false otherwise.
 	 */
-	virtual bool IsHovered() const = 0;
+	virtual bool IsHovered() const;
+
+
+	virtual void NavigateUp() override;
+
+	virtual void NavigateDown() override;
+
+	virtual void NavigateRight() override;
+
+	virtual void NavigateLeft() override;
 };
