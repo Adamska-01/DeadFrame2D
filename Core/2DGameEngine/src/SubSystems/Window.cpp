@@ -138,6 +138,10 @@ void Window::SetWindowMode(WindowMode mode)
 		SDL_SetWindowBordered(window, SDL_FALSE);
 		break;
 
+	case WindowMode::WINDOW_FULLSCREEN:
+		SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+		break;
+
 	case WindowMode::FULLSCREEN:
 		SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 		break;
