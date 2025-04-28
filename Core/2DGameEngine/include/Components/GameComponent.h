@@ -10,6 +10,8 @@ class GameComponent
 
 
 protected:
+	mutable bool isDirty;
+
 	bool isActive;
 
 	GameObject* OwningObject;
@@ -18,9 +20,9 @@ protected:
 public:
 	GameComponent();
 
-	virtual ~GameComponent() = default;
-
 	GameComponent(GameComponent&& other) = default;
+
+	virtual ~GameComponent() = default;
 
 
 	virtual void Init() = 0;
@@ -28,6 +30,9 @@ public:
 	virtual void Update(float deltaTime) = 0;
 
 	virtual void Draw() = 0;
+
+
+	virtual void MarkDirty();
 
 
 	GameObject* GetGameObject() const;
