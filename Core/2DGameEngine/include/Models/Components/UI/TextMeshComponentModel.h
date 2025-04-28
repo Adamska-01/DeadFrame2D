@@ -15,7 +15,9 @@ struct TextMeshComponentModel
 
 	SDL_Color textColor = SDL_Color{ 255, 255,  255,  255 };
 	
-	unsigned int fontSize = 24;
+	unsigned int fontSize = 30;
+
+	Vector2F textObjectInitialScale = Vector2F::One;
 	
 	unsigned int linesNumber = 1;
 };
