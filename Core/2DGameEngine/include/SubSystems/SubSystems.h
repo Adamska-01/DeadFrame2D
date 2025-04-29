@@ -32,4 +32,7 @@ public:
 
 
 	void InitializeSubSystems();
+
+
+	void BeginFrame();
 };

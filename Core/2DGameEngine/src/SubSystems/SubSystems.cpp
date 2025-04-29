@@ -58,3 +58,8 @@ void SubSystems::InitializeSubSystems()
 
 	audioManager = new AudioManager();
 }
+
+void SubSystems::BeginFrame()
+{
+	input->BeginFrame();
+}

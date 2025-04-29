@@ -66,6 +66,16 @@ Input::~Input()
 	}
 }
 
+void Input::BeginFrame()
+{
+	for (const auto& device : controllerDevices)
+	{
+		device->BeginInputFrame();
+	}
+	keyboardDevice->BeginInputFrame();
+	mouseDevice->BeginInputFrame();
+}
+
 void Input::DisconnectControllerHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
 {
 	auto controllerDisconnectedEvent = DispatchableEvent::SafeCast<ControllerDisconnectedEvent>(dispatchableEvent);

@@ -30,8 +30,6 @@ ControllerInputDevice::~ControllerInputDevice()
 
 void ControllerInputDevice::ProcessEvent(const SDL_Event& controllerEvent)
 {
-	lastInputStates = currentInputStates;
-
 	if (deviceID != controllerEvent.cdevice.which)
 		return;
 

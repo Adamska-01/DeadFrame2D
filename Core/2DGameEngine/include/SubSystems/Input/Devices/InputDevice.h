@@ -4,8 +4,6 @@
 #include <unordered_map>
 
 
-
-
 class InputDevice
 {
 protected:
@@ -22,6 +20,8 @@ protected:
 public:
 	virtual void ProcessEvent(const SDL_Event& controllerEvent) = 0;
 
+
+	void BeginInputFrame();
 
 	PlayerInputSlot GetAssignedPlayer() const;
 	

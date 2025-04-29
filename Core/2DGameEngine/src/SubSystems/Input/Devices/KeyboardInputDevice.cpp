@@ -7,8 +7,6 @@ KeyboardInputDevice::KeyboardInputDevice()
 
 void KeyboardInputDevice::ProcessEvent(const SDL_Event& eventType)
 {
-	lastInputStates = currentInputStates;
-
 	switch (eventType.type)
 	{
 	case SDL_EventType::SDL_KEYDOWN:
