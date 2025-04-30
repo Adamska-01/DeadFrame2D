@@ -110,6 +110,9 @@ void GameObject::AddChildGameObject(std::weak_ptr<GameObject> child)
 	// Propagate active state
 	childPtr->hasActiveParent = this->IsActive();
 	PropagateActiveStateToChildren();
+
+	// Clear 'OnActiveStateChanged' callback
+	OnActiveStateChanged.Clear();
 }
 
 bool GameObject::IsChildOf(const GameObject* potentialChild, bool recursive) const
