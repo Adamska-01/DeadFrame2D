@@ -11,14 +11,24 @@ HorizontalLayoutGroup::HorizontalLayoutGroup(float layoutSpacing, LayoutPadding 
 
 void HorizontalLayoutGroup::UpdateLayout()
 {
-	auto interactables = OwningObject->GetComponentsInChildren<UIComponent>();
+	LayoutGroup::UpdateLayout();
 
-	size_t groupSize = interactables.size();
+	std::vector<UIComponent*> interactables;
+
+	for (const auto& ui : OwningObject->GetComponentsInChildren<UIComponent>())
+	{
+		if (ui == nullptr || !ui->GetGameObject()->IsActive())
+			continue;
+		
+		interactables.push_back(ui);
+	}
+
+	auto groupSize = interactables.size();
 	if (groupSize == 0)
 		return;
 
 	// Precompute total layout width
-	float totalWidth = 0.0f;
+	auto totalWidth = 0.0f;
 	for (const auto& interactable : interactables)
 	{
 		totalWidth += interactable->GetWidgetSize().x;
@@ -26,10 +36,10 @@ void HorizontalLayoutGroup::UpdateLayout()
 	totalWidth += layoutSpacing * (groupSize - 1);
 
 	// Get half of the width of the first element
-	float firstElementHalfWidth = interactables.front()->GetWidgetSize().x / 2.0f;
+	auto firstElementHalfWidth = interactables.front()->GetWidgetSize().x / 2.0f;
 
 	// Start centered
-	Vector2F currentPosition{ -totalWidth / 2.0f + firstElementHalfWidth, 0.0f };
+	auto currentPosition = Vector2F(- totalWidth / 2.0f + firstElementHalfWidth, 0.0f);
 
 	for (auto& interactable : interactables)
 	{

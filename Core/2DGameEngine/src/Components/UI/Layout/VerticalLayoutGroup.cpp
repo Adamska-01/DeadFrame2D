@@ -2,6 +2,7 @@
 #include "Components/UI/Abstractions/UIComponent.h"
 #include "Components/UI/Layout/VerticalLayoutGroup.h"
 #include "GameObject.h"
+#include "Tools/Helpers/EventHelpers.h"
 
 
 VerticalLayoutGroup::VerticalLayoutGroup(float layoutSpacing, LayoutPadding layoutPadding)
@@ -11,9 +12,19 @@ VerticalLayoutGroup::VerticalLayoutGroup(float layoutSpacing, LayoutPadding layo
 
 void VerticalLayoutGroup::UpdateLayout()
 {
-	auto interactables = OwningObject->GetComponentsInChildren<UIComponent>();
+	LayoutGroup::UpdateLayout();
 
-	size_t groupSize = interactables.size();
+	std::vector<UIComponent*> interactables;
+
+	for (const auto& ui : OwningObject->GetComponentsInChildren<UIComponent>())
+	{
+		if (ui == nullptr || !ui->GetGameObject()->IsActive())
+			continue;
+
+		interactables.push_back(ui);
+	}
+
+	auto groupSize = interactables.size();
 	if (groupSize == 0)
 		return;
 

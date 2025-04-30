@@ -5,6 +5,7 @@
 
 
 class DispatchableEvent;
+class UIComponent;
 
 
 class LayoutGroup : public GameComponent
@@ -20,6 +21,9 @@ protected:
 
 	LayoutPadding layoutPadding;
 
+	
+	void OnActiveStateChangeHandler(GameObject* child, bool activeState);
+
 
 public:
 	LayoutGroup(float layoutSpacing, LayoutPadding layoutPadding);
@@ -34,5 +38,5 @@ public:
 	virtual void Draw() override;
 
 
-	virtual void UpdateLayout() = 0;
+	virtual void UpdateLayout();
 };

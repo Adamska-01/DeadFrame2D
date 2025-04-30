@@ -4,6 +4,7 @@
 #include "EventSystem/Events/GameObjectEvents/GameObjectCreatedEvent.h"
 #include "EventSystem/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
 #include "Tools/Helpers/EventHelpers.h"
+#include "Components/UI/Abstractions/UIComponent.h"
 
 
 LayoutGroup::LayoutGroup(float layoutSpacing, LayoutPadding layoutPadding)
@@ -31,6 +32,9 @@ void LayoutGroup::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> di
 	if (!target->IsChildOf(OwningObject))
 		return;
 
+	target->OnActiveStateChanged -= EventHelpers::BindFunction(this, &LayoutGroup::OnActiveStateChangeHandler);
+	target->OnActiveStateChanged += EventHelpers::BindFunction(this, &LayoutGroup::OnActiveStateChangeHandler);
+
 	MarkDirty();
 }
 
@@ -49,6 +53,11 @@ void LayoutGroup::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> 
 	MarkDirty();
 }
 
+void LayoutGroup::OnActiveStateChangeHandler(GameObject* child, bool activeState)
+{
+	MarkDirty();
+}
+
 void LayoutGroup::Init()
 {
 	UpdateLayout();
@@ -64,4 +73,13 @@ void LayoutGroup::Update(float deltaTime)
 
 void LayoutGroup::Draw()
 {
+}
+
+void LayoutGroup::UpdateLayout()
+{
+	for (const auto& ui : OwningObject->GetComponentsInChildren<UIComponent>())
+	{
+		ui->GetGameObject()->OnActiveStateChanged -= EventHelpers::BindFunction(this, &LayoutGroup::OnActiveStateChangeHandler);
+		ui->GetGameObject()->OnActiveStateChanged += EventHelpers::BindFunction(this, &LayoutGroup::OnActiveStateChangeHandler);
+	}
 }
