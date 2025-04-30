@@ -56,5 +56,7 @@ public:
 
 	void SetText(std::string newText, unsigned int numRows);
 
+	std::string GetText();
+
 	SDL_Rect GetTextBoundingBox();
 };

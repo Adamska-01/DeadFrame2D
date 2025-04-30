@@ -72,6 +72,11 @@ void TextMesh::SetText(std::string newText, unsigned int newLinesNumber)
 	textRectSize.y = static_cast<int>(height);
 }
 
+std::string TextMesh::GetText()
+{
+	return text;
+}
+
 SDL_Rect TextMesh::GetTextBoundingBox()
 {
 	auto currentPosition = transform->GetWorldPosition();
