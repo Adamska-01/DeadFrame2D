@@ -6,11 +6,29 @@
 GameObject::GameObject()
 	: isDestroyed(false),
 	isInitialized(false),
+	isActive(true),
+	hasActiveParent(true),
 	parent(nullptr)
 {
 	children.clear();
 
 	transform = AddComponent<Transform>();
+}
+
+void GameObject::PropagateActiveStateToChildren()
+{
+	bool newParentState = IsActive(); // This object’s own active state including its parents
+
+	for (const auto& child : children)
+	{
+		auto childPtr = child.lock();
+
+		if (childPtr == nullptr || childPtr->isDestroyed)
+			continue;
+
+		childPtr->hasActiveParent = newParentState;
+		childPtr->PropagateActiveStateToChildren();
+	}	
 }
 
 void GameObject::Init()
@@ -39,7 +57,6 @@ void GameObject::Update(float dt)
 
 void GameObject::LateUpdate(float deltaTime)
 {
-
 }
 
 void GameObject::Draw()
@@ -89,6 +106,10 @@ void GameObject::AddChildGameObject(std::weak_ptr<GameObject> child)
 	transform->SetWorldPosition(worldPos);
 	transform->SetWorldScale(worldScale);
 	transform->SetWorldRotation(worldRot);
+
+	// Propagate active state
+	childPtr->hasActiveParent = this->IsActive();
+	PropagateActiveStateToChildren();
 }
 
 bool GameObject::IsChildOf(const GameObject* potentialChild, bool recursive) const
@@ -140,4 +161,30 @@ Transform* GameObject::GetTransform() const
 std::vector<std::weak_ptr<GameObject>> GameObject::GetChildren() const
 {
 	return children;
+}
+
+bool GameObject::IsActive() const
+{
+	return isActive && hasActiveParent;
+}
+
+void GameObject::SetActive(bool value)
+{
+	isActive = value;
+
+	// this includes our own parent's state
+	auto newParentState = IsActive(); 
+
+	OnActiveStateChanged(this, newParentState);
+
+	for (const auto& child : children) 
+	{
+		auto childPtr = child.lock();
+
+		if (childPtr == nullptr || childPtr->isDestroyed)
+			continue;
+
+		childPtr->hasActiveParent = newParentState;
+		childPtr->PropagateActiveStateToChildren();
+	}
 }

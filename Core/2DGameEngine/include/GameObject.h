@@ -17,7 +17,15 @@ private:
 	bool isDestroyed;
 
 
+	void PropagateActiveStateToChildren();
+
+
 protected:
+	bool isActive;
+
+	bool hasActiveParent;
+
+
 	GameObject();
 
 
@@ -31,6 +39,9 @@ protected:
 
 
 public:
+	MulticastDelegate<GameObject*, bool> OnActiveStateChanged;
+
+
 	virtual ~GameObject() override = default;
 
 	
@@ -50,7 +61,7 @@ public:
 	T* GetComponentInChildren(bool recursive = false) const;
 
 	template <typename T>
-	std::vector<T*> GetComponentsInChildren(bool recursive = true) const;
+	std::vector<T*> GetComponentsInChildren(bool recursive = false) const;
 	
 	template<typename T, typename... TArgs>
 	T* AddComponent(TArgs&& ...args);
@@ -72,6 +83,10 @@ public:
 	Transform* GetTransform() const;
 
 	std::vector<std::weak_ptr<GameObject>> GetChildren() const;
+	
+	bool IsActive() const;
+
+	void SetActive(bool value);
 };
 
 
