@@ -18,6 +18,8 @@ public:
 
 	bool IsEmpty();
 
+	void Clear();
+
 
 	MulticastDelegate& operator += (const std::function<void(Args...)> func);
 	
@@ -34,6 +36,12 @@ template<typename ...Args>
 inline bool MulticastDelegate<Args...>::IsEmpty()
 {
 	return listeners.empty();
+}
+
+template<typename ...Args>
+inline void MulticastDelegate<Args...>::Clear()
+{
+	listeners.clear();
 }
 
 template<typename ...Args>
