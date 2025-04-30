@@ -160,6 +160,9 @@ void Scene::Update(float deltaTime)
 
 	for (size_t i = 0; i < gameobjectSize; i++)
 	{
+		if (!gameObjects[i]->IsActive())
+			continue;
+
 		gameObjects[i]->Update(deltaTime);
 	}
 
@@ -167,6 +170,10 @@ void Scene::Update(float deltaTime)
 	{
 		for (size_t j = i + 1; j < colliderSize; ++j)
 		{
+			if (!colliders[i]->GetGameObject()->IsActive()
+				|| !colliders[j]->GetGameObject()->IsActive())
+				continue;
+
 			auto colliderA = colliders[i];
 			auto colliderB = colliders[j];
 
@@ -184,6 +191,9 @@ void Scene::Draw()
 
 	for (const auto& obj : gameObjects)
 	{
+		if (!obj->IsActive())
+			continue;
+
 		obj->Draw();
 	}
 
