@@ -50,13 +50,4 @@ public:
 	 * @return True if hovered, false otherwise.
 	 */
 	virtual bool IsHovered() const;
-
-
-	virtual void NavigateUp() override;
-
-	virtual void NavigateDown() override;
-
-	virtual void NavigateRight() override;
-
-	virtual void NavigateLeft() override;
 };

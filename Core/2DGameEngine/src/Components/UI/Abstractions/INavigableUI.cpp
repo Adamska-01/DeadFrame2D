@@ -1,6 +1,26 @@
 #include "Components/UI/Abstractions/INavigableUI.h"
 
 
+IInteractableUI* INavigableUI::GetUpInteractable()
+{
+	return up;
+}
+
+IInteractableUI* INavigableUI::GetDownInteractable()
+{
+	return down;
+}
+
+IInteractableUI* INavigableUI::GetRightInteractable()
+{
+	return right;
+}
+
+IInteractableUI* INavigableUI::GetLeftInteractable()
+{
+	return left;
+}
+
 void INavigableUI::SetNavigableUpElement(IInteractableUI* upElement)
 {
 	up = upElement;

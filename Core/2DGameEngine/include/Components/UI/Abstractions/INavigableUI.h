@@ -33,24 +33,24 @@ protected:
 
 public:
 	/**
-	 * @brief Navigates the UI element upwards.
+	 * @brief Gets the UI element upwards.
 	 */
-	virtual void NavigateUp() = 0;
+	IInteractableUI* GetUpInteractable();
 
 	/**
-	 * @brief Navigates the UI element downwards.
+	 * @brief Gets the UI element downwards.
 	 */
-	virtual void NavigateDown() = 0;
+	IInteractableUI* GetDownInteractable();
 
 	/**
-	 * @brief Navigates the UI element rightwards.
+	 * @brief Gets the UI element rightwards.
 	 */
-	virtual void NavigateRight() = 0;
+	IInteractableUI* GetRightInteractable();
 
 	/**
-	 * @brief Navigates the UI element leftwards.
+	 * @brief Gets the UI element leftwards.
 	 */
-	virtual void NavigateLeft() = 0;
+	IInteractableUI* GetLeftInteractable();
 
 
 	/**
