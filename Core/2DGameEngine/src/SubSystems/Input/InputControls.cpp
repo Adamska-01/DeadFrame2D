@@ -11,6 +11,11 @@ void InputControls::Deserialize(std::string_view filePath)
 	inputActions = JsonSerializer::DeserializeFromFile<std::unordered_map<std::string, std::vector<InputBinding>>>(filePath);
 }
 
+std::unordered_map<std::string, std::vector<InputBinding>> InputControls::GetAllActions()
+{
+	return inputActions;
+}
+
 void InputControls::AddOrOverrideAction(const std::string& actionName, const std::vector<InputBinding>& bindings)
 {
 	inputActions[actionName] = bindings;
