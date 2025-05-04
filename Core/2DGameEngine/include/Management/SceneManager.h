@@ -1,6 +1,7 @@
 #pragma once
 #include "Management/Scene.h"
 #include <memory>
+#include <vector>
 
 
 class SceneManager
@@ -32,6 +33,9 @@ public:
 
 	template <typename T>
 	static T* FindObjectOfType();
+	
+	template <typename T>
+	static std::vector<T*> FindObjectsOfType();
 };
 
 
@@ -54,4 +58,10 @@ template<typename T>
 inline T* SceneManager::FindObjectOfType()
 {
 	return currentScene->FindObjectOfType<T>();
+}
+
+template<typename T>
+inline std::vector<T*> SceneManager::FindObjectsOfType()
+{
+	return currentScene->FindObjectsOfType<T>();
 }
