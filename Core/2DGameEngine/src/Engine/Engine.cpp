@@ -10,8 +10,6 @@ Engine::Engine()
 	sceneManager = std::make_unique<SceneManager>();
 	
 	ft.SetTargetFramerate(60);
-
-	InputControls::Deserialize("Shared/Configurations/InputControls.json");
 }
 
 std::optional<int> Engine::Run()
