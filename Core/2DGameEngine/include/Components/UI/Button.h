@@ -1,28 +1,20 @@
 #pragma once
-#include "Components/GameComponent.h"
+#include "Components/UI/Abstractions/IInteractableUI.h"
 #include "Math/Vector2.h"
 #include "SubSystems//Events/Interfaces/IEventProcessor.h"
-#include "SubSystems/TextureManager.h"
 #include "Tools/MulticastDelegate.h"
 #include <functional>
 #include <string_view>
 
 
 class Transform;
+struct ButtonComponentModel;
 
 
-class Button : public GameComponent, public IEventProcessor
+class Button : public IInteractableUI, public IEventProcessor
 {
 private:
-	bool isPressed;
-
-	bool isHovered;
-
-	SDL_Rect destRect;
-
-	std::string text;
-
-	Transform* transfom;
+	Transform* transform;
 
 	MultiCastVoid onPressedCallback;
 
@@ -36,13 +28,7 @@ private:
 
 
 public:
-	Button(
-		std::function<void()> onPressedHandler,
-		std::string_view idleButtonSource,
-		std::string_view hoveredButtonSource,
-		std::string_view pressedButtonSource,
-		std::string buttonText,
-		Vector2F size);
+	Button(const ButtonComponentModel& buttonConfiguration);
 
 	virtual ~Button() override = default;
 
@@ -57,20 +43,20 @@ public:
 	virtual void Draw() override;
 
 
+	virtual void OnPointerEnter() override;
+
+	virtual void OnPointerExit() override;
+
+	virtual void OnPointerDown() override;
+	
+	virtual void OnPointerUp() override;
+
+
 	void AddPressedCallback(std::function<void()> onPressedHandler);
 	
-	const SDL_Rect& GetBoundingBox() const;
+	SDL_Rect GetBoundingBox() const;
 
 	void SetButtonImageSources(std::string_view idleButtonSource, std::string_view hoveredButtonSource, std::string_view pressedButtonSource);
 
-	void SetButtonSize(int width, int height);
-
-
-	void OnPointerEnter();
-
-	void OnPointerExit();
-
-	void OnPointerDown();
-	
-	void OnPointerUp();
+	void SetButtonSize(Vector2F size);
 };

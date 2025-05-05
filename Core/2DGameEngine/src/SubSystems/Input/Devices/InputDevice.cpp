@@ -8,6 +8,11 @@ InputDevice::InputDevice()
 	lastInputStates.clear();
 }
 
+void InputDevice::BeginInputFrame()
+{
+	lastInputStates = currentInputStates;
+}
+
 PlayerInputSlot InputDevice::GetAssignedPlayer() const
 {
 	return assignedPlayer;

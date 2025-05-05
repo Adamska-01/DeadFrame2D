@@ -32,6 +32,8 @@ private:
 	static std::vector<std::unique_ptr<InputDevice>> controllerDevices;
 
 
+	void BeginFrame();
+
 	void DisconnectControllerHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
 
 

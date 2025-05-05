@@ -1,14 +1,24 @@
 #include "SubSystems/Input/Devices/KeyboardInputDevice.h"
+#include "SubSystems/Input/InputControls.h"
 
 
 KeyboardInputDevice::KeyboardInputDevice()
 {
+	for (const auto& [actionName, actionMappings] : InputControls::GetAllActions())
+	{
+		for (const auto& mapping : actionMappings)
+		{
+			if (mapping.inputDeviceType != InputDeviceType::KEYBOARD)
+				continue;
+
+			// Initialize the key state to false (not pressed)
+			currentInputStates.insert({ mapping.inputKey, false });
+		}
+	}
 }
 
 void KeyboardInputDevice::ProcessEvent(const SDL_Event& eventType)
 {
-	lastInputStates = currentInputStates;
-
 	switch (eventType.type)
 	{
 	case SDL_EventType::SDL_KEYDOWN:

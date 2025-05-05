@@ -8,10 +8,8 @@ Engine::Engine()
 	engineSubSystems->InitializeSubSystems();
 
 	sceneManager = std::make_unique<SceneManager>();
-
+	
 	ft.SetTargetFramerate(60);
-
-	InputControls::Deserialize("Shared/Configurations/InputControls.json");
 }
 
 std::optional<int> Engine::Run()
@@ -19,6 +17,8 @@ std::optional<int> Engine::Run()
 	while (true)
 	{
 		ft.StartClock();
+
+		engineSubSystems->BeginFrame();
 
 		//Looks for messages and return optional if QUIT
 		if (const auto ecode = eventManager.ProcessEvents())

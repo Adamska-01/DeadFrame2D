@@ -3,6 +3,7 @@
 #include <optional>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 
 class InputControls
@@ -15,6 +16,8 @@ public:
 	static void Deserialize(std::string_view filePath);
 
 	// TODO: Delete all this shit..
+
+	static std::unordered_map<std::string, std::vector<InputBinding>> GetAllActions();
 
 	static void AddOrOverrideAction(const std::string& actionName, const std::vector<InputBinding>& bindings);
 

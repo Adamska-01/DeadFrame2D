@@ -5,9 +5,9 @@ project "App"
 	targetdir ("./Binaries/" .. OutputDir)
 	targetname "Application"
 	objdir ("./Binaries/Intermediates/" .. OutputDir)
-	dependson { "2DGameEngine", "Shared" }
+	dependson { "2DGameEngine" }
 	staticruntime "off"
-	debugdir "../"
+	debugdir "../" -- Set working directory to the root of the solution 
 	
 
 	files { 
@@ -18,6 +18,7 @@ project "App"
 	includedirs {
 		-- Include Core
 		"include",
+		"../Shared/include",
 		"../Core/2DGameEngine/include",
 		"../Vendor/nlohmann-3.11.3", 
 		"../Vendor/tinyxml2-10.0.0", 

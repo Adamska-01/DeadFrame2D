@@ -53,6 +53,9 @@ public:
 
 	template <typename T>
 	T* FindObjectOfType();
+	
+	template <typename T>
+	std::vector<T*> FindObjectsOfType();
 };
 
 
@@ -72,4 +75,23 @@ inline T* Scene::FindObjectOfType()
 	}
 
 	return nullptr;
+}
+
+template <typename T>
+inline std::vector<T*> Scene::FindObjectsOfType()
+{
+	static_assert(std::is_base_of_v<GameComponent, T>, "T must derive from GameComponent");
+
+	std::vector<T*> results;
+
+	for (const auto& object : gameObjects)
+	{
+		auto component = object->GetComponent<T>();
+		if (component != nullptr)
+		{
+			results.push_back(component);
+		}
+	}
+
+	return results;
 }

@@ -41,6 +41,8 @@ Input::Input()
 	// and once through XInput, which can lead to duplicate devices being detected.
 	SDL_SetHint(SDL_HINT_JOYSTICK_RAWINPUT_CORRELATE_XINPUT, "0");
 
+	InputControls::Deserialize("Shared/Configurations/InputControls.json");
+
 	// Initialize default devices
 	keyboardDevice = std::make_unique<KeyboardInputDevice>();
 	mouseDevice = std::make_unique<MouseInputDevice>();
@@ -64,6 +66,16 @@ Input::~Input()
 	{
 		std::cout << "[Info] SDL_GAMECONTROLLER subsystem was not initialized, no need to shut down." << std::endl;
 	}
+}
+
+void Input::BeginFrame()
+{
+	for (const auto& device : controllerDevices)
+	{
+		device->BeginInputFrame();
+	}
+	keyboardDevice->BeginInputFrame();
+	mouseDevice->BeginInputFrame();
 }
 
 void Input::DisconnectControllerHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)

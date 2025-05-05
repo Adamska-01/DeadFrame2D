@@ -3,7 +3,7 @@
 #include "Constants/AssetPaths.h"
 #include "Prefabs/Player.h"
 #include <Components/GameMapParser.h>
-#include <Components/Sprite.h>
+#include <Components/Rendering/Sprite.h>
 #include <Components/Transform.h>
 #include <Constants/TiledObjectGroupNames.h>
 #include <Management/SceneManager.h>
@@ -18,7 +18,7 @@ Player::Player(PlayerIdentifier playerID, Vector2F scale)
 
 	transform->Scale(scale);
 
-	AddComponent<Sprite>(AssetPaths::ARROW_IMAGE_PATH);
+	AddComponent<Sprite>(AssetPaths::Sprites::ARROW_IMAGE_PATH);
 	AddComponent<Cannon>();
 	AddComponent<PlayerInput>();
 }

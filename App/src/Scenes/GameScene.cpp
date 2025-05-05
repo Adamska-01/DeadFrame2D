@@ -7,7 +7,7 @@
 
 void GameScene::Enter()
 {
-	gameMap = GameObject::Instantiate<GameMap>(AssetPaths::SINGLEPLAYER_MAP_PATH, true);
+	gameMap = GameObject::Instantiate<GameMap>(AssetPaths::Maps::SINGLEPLAYER_MAP_PATH, true);
 	player = GameObject::Instantiate<Player>(PlayerIdentifier::PLAYER_1, Vector2F(2.0f, 2.0f));
 	levelManager = GameObject::Instantiate<LevelManagerObject>(GameMode::SINGLE_PLAYER);
 }

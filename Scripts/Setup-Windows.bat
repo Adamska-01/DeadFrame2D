@@ -7,6 +7,7 @@ set "HOOK_PATH=..\.git\hooks\post-checkout"
 
 
 :: Run Premake
+
 echo Generating project files...
 pushd ..
 %PREMAKE_PATH% --file=Build.lua vs2022

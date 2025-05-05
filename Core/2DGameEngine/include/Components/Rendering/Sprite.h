@@ -1,7 +1,7 @@
 #pragma once
-#include "GameComponent.h"
+#include "Components/GameComponent.h"
+#include "Math/Vector2.h"
 #include <memory>
-#include <SDL.h>
 #include <string>
 
 
@@ -11,12 +11,12 @@ struct SDL_Texture;
 
 class Sprite : public GameComponent
 {
-private :
+protected:
 	std::shared_ptr<SDL_Texture> spriteTexture;
 
 	Transform* transform;
 
-	SDL_Rect destRect;
+	Vector2I spriteSize;
 
 
 public:

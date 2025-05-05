@@ -8,32 +8,6 @@ Transform::Transform(Vector2F position, Vector2F scale, float angle)
 {
 }
 
-void Transform::MarkDirty()
-{
-	if (isDirty)
-		return;
-
-	isDirty = true;
-
-	// Propagate to children
-	if (OwningObject)
-	{
-		const auto& children = OwningObject->GetChildren();
-		for (const auto& weakChild : children)
-		{
-			auto child = weakChild.lock();
-			if (!child)
-				continue;
-
-			auto childTransform = child->GetComponent<Transform>();
-			if (childTransform)
-			{
-				childTransform->MarkDirty();
-			}
-		}
-	}
-}
-
 void Transform::RecalculateWorldTransform() const
 {
 	if (!OwningObject || !OwningObject->GetParent())
@@ -68,6 +42,32 @@ void Transform::RecalculateWorldTransform() const
 	}
 
 	isDirty = false;
+}
+
+void Transform::MarkDirty()
+{
+	if (isDirty)
+		return;
+
+	isDirty = true;
+
+	// Propagate to children
+	if (OwningObject)
+	{
+		const auto& children = OwningObject->GetChildren();
+		for (const auto& weakChild : children)
+		{
+			auto child = weakChild.lock();
+			if (!child)
+				continue;
+
+			auto childTransform = child->GetComponent<Transform>();
+			if (childTransform)
+			{
+				childTransform->MarkDirty();
+			}
+		}
+	}
 }
 
 void Transform::TranslateX(float x)

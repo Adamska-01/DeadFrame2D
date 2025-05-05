@@ -6,8 +6,6 @@
 class Transform : public GameComponent
 {
 private:
-	mutable bool isDirty = true;
-	
 	mutable Vector2F position = Vector2F::Zero;
 
 	mutable Vector2F scale = Vector2F::One;
@@ -23,9 +21,11 @@ private:
 	Vector2F startFramePosition;
 
 
-	void MarkDirty();
-
 	void RecalculateWorldTransform() const;
+
+
+protected:
+	virtual void MarkDirty() override;
 
 
 public:

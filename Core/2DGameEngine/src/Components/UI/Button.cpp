@@ -1,30 +1,24 @@
 #include "Components/Transform.h"
 #include "Components/UI/Button.h"
 #include "GameObject.h"
-#include "SubSystems/Events/EventManager.h"
-#include "SubSystems/UIManager.h"
+#include "Models/Components/UI/ButtonComponentModel.h"
+#include "SubSystems/TextureManager.h"
 #include "Tools/Collisions/CollisionHandler.h"
 
 
-Button::Button(
-	std::function<void()> onPressedHandler, 
-	std::string_view idleButtonSource, 
-	std::string_view hoveredButtonSource, 
-	std::string_view pressedButtonSource, 
-	std::string buttonText,
-	Vector2F size)
+Button::Button(const ButtonComponentModel& buttonConfiguration)
 {
 	isPressed = false;
 	isHovered = false;
-	transfom = nullptr;
+	transform = nullptr;
 
-	destRect.w = static_cast<int>(size.x);
-	destRect.h = static_cast<int>(size.y);
+	this->widgetSize = buttonConfiguration.buttonSize;
 
-	text = buttonText;
-
-	AddPressedCallback(onPressedHandler);
-	SetButtonImageSources(idleButtonSource, hoveredButtonSource, pressedButtonSource);
+	AddPressedCallback(buttonConfiguration.onPressedHandler);
+	SetButtonImageSources(
+		buttonConfiguration.idleButtonSource, 
+		buttonConfiguration.hoveredButtonSource, 
+		buttonConfiguration.pressedButtonSource);
 }
 
 std::optional<int> Button::ProcessEvents(const SDL_Event& sdlEvent)
@@ -38,6 +32,7 @@ std::optional<int> Button::ProcessEvents(const SDL_Event& sdlEvent)
 				static_cast<float>(sdlEvent.button.x),
 				static_cast<float>(sdlEvent.button.y)
 			};
+			auto destRect = GetBoundingBox();
 
 			if (CollisionHandler::PointVsBox(mousePos, &destRect))
 			{
@@ -53,6 +48,7 @@ std::optional<int> Button::ProcessEvents(const SDL_Event& sdlEvent)
 				static_cast<float>(sdlEvent.button.x),
 				static_cast<float>(sdlEvent.button.y)
 			};
+			auto destRect = GetBoundingBox();
 
 			if (CollisionHandler::PointVsBox(mousePos, &destRect))
 			{
@@ -68,6 +64,7 @@ std::optional<int> Button::ProcessEvents(const SDL_Event& sdlEvent)
 	
 	case SDL_EventType::SDL_MOUSEMOTION:
 		{
+			auto destRect = GetBoundingBox();
 			auto isColliding = CollisionHandler::PointVsBox(
 				Vector2F(
 					static_cast<float>(sdlEvent.motion.x),
@@ -91,57 +88,18 @@ std::optional<int> Button::ProcessEvents(const SDL_Event& sdlEvent)
 
 void Button::Init()
 {
-	transfom = OwningObject->GetComponent<Transform>();
+	transform = OwningObject->GetComponent<Transform>();
 }
 
 void Button::Update(float deltaTime)
 {
-	auto currentPosition = transfom->GetWorldPosition();
-
-	destRect.x = static_cast<int>(currentPosition.x - (destRect.w / 2.0f));
-	destRect.y = static_cast<int>(currentPosition.y - (destRect.h / 2.0f));
 }
 
 void Button::Draw()
 {
-	TextureManager::DrawTexture(currentButtonImage, NULL, &destRect);
+	auto destRect = GetBoundingBox();
 
-	auto currentPosition = transfom->GetWorldPosition();
-
-	// This is not final. just testing text
-	auto font = UIManager::LoadFont("App/Assets/Fonts/consola.ttf", 100);
-	auto texture = UIManager::LoadText(font.get(), text, SDL_Color(216, 139, 13, 255), 1);
-	TTF_SetFontStyle(font.get(), TTF_STYLE_BOLD);
-	auto textDest = destRect;
-
-	textDest.w = static_cast<int>(textDest.w * 0.5f);
-	textDest.h = static_cast<int>(textDest.h * 0.5f);
-	textDest.x = static_cast<int>(currentPosition.x - (textDest.w / 2.0f));
-	textDest.y = static_cast<int>(currentPosition.y - (textDest.h / 2.0f));
-	TextureManager::DrawTexture(std::shared_ptr<SDL_Texture>(texture, SDL_DestroyTexture), NULL, &textDest);
-}
-
-void Button::AddPressedCallback(std::function<void()> onPressedHandler)
-{
-	this->onPressedCallback += onPressedHandler;
-}
-
-const SDL_Rect& Button::GetBoundingBox() const
-{
-	return destRect;
-}
-
-void Button::SetButtonImageSources(std::string_view idleButtonSource, std::string_view hoveredButtonSource, std::string_view pressedButtonSource)
-{
-	currentButtonImage = buttonIdleImage = TextureManager::LoadTexture(idleButtonSource);
-	buttonHoveredImage = TextureManager::LoadTexture(hoveredButtonSource);
-	buttonPressedImage = TextureManager::LoadTexture(pressedButtonSource);
-}
-
-void Button::SetButtonSize(int width, int height)
-{
-	destRect.w = width;
-	destRect.h = height;
+	TextureManager::DrawTexture(currentButtonImage, NULL, &destRect, transform->GetWorldRotation());
 }
 
 void Button::OnPointerEnter()
@@ -182,4 +140,35 @@ void Button::OnPointerUp()
 	{
 		currentButtonImage = buttonPressedImage;
 	}
+}
+
+void Button::AddPressedCallback(std::function<void()> onPressedHandler)
+{
+	this->onPressedCallback += onPressedHandler;
+}
+
+SDL_Rect Button::GetBoundingBox() const
+{
+	auto currentPosition = transform->GetWorldPosition();
+	auto scaledSize = widgetSize * transform->GetWorldScale();
+
+	return SDL_Rect
+	{
+		static_cast<int>(currentPosition.x - ((scaledSize.x) / 2.0f)),
+		static_cast<int>(currentPosition.y - ((scaledSize.y) / 2.0f)),
+		static_cast<int>(scaledSize.x),
+		static_cast<int>(scaledSize.y)
+	};
+}
+
+void Button::SetButtonImageSources(std::string_view idleButtonSource, std::string_view hoveredButtonSource, std::string_view pressedButtonSource)
+{
+	currentButtonImage = buttonIdleImage = TextureManager::LoadTexture(idleButtonSource);
+	buttonHoveredImage = TextureManager::LoadTexture(hoveredButtonSource);
+	buttonPressedImage = TextureManager::LoadTexture(pressedButtonSource);
+}
+
+void Button::SetButtonSize(Vector2F size)
+{
+	this->widgetSize = size;
 }

@@ -60,6 +60,10 @@ public:
 
 	constexpr Vector2<T> operator/(const T& scalar) const;
 
+	constexpr Vector2<T>& operator*=(const T& scalar);
+
+	constexpr Vector2<T>& operator/=(const T& scalar);
+
 	constexpr Vector2<T>& operator+=(const Vector2<T>& other);
 
 	constexpr Vector2<T>& operator-=(const Vector2<T>& other);
@@ -213,6 +217,24 @@ template<typename T>
 inline constexpr Vector2<T> Vector2<T>::operator/(const T& scalar) const
 {
 	return Vector2<T>(x / scalar, y / scalar);
+}
+
+template<typename T>
+inline constexpr Vector2<T>& Vector2<T>::operator*=(const T& scalar)
+{
+	x *= scalar;
+	y *= scalar;
+
+	return *this;
+}
+
+template<typename T>
+inline constexpr Vector2<T>& Vector2<T>::operator/=(const T& scalar)
+{
+	x /= scalar;
+	y /= scalar;
+
+	return *this;
 }
 
 template<typename T>
