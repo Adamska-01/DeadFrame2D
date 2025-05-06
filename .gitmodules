@@ -1,3 +1,3 @@
-[submodule "Vendor/box2d"]
-	path = Vendor/box2d
+[submodule "Vendor/Box2D"]
+	path = Vendor/Box2D
 	url = https://github.com/erincatto/box2d.git
