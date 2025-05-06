@@ -6,7 +6,7 @@ project "App"
 	targetdir ("./Binaries/" .. OutputDir)
 	objdir ("./Binaries/Intermediates/" .. OutputDir)
 	dependson { "2DGameEngine", "Box2D" }
-	staticruntime "off"
+	staticruntime "on"
 	debugdir "../" -- Set working directory to the root of the solution 
 	
 
@@ -35,11 +35,11 @@ project "App"
 	-- Copy Assets and Shared files in the target dir
 	postbuildcommands {
 		-- Make sure destination folders exist
-		'{MKDIR} "%{cfg.targetdir}/Shared/Configurations"',
+		'{MKDIR} "%{cfg.targetdir}/Shared/Resources"',
 		'{MKDIR} "%{cfg.targetdir}/App/Assets"',
 
 		-- Use bash to copy contents of the folders, not the folders themselves
-		'bash -c "cp -rf ../Shared/Configurations/* %{cfg.targetdir}/Shared/Configurations/"',
+		'bash -c "cp -rf ../Shared/Resources/* %{cfg.targetdir}/Shared/Resources/"',
 		'bash -c "cp -rf ./Assets/* %{cfg.targetdir}/App/Assets/"'
 	}
 
