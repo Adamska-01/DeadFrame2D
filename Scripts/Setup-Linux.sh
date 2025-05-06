@@ -38,10 +38,3 @@ bash "$SDL_AUTOMATION_SCRIPT_PATH"
 
 # Update submodules
 git submodule update --init --recursive
-
-# Update Box2D Submodule to v2.4.2
-echo "Updating Box2D submodule to v2.4.2..."
-pushd "$BOX2D_SUBMODULE_PATH"
-git checkout v2.4.2
-popd
-echo "Box2D submodule updated to v2.4.2!"
