@@ -8,11 +8,22 @@ project "Box2D"
 	objdir ("./Box2D/Binaries/Intermediates/" .. OutputDir)
 
 	files {
-		"Box2D/src/**.c",
-		"Box2D/src/**.h",
+		"Box2D/src/**.cpp",
 		"Box2D/include/**.h"
 	}
 
 	includedirs {
 		"Box2D/include"
 	}
+
+	filter {}
+	filter "configurations:Debug"
+		defines { "DEBUG" }
+		runtime "Debug"
+		symbols "On"
+
+	filter "configurations:Release"
+		defines { "RELEASE" }
+		runtime "Release"
+		optimize "On"
+		symbols "Off"
