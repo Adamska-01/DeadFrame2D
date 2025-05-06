@@ -34,3 +34,7 @@ echo "Hook installed at $HOOK_PATH"
 echo "Building SDL Libs..."
 chmod +x $SDL_AUTOMATION_SCRIPT_PATH
 bash "$SDL_AUTOMATION_SCRIPT_PATH"
+
+
+# Update submodules
+git submodule update --init --recursive
