@@ -21,6 +21,7 @@ project "App"
 		"../Shared/include",
 		"../Core/2DGameEngine/include",
 		"../Vendor/nlohmann-3.11.3", 
+        "../Vendor/Box2D/include",
 		"../Vendor/tinyxml2-10.0.0", 
 		-- There are a lot of useful sdl structs/classes that the app could use
 		"../Vendor/SDL/SDL2-2.30.10/include",
