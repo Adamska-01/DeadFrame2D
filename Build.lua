@@ -22,7 +22,13 @@ workspace "Project"
 			basePath .. "SDL2-" .. sdl_version .. "/lib/" .. platformPath .. "/" .. architecturePath,
 			basePath .. "SDL2_image-" .. image_version .. "/lib/" .. platformPath .. "/" .. architecturePath,
 			basePath .. "SDL2_ttf-" .. ttf_version .. "/lib/" .. platformPath .. "/" .. architecturePath,
-			basePath .. "SDL2_mixer-" .. mixer_version .. "/lib/" .. platformPath .. "/" .. architecturePath
+			basePath .. "SDL2_mixer-" .. mixer_version .. "/lib/" .. platformPath .. "/" .. architecturePath,
+		}
+	end
+
+	function get_box2d_libdirs(basePath)
+		return {
+			basePath .. OutputDir
 		}
 	end
 	
@@ -30,3 +36,4 @@ workspace "Project"
 	include "Core/2DGameEngine/Build-2DGameEngine.lua"
 	include "Shared/Build-Shared.lua" 
 	include "App/Build-App.lua"
+	include "Vendor/Build-Box2D.lua"
