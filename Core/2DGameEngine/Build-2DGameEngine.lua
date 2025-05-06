@@ -5,7 +5,7 @@ project "2DGameEngine"
 	targetdir ("./Binaries/" .. OutputDir)
 	objdir ("./Binaries/Intermediates/" .. OutputDir)
 	dependson { "Box2D" }
-	staticruntime "off"
+	staticruntime "on"
 	debugdir "../../" -- Set working directory to the root of the solution
 
 
@@ -20,7 +20,7 @@ project "2DGameEngine"
 		"../../Shared/include", 
 		"../../Vendor/nlohmann-3.11.3", 
 		"../../Vendor/tinyxml2-10.0.0", 
-        "../../Vendor/Box2D/include",
+		"../../Vendor/Box2D/include",
 		"../../Vendor/SDL/SDL2-2.30.10/include", 
 		"../../Vendor/SDL/SDL2_image-2.8.2/include", 
 		"../../Vendor/SDL/SDL2_ttf-2.22.0/include", 
