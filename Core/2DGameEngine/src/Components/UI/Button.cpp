@@ -3,7 +3,7 @@
 #include "GameObject.h"
 #include "Models/Components/UI/ButtonComponentModel.h"
 #include "SubSystems/TextureManager.h"
-#include "Tools/Collisions/CollisionHandler.h"
+#include "Tools/Collisions/CollisionUtils.h"
 
 
 Button::Button(const ButtonComponentModel& buttonConfiguration)
@@ -34,7 +34,7 @@ std::optional<int> Button::ProcessEvents(const SDL_Event& sdlEvent)
 			};
 			auto destRect = GetBoundingBox();
 
-			if (CollisionHandler::PointVsBox(mousePos, &destRect))
+			if (CollisionUtils::PointVsBox(mousePos, &destRect))
 			{
 				OnPointerDown();
 			}
@@ -50,7 +50,7 @@ std::optional<int> Button::ProcessEvents(const SDL_Event& sdlEvent)
 			};
 			auto destRect = GetBoundingBox();
 
-			if (CollisionHandler::PointVsBox(mousePos, &destRect))
+			if (CollisionUtils::PointVsBox(mousePos, &destRect))
 			{
 				OnPointerUp();
 			}
@@ -65,7 +65,7 @@ std::optional<int> Button::ProcessEvents(const SDL_Event& sdlEvent)
 	case SDL_EventType::SDL_MOUSEMOTION:
 		{
 			auto destRect = GetBoundingBox();
-			auto isColliding = CollisionHandler::PointVsBox(
+			auto isColliding = CollisionUtils::PointVsBox(
 				Vector2F(
 					static_cast<float>(sdlEvent.motion.x),
 					static_cast<float>(sdlEvent.motion.y)),
