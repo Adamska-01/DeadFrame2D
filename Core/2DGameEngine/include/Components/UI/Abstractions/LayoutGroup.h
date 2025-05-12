@@ -22,7 +22,7 @@ protected:
 	LayoutPadding layoutPadding;
 
 	
-	void OnActiveStateChangeHandler(GameObject* child, bool activeState);
+	virtual void OnGameObjectActiveStateChangedHandler(GameObject* child, bool activeState) override;
 
 
 public:

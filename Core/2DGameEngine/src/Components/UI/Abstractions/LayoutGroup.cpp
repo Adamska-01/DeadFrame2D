@@ -32,8 +32,8 @@ void LayoutGroup::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> di
 	if (!target->IsChildOf(OwningObject))
 		return;
 
-	target->OnActiveStateChanged -= EventHelpers::BindFunction(this, &LayoutGroup::OnActiveStateChangeHandler);
-	target->OnActiveStateChanged += EventHelpers::BindFunction(this, &LayoutGroup::OnActiveStateChangeHandler);
+	DeregisterAllHandlers(target.get());
+	RegisterAllHandlers(target.get());
 
 	MarkDirty();
 }
@@ -53,7 +53,7 @@ void LayoutGroup::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> 
 	MarkDirty();
 }
 
-void LayoutGroup::OnActiveStateChangeHandler(GameObject* child, bool activeState)
+void LayoutGroup::OnGameObjectActiveStateChangedHandler(GameObject* child, bool activeState)
 {
 	MarkDirty();
 }
@@ -79,7 +79,7 @@ void LayoutGroup::UpdateLayout()
 {
 	for (const auto& ui : OwningObject->GetComponentsInChildren<UIComponent>())
 	{
-		ui->GetGameObject()->OnActiveStateChanged -= EventHelpers::BindFunction(this, &LayoutGroup::OnActiveStateChangeHandler);
-		ui->GetGameObject()->OnActiveStateChanged += EventHelpers::BindFunction(this, &LayoutGroup::OnActiveStateChangeHandler);
+		DeregisterAllHandlers(ui->GetGameObject());
+		RegisterAllHandlers(ui->GetGameObject());
 	}
 }
