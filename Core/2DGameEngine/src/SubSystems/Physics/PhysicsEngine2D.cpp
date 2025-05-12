@@ -8,17 +8,15 @@ std::unique_ptr<b2World> PhysicsEngine2D::world;
 
 
 PhysicsEngine2D::PhysicsEngine2D(const Vector2F& gravity)
-	: velocityIterations(PhysicsConstants::VELOCITY_ITERATIONS),
-	positionIterations(PhysicsConstants::POSITION_ITERATIONS)
 {
 	auto b2Gravity = b2Vec2(gravity.x, gravity.y);
-
+	
 	world = std::make_unique<b2World>(b2Gravity);
 }
 
 void PhysicsEngine2D::BeginFrame()
 {
-	world->Step(FrameTimer::DeltaTime(), velocityIterations, positionIterations);
+	world->Step(FrameTimer::DeltaTime(), PhysicsConstants::VELOCITY_ITERATIONS, PhysicsConstants::POSITION_ITERATIONS);
 }
 
 void PhysicsEngine2D::SetContactListener(b2ContactListener* listener)
@@ -38,4 +36,14 @@ void PhysicsEngine2D::SetGravity(const Vector2F& newGravity)
 	auto b2Gravity = b2Vec2(newGravity.x, newGravity.y);
 
 	world->SetGravity(b2Gravity);
+}
+
+b2Body* PhysicsEngine2D::CreateBody(const b2BodyDef* bodyDef)
+{
+	return world->CreateBody(bodyDef);
+}
+
+void PhysicsEngine2D::DestroyBody(b2Body* bodyToDestroy)
+{
+	return world->DestroyBody(bodyToDestroy);
 }

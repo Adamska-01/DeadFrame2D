@@ -3,6 +3,8 @@
 #include <memory>
 
 
+struct b2BodyDef;
+class b2Body;
 class b2World;
 class b2ContactListener;
 
@@ -14,11 +16,6 @@ class PhysicsEngine2D
 
 private:
 	static std::unique_ptr<b2World> world;
-
-
-	int velocityIterations;
-
-	int positionIterations;
 
 
 	PhysicsEngine2D(const Vector2F& gravity);
@@ -39,4 +36,8 @@ public:
 	static Vector2F GetGravity();
 
 	static void SetGravity(const Vector2F& newGravity);
+
+	static b2Body* CreateBody(const b2BodyDef* bodyDef);
+
+	static void DestroyBody(b2Body* bodyToDestroy);
 };
