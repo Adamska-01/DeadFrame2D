@@ -1,10 +1,11 @@
 #pragma once
+#include "GameObjectObserver.h"
 
 
 class GameObject;
 
 
-class GameComponent
+class GameComponent : public GameObjectObserver
 {
 	friend class ComponentBucket;
 
@@ -22,7 +23,7 @@ public:
 
 	GameComponent(GameComponent&& other) = default;
 
-	virtual ~GameComponent() = default;
+	virtual ~GameComponent() override = default;
 
 
 	virtual void Init() = 0;

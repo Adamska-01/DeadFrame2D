@@ -1,4 +1,5 @@
 #include "Components/GameComponent.h"
+#include "GameObject.h"
 
 
 GameComponent::GameComponent()
