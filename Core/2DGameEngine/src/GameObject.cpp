@@ -171,6 +171,11 @@ bool GameObject::IsActive() const
 	return isActive && hasActiveParent;
 }
 
+bool GameObject::IsMarkedForDestruction() const
+{
+	return isDestroyed;
+}
+
 void GameObject::SetActive(bool value)
 {
 	isActive = value;

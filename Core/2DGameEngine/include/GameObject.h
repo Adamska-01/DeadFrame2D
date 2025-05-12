@@ -2,6 +2,7 @@
 #include "ComponentBucket.h"
 #include "EventSystem/EventDispatcher.h"
 #include "EventSystem/Events/GameObjectEvents/GameObjectCreatedEvent.h"
+#include "GameObjectNotifier.h"
 #include "IObject.h"
 #include <memory>
 
@@ -9,7 +10,7 @@
 class Transform;
 
 
-class GameObject : public IObject
+class GameObject : public IObject, public GameObjectNotifier
 {
 private:
 	bool isInitialized;
@@ -39,9 +40,6 @@ protected:
 
 
 public:
-	MulticastDelegate<GameObject*, bool> OnActiveStateChanged;
-
-
 	virtual ~GameObject() override = default;
 
 	
@@ -62,6 +60,12 @@ public:
 
 	template <typename T>
 	std::vector<T*> GetComponentsInChildren(bool recursive = false) const;
+
+	template<typename T>
+	inline T* GetComponentInParent(bool recursive = false) const;
+
+	template<typename T>
+	inline std::vector<T*> GetComponentsInParent(bool recursive = false) const;
 	
 	template<typename T, typename... TArgs>
 	T* AddComponent(TArgs&& ...args);
@@ -85,6 +89,8 @@ public:
 	std::vector<std::weak_ptr<GameObject>> GetChildren() const;
 	
 	bool IsActive() const;
+
+	bool IsMarkedForDestruction() const;
 
 	void SetActive(bool value);
 };
@@ -145,10 +151,53 @@ inline std::vector<T*> GameObject::GetComponentsInChildren(bool recursive) const
 	return results;
 }
 
+template<typename T>
+inline T* GameObject::GetComponentInParent(bool recursive) const
+{
+	auto current = parent;
+
+	while (current != nullptr)
+	{
+		if (T* comp = current->GetComponent<T>())
+			return comp;
+
+		if (!recursive)
+			break;
+
+		current = current->parent;
+	}
+
+	return nullptr;
+}
+
+template<typename T>
+inline std::vector<T*> GameObject::GetComponentsInParent(bool recursive) const
+{
+	std::vector<T*> results;
+	auto current = parent;
+
+	while (current)
+	{
+		if (T* comp = current->GetComponent<T>())
+			results.push_back(comp);
+
+		if (!recursive)
+			break;
+
+		current = current->parent;
+	}
+
+	return results;
+}
+
 template<typename T, typename... TArgs>
 inline T* GameObject::AddComponent(TArgs&& ...args)
 {
-	return componentBucket.AddComponent<T>(this, isInitialized, std::forward<TArgs>(args)...);
+	auto newComponent = componentBucket.AddComponent<T>(this, isInitialized, std::forward<TArgs>(args)...);
+
+	OnNewComponentAdded(newComponent);
+
+	return newComponent;
 }
 
 template<typename T, typename ...Args>
