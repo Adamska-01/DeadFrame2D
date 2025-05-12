@@ -1,18 +1,18 @@
 #pragma once
-#include "GameObject.h"
 #include "Math/Vector2.h"
+
+
+class GameObject;
+class Collider2D;
 
 
 struct CollisionInfo
 {
-	Vector2F normal;
+	Vector2F contactPoint = Vector2F::Zero;
 
-	const GameObject* owningGameObject;
+	Vector2F normal = Vector2F::Zero;
 
+	Collider2D* otherCollider = nullptr;
 
-	CollisionInfo(Vector2F normal, const GameObject* owningGameObject)
-	{
-		this->normal = normal;
-		this->owningGameObject = owningGameObject;
-	}
+	GameObject* otherGameObject = nullptr;
 };
