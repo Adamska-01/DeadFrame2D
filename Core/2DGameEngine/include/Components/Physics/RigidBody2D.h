@@ -1,10 +1,14 @@
 #pragma once
 #include "Components/GameComponent.h"
-#include "Constants/PhysicsConstants.h"
+#include "Data/Physics/BodyDefinition2D.h"
+#include "Data/Physics/BodyType2D.h"
 #include "Math/Vector2.h"
 
 
+struct b2FixtureDef;
+class b2Fixture;
 class Transform;
+class b2Body;
 
 
 class RigidBody2D : public GameComponent
@@ -12,67 +16,46 @@ class RigidBody2D : public GameComponent
 private:
 	Transform* transform;
 
+	b2Body* body;
+
+	BodyDefinition2D bodyDefinition;
+
+	BodyType2D bodyType;
+
 	mutable Vector2F velocity = Vector2F::Zero;
 	
 	mutable Vector2F acceleration = Vector2F::Zero;
 
-	float mass = 1.0f;
+	float gravityScale = 1.0f;
+
 	
-	float linearDamping = 0.1f;
-	
-	bool useGravity = true;
-
-	Vector2F gravity = Vector2F(PhysicsConstants::GRAVITY_X, PhysicsConstants::GRAVITY_Y);
-
-	Vector2F totalForce = Vector2F::Zero;
-
-	Vector2F startFrameVelocity = Vector2F::Zero;
-
-
-protected:
-	void ApplyForces(float dt);
-	
-	void ClearForces();
-
-
 public:
-	RigidBody2D(float mass = 1.0f, float linearDamping = 0.1f, bool useGravity = true);
+	RigidBody2D(const BodyDefinition2D& bodyDefinition, float gravityScale = 1.0f);
 
 	RigidBody2D(RigidBody2D&& other) = default;
 	
-	virtual ~RigidBody2D() override = default;
+	virtual ~RigidBody2D() override;
 
 
 	void Init() override;
 	
-	void Update(float dt) override;
+	void Update(float deltaTime) override;
 
 	void Draw() override;
 
 
-	void AddForce(const Vector2F& force);
-	
-	void AddImpulse(const Vector2F& impulse);
+	b2Fixture* CreateFixture(const b2FixtureDef* fixtureDef);
 
-	void SetVelocity(const Vector2F& v);
-	
-	void SetAcceleration(const Vector2F& a);
+	void DestroyFixture(b2Fixture* fixtureDef);
 
-	void SetMass(float m);
-
-	void SetGravityEnabled(bool enabled);
-
-	void SetGravity(const Vector2F& g);
-
-	void SetLinearDamping(float damping);
 
 	Vector2F GetVelocity() const;
+
+	void SetVelocity(const Vector2F& velocity);
+
+	void AddForce(const Vector2F& force);
 	
-	Vector2F GetStartFrameVelocity() const;
-	
-	Vector2F GetAcceleration() const;
-	
-	float GetMass() const;
-	
-	bool IsUsingGravity() const;
+	void AddLinearImpulse(const Vector2F& impulse);
+
+	void SetGravityScale(float newGravityScale);
 };

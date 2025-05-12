@@ -1,114 +1,98 @@
+#include "Components/Collisions/Collider2D.h"
 #include "Components/Physics/RigidBody2D.h"
 #include "Components/Transform.h"
+#include "Constants/PhysicsConstants.h"
+#include "Data/Physics/BodyDefinition2D.h"
 #include "GameObject.h"
+#include "SubSystems/Physics/PhysicsEngine2D.h"
+#include "Tools/Helpers/Physics/PhysicsConversion.h"
+#include <box2d/b2_body.h>
 
 
-RigidBody2D::RigidBody2D(float mass, float linearDamping, bool useGravity)
-	: mass(mass), linearDamping(linearDamping), useGravity(useGravity)
+RigidBody2D::RigidBody2D(const BodyDefinition2D& bodyDefinition, float gravityScale)
+	: bodyDefinition(bodyDefinition), gravityScale(gravityScale)
 {
+	auto bodyDef = PhysicsConversion::ToB2BodyDef(bodyDefinition);
+
+	body = PhysicsEngine2D::CreateBody(&bodyDef);
+}
+
+RigidBody2D::~RigidBody2D()
+{
+	if (body == nullptr)
+		return;
+
+	auto fixture = body->GetFixtureList();
+
+	while (fixture != nullptr)
+	{
+		auto next = fixture->GetNext();
+
+		body->DestroyFixture(fixture);
+		
+		fixture = next;
+	}
 }
 
 void RigidBody2D::Init()
 {
-	transform = OwningObject->GetComponent<Transform>();
+	transform = OwningObject->GetTransform();
+	
+	auto worldPos = transform->GetWorldPosition() * PhysicsConstants::PIXEL_TO_METER;
+
+	body->SetTransform(b2Vec2(worldPos.x, worldPos.y), 0);
 }
 
-void RigidBody2D::Update(float dt)
+void RigidBody2D::Update(float deltaTime)
 {
-	startFrameVelocity = velocity;
+	auto pos = body->GetPosition();
+	auto angle = body->GetAngle();
 
-	ApplyForces(dt);
+	pos.x *= PhysicsConstants::METER_TO_PIXEL;
+	pos.y *= PhysicsConstants::METER_TO_PIXEL;
 
-	velocity += acceleration * dt;
-	velocity *= (1.0f - linearDamping);
-
-	transform->Translate(velocity * dt);
-
-	ClearForces();
+	// Sync transform to physics body
+	transform->SetWorldPosition(Vector2F(pos.x, pos.y));
+	transform->SetLocalRotation(angle * (180.0f / MathConstants::PI));
 }
 
 void RigidBody2D::Draw()
 {
 }
 
-void RigidBody2D::AddForce(const Vector2F& force)
+b2Fixture* RigidBody2D::CreateFixture(const b2FixtureDef* fixtureDef)
 {
-	totalForce += force;
+	return body->CreateFixture(fixtureDef);
 }
 
-void RigidBody2D::AddImpulse(const Vector2F& impulse)
+void RigidBody2D::DestroyFixture(b2Fixture* fixtureDef)
 {
-	velocity += impulse / mass;
-}
-
-void RigidBody2D::SetVelocity(const Vector2F& v)
-{
-	velocity = v;
-}
-
-void RigidBody2D::SetAcceleration(const Vector2F& a)
-{
-	acceleration = a;
-}
-
-void RigidBody2D::SetMass(float m)
-{
-	mass = m;
-}
-
-void RigidBody2D::SetGravityEnabled(bool enabled)
-{
-	useGravity = enabled;
-}
-
-void RigidBody2D::SetGravity(const Vector2F& g)
-{
-	gravity = g;
-}
-
-void RigidBody2D::SetLinearDamping(float damping)
-{
-	linearDamping = damping;
+	body->DestroyFixture(fixtureDef);
 }
 
 Vector2F RigidBody2D::GetVelocity() const
 {
-	return velocity;
+	auto v = body->GetLinearVelocity();
+	
+	return Vector2F(v.x, v.y);
 }
 
-Vector2F RigidBody2D::GetStartFrameVelocity() const
+void RigidBody2D::SetVelocity(const Vector2F& velocity)
 {
-	return startFrameVelocity;
+	body->SetLinearVelocity(b2Vec2(velocity.x, velocity.y));
 }
 
-Vector2F RigidBody2D::GetAcceleration() const
+void RigidBody2D::AddForce(const Vector2F& force)
 {
-	return acceleration;
+	body->ApplyForceToCenter(b2Vec2(force.x, force.y), true);
 }
 
-float RigidBody2D::GetMass() const
+void RigidBody2D::AddLinearImpulse(const Vector2F& impulse)
 {
-	return mass;
+	body->ApplyLinearImpulseToCenter(b2Vec2(impulse.x, impulse.y), true);
 }
 
-bool RigidBody2D::IsUsingGravity() const
+void RigidBody2D::SetGravityScale(float newGravityScale)
 {
-	return useGravity;
-}
-
-void RigidBody2D::ApplyForces(float dt)
-{
-	auto netForce = totalForce;
-
-	if (useGravity)
-	{
-		netForce += gravity * mass;
-	}
-
-	acceleration = netForce / mass;
-}
-
-void RigidBody2D::ClearForces()
-{
-	totalForce = Vector2F::Zero;
+	body->SetGravityScale(newGravityScale);
 }
