@@ -1,11 +1,13 @@
 #include "Constants/ScreenConstants.h"
 #include "SubSystems/AudioManager.h"
 #include "SubSystems/Input/Input.h"
+#include "SubSystems/Physics/PhysicsEngine2D.h"
 #include "SubSystems/Renderer.h"
 #include "SubSystems/SubSystems.h"
 #include "SubSystems/TextureManager.h"
 #include "SubSystems/UIManager.h"
 #include "SubSystems/Window.h"
+#include <Constants/PhysicsConstants.h>
 
 
 SubSystems::SubSystems()
@@ -16,6 +18,7 @@ SubSystems::SubSystems()
 	textureManager = nullptr;
 	uiManager = nullptr;
 	audioManager = nullptr;
+	physicsEngine2D = nullptr;
 }
 
 SubSystems::~SubSystems()
@@ -37,6 +40,9 @@ SubSystems::~SubSystems()
 
 	delete audioManager;
 	audioManager = nullptr;
+	
+	delete physicsEngine2D;
+	physicsEngine2D = nullptr;
 }
 
 void SubSystems::InitializeSubSystems()
@@ -57,9 +63,12 @@ void SubSystems::InitializeSubSystems()
 	uiManager = new UIManager();
 
 	audioManager = new AudioManager();
+
+	physicsEngine2D = new PhysicsEngine2D(Vector2F(PhysicsConstants::GRAVITY_X, PhysicsConstants::GRAVITY_Y));
 }
 
 void SubSystems::BeginFrame()
 {
 	input->BeginFrame();
+	physicsEngine2D->BeginFrame();
 }

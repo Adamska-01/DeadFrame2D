@@ -7,6 +7,7 @@ class Input;
 class UIManager;
 class TextureManager;
 class AudioManager;
+class PhysicsEngine2D;
 
 
 class SubSystems
@@ -23,6 +24,8 @@ private:
 	TextureManager* textureManager;
 
 	AudioManager* audioManager;
+	
+	PhysicsEngine2D* physicsEngine2D;
 
 
 public:
