@@ -67,6 +67,8 @@ T* ComponentBucket::AddComponent(GameObject* owner, bool canInitialize, TArgs&& 
 
 	component->OwningObject = owner;
 
+	component->RegisterAllHandlers(owner);
+
 	std::unique_ptr<GameComponent> uniquePtr(component);
 
 	static_assert(std::is_base_of<GameComponent, T>::value, "child must inherit from GameComponent");
