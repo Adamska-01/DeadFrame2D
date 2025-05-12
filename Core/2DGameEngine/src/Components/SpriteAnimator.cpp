@@ -73,7 +73,7 @@ void SpriteAnimator::Draw()
 	dstRect.w *= currentScale.x;
 	dstRect.h *= currentScale.y;
 
-	TextureManager::DrawTexture(spriteTexture, &srcRect, &dstRect, 0.0f, NULL, animationProperties.flip);
+	TextureManager::DrawTexture(spriteTexture, &srcRect, &dstRect, transform->GetWorldRotation(), NULL, animationProperties.flip);
 }
 
 void SpriteAnimator::SetProp(bool repeat, int row, int frameCount, int rowCount, int speed, SDL_RendererFlip flip)
