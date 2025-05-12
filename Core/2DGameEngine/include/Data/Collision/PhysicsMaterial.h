@@ -1,5 +1,6 @@
 #pragma once
 #include "Data/Collision/FilterData.h"
+#include <box2d/box2d.h>
 
 
 class b2Shape;
