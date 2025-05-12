@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 
 
 class GameObject;
@@ -7,10 +8,14 @@ class GameComponent;
 
 class GameObjectObserver 
 {
+private: 
+	std::vector<GameObject*> allRegisteredGameObjects;
+
+
 protected:
-	GameObjectObserver() = default;
+	GameObjectObserver();
 	
-	virtual ~GameObjectObserver() = default;
+	virtual ~GameObjectObserver();
 
 
 	void RegisterAllHandlers(GameObject* owner);
