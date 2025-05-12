@@ -12,11 +12,8 @@ Scene::Scene()
 	isRunning = false;
 
 	gameObjects.clear();
-	colliders.clear();
 	gameObjectsToInitialize.clear();
 	objectsPendingDestroy.clear();
-
-	collisionHandler = CollisionHandler();
 
 	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &Scene::GameObjectCreatedHandler));
 	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &Scene::GameObjectDestroyedHandler));
@@ -25,7 +22,6 @@ Scene::Scene()
 Scene::~Scene()
 {
 	gameObjects.clear();
-	colliders.clear();
 	gameObjectsToInitialize.clear();
 	objectsPendingDestroy.clear();
 
@@ -43,13 +39,6 @@ void Scene::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatch
 	auto target = gameObjEvent->gameObjectCreated;
 
 	gameObjects.push_back(target);
-
-	auto collider = gameObjects.back()->GetComponent<Collider2D>();
-
-	if (collider != nullptr)
-	{
-		colliders.push_back(collider);
-	}
 
 	if (isRunning)
 	{
@@ -80,20 +69,8 @@ void Scene::CleanupDestroyedObjects()
 
 	for (const auto& target : objectsPendingDestroy)
 	{
-		if (!target)
+		if (target == nullptr)
 			continue;
-
-		// Remove collider if it exists
-		auto targetCollider = target->GetComponent<Collider2D>();
-		if (targetCollider != nullptr)
-		{
-			auto colliderIt = std::remove(
-				colliders.begin(), 
-				colliders.end(), 
-				targetCollider);
-			
-			colliders.erase(colliderIt, colliders.end());
-		}
 
 		// Remove GameObject
 		auto objIt = std::remove_if(
@@ -113,7 +90,6 @@ void Scene::CleanupDestroyedObjects()
 void Scene::Exit()
 {
 	gameObjects.clear();
-	colliders.clear();
 	gameObjectsToInitialize.clear();
 	objectsPendingDestroy.clear();
 }
@@ -156,7 +132,6 @@ void Scene::Init()
 void Scene::Update(float deltaTime)
 {
 	auto gameobjectSize = gameObjects.size();
-	auto colliderSize = colliders.size();
 
 	for (size_t i = 0; i < gameobjectSize; i++)
 	{
@@ -164,22 +139,6 @@ void Scene::Update(float deltaTime)
 			continue;
 
 		gameObjects[i]->Update(deltaTime);
-	}
-
-	for (size_t i = 0; i < colliderSize; ++i)
-	{
-		for (size_t j = i + 1; j < colliderSize; ++j)
-		{
-			if (!colliders[i]->GetGameObject()->IsActive()
-				|| !colliders[j]->GetGameObject()->IsActive())
-				continue;
-
-			auto colliderA = colliders[i];
-			auto colliderB = colliders[j];
-
-			colliderA->Accept(collisionHandler, colliderB);
-			colliderB->Accept(collisionHandler, colliderA);
-		}
 	}
 
 	CleanupDestroyedObjects();
