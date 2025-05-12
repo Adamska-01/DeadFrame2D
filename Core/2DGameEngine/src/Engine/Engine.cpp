@@ -1,5 +1,4 @@
 #include "Engine/Engine.h"
-#include "SubSystems/Input/InputControls.h"
 
 
 Engine::Engine()
@@ -18,13 +17,15 @@ std::optional<int> Engine::Run()
 	{
 		ft.StartClock();
 
+		auto deltaTime = ft.DeltaTime();
+
 		engineSubSystems->BeginFrame();
 
 		//Looks for messages and return optional if QUIT
 		if (const auto ecode = eventManager.ProcessEvents())
 			return *ecode;
 
-		sceneManager->UpdateScene(ft.DeltaTime());
+		sceneManager->UpdateScene(deltaTime);
 		sceneManager->DrawScene();
 
 		sceneManager->LoadNewSceneIfAvailable();
