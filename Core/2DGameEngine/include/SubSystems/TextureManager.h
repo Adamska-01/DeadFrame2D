@@ -1,5 +1,6 @@
 #pragma once
 #include "Components/Generic/Circle.h"
+#include "Constants/CommonColors.h"
 #include <memory>
 #include <SDL_image.h>
 #include <string>
@@ -33,9 +34,9 @@ public:
 	static std::shared_ptr<SDL_Texture> LoadTexture(std::string_view filename);
 
 
-	static void DrawRect(SDL_Rect rect, SDL_Color color, bool filled);
+	static void DrawRect(SDL_Rect rect, float angleDegrees, SDL_Color color = CommonColors::WHITE, bool filled = false);
 
-	static void DrawCircle(Circle circle, SDL_Color color, bool filled);
+	static void DrawCircle(Circle circle, SDL_Color color = CommonColors::WHITE, bool filled = false);
 
 	static void DrawTexture(
 		std::shared_ptr<SDL_Texture> texture,
@@ -45,5 +46,5 @@ public:
 		SDL_Point* rotationOrigin = NULL,
 		SDL_RendererFlip flip = SDL_FLIP_NONE, 
 		Uint8 alpha = 255, 
-		SDL_Color colorMod = { 255, 255, 255, 255 });
+		SDL_Color colorMod = CommonColors::WHITE);
 };

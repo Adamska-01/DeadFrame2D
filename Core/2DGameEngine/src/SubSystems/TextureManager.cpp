@@ -69,23 +69,64 @@ std::shared_ptr<SDL_Texture> TextureManager::LoadTexture(std::string_view filena
 	return sharedPtr;
 }
 
-void TextureManager::DrawRect(SDL_Rect rect, SDL_Color color, bool filled)
+void TextureManager::DrawRect(SDL_Rect rect, float angleDegrees, SDL_Color color, bool filled)
 {
 	auto renderer = Renderer::GetRenderer();
 	auto oldRenderColor = Renderer::GetDisplayColor();
 
 	Renderer::SetDisplayColor(color.r, color.g, color.b, color.a);
 
+	auto cx = rect.x + rect.w * 0.5f;
+	auto cy = rect.y + rect.h * 0.5f;
+
+	auto angleRad = angleDegrees * (MathConstants::PI / 180.0f);
+	auto cosA = std::cos(angleRad);
+	auto sinA = std::sin(angleRad);
+
+	SDL_FPoint corners[4] = 
+	{
+		{-rect.w / 2, -rect.h / 2},
+		{ rect.w / 2, -rect.h / 2},
+		{ rect.w / 2,  rect.h / 2},
+		{-rect.w / 2,  rect.h / 2}
+	};
+
+	for (auto& p : corners)
+	{
+		auto x = p.x * cosA - p.y * sinA;
+		auto y = p.x * sinA + p.y * cosA;
+
+		p.x = x + cx;
+		p.y = y + cy;
+	}
+
 	if (filled)
 	{
-		SDL_RenderFillRect(renderer, &rect);
+		SDL_Vertex vertices[6];
+
+		SDL_Color vertexColor = color;
+
+		vertices[0] = { corners[0], vertexColor, {0, 0} };
+		vertices[1] = { corners[1], vertexColor, {0, 0} };
+		vertices[2] = { corners[2], vertexColor, {0, 0} };
+
+		vertices[3] = { corners[2], vertexColor, {0, 0} };
+		vertices[4] = { corners[3], vertexColor, {0, 0} };
+		vertices[5] = { corners[0], vertexColor, {0, 0} };
+
+		SDL_RenderGeometry(renderer, nullptr, vertices, 6, nullptr, 0);
 	}
 	else
 	{
-		SDL_RenderDrawRect(renderer, &rect);
+		for (auto i = 0; i < 4; ++i)
+		{
+			SDL_RenderDrawLineF(
+				renderer,
+				corners[i].x, corners[i].y,
+				corners[(i + 1) % 4].x, corners[(i + 1) % 4].y);
+		}
 	}
 
-	// Reset Display Color
 	Renderer::SetDisplayColor(oldRenderColor.r, oldRenderColor.g, oldRenderColor.b, oldRenderColor.a);
 }
 
