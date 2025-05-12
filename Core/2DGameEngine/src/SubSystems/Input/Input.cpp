@@ -1,12 +1,12 @@
 #include "EventSystem/EventDispatcher.h"
 #include "EventSystem/Events/Input/ControllerDisconnectedEvent.h"
-#include "SubSystems/Events/EventManager.h"
 #include "SubSystems/Input/Devices/ControllerInputDevice.h"
 #include "SubSystems/Input/Devices/KeyboardInputDevice.h"
 #include "SubSystems/Input/Devices/MouseInputDevice.h"
 #include "SubSystems/Input/Input.h"
 #include "SubSystems/Input/InputControls.h"
 #include "Tools/Helpers/EventHelpers.h"
+#include <Constants/SharedResourcePaths.h>
 #include <iostream>
 #include <unordered_set>
 
@@ -41,7 +41,7 @@ Input::Input()
 	// and once through XInput, which can lead to duplicate devices being detected.
 	SDL_SetHint(SDL_HINT_JOYSTICK_RAWINPUT_CORRELATE_XINPUT, "0");
 
-	InputControls::Deserialize("Shared/Configurations/InputControls.json");
+	InputControls::Deserialize(SharedResourcePaths::Configurations::INPUT_CONTROLS_CONFIGURATION_PATH);
 
 	// Initialize default devices
 	keyboardDevice = std::make_unique<KeyboardInputDevice>();
