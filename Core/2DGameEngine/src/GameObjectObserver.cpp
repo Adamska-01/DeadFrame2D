@@ -12,37 +12,45 @@ GameObjectObserver::~GameObjectObserver()
 {
 	for (auto obj : allRegisteredGameObjects)
 	{
-		if (obj == nullptr || obj->IsMarkedForDestruction())
-			continue;
-
 		DeregisterAllHandlers(obj);
 	}
 
 	allRegisteredGameObjects.clear();
 }
 
-void GameObjectObserver::RegisterAllHandlers(GameObject* owner)
+void GameObjectObserver::RegisterAllHandlers(std::weak_ptr<GameObject> owner)
 {
-	auto it = std::remove(allRegisteredGameObjects.begin(), allRegisteredGameObjects.end(), owner);
+	auto ownerPtr = owner.lock();
+	if (ownerPtr == nullptr)
+		return;
+
+	auto it = std::remove_if(allRegisteredGameObjects.begin(), allRegisteredGameObjects.end(),
+		[ownerPtr](const std::weak_ptr<GameObject>& other)
+		{
+			return other.lock().get() == ownerPtr.get();
+		});
+
 	if (it == allRegisteredGameObjects.end())
 	{
 		allRegisteredGameObjects.push_back(owner);
 	}
+	
+	auto identifier = reinterpret_cast<uintptr_t>(this);
 
-	owner->RegisterOnActiveStateChangedHandler(EventHelpers::BindFunction(this, &GameObjectObserver::OnGameObjectActiveStateChangedHandler));
-	owner->RegisterOnNewComponentAddedHandler(EventHelpers::BindFunction(this, &GameObjectObserver::OnNewComponentAddedHandler));
+	ownerPtr->RegisterOnActiveStateChangedHandler(EventHelpers::BindFunction(this, &GameObjectObserver::OnGameObjectActiveStateChangedHandler), identifier);
+	ownerPtr->RegisterOnNewComponentAddedHandler(EventHelpers::BindFunction(this, &GameObjectObserver::OnNewComponentAddedHandler), identifier);
 }
 
-void GameObjectObserver::DeregisterAllHandlers(GameObject* owner)
+void GameObjectObserver::DeregisterAllHandlers(std::weak_ptr<GameObject> owner)
 {
-	auto it = std::remove(allRegisteredGameObjects.begin(), allRegisteredGameObjects.end(), owner);
-	if (it != allRegisteredGameObjects.end())
-	{
-		allRegisteredGameObjects.erase(it, allRegisteredGameObjects.end());
-	}
+	auto ownerPtr = owner.lock();
+	if (ownerPtr == nullptr)
+		return;
 
-	owner->DeregisterOnActiveStateChangedHandler(EventHelpers::BindFunction(this, &GameObjectObserver::OnGameObjectActiveStateChangedHandler));
-	owner->DeregisterOnNewComponentAddedHandler(EventHelpers::BindFunction(this, &GameObjectObserver::OnNewComponentAddedHandler));
+	auto identifier = reinterpret_cast<uintptr_t>(this);
+
+	ownerPtr->DeregisterOnActiveStateChangedHandler(identifier);
+	ownerPtr->DeregisterOnNewComponentAddedHandler(identifier);
 }
 
 void GameObjectObserver::OnGameObjectActiveStateChangedHandler(GameObject* obj, bool isActive)

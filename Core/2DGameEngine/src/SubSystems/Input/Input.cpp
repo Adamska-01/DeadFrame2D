@@ -47,12 +47,12 @@ Input::Input()
 	keyboardDevice = std::make_unique<KeyboardInputDevice>();
 	mouseDevice = std::make_unique<MouseInputDevice>();
 
-	EventDispatcher::RegisterEventHandler(std::type_index(typeid(ControllerDisconnectedEvent)), EventHelpers::BindFunction(this, &Input::DisconnectControllerHandler));
+	EventDispatcher::RegisterEventHandler(std::type_index(typeid(ControllerDisconnectedEvent)), EventHelpers::BindFunction(this, &Input::DisconnectControllerHandler), reinterpret_cast<std::uintptr_t>(this));
 }
 
 Input::~Input()
 {
-	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(ControllerDisconnectedEvent)), EventHelpers::BindFunction(this, &Input::DisconnectControllerHandler));
+	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(ControllerDisconnectedEvent)), reinterpret_cast<std::uintptr_t>(this));
 	
 	controllerDevices.clear();
 

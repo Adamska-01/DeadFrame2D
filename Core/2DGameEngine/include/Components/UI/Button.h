@@ -4,7 +4,6 @@
 #include "SubSystems//Events/Interfaces/IEventProcessor.h"
 #include "Tools/MulticastDelegate.h"
 #include <functional>
-#include <string_view>
 
 
 class Transform;
@@ -52,7 +51,7 @@ public:
 	virtual void OnPointerUp() override;
 
 
-	void AddPressedCallback(std::function<void()> onPressedHandler);
+	void AddPressedCallback(std::function<void()> onPressedHandler, std::uintptr_t identifier);
 	
 	SDL_Rect GetBoundingBox() const;
 

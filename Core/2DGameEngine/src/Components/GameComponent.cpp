@@ -4,7 +4,6 @@
 
 GameComponent::GameComponent()
 {
-	OwningObject = nullptr;
 	isActive = true;
 	isDirty = true;
 }
@@ -14,7 +13,7 @@ void GameComponent::MarkDirty()
 	isDirty = true;
 }
 
-GameObject* GameComponent::GetGameObject() const
+std::weak_ptr<GameObject> GameComponent::GetGameObject() const
 {
 	return OwningObject;
 }

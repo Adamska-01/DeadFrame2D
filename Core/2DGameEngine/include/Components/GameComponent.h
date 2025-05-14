@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObjectObserver.h"
+#include <memory>
 
 
 class GameObject;
@@ -15,7 +16,7 @@ protected:
 
 	bool isActive;
 
-	GameObject* OwningObject;
+	std::weak_ptr<GameObject> OwningObject;
 
 
 public:
@@ -36,7 +37,7 @@ public:
 	virtual void MarkDirty();
 
 
-	GameObject* GetGameObject() const;
+	std::weak_ptr<GameObject> GetGameObject() const;
 
 	bool IsActive() const;
 

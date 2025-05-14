@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/Vector2.h"
+#include <memory>
 
 
 class GameObject;
@@ -14,5 +15,5 @@ struct CollisionInfo
 
 	Collider2D* otherCollider = nullptr;
 
-	GameObject* otherGameObject = nullptr;
+	std::weak_ptr<GameObject> otherGameObject;
 };

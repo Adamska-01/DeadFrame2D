@@ -10,7 +10,9 @@ Transform::Transform(Vector2F position, Vector2F scale, float angle)
 
 void Transform::RecalculateWorldTransform() const
 {
-	if (!OwningObject || !OwningObject->GetParent())
+	auto owningObjectPtr = OwningObject.lock();
+
+	if (owningObjectPtr == nullptr || owningObjectPtr->GetParent().lock() == nullptr)
 	{
 		position = localPosition;
 		scale = localScale;
@@ -18,9 +20,9 @@ void Transform::RecalculateWorldTransform() const
 	}
 	else
 	{
-		auto parentTransform = OwningObject->GetParent()->GetComponent<Transform>();
+		auto parentTransform = owningObjectPtr->GetParent().lock()->GetComponent<Transform>();
 
-		if (parentTransform)
+		if (parentTransform != nullptr)
 		{
 			auto rotated = localPosition.Rotated(parentTransform->GetWorldRotation());
 			auto scaled = Vector2F
@@ -52,21 +54,22 @@ void Transform::MarkDirty()
 	isDirty = true;
 
 	// Propagate to children
-	if (OwningObject)
-	{
-		const auto& children = OwningObject->GetChildren();
-		for (const auto& weakChild : children)
-		{
-			auto child = weakChild.lock();
-			if (!child)
-				continue;
+	auto owningOnjectPtr = OwningObject.lock();
+	if (owningOnjectPtr == nullptr)
+		return;
 
-			auto childTransform = child->GetComponent<Transform>();
-			if (childTransform)
-			{
-				childTransform->MarkDirty();
-			}
-		}
+	const auto& children = owningOnjectPtr->GetChildren();
+	for (const auto& weakChild : children)
+	{
+		auto child = weakChild.lock();
+		if (!child)
+			continue;
+
+		auto childTransform = child->GetComponent<Transform>();
+		if (childTransform == nullptr)
+			continue;
+
+		childTransform->MarkDirty();
 	}
 }
 
@@ -199,8 +202,8 @@ void Transform::SetLocalPosition(const Vector2F& pos)
 
 void Transform::SetWorldPosition(const Vector2F& worldPos)
 {
-	auto parent = OwningObject ? OwningObject->GetParent() : nullptr;
-	auto parentTransform = parent ? parent->GetComponent<Transform>() : nullptr;
+	auto parent = OwningObject.lock() ? OwningObject.lock()->GetParent().lock() : nullptr;
+	auto parentTransform = parent != nullptr ? parent->GetComponent<Transform>() : nullptr;
 
 	if (parentTransform == nullptr)
 	{
@@ -237,10 +240,10 @@ void Transform::SetLocalScale(const Vector2F& scale)
 
 void Transform::SetWorldScale(const Vector2F& worldScale)
 {
-	auto parent = OwningObject ? OwningObject->GetParent() : nullptr;
-	auto parentTransform = parent ? parent->GetComponent<Transform>() : nullptr;
+	auto parent = OwningObject.lock() ? OwningObject.lock()->GetParent().lock() : nullptr;
+	auto parentTransform = parent != nullptr ? parent->GetComponent<Transform>() : nullptr;
 
-	if (!parentTransform)
+	if (parentTransform == nullptr)
 	{
 		localScale = worldScale;
 	}
@@ -265,8 +268,8 @@ void Transform::SetLocalRotation(float rotation)
 
 void Transform::SetWorldRotation(float worldRotation)
 {
-	auto parent = OwningObject ? OwningObject->GetParent() : nullptr;
-	auto parentTransform = parent ? parent->GetComponent<Transform>() : nullptr;
+	auto parent = OwningObject.lock() ? OwningObject.lock()->GetParent().lock() : nullptr;
+	auto parentTransform = parent != nullptr ? parent->GetComponent<Transform>() : nullptr;
 
 	localRotation = parentTransform
 		? worldRotation - parentTransform->GetWorldRotation()

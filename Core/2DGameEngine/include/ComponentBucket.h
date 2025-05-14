@@ -1,10 +1,8 @@
 #pragma once
 #include "Components/GameComponent.h"
+#include "GameObject.h"
 #include <memory>
 #include <vector>
-
-
-class GameObject;
 
 
 class ComponentBucket
@@ -17,13 +15,16 @@ public:
 	ComponentBucket();
 
 	~ComponentBucket();
+
+
+	void LinkComponentToOwner(std::weak_ptr<GameObject> owner, GameComponent* toInitialize);
 	
-	
+
 	template <typename T>
 	T* GetComponent() const;
 
 	template<typename T, typename... TArgs>
-	T* AddComponent(GameObject* owner, bool canInitialize, TArgs&& ...args);
+	T* AddComponent(std::weak_ptr<GameObject> owner, bool canInitialize, TArgs&& ...args);
 
 
 	const std::vector<std::unique_ptr<GameComponent>>& GetComponents();
@@ -40,8 +41,15 @@ inline ComponentBucket::~ComponentBucket()
 	components.clear();
 }
 
+inline void ComponentBucket::LinkComponentToOwner(std::weak_ptr<GameObject> owner, GameComponent* toInitialize)
+{
+	toInitialize->OwningObject = owner;
+
+	toInitialize->RegisterAllHandlers(owner);
+}
+
 template<typename T>
-T* ComponentBucket::GetComponent() const
+inline T* ComponentBucket::GetComponent() const
 {
 	for (const auto& component : components)
 	{
@@ -56,7 +64,7 @@ T* ComponentBucket::GetComponent() const
 }
 
 template<typename T, typename ...TArgs>
-T* ComponentBucket::AddComponent(GameObject* owner, bool canInitialize, TArgs&& ...args)
+inline T* ComponentBucket::AddComponent(std::weak_ptr<GameObject> owner, bool canInitialize, TArgs&& ...args)
 {
 	auto existingComponent = GetComponent<T>();
 
@@ -65,9 +73,11 @@ T* ComponentBucket::AddComponent(GameObject* owner, bool canInitialize, TArgs&& 
 
 	T* component = new T(std::forward<TArgs>(args)...);
 
-	component->OwningObject = owner;
-
-	component->RegisterAllHandlers(owner);
+	// This is necessary due to smart pointer/C++ limitations
+	if (owner.lock() != nullptr)
+	{
+		LinkComponentToOwner(owner, component);
+	}
 
 	std::unique_ptr<GameComponent> uniquePtr(component);
 
@@ -78,6 +88,8 @@ T* ComponentBucket::AddComponent(GameObject* owner, bool canInitialize, TArgs&& 
 
 	if (canInitialize)
 	{
+		LinkComponentToOwner(owner, component);
+
 		component->Init();
 	}
 

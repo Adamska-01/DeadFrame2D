@@ -14,7 +14,7 @@ Button::Button(const ButtonComponentModel& buttonConfiguration)
 
 	this->widgetSize = buttonConfiguration.buttonSize;
 
-	AddPressedCallback(buttonConfiguration.onPressedHandler);
+	AddPressedCallback(buttonConfiguration.onPressedHandler, buttonConfiguration.identifier);
 	SetButtonImageSources(
 		buttonConfiguration.idleButtonSource, 
 		buttonConfiguration.hoveredButtonSource, 
@@ -88,7 +88,7 @@ std::optional<int> Button::ProcessEvents(const SDL_Event& sdlEvent)
 
 void Button::Init()
 {
-	transform = OwningObject->GetComponent<Transform>();
+	transform = OwningObject.lock()->GetComponent<Transform>();
 }
 
 void Button::Update(float deltaTime)
@@ -142,9 +142,9 @@ void Button::OnPointerUp()
 	}
 }
 
-void Button::AddPressedCallback(std::function<void()> onPressedHandler)
+void Button::AddPressedCallback(std::function<void()> onPressedHandler, std::uintptr_t identifier)
 {
-	this->onPressedCallback += onPressedHandler;
+	this->onPressedCallback.RegisterCallback(onPressedHandler, identifier);
 }
 
 SDL_Rect Button::GetBoundingBox() const

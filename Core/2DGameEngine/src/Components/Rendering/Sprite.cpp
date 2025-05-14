@@ -14,7 +14,7 @@ Sprite::Sprite(std::string_view texturePath)
 
 void Sprite::Init()
 {
-	transform = OwningObject->GetComponent<Transform>();
+	transform = OwningObject.lock()->GetComponent<Transform>();
 }
 
 void Sprite::Update(float deltaTime)

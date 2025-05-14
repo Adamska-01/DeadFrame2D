@@ -7,8 +7,7 @@ GameObject::GameObject()
 	: isDestroyed(false),
 	isInitialized(false),
 	isActive(true),
-	hasActiveParent(true),
-	parent(nullptr)
+	hasActiveParent(true)
 {
 	children.clear();
 
@@ -84,9 +83,10 @@ void GameObject::AddChildGameObject(std::weak_ptr<GameObject> child)
 	auto worldRot = transform->GetWorldRotation();
 
 	// Step 2: Remove from previous parent
-	if (childPtr->parent)
+	auto parentPtr = childPtr->parent.lock();
+	if (parentPtr != nullptr)
 	{
-		auto& siblings = childPtr->parent->children;
+		auto& siblings = parentPtr->children;
 
 		siblings.erase(
 			std::remove_if(siblings.begin(), siblings.end(),
@@ -99,7 +99,7 @@ void GameObject::AddChildGameObject(std::weak_ptr<GameObject> child)
 	}
 
 	// Step 3: Reparent
-	childPtr->parent = this;
+	childPtr->parent = thisWeak;
 	children.push_back(child);
 
 	// Step 4: Convert world transform back to local under new parent
@@ -115,22 +115,23 @@ void GameObject::AddChildGameObject(std::weak_ptr<GameObject> child)
 	OnActiveStateChanged.Clear();
 }
 
-bool GameObject::IsChildOf(const GameObject* potentialChild, bool recursive) const
+bool GameObject::IsChildOf(std::weak_ptr<GameObject> potentialChild, bool recursive) const
 {
-	if (potentialChild == nullptr)
+	auto potentialChildPtr = potentialChild.lock();
+	if (potentialChildPtr == nullptr)
 		return false;
 
-	auto currentParent = parent;
-	if (currentParent == nullptr)
+	auto currentParentPtr = parent.lock();
+	if (currentParentPtr == nullptr)
 		return false;
 
-	if (currentParent == potentialChild)
+	if (currentParentPtr == potentialChildPtr)
 		return true;
 
 	if (!recursive)
 		return false;
 
-	return currentParent->IsChildOf(potentialChild, true);
+	return currentParentPtr->IsChildOf(potentialChildPtr, true);
 }
 
 void GameObject::Destroy()
@@ -140,7 +141,7 @@ void GameObject::Destroy()
 
 	isDestroyed = true;
 
-	EventDispatcher::SendEvent(std::make_shared<GameObjectDestroyedEvent>(this));
+	EventDispatcher::SendEvent(std::make_shared<GameObjectDestroyedEvent>(thisWeak));
 
 	for (auto& child : children)
 	{
@@ -151,7 +152,12 @@ void GameObject::Destroy()
 	}
 }
 
-GameObject* GameObject::GetParent() const
+std::weak_ptr<GameObject> GameObject::GetThisWeak() const
+{
+	return thisWeak;
+}
+
+std::weak_ptr<GameObject> GameObject::GetParent() const
 {
 	return parent;
 }
@@ -169,11 +175,6 @@ std::vector<std::weak_ptr<GameObject>> GameObject::GetChildren() const
 bool GameObject::IsActive() const
 {
 	return isActive && hasActiveParent;
-}
-
-bool GameObject::IsMarkedForDestruction() const
-{
-	return isDestroyed;
 }
 
 void GameObject::SetActive(bool value)

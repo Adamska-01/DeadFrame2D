@@ -18,8 +18,8 @@ SpriteAnimator::SpriteAnimator()
 
 void SpriteAnimator::Init()
 {
-	transform = OwningObject->GetComponent<Transform>();
-	sprite = OwningObject->GetComponent<Sprite>();
+	transform = OwningObject.lock()->GetComponent<Transform>();
+	sprite = OwningObject.lock()->GetComponent<Sprite>();
 
 	if (sprite == nullptr)
 		return;

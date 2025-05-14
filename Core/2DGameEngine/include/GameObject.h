@@ -26,23 +26,24 @@ protected:
 
 	bool hasActiveParent;
 
+	std::weak_ptr<GameObject> thisWeak;
 
-	GameObject();
+	std::weak_ptr<GameObject> parent;
 
+	std::vector<std::weak_ptr<GameObject>> children;
 
 	Transform* transform;
 
 	ComponentBucket componentBucket;
 
-	GameObject* parent;
 
-	std::vector<std::weak_ptr<GameObject>> children;
+	GameObject();
 
 
 public:
 	virtual ~GameObject() override = default;
 
-	
+
 	virtual void Init() override;
 
 	virtual void Update(float deltaTime) override;
@@ -50,6 +51,10 @@ public:
 	virtual void LateUpdate(float deltaTime) override;
 	
 	virtual void Draw() override;
+
+
+	template<typename T, typename ...Args>
+	static std::weak_ptr<T> Instantiate(Args && ...args);
 
 
 	template <typename T>
@@ -72,17 +77,14 @@ public:
 
 	void AddChildGameObject(std::weak_ptr<GameObject> child);
 
-	bool IsChildOf(const GameObject* potentialChild, bool recursive = false) const;
-
-
-	template<typename T, typename ...Args>
-	static std::weak_ptr<T> Instantiate(Args && ...args);
-	
+	bool IsChildOf(std::weak_ptr<GameObject> potentialChild, bool recursive = false) const;
 
 	void Destroy();
 
 
-	GameObject* GetParent() const;
+	std::weak_ptr<GameObject> GetThisWeak() const;
+
+	std::weak_ptr<GameObject> GetParent() const;
 
 	Transform* GetTransform() const;
 
@@ -90,11 +92,29 @@ public:
 	
 	bool IsActive() const;
 
-	bool IsMarkedForDestruction() const;
-
 	void SetActive(bool value);
 };
 
+
+template<typename T, typename ...Args>
+inline std::weak_ptr<T> GameObject::Instantiate(Args && ...args)
+{
+	static_assert(std::is_base_of<GameObject, T>::value, "T must derive from GameObject");
+
+	auto obj = std::shared_ptr<T>(new T(std::forward<Args>(args)...));
+
+	obj->thisWeak = obj;
+
+	// This is necessary due to smart pointer/C++ limitations
+	for (auto& component : obj->componentBucket.GetComponents())
+	{
+		obj->componentBucket.LinkComponentToOwner(obj, component.get());
+	}
+
+	EventDispatcher::SendEvent(std::make_shared<GameObjectCreatedEvent>(obj));
+
+	return obj;
+}
 
 template<typename T>
 inline T* GameObject::GetComponent() const
@@ -154,7 +174,7 @@ inline std::vector<T*> GameObject::GetComponentsInChildren(bool recursive) const
 template<typename T>
 inline T* GameObject::GetComponentInParent(bool recursive) const
 {
-	auto current = parent;
+	auto current = parent.lock();
 
 	while (current != nullptr)
 	{
@@ -164,7 +184,7 @@ inline T* GameObject::GetComponentInParent(bool recursive) const
 		if (!recursive)
 			break;
 
-		current = current->parent;
+		current = current->parent.lock();
 	}
 
 	return nullptr;
@@ -193,21 +213,9 @@ inline std::vector<T*> GameObject::GetComponentsInParent(bool recursive) const
 template<typename T, typename... TArgs>
 inline T* GameObject::AddComponent(TArgs&& ...args)
 {
-	auto newComponent = componentBucket.AddComponent<T>(this, isInitialized, std::forward<TArgs>(args)...);
+	auto newComponent = componentBucket.AddComponent<T>(thisWeak, isInitialized, std::forward<TArgs>(args)...);
 
 	OnNewComponentAdded(newComponent);
 
 	return newComponent;
-}
-
-template<typename T, typename ...Args>
-inline std::weak_ptr<T> GameObject::Instantiate(Args && ...args)
-{
-	static_assert(std::is_base_of<GameObject, T>::value, "T must derive from GameObject");
-
-	auto obj = std::shared_ptr<T>(new T(std::forward<Args>(args)...));
-
-	EventDispatcher::SendEvent(std::make_shared<GameObjectCreatedEvent>(obj));
-
-	return obj;
 }

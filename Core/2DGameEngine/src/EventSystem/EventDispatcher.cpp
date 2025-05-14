@@ -5,17 +5,17 @@
 std::unordered_map<std::type_index, EventHandler> EventDispatcher::eventHandlers;
 
 
-void EventDispatcher::RegisterEventHandler(const std::type_index& eventType, const std::function<void(std::shared_ptr<DispatchableEvent>)>& handler)
+void EventDispatcher::RegisterEventHandler(const std::type_index& eventType, const std::function<void(std::shared_ptr<DispatchableEvent>)>& handler, std::uintptr_t identifier)
 {
 	if (eventHandlers.find(eventType) == eventHandlers.end())
 	{
 		eventHandlers[eventType] = EventHandler();
 	}
 	
-	eventHandlers[eventType] += handler;
+	eventHandlers[eventType].RegisterCallback(handler, identifier);
 }
 
-void EventDispatcher::DeregisterEventHandler(const std::type_index& eventType, const std::function<void(std::shared_ptr<DispatchableEvent>)>& handler)
+void EventDispatcher::DeregisterEventHandler(const std::type_index& eventType, std::uintptr_t identifier)
 {
 	if (eventHandlers.find(eventType) == eventHandlers.end())
 	{
@@ -24,7 +24,7 @@ void EventDispatcher::DeregisterEventHandler(const std::type_index& eventType, c
 		return;
 	}
 	
-	eventHandlers[eventType] -= handler;
+	eventHandlers[eventType].DeregisterCallback(identifier);
 	
 	if (eventHandlers[eventType].IsEmpty())
 	{

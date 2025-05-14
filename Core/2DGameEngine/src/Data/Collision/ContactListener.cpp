@@ -56,11 +56,12 @@ void ContactListener::EndContact(b2Contact* contact)
 		return;
 
 	// Even though the contact has ended, we can still build a basic CollisionInfo.
-	// Note: contact point and normal might not be meaningful here, but can be set to defaults.
 	CollisionInfo infoA
 	{
-		.contactPoint = Vector2F(), // optionally, keep it zero since contact has ended
-		.normal = Vector2F(),       // no direction after separation
+		// optionally, keep it zero since contact has ended
+		.contactPoint = Vector2F(),
+		// no direction after separation
+		.normal = Vector2F(),
 		.otherCollider = colB,
 		.otherGameObject = colB->GetGameObject(),
 	};

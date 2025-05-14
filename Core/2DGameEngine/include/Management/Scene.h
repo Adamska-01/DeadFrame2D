@@ -12,7 +12,7 @@ private:
 
 	std::vector<std::weak_ptr<GameObject>> gameObjectsToInitialize;
 
-	std::vector<const GameObject*> objectsPendingDestroy;
+	std::vector<std::weak_ptr<GameObject>> objectsPendingDestroy;
 
 
 protected:
@@ -35,16 +35,17 @@ public:
 
 	virtual void Enter() = 0;
 
-	
-	void Exit();
 
 	void Init();
 
 
 	virtual void Update(float deltaTime);
-
+	
 	virtual void Draw();
 	
+
+	void Exit();
+
 
 	template <typename T>
 	T* FindObjectOfType();

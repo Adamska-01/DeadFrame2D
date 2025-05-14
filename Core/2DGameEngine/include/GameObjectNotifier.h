@@ -21,12 +21,12 @@ protected:
 
 
 public:
-	void RegisterOnActiveStateChangedHandler(std::function<void(GameObject*, bool)> handler);
+	void RegisterOnActiveStateChangedHandler(std::function<void(GameObject*, bool)> handler, std::uintptr_t identifier);
 	
-	void RegisterOnNewComponentAddedHandler(std::function<void(GameComponent*)> handler);
+	void RegisterOnNewComponentAddedHandler(std::function<void(GameComponent*)> handler, std::uintptr_t identifier);
 
 
-	void DeregisterOnActiveStateChangedHandler(std::function<void(GameObject*, bool)> handler);
+	void DeregisterOnActiveStateChangedHandler(std::uintptr_t identifier);
 	
-	void DeregisterOnNewComponentAddedHandler(std::function<void(GameComponent*)> handler);
+	void DeregisterOnNewComponentAddedHandler(std::uintptr_t identifier);
 };

@@ -38,4 +38,6 @@ public:
 
 
 	void BeginFrame();
+
+	void EndFrame();
 };

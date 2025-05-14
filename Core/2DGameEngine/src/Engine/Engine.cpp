@@ -1,4 +1,5 @@
 #include "Engine/Engine.h"
+#include "SubSystems/Renderer.h"
 
 
 Engine::Engine()
@@ -26,10 +27,17 @@ std::optional<int> Engine::Run()
 			return *ecode;
 
 		sceneManager->UpdateScene(deltaTime);
+
+		Renderer::ClearBuffer();
+
 		sceneManager->DrawScene();
 
+		engineSubSystems->EndFrame();
+
+		Renderer::PresentBuffer();
+
 		sceneManager->LoadNewSceneIfAvailable();
-		
+
 		//FPS and delay
 		ft.EndClock();
 		ft.DelayByFrameTime();

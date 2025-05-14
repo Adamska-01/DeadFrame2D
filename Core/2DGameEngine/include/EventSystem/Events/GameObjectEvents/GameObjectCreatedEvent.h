@@ -1,5 +1,6 @@
 #pragma once
 #include "EventSystem/DispatchableEvent.h"
+#include <memory>
 
 
 class GameObject;

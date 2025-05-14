@@ -1,13 +1,14 @@
 #pragma once
-#include <list>
 #include <functional>
+#include <unordered_map>
 
 
 template<typename ... Args>
 class MulticastDelegate
 {
 private:
-	std::list<std::function<void(Args...)>> listeners;
+	// TODO: it should be a list of std::function paired with their identifier.
+	std::unordered_map<std::uintptr_t, std::function<void(Args...)>> listeners;
 
 
 public:
@@ -21,9 +22,10 @@ public:
 	void Clear();
 
 
-	MulticastDelegate& operator += (const std::function<void(Args...)> func);
-	
-	MulticastDelegate& operator -= (const std::function<void(Args...)> func);
+	void RegisterCallback(const std::function<void(Args...)>& func, std::uintptr_t identifier);
+
+	void DeregisterCallback(std::uintptr_t identifier);
+
 
 	void operator() (Args... params);
 };
@@ -45,35 +47,21 @@ inline void MulticastDelegate<Args...>::Clear()
 }
 
 template<typename ...Args>
-inline MulticastDelegate<Args...>& MulticastDelegate<Args...>::operator+=(const std::function<void(Args...)> func)
+inline void MulticastDelegate<Args...>::RegisterCallback(const std::function<void(Args...)>& func, std::uintptr_t identifier)
 {
-	listeners.push_back(func);
-
-	return *this;
+	listeners[identifier] = func;
 }
 
 template<typename ...Args>
-inline MulticastDelegate<Args...>& MulticastDelegate<Args...>::operator-=(const std::function<void(Args...)> func)
+inline void MulticastDelegate<Args...>::DeregisterCallback(std::uintptr_t identifier)
 {
-	using FunctionType = void(Args...);
-
-	auto it = std::find_if(listeners.begin(), listeners.end(), [&func](const std::function<FunctionType>& f)
-		{
-			return f.template target<FunctionType>() == func.template target<FunctionType>();
-		});
-
-	if (it != listeners.end())
-	{
-		listeners.erase(it);
-	}
-
-	return *this;
+	listeners.erase(identifier);
 }
 
 template<typename ...Args>
 inline void MulticastDelegate<Args...>::operator()(Args ...params)
 {
-	for (auto listener : listeners)
+	for (const auto& [_, listener] : listeners)
 	{
 		listener(params...);
 	}

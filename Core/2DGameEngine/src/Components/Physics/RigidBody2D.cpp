@@ -36,7 +36,7 @@ RigidBody2D::~RigidBody2D()
 
 void RigidBody2D::Init()
 {
-	transform = OwningObject->GetTransform();
+	transform = OwningObject.lock()->GetTransform();
 	
 	auto worldPos = transform->GetWorldPosition() * PhysicsConstants::PIXEL_TO_METER;
 

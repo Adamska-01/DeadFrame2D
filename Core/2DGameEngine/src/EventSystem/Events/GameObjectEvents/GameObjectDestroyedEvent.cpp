@@ -1,7 +1,7 @@
 #include "EventSystem/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
 
 
-GameObjectDestroyedEvent::GameObjectDestroyedEvent(const GameObject* gameObjectDestroyed)
+GameObjectDestroyedEvent::GameObjectDestroyedEvent(std::weak_ptr<GameObject> gameObjectDestroyed)
 	: gameObjectDestroyed(gameObjectDestroyed)
 {
 }

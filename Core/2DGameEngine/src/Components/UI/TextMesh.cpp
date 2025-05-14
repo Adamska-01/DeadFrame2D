@@ -20,7 +20,7 @@ TextMesh::TextMesh(const TextMeshComponentModel& textMeshConfiguration)
 
 void TextMesh::Init()
 {
-	transform = OwningObject->GetComponent<Transform>();
+	transform = OwningObject.lock()->GetComponent<Transform>();
 
 	transform->SetLocalScale(initialObjectScale);
 }

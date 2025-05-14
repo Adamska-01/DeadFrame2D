@@ -1,13 +1,14 @@
 #pragma once
 #include "EventSystem/DispatchableEvent.h"
 #include "GameObject.h"
+#include <memory>
 
 
 class GameObjectDestroyedEvent : public DispatchableEvent
 {
 public:
-	const GameObject* gameObjectDestroyed;
+	std::weak_ptr<GameObject> gameObjectDestroyed;
 
 
-	GameObjectDestroyedEvent(const GameObject* gameObjectDestroyed);
+	GameObjectDestroyedEvent(std::weak_ptr<GameObject> gameObjectDestroyed);
 };

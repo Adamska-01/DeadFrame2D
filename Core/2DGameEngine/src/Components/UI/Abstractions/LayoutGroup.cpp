@@ -10,14 +10,18 @@
 LayoutGroup::LayoutGroup(float layoutSpacing, LayoutPadding layoutPadding)
 	: layoutSpacing(layoutSpacing), layoutPadding(layoutPadding)
 {
-	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &LayoutGroup::GameObjectCreatedHandler));
-	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &LayoutGroup::GameObjectDestroyedHandler));
+	auto identifier = reinterpret_cast<uintptr_t>(this);
+	
+	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &LayoutGroup::GameObjectCreatedHandler), identifier);
+	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &LayoutGroup::GameObjectDestroyedHandler), identifier);
 }
 
 LayoutGroup::~LayoutGroup()
 {
-	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &LayoutGroup::GameObjectCreatedHandler));
-	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &LayoutGroup::GameObjectDestroyedHandler));
+	auto identifier = reinterpret_cast<uintptr_t>(this);
+
+	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), identifier);
+	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), identifier);
 }
 
 void LayoutGroup::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
@@ -26,14 +30,14 @@ void LayoutGroup::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> di
 
 	if (gameObjEvent == nullptr || gameObjEvent->gameObjectCreated == nullptr)
 		return;
-
-	auto& target = gameObjEvent->gameObjectCreated;
+	
+	auto& target = gameObjEvent->gameObjectCreated; 
 
 	if (!target->IsChildOf(OwningObject))
 		return;
 
-	DeregisterAllHandlers(target.get());
-	RegisterAllHandlers(target.get());
+	DeregisterAllHandlers(target);
+	RegisterAllHandlers(target);
 
 	MarkDirty();
 }
@@ -42,13 +46,15 @@ void LayoutGroup::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> 
 {
 	auto gameObjEvent = DispatchableEvent::SafeCast<GameObjectDestroyedEvent>(dispatchableEvent);
 
-	if (!gameObjEvent || gameObjEvent->gameObjectDestroyed == nullptr)
+	if (!gameObjEvent || gameObjEvent->gameObjectDestroyed.lock() == nullptr)
 		return;
 
 	auto target = gameObjEvent->gameObjectDestroyed;
 
-	if (!target->IsChildOf(OwningObject))
+	if (!target.lock()->IsChildOf(OwningObject))
 		return;
+
+	DeregisterAllHandlers(target);
 
 	MarkDirty();
 }
@@ -77,7 +83,7 @@ void LayoutGroup::Draw()
 
 void LayoutGroup::UpdateLayout()
 {
-	for (const auto& ui : OwningObject->GetComponentsInChildren<UIComponent>())
+	for (const auto& ui : OwningObject.lock()->GetComponentsInChildren<UIComponent>())
 	{
 		DeregisterAllHandlers(ui->GetGameObject());
 		RegisterAllHandlers(ui->GetGameObject());

@@ -1,9 +1,7 @@
-#include "Components/Collisions/Collider2D.h"
 #include "EventSystem/EventDispatcher.h"
 #include "EventSystem/Events/GameObjectEvents/GameObjectCreatedEvent.h"
 #include "EventSystem/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
 #include "Management/Scene.h"
-#include "SubSystems/Renderer.h"
 #include "Tools/Helpers/EventHelpers.h"
 
 
@@ -15,8 +13,10 @@ Scene::Scene()
 	gameObjectsToInitialize.clear();
 	objectsPendingDestroy.clear();
 
-	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &Scene::GameObjectCreatedHandler));
-	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &Scene::GameObjectDestroyedHandler));
+	auto identifier = reinterpret_cast<uintptr_t>(this);
+	
+	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &Scene::GameObjectCreatedHandler), identifier);
+	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &Scene::GameObjectDestroyedHandler), identifier);
 }
 
 Scene::~Scene()
@@ -25,8 +25,10 @@ Scene::~Scene()
 	gameObjectsToInitialize.clear();
 	objectsPendingDestroy.clear();
 
-	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &Scene::GameObjectCreatedHandler));
-	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &Scene::GameObjectDestroyedHandler));
+	auto identifier = reinterpret_cast<uintptr_t>(this);
+	
+	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), identifier);
+	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), identifier);
 }
 
 void Scene::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
@@ -55,7 +57,7 @@ void Scene::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispat
 {
 	auto gameObjEvent = DispatchableEvent::SafeCast<GameObjectDestroyedEvent>(dispatchableEvent);
 
-	if (!gameObjEvent || !gameObjEvent->gameObjectDestroyed)
+	if (!gameObjEvent || gameObjEvent->gameObjectDestroyed.lock() == nullptr)
 		return;
 
 	// Mark for destruction
@@ -69,28 +71,22 @@ void Scene::CleanupDestroyedObjects()
 
 	for (const auto& target : objectsPendingDestroy)
 	{
-		if (target == nullptr)
+		auto targetPtr = target.lock();
+		if (targetPtr == nullptr)
 			continue;
 
 		// Remove GameObject
 		auto objIt = std::remove_if(
 			gameObjects.begin(), 
 			gameObjects.end(),
-			[target](const std::shared_ptr<GameObject>& obj)
+			[targetPtr](const std::shared_ptr<GameObject>& obj)
 			{
-				return obj.get() == target;
+				return obj.get() == targetPtr.get();
 			});
 		
 		gameObjects.erase(objIt, gameObjects.end());
 	}
 
-	objectsPendingDestroy.clear();
-}
-
-void Scene::Exit()
-{
-	gameObjects.clear();
-	gameObjectsToInitialize.clear();
 	objectsPendingDestroy.clear();
 }
 
@@ -146,8 +142,6 @@ void Scene::Update(float deltaTime)
 
 void Scene::Draw()
 {
-	Renderer::ClearBuffer();
-
 	for (const auto& obj : gameObjects)
 	{
 		if (!obj->IsActive())
@@ -155,6 +149,11 @@ void Scene::Draw()
 
 		obj->Draw();
 	}
+}
 
-	Renderer::PresentBuffer();
+void Scene::Exit()
+{
+	gameObjects.clear();
+	gameObjectsToInitialize.clear();
+	objectsPendingDestroy.clear();
 }

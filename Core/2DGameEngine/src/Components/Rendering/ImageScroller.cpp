@@ -1,10 +1,10 @@
 #include "Components/Rendering/ImageScroller.h"
+#include "Components/Transform.h"
+#include "Constants/ScreenConstants.h"
+#include "EventSystem/EventDispatcher.h"
+#include "EventSystem/Events/SubSystems/Renderer/RenderTargetSizeChangedEvent.h"
 #include "SubSystems/TextureManager.h"
-#include <Components/Transform.h>
-#include <Constants/ScreenConstants.h>
-#include <EventSystem/EventDispatcher.h>
-#include <EventSystem/Events/SubSystems/Renderer/RenderTargetSizeChangedEvent.h>
-#include <Tools/Helpers/EventHelpers.h>
+#include "Tools/Helpers/EventHelpers.h"
 
 
 ImageScroller::ImageScroller(std::string_view textureSource, ScrollDirection scrollDirection, float scrollSpeed)
@@ -15,12 +15,12 @@ ImageScroller::ImageScroller(std::string_view textureSource, ScrollDirection scr
 
 	scrollOffset = 0;
 
-	EventDispatcher::RegisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), EventHelpers::BindFunction(this, &ImageScroller::RenderTargetSizeChangedHandler));
+	EventDispatcher::RegisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), EventHelpers::BindFunction(this, &ImageScroller::RenderTargetSizeChangedHandler), reinterpret_cast<std::uintptr_t>(this));
 }
 
 ImageScroller::~ImageScroller()
 {
-	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), EventHelpers::BindFunction(this, &ImageScroller::RenderTargetSizeChangedHandler));
+	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), reinterpret_cast<std::uintptr_t>(this));
 }
 
 void ImageScroller::RenderTargetSizeChangedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)

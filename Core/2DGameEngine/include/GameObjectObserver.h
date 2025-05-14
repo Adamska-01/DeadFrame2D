@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <vector>
 
 
@@ -9,7 +10,7 @@ class GameComponent;
 class GameObjectObserver 
 {
 private: 
-	std::vector<GameObject*> allRegisteredGameObjects;
+	std::vector<std::weak_ptr<GameObject>> allRegisteredGameObjects;
 
 
 protected:
@@ -18,9 +19,9 @@ protected:
 	virtual ~GameObjectObserver();
 
 
-	void RegisterAllHandlers(GameObject* owner);
+	void RegisterAllHandlers(std::weak_ptr<GameObject> owner);
 
-	void DeregisterAllHandlers(GameObject* owner);
+	void DeregisterAllHandlers(std::weak_ptr<GameObject> owner);
 
 
 	virtual void OnGameObjectActiveStateChangedHandler(GameObject* obj, bool isActive);

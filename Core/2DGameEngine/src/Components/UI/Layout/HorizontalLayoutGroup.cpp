@@ -15,9 +15,9 @@ void HorizontalLayoutGroup::UpdateLayout()
 
 	std::vector<UIComponent*> interactables;
 
-	for (const auto& ui : OwningObject->GetComponentsInChildren<UIComponent>())
+	for (const auto& ui : OwningObject.lock()->GetComponentsInChildren<UIComponent>())
 	{
-		if (ui == nullptr || !ui->GetGameObject()->IsActive())
+		if (ui == nullptr || !ui->GetGameObject().lock()->IsActive())
 			continue;
 		
 		interactables.push_back(ui);
@@ -43,7 +43,7 @@ void HorizontalLayoutGroup::UpdateLayout()
 
 	for (auto& interactable : interactables)
 	{
-		auto transform = interactable->GetGameObject()->GetComponent<Transform>();
+		auto transform = interactable->GetGameObject().lock()->GetComponent<Transform>();
 		transform->SetLocalPosition(currentPosition);
 
 		currentPosition.x += interactable->GetWidgetSize().x + layoutSpacing;

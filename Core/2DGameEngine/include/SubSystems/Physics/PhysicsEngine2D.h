@@ -26,8 +26,10 @@ private:
 
 	PhysicsEngine2D(PhysicsEngine2D&&) = delete;
 
-
+	// TODO: Make this an interface and share it with other subsystems
 	void BeginFrame();
+
+	void EndFrame();
 
 
 public:
