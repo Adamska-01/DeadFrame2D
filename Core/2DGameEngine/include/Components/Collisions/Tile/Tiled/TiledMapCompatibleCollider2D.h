@@ -4,28 +4,32 @@
 #include "Math/Vector2.h"
 
 
+class RigidBody2D;
+class b2Fixture;
+
+
 class TiledMapCompatibleCollider2D : public TileCollider2D<TiledMapCompatibleRenderer>
 {
-private:
+protected:
 	std::vector<TiledLayer> collisionLayers;
+
+	std::vector<b2Fixture*> fixtures;
 
 	Vector2I tileMapDimension;
 
 	int tileSize;
 
 
+	virtual void RebuildFixture() override;
+
+
 public:
-	TiledMapCompatibleCollider2D(std::vector<TiledLayer> collisionLayers);
+	TiledMapCompatibleCollider2D(std::vector<TiledLayer> collisionLayers, const PhysicsMaterial& physicsMaterial = PhysicsMaterial());
+
+	virtual ~TiledMapCompatibleCollider2D() override;
 
 
 	virtual void Init() override;
-
-
-	virtual bool Accept(ICollisionVisitor& visitor, Collider2D* other) override;
-
-	virtual bool AcceptDispatch(BoxCollider2D* other, ICollisionVisitor& visitor) override;
-
-	virtual bool AcceptDispatch(CircleCollider2D* other, ICollisionVisitor& visitor) override;
 
 
 	const std::vector<TiledLayer>& GetCollisionLayers() const;

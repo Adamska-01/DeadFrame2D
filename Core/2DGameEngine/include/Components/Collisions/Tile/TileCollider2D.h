@@ -9,15 +9,10 @@ protected:
 	TRenderer* tileMapRenderer;
 	
 	
-	TileCollider2D()
-		: tileMapRenderer(nullptr)
+	TileCollider2D(const PhysicsMaterial& physicsMaterial = PhysicsMaterial())
+		: Collider2D(physicsMaterial), tileMapRenderer(nullptr)
 	{
 	}
 
-
-public:
 	virtual ~TileCollider2D() = default;
-
-
-	virtual bool Accept(ICollisionVisitor& visitor, Collider2D* other) override = 0;
 };
