@@ -6,6 +6,8 @@
 
 struct ButtonComponentModel
 {
+	std::uintptr_t identifier = 0;
+
 	std::function<void()> onPressedHandler = []() {};
 
 	std::string_view idleButtonSource = "";
