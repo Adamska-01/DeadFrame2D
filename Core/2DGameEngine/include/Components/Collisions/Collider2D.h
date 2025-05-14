@@ -1,30 +1,52 @@
 #pragma once
 #include "Components/GameComponent.h"
 #include "Data/Collision/CollisionInfo.h"
-#include "Math/Vector2.h"
-#include "Tools/Collisions/ICollisionVisitable.h"
+#include "Data/Collision/PhysicsMaterial.h"
+#include "EventSystem/DispatchableEvent.h"
 #include "Tools/MulticastDelegate.h"
 
 
+class b2Fixture;
 class Transform;
+class RigidBody2D;
 
 
-class Collider2D : public GameComponent, public ICollisionVisitable
+class Collider2D : public GameComponent
 {
+	friend class ContactListener;
+
+private:
+	void GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
+
+	void GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
+
+
 protected:
+	b2Fixture* fixture;
+
 	Transform* transform;
 
-	Vector2F startFramePosition;
+	RigidBody2D* rigidBody;
 
-	MulticastDelegate<const CollisionInfo&> OnCollision;
+	PhysicsMaterial physicsMaterial;
+
+	MulticastDelegate<const CollisionInfo&> OnCollisionEnterCallback;
+
+	MulticastDelegate<const CollisionInfo&> OnCollisionExitCallback;
+
+
+	Collider2D(const PhysicsMaterial& physicsMaterial);
+
+	virtual ~Collider2D() override;
+
+
+	virtual void RebuildFixture();
+
+	
+	void SearchRigidBody();
 
 
 public:
-	Collider2D();
-
-	virtual ~Collider2D() = default;
-
-
 	virtual void Init();
 	
 	virtual void Update(float dt);
@@ -32,17 +54,16 @@ public:
 	virtual void Draw();
 
 
-	virtual bool Accept(ICollisionVisitor& visitor, Collider2D* other) override = 0;
+	void RegisterCollisionEnterHandler(const std::function<void(const CollisionInfo&)>& handler, std::uintptr_t identifier);
 
-
-	void OnCollisionCallback(const CollisionInfo& collisionInfo);
-
-	void RegisterCollisionHandler(const std::function<void(const CollisionInfo&)>& handler);
+	void RegisterCollisionExitHandler(const std::function<void(const CollisionInfo&)>& handler, std::uintptr_t identifier);
 	
-	void DeregisterEventHandler(const std::function<void(const CollisionInfo&)>& handler);
+	void DeregisterCollisionEnterHandler(std::uintptr_t identifier);
+	
+	void DeregisterCollisionExitHandler(std::uintptr_t identifier);
 
 
 	Transform* GetTranform() const;
 
-	Vector2F GetStartFramePosition() const;
+	PhysicsMaterial GetPhysicsMaterial();
 };
