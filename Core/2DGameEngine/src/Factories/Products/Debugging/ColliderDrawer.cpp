@@ -8,6 +8,12 @@
 ColliderDrawer::ColliderDrawer(SDL_Renderer* renderer)
 	: renderer(renderer)
 {
+	SetFlags(
+		b2Draw::e_shapeBit |
+		b2Draw::e_jointBit |
+		b2Draw::e_aabbBit |
+		b2Draw::e_pairBit |
+		b2Draw::e_centerOfMassBit);
 }
 
 void ColliderDrawer::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
