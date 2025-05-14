@@ -10,6 +10,10 @@ class b2Fixture;
 
 class TiledMapCompatibleCollider2D : public TileCollider2D<TiledMapCompatibleRenderer>
 {
+private:
+	void DeleteFixtures();
+
+
 protected:
 	std::vector<TiledLayer> collisionLayers;
 

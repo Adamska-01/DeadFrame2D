@@ -17,7 +17,12 @@ TiledMapCompatibleCollider2D::TiledMapCompatibleCollider2D(std::vector<TiledLaye
 
 TiledMapCompatibleCollider2D::~TiledMapCompatibleCollider2D()
 {
-	if (rigidBody == nullptr)
+	DeleteFixtures();
+}
+
+void TiledMapCompatibleCollider2D::DeleteFixtures()
+{
+	if (fixtures.size() <= 0 || rigidBody == nullptr)
 		return;
 
 	for (auto fix : fixtures)
@@ -31,16 +36,7 @@ TiledMapCompatibleCollider2D::~TiledMapCompatibleCollider2D()
 
 void TiledMapCompatibleCollider2D::RebuildFixture()
 {
-	if(fixtures.size() > 0 && rigidBody != nullptr)
-	{
-		for (auto fix : fixtures)
-		{
-			if (fix == nullptr)
-				continue;
-
-			rigidBody->DestroyFixture(fix);
-		}
-	}
+	DeleteFixtures();
 
 	SearchRigidBody();
 
