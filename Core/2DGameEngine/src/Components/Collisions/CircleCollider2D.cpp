@@ -1,81 +1,34 @@
 #include "Components/Collisions/CircleCollider2D.h"
-#include "Components/Transform.h"
-#include "Constants/CommonColors.h"
-#include "Factories/Concretions/Debugging/DebugCircleColliderDrawerFactory.h"
-#include "Tools/Collisions/ICollisionVisitor.h"
+#include "Tools/Helpers/Physics/PhysicsShapeCreators.h"
 
 
-CircleCollider2D::CircleCollider2D(Circle collider)
-	: circle(collider), startFrameCircle(collider)
+CircleCollider2D::CircleCollider2D(float radius, Vector2F offsetFromCenter, const PhysicsMaterial& physicsMaterial)
+	: Collider2D(physicsMaterial), shape(nullptr)
 {
-	debugCollisionDrawer = std::unique_ptr<IDebugColliderDrawer<CircleCollider2D>>(std::move(DebugCircleColliderDrawerFactory().CreateProduct(this)));
+	SetNewCircleShape(radius, offsetFromCenter);
 }
 
-void CircleCollider2D::SetCirclePos(Circle& collisionCircle, const Vector2F& newPos)
+CircleCollider2D:: ~CircleCollider2D()
 {
-	collisionCircle.position.x = newPos.x;
-	collisionCircle.position.y = newPos.y;
+	DeleteShape();
 }
 
-const Circle& CircleCollider2D::GetCircle() const
+void CircleCollider2D::DeleteShape()
 {
-	return circle;
+	if (shape != nullptr)
+	{
+		delete shape;
+		shape = nullptr;
+	}
 }
 
-const Circle& CircleCollider2D::GetStartFrameCircle() const
+void CircleCollider2D::SetNewCircleShape(float radius, Vector2F offsetFromCenter)
 {
-	return startFrameCircle;
-}
+	DeleteShape();
 
-void CircleCollider2D::SetPos(const Vector2F& pos)
-{
-	SetCirclePos(circle, pos);
-}
+	shape = PhysicsShapeCreators::CreateCircleShape(radius, offsetFromCenter);
 
-void CircleCollider2D::SetSize(float newRadius)
-{
-	circle.radius = newRadius;
+	this->physicsMaterial.shape = shape;
 
-	startFrameCircle.radius = newRadius;
-}
-
-void CircleCollider2D::Init()
-{
-	Collider2D::Init();
-}
-
-void CircleCollider2D::Update(float dt)
-{
-	Collider2D::Update(dt);
-
-}
-
-void CircleCollider2D::Draw()
-{
-	Collider2D::Draw();
-
-	debugCollisionDrawer->DrawCollider(CommonColors::WHITE);
-}
-
-bool CircleCollider2D::Accept(ICollisionVisitor& visitor, Collider2D* other)
-{
-	SetCirclePos(circle, transform->GetWorldPosition());
-	SetCirclePos(startFrameCircle, startFramePosition);
-
-	return other->AcceptDispatch(this, visitor);
-}
-
-bool CircleCollider2D::AcceptDispatch(BoxCollider2D* other, ICollisionVisitor& visitor)
-{
-	return visitor.Visit(this, other);
-}
-
-bool CircleCollider2D::AcceptDispatch(CircleCollider2D* other, ICollisionVisitor& visitor)
-{
-	return visitor.Visit(this, other);
-}
-
-bool CircleCollider2D::AcceptDispatch(TiledMapCompatibleCollider2D* other, ICollisionVisitor& visitor)
-{
-	return visitor.Visit(this, other);
+	MarkDirty();
 }
