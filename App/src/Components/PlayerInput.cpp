@@ -39,14 +39,11 @@ void PlayerInput::ProcessFireInput()
 
 void PlayerInput::Init()
 {
-	transform = OwningObject->GetComponent<Transform>();
+	transform = OwningObject.lock()->GetComponent<Transform>();
 }
 
 void PlayerInput::Update(float deltaTime)
 {
-	if (transform == nullptr)
-		return;
-
 	ProcessRotationInput(deltaTime);
 	ProcessFireInput();
 }

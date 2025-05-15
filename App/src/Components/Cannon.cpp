@@ -20,7 +20,7 @@ Cannon::~Cannon()
 
 void Cannon::Init()
 {
-	transform = OwningObject->GetComponent<Transform>();
+	transform = OwningObject.lock()->GetComponent<Transform>();
 }
 
 void Cannon::Update(float deltaTime)

@@ -15,7 +15,7 @@ PlayerInputMainMenu::PlayerInputMainMenu()
 
 void PlayerInputMainMenu::Init()
 {
-	transform = OwningObject->GetComponent<Transform>();
+	transform = OwningObject.lock()->GetComponent<Transform>();
 	menuManager = SceneManager::FindObjectOfType<MenuManager>();
 
 	assert(menuManager != nullptr && "MenuManager not found in scene!");

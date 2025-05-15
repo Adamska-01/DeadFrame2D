@@ -3,7 +3,6 @@
 #include <Components/Rendering/Sprite.h>
 #include <Components/SpriteAnimator.h>
 #include <Components/Transform.h>
-#include <SubSystems/Input/Input.h>
 
 
 const std::string IDLE_BOBBLE_PATH = "App/Assets/Sprites/IdleBobbles.png";
@@ -19,7 +18,8 @@ Bobble::Bobble(Vector2F startPos, BobbleColor color)
 
 	AddComponent<Sprite>(IDLE_BOBBLE_PATH);
 	AddComponent<SpriteAnimator>()->SetProp(true, (int)color, 10, (int)BobbleColor::ALL_COLOURS, 5);
-	AddComponent<CircleCollider2D>(Circle(Vector2F::Zero, 16));
+	// TODO: Make this a constant
+	AddComponent<CircleCollider2D>(16.0f);
 	
 	transform->Scale({ 2, 2 });
 }

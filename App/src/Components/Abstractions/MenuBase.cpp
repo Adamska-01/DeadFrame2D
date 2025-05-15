@@ -57,12 +57,12 @@ void MenuBase::Draw()
 
 void MenuBase::Show()
 {
-	OwningObject->SetActive(true);
+	OwningObject.lock()->SetActive(true);
 }
 
 void MenuBase::Hide()
 {
-	OwningObject->SetActive(false);
+	OwningObject.lock()->SetActive(false);
 }
 
 void MenuBase::NavigateLeft()
