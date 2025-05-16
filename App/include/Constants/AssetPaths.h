@@ -11,6 +11,11 @@ namespace AssetPaths
 		inline constexpr std::string_view MULTIPLAYER_MAP_PATH = "App/Assets/Maps/MultiplayerMap.tmx";
 	}
 
+	namespace Levels
+	{
+		inline constexpr std::string_view SINGLEPLAYER_LEVELS_FOLDER_PATH = "App/Assets/Levels";
+	}
+
 	namespace Backgrounds
 	{
 		inline constexpr std::string_view BACKGROUND_IMAGE_PATH = "App/Assets/Backgrounds/Stars.png";
