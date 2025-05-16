@@ -1,54 +1,24 @@
 #include "Components/Cannon.h"
 #include "Components/PlayerInput.h"
+#include "Components/Transform.h"
 #include "Constants/AssetPaths.h"
 #include "Prefabs/Player.h"
-#include <Components/GameMapParser.h>
 #include <Components/Rendering/Sprite.h>
-#include <Components/Transform.h>
-#include <Constants/TiledObjectGroupNames.h>
-#include <Management/SceneManager.h>
-#include <TileEditors/Tiled/Models/TiledObjectGroup.h>
+#include <Math/Vector2.h>
 
 
-Player::Player(PlayerIdentifier playerID, Vector2F scale)
-	: playerID(playerID)
+Player::Player()
 {
-	sprite = nullptr;
-	cannon = nullptr;
-
-	transform->Scale(scale);
-
 	AddComponent<Sprite>(AssetPaths::Sprites::ARROW_IMAGE_PATH);
 	AddComponent<Cannon>();
 	AddComponent<PlayerInput>();
+
+	transform->Scale(Vector2F(2.0f, 2.0f));
 }
 
 void Player::Init()
 {
 	GameObject::Init();
-
-	auto gameMapObject = SceneManager::FindObjectOfType<GameMapParser>();
-
-	if (gameMapObject == nullptr)
-	{
-		throw std::runtime_error("Cannon::Init: GameMapParser not found in the scene.");
-	}
-
-	auto groupObject = gameMapObject->RetrieveObjectGroup(TiledObjectGroupNames::PLAYER_POSITION_GROUP);
-
-	if (!groupObject.has_value() || groupObject.value().points.size() < 0)
-		return;
-
-	if (playerID == PlayerIdentifier::PLAYER_1)
-	{
-		transform->SetWorldPosition(groupObject.value().points.front());
-	}
-	else if (playerID == PlayerIdentifier::PLAYER_2)
-	{
-		transform->SetWorldPosition(groupObject.value().points.back());
-	}
-
-	transform->Scale(Vector2F(2.0f, 2.0f));
 }
 
 void Player::Update(float deltaTime)
