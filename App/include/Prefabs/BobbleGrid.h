@@ -1,32 +1,33 @@
 #pragma once
 #include "Math/Vector2.h"
-#include "Models/BobbleGridLevel.h"
-#include <GameObject.h>
+#include <Components/GameComponent.h>
 
 
 class Bobble;
+class Transform;
 
 
-class BobbleGrid : public GameObject
+class BobbleGrid : public GameComponent
 {
 private:
-	int tileSize;
-
-	Vector2F placement;
-
-	BobbleGridLevel levelData;
-
-	std::vector<std::weak_ptr<Bobble>> bobbles;
+	Transform* transform;
 
 
-	void CreateBobbleRow(int row, int columnCount);
+	void DestroyGridLevel();
 
 
 public:
-	BobbleGrid(std::string_view levelSource, Vector2F placement, int tileSize);
+	BobbleGrid();
 
-	virtual ~BobbleGrid() = default;
+	virtual ~BobbleGrid() override = default;
 
 
 	virtual void Init() override;
+
+	virtual void Update(float deltaTime) override;
+
+	virtual void Draw() override;
+
+
+	void SetNewGridLevel(std::string_view levelSource, int tileSize);
 };
