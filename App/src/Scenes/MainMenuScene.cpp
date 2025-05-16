@@ -1,7 +1,7 @@
 #include "Components/MenuManager.h"
 #include "Components/PlayerInputMainMenu.h"
-#include "Scenes/GameScene.h"
 #include "Scenes/MainMenuScene.h"
+#include "Scenes/SinglePlayerScene.h"
 #include <Blueprints/UI/ButtonBlueprint.h>
 #include <Components/Rendering/ImageScroller.h>
 #include <Components/Rendering/Sprite.h>
@@ -79,7 +79,7 @@ void MainMenuScene::Enter()
 	auto mainMenuObject = GameObject::Instantiate<GameObject>();
 	auto mainMenuBase = mainMenuObject.lock()->AddComponent<MenuBase>();
 
-	auto spButton = CreateButton("SinglePlayer", []() { SceneManager::LoadScene<GameScene>(); });
+	auto spButton = CreateButton("SinglePlayer", []() { SceneManager::LoadScene<SinglePlayerScene>(); });
 	auto mpButton = CreateButton("Multiplayer", []() { /* Multiplayer logic */ });
 	//auto settingsButton = CreateButton("Settings", [menuManagerComponent, settingsMenuBase]() { menuManagerComponent->PushMenu(settingsMenuBase); });
 	auto exitButton = CreateButton("Exit", []() { EventManager::SendSystemEvent(SDL_EventType::SDL_QUIT); });
