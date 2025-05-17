@@ -25,13 +25,7 @@ void Cannon::Init()
 
 void Cannon::Update(float deltaTime)
 {
-	auto bobblePtr = loadedBobble.lock();
-
-	if (bobblePtr == nullptr)
-	{
-		// TODO: The color needs to be set based on the available boobles in the grid
-		loadedBobble = GameObject::Instantiate<Bobble>(transform->GetWorldPosition(), BobbleColor::Blue);
-	}
+	LoadBobble();
 }
 
 void Cannon::Draw()
@@ -41,4 +35,13 @@ void Cannon::Draw()
 void Cannon::Fire()
 {
 	// TODO: Fire Bobble
+}
+
+void Cannon::LoadBobble()
+{
+	if (loadedBobble.lock() != nullptr)
+		return;
+
+	// TODO: For now, randomize color. For later, get the color pick from the currently available colors in the grid.
+	loadedBobble = GameObject::Instantiate<Bobble>(transform->GetWorldPosition(), BobbleColor::Blue);
 }

@@ -3,8 +3,8 @@
 #include <memory>
 
 
+class GameObject;
 class Transform;
-class Bobble;
 
 
 class Cannon : public GameComponent
@@ -12,7 +12,7 @@ class Cannon : public GameComponent
 private:
 	Transform* transform;
 
-	std::weak_ptr<Bobble> loadedBobble;
+	std::weak_ptr<GameObject> loadedBobble;
 
 
 public:
@@ -29,4 +29,6 @@ public:
 
 
 	void Fire();
+
+	void LoadBobble();
 };
