@@ -3,6 +3,7 @@
 #include <memory>
 
 
+class CollisionInfo;
 class GameObject;
 class Transform;
 
@@ -13,6 +14,13 @@ private:
 	Transform* transform;
 
 	std::weak_ptr<GameObject> loadedBobble;
+
+	bool bounceProcessed;
+
+
+	void OnBobbleWallCollisionEnterHandler(const CollisionInfo& collisionInfo);
+
+	void OnBobbleWallCollisionExitHandler(const CollisionInfo& collisionInfo);
 
 
 public:
@@ -28,7 +36,7 @@ public:
 	virtual void Draw() override;
 
 
-	void Fire();
+	void ShootBobble();
 
 	void LoadBobble();
 };
