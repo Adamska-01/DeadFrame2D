@@ -13,7 +13,7 @@ struct CollisionInfo
 
 	Vector2F normal = Vector2F::Zero;
 
-	Collider2D* otherCollider = nullptr;
+	Collider2D* thisCollider = nullptr;
 
-	std::weak_ptr<GameObject> otherGameObject;
+	Collider2D* otherCollider = nullptr;
 };
