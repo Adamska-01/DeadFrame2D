@@ -33,8 +33,6 @@ private:
 
 
 public:
-	static void SetContactListener(b2ContactListener* listener);
-
 	static Vector2F GetGravity();
 
 	static void SetGravity(const Vector2F& newGravity);
