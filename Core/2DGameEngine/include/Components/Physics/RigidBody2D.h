@@ -7,8 +7,8 @@
 
 struct b2FixtureDef;
 class b2Fixture;
-class Transform;
 class b2Body;
+class Transform;
 
 
 class RigidBody2D : public GameComponent
@@ -18,15 +18,9 @@ private:
 
 	b2Body* body;
 
-	BodyDefinition2D bodyDefinition;
-
-	BodyType2D bodyType;
-
 	mutable Vector2F velocity = Vector2F::Zero;
 	
 	mutable Vector2F acceleration = Vector2F::Zero;
-
-	float gravityScale = 1.0f;
 
 	
 public:
@@ -45,6 +39,8 @@ public:
 
 
 	b2Fixture* CreateFixture(const b2FixtureDef* fixtureDef);
+
+	void ChangeBodyType(BodyType2D newBodyType);
 
 	void DestroyFixture(b2Fixture* fixtureDef);
 
