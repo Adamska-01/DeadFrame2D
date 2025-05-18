@@ -28,20 +28,23 @@ void ContactListener::BeginContact(b2Contact* contact)
 	b2WorldManifold worldManifold;
 	contact->GetWorldManifold(&worldManifold);
 
+	auto contactPoint = Vector2F(worldManifold.points[0].x, worldManifold.points[0].y);
+	auto normal = Vector2F(worldManifold.normal.x, worldManifold.normal.y);
+
 	auto infoA = CollisionInfo
 	{
-		.contactPoint = Vector2F(worldManifold.points[0].x, worldManifold.points[0].y),
-		.normal = Vector2F(worldManifold.normal.x, worldManifold.normal.y),
-		.otherCollider = colA,
-		.otherGameObject = colA->GetGameObject(),
+		.contactPoint = contactPoint,
+		.normal = normal,
+		.thisCollider = colA,
+		.otherCollider = colB,
 	};
 	
 	auto infoB = CollisionInfo
 	{
-		.contactPoint = Vector2F(worldManifold.points[0].x, worldManifold.points[0].y),
-		.normal = Vector2F(-worldManifold.normal.x, -worldManifold.normal.y),
-		.otherCollider = colB,
-		.otherGameObject = colB->GetGameObject(),
+		.contactPoint = contactPoint,
+		.normal = normal * -1,
+		.thisCollider = colB,
+		.otherCollider = colA
 	};
 
 	colA->OnCollisionEnterCallback(infoA);
@@ -55,23 +58,20 @@ void ContactListener::EndContact(b2Contact* contact)
 	if (!colA || !colB)
 		return;
 
-	// Even though the contact has ended, we can still build a basic CollisionInfo.
 	CollisionInfo infoA
 	{
-		// optionally, keep it zero since contact has ended
 		.contactPoint = Vector2F(),
-		// no direction after separation
 		.normal = Vector2F(),
-		.otherCollider = colB,
-		.otherGameObject = colB->GetGameObject(),
+		.thisCollider = colA,
+		.otherCollider = colB
 	};
 
 	CollisionInfo infoB
 	{
 		.contactPoint = Vector2F(),
 		.normal = Vector2F(),
-		.otherCollider = colA,
-		.otherGameObject = colA->GetGameObject(),
+		.thisCollider = colB,
+		.otherCollider = colA
 	};
 
 	colA->OnCollisionExitCallback(infoA);

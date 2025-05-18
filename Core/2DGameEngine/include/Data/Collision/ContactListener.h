@@ -3,6 +3,9 @@
 #include <utility>
 
 
+class Collider2D;
+
+
 /**
  * @brief Custom contact listener for Box2D collision events.
  *
