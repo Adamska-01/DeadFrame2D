@@ -62,7 +62,7 @@ void BobbleGrid::SetNewGridLevel(std::string_view levelSource, int tileSize)
 
 	auto placement = transform->GetWorldPosition();
 
-	for (int i = 0; i < levelData.height; i++)
+	for (auto i = 0; i < levelData.height; i++)
 	{
 		auto displacement = (i % 2) * tileSize / 2;
 		auto start = i * levelData.width;
