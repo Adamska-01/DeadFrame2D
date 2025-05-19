@@ -1,4 +1,6 @@
+#include "Components/BobbleConnections.h"
 #include "Components/Transform.h"
+#include "Math/Vector2.h"
 #include "Models/BobbleGridLevel.h"
 #include "Prefabs/Bobble.h"
 #include "Prefabs/BobbleGrid.h"
@@ -9,6 +11,9 @@
 BobbleGrid::BobbleGrid()
 {
 	transform = nullptr;
+
+	positionToBobble.clear();
+	bobbleToPosition.clear();
 
 	if (!JsonSerializer::IsSerializable<BobbleGridLevel>())
 	{
@@ -50,6 +55,7 @@ void BobbleGrid::SetNewGridLevel(std::string_view levelSource, int tileSize)
 
 	auto levelData = JsonSerializer::DeserializeFromFile<BobbleGridLevel>(levelSource);
 
+	// TODO: Set the color in the grid data source itself
 	static std::random_device rd;  // Seed for random number engine
 	static std::mt19937 gen(rd()); // Mersenne Twister PRNG
 	static std::uniform_int_distribution<int> dist(0, static_cast<int>(BobbleColor::ALL_COLOURS) - 1);
@@ -71,10 +77,65 @@ void BobbleGrid::SetNewGridLevel(std::string_view levelSource, int tileSize)
 			auto y = placement.y + i * tileSize;
 
 			auto bobble = GameObject::Instantiate<Bobble>(Vector2F{ x + tileSize / 2.0f, y + tileSize / 2.0f }, static_cast<BobbleColor>(dist(gen)));
+			auto coord = std::make_pair(i, j % levelData.width);
+			
+			positionToBobble[coord] = bobble;
+			bobbleToPosition[bobble] = coord;
 
 			OwningObject.lock()->AddChildGameObject(bobble);
 		}
 	}
 
-	// TODO: Set bobble connection
+	auto getNeighborCoord = [&](int row, int col, BobbleConnectionDirection dir) -> std::optional<std::pair<int, int>> 
+		{
+			auto isOddRow = (row % 2) != 0;
+			switch (dir)
+			{
+			case BobbleConnectionDirection::TOP_LEFT:
+				return std::make_pair(row - 1, isOddRow ? col : col - 1);
+			case BobbleConnectionDirection::TOP_RIGHT:
+				return std::make_pair(row - 1, isOddRow ? col + 1 : col);
+			case BobbleConnectionDirection::LEFT:
+				return std::make_pair(row, col - 1);
+			case BobbleConnectionDirection::RIGHT:
+				return std::make_pair(row, col + 1);
+			case BobbleConnectionDirection::BOTTOM_LEFT:
+				return std::make_pair(row + 1, isOddRow ? col : col - 1);
+			case BobbleConnectionDirection::BOTTOM_RIGHT:
+				return std::make_pair(row + 1, isOddRow ? col + 1 : col);
+			default:
+				return std::nullopt;
+			}
+		};
+	
+	for (const auto& [position, weakBobble] : positionToBobble)
+	{
+		const auto& [row, col] = position;
+		auto bobbleConnections = weakBobble.lock()->GetComponent<BobbleConnections>();
+
+		assert(bobbleConnections != nullptr && "Bobble has no 'BobbleConnections' component!");
+
+		for (auto dir : 
+			{
+				BobbleConnectionDirection::TOP_LEFT,
+				BobbleConnectionDirection::TOP_RIGHT,
+				BobbleConnectionDirection::LEFT,
+				BobbleConnectionDirection::RIGHT,
+				BobbleConnectionDirection::BOTTOM_LEFT,
+				BobbleConnectionDirection::BOTTOM_RIGHT 
+			})
+		{
+			auto neighborCoordOpt = getNeighborCoord(row, col, dir);
+			
+			if (!neighborCoordOpt.has_value())
+				continue;
+			
+			auto it = positionToBobble.find(neighborCoordOpt.value());
+			
+			if (it == positionToBobble.end())
+				continue;
+
+			bobbleConnections->SetConnectionAt(dir, it->second);
+		}
+	}
 }
