@@ -3,15 +3,15 @@
 
 enum class BobbleConnectionDirection
 {
-	TOP_LEFT = 0,
+	TOP_RIGHT = 0,
 	
-	TOP_RIGHT = 1,
+	RIGHT = 1,
 	
-	LEFT = 2,
+	BOTTOM_RIGHT = 2,
+
+	BOTTOM_LEFT = 3,
 	
-	RIGHT = 3,
+	LEFT = 4,
 	
-	BOTTOM_LEFT = 4,
-	
-	BOTTOM_RIGHT = 5
+	TOP_LEFT = 5
 };
