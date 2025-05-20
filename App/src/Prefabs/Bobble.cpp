@@ -1,4 +1,4 @@
-#include "Components/BobbleConnections.h"
+#include "Components/BobbleController.h"
 #include "Prefabs/Bobble.h"
 #include <Components/Collisions/CircleCollider2D.h>
 #include <Components/Physics/RigidBody2D.h>
@@ -20,7 +20,7 @@ Bobble::Bobble(Vector2F startPos, BobbleColor color)
 	AddComponent<SpriteAnimator>()->SetProp(true, (int)color, 10, (int)BobbleColor::ALL_COLOURS, 5);
 	AddComponent<CircleCollider2D>(16.0f);
 	AddComponent<RigidBody2D>(BodyDefinition2D(), 0.0f);
-	AddComponent<BobbleConnections>();
+	AddComponent<BobbleController>();
 	
 	transform->Scale({ 2, 2 });
 }
