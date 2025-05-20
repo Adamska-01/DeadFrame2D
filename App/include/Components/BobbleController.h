@@ -9,16 +9,20 @@
 class GameObject;
 
 
-class BobbleConnections : public GameComponent
+class BobbleController : public GameComponent
 {
 private:
+	bool itsHanging;
+
+	bool partOfGrid;
+
 	std::array<std::weak_ptr<GameObject>, BobbleConstants::MAX_BOBBLE_NEIGHBOURS> connectionList;
 
 
 public:
-	BobbleConnections();
+	BobbleController();
 
-	virtual ~BobbleConnections() override = default;
+	virtual ~BobbleController() override = default;
 	
 
 	virtual void Init() override;
@@ -27,6 +31,14 @@ public:
 
 	virtual void Draw() override;
 
+
+	bool IsPartOfGrid() const;
+
+	bool IsHanging() const;
+
+	void SetHanging(bool hanging);
+
+	void SetPartOfGrid(bool partOfGrid);
 
 	void SetConnectionAt(BobbleConnectionDirection connectionDirection, std::weak_ptr<GameObject> connection);
 };
