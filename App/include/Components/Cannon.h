@@ -15,6 +15,8 @@ private:
 
 	std::weak_ptr<GameObject> loadedBobble;
 
+	float bobbleSpeed;
+
 	bool bounceProcessed;
 
 

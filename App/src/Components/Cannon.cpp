@@ -13,6 +13,7 @@ Cannon::Cannon()
 {
 	transform = nullptr;
 	bounceProcessed = false;
+	bobbleSpeed = 20.0f;
 }
 
 Cannon::~Cannon()
