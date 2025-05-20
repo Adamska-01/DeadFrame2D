@@ -54,6 +54,9 @@ public:
 	constexpr bool IsZero() const;
 
 
+	static constexpr T Dot(const Vector2<T>& a, const Vector2<T>& b);
+
+
 	constexpr Vector2<T>& operator=(const Vector2<T>& other);
 
 	constexpr Vector2<T> operator+(const Vector2<T>& other) const;
@@ -192,6 +195,12 @@ template<typename T>
 inline constexpr bool Vector2<T>::IsZero() const
 {
 	return *this == Vector2<T>::Zero;
+}
+
+template<typename T>
+inline constexpr T Vector2<T>::Dot(const Vector2<T>& a, const Vector2<T>& b)
+{
+	return a.x * b.x + a.y * b.y;
 }
 
 template<typename T>
