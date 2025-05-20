@@ -15,6 +15,11 @@ RigidBody2D::RigidBody2D(const BodyDefinition2D& bodyDefinition, float gravitySc
 	body = PhysicsEngine2D::CreateBody(&bodyDef);
 
 	SetGravityScale(gravityScale);
+
+	pendingActions.Clear();
+
+	lastTransformPosition = Vector2F::Zero;
+	lastTransformRotation = 0.0f;
 }
 
 RigidBody2D::~RigidBody2D()
@@ -45,6 +50,26 @@ void RigidBody2D::Init()
 
 void RigidBody2D::Update(float deltaTime)
 {
+	if (!pendingActions.IsEmpty())
+	{
+		pendingActions();
+
+		pendingActions.Clear();
+	}
+
+	auto currentTransformPosition = transform->GetWorldPosition();
+	auto currentTransformRotation = transform->GetWorldRotation();
+
+	if (currentTransformPosition != lastTransformPosition)
+	{
+		currentTransformPosition = currentTransformPosition * PhysicsConstants::PIXEL_TO_METER;
+		body->SetTransform(b2Vec2(currentTransformPosition.x, currentTransformPosition.y), body->GetAngle());
+	}
+	if (currentTransformRotation != lastTransformRotation)
+	{
+		body->SetTransform(body->GetPosition(), currentTransformRotation * (MathConstants::PI / 180.0f));
+	}
+
 	auto pos = body->GetPosition();
 	auto angle = body->GetAngle();
 
@@ -58,6 +83,8 @@ void RigidBody2D::Update(float deltaTime)
 
 void RigidBody2D::Draw()
 {
+	lastTransformPosition = transform->GetWorldPosition();
+	lastTransformRotation = transform->GetWorldRotation();
 }
 
 b2Fixture* RigidBody2D::CreateFixture(const b2FixtureDef* fixtureDef)
@@ -67,7 +94,11 @@ b2Fixture* RigidBody2D::CreateFixture(const b2FixtureDef* fixtureDef)
 
 void RigidBody2D::ChangeBodyType(BodyType2D newBodyType)
 {
-	body->SetType(PhysicsConversion::ToB2BodyType(newBodyType));
+	pendingActions.RegisterCallback([this, newBodyType]()
+		{
+			body->SetType(PhysicsConversion::ToB2BodyType(newBodyType));
+		},
+		reinterpret_cast<uintptr_t>(this));
 }
 
 void RigidBody2D::DestroyFixture(b2Fixture* fixtureDef)

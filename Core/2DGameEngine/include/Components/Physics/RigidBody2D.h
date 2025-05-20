@@ -3,6 +3,7 @@
 #include "Data/Physics/BodyDefinition2D.h"
 #include "Data/Physics/BodyType2D.h"
 #include "Math/Vector2.h"
+#include "Tools/MulticastDelegate.h"
 
 
 struct b2FixtureDef;
@@ -21,6 +22,12 @@ private:
 	mutable Vector2F velocity = Vector2F::Zero;
 	
 	mutable Vector2F acceleration = Vector2F::Zero;
+
+	MultiCastVoid pendingActions;
+
+	Vector2F lastTransformPosition;
+
+	float lastTransformRotation;
 
 	
 public:
