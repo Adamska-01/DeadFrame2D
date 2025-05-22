@@ -1,14 +1,18 @@
 #include "Components/BobbleController.h"
 #include "Components/Transform.h"
+#include "Constants/BobbleConstants.h"
 #include "Math/Vector2.h"
 #include "Models/BobbleGridLevel.h"
 #include "Prefabs/Bobble.h"
 #include "Prefabs/BobbleGrid.h"
 #include <Components/Collisions/Collider2D.h>
 #include <Components/Physics/RigidBody2D.h>
+#include <queue>
 #include <random>
-#include <Tools/JsonSerializer.h>
+#include <Tools/Hashing/PairHash.h>
 #include <Tools/Helpers/EventHelpers.h>
+#include <Tools/JsonSerializer.h>
+#include <unordered_set>
 
 
 BobbleGrid::BobbleGrid()
@@ -27,17 +31,45 @@ BobbleGrid::BobbleGrid()
 
 void BobbleGrid::DestroyGridLevel()
 {
-	auto bobbles = OwningObject.lock()->GetChildren();
-
-	for (auto& bobble : bobbles)
+	for (auto& bobble : positionToBobble)
 	{
-		if (auto b = bobble.lock())
+		if (auto b = bobble.second.lock())
 		{
 			b->Destroy();
 		}
 	}
 
-	bobbles.clear();
+	positionToBobble.clear();
+	bobbleToPosition.clear();
+}
+
+void BobbleGrid::RemoveAndDestroyBobbles(std::unordered_set<std::weak_ptr<GameObject>, WeakPtrHash<GameObject>, WeakPtrEqual<GameObject>> bobbles, bool canPop)
+{
+	for (const auto& bobble : bobbles)
+	{
+		auto bobblePtr = bobble.lock();
+
+		if (bobblePtr == nullptr)
+			continue;
+
+		auto it = bobbleToPosition.find(bobble);
+
+		if (it == bobbleToPosition.end())
+			continue;
+
+		positionToBobble.erase(it->second);
+		bobbleToPosition.erase(it->first);
+
+		// TODO: differentiate between pop animation and falling destruction for disconnected bobbles (add logic in BobbleController)
+		if (canPop)
+		{
+			bobblePtr->Destroy();
+		}
+		else
+		{
+			bobblePtr->Destroy();
+		}
+	}
 }
 
 void BobbleGrid::OnGridBobbleCollisionEnterHandler(const CollisionInfo& collisionInfo)
@@ -58,57 +90,14 @@ void BobbleGrid::OnGridBobbleCollisionEnterHandler(const CollisionInfo& collisio
 		|| otherBobbleController->IsPartOfGrid())
 		return;
 
-	auto otherTransform = otherBobble->GetComponent<Transform>();
-	auto thisTransform = thisBobble->GetComponent<Transform>();
+	PlaceBobbleAdjacentTo(thisBobble, otherBobble);
 
-	auto fromThisToOther = (otherTransform->GetWorldPosition() - thisTransform->GetWorldPosition()).Normalize();
+	RemoveAndDestroyBobbles(FindConnectedSameColorBobbles(otherBobble));
 
-	static const std::array<Vector2F, 6> HEX_DIRECTIONS = 
-	{
-		Vector2F(std::cos(MathConstants::PI / 3), -std::sin(MathConstants::PI / 3)),	// TOPRIGHT
-		Vector2F(1, 0),																	// RIGHT
-		Vector2F(std::cos(MathConstants::PI / 3), std::sin(MathConstants::PI / 3)),		// BOTTOMRIGHT
-		Vector2F(-std::cos(MathConstants::PI / 3), std::sin(MathConstants::PI / 3)),	// BOTTOMLEFT
-		Vector2F(-1, 0),																// LEFT
-		Vector2F(-std::cos(MathConstants::PI / 3), -std::sin(MathConstants::PI / 3))	// TOPLEFT
-	};
-
-	auto bestDirectionIndex = 0;
-	auto maxDot = -std::numeric_limits<float>::infinity();
-
-	for (size_t i = 0; i < HEX_DIRECTIONS.size(); ++i)
-	{
-		auto dot = Vector2F::Dot(fromThisToOther, HEX_DIRECTIONS[i]);
-		
-		if (dot > maxDot)
-		{
-			maxDot = dot;
-			bestDirectionIndex = i;
-		}
-	}
-
-	const auto& [row, col] = bobbleToPosition[thisBobble];
-
-	auto newBobbleCord = GetNeighborCoord(row, col, (BobbleConnectionDirection)bestDirectionIndex);
-
-	auto otherRigidBody = otherBobble->GetComponent<RigidBody2D>();
-
-	otherRigidBody->SetVelocity(Vector2F::Zero);
-	otherRigidBody->ChangeBodyType(BodyType2D::Static);
-
-	auto placement = transform->GetWorldPosition();
-
-	auto displacement = (newBobbleCord.value().first % 2) * bobbleSize / 2;
-	auto x = placement.x + newBobbleCord.value().second * bobbleSize + displacement;
-	auto y = placement.y + newBobbleCord.value().first * bobbleSize;
-
-	otherTransform->SetWorldPosition(Vector2F(x + bobbleSize / 2.0f, y + bobbleSize / 2.0f));
-
-	otherBobbleController->SetHanging(row == 0);
-	otherBobbleController->SetPartOfGrid(true);
+	RemoveAndDestroyBobbles(FindDisconnectedBobbles(), false);
 }
 
-std::optional<std::pair<int, int>> BobbleGrid::GetNeighborCoord(int row, int col, BobbleConnectionDirection direction)
+std::optional<std::pair<int, int>> BobbleGrid::GetNeighborCoord(int row, int col, BobbleConnectionDirection direction) const
 {
 	auto isOddRow = (row % 2) != 0;
 
@@ -129,6 +118,172 @@ std::optional<std::pair<int, int>> BobbleGrid::GetNeighborCoord(int row, int col
 	default:
 		return std::nullopt;
 	}
+}
+
+void BobbleGrid::PlaceBobbleAdjacentTo(const std::shared_ptr<GameObject>& referenceBobble, const std::shared_ptr<GameObject>& newBobble)
+{
+	auto referenceTransform = referenceBobble->GetComponent<Transform>();
+	auto newTransform = newBobble->GetComponent<Transform>();
+	auto newRigidBody = newBobble->GetComponent<RigidBody2D>();
+	auto newBobbleController = newBobble->GetComponent<BobbleController>();
+
+	auto fromRefToNew = (newTransform->GetWorldPosition() - referenceTransform->GetWorldPosition()).Normalize();
+
+	int bestDirectionIndex = 0;
+	float maxDot = -std::numeric_limits<float>::infinity();
+
+	for (size_t i = 0; i < BobbleConstants::BOBBLE_HEX_DIRECTIONS.size(); ++i)
+	{
+		auto dot = Vector2F::Dot(fromRefToNew, BobbleConstants::BOBBLE_HEX_DIRECTIONS[i]);
+		if (dot > maxDot)
+		{
+			maxDot = dot;
+			bestDirectionIndex = static_cast<int>(i);
+		}
+	}
+
+	const auto& [row, col] = bobbleToPosition[referenceBobble];
+	auto newCoord = GetNeighborCoord(row, col, static_cast<BobbleConnectionDirection>(bestDirectionIndex)).value();
+
+	newRigidBody->SetVelocity(Vector2F::Zero);
+	newRigidBody->ChangeBodyType(BodyType2D::Static);
+
+	auto placementOrigin = transform->GetWorldPosition();
+	auto displacement = (newCoord.first % 2) * bobbleSize / 2;
+	auto x = placementOrigin.x + newCoord.second * bobbleSize + displacement;
+	auto y = placementOrigin.y + newCoord.first * bobbleSize;
+
+	newTransform->SetWorldPosition(Vector2F(x + bobbleSize / 2.0f, y + bobbleSize / 2.0f));
+
+	newBobbleController->SetPartOfGrid(true);
+
+	positionToBobble[newCoord] = newBobble;
+	bobbleToPosition[newBobble] = newCoord;
+}
+
+std::unordered_set<std::weak_ptr<GameObject>, WeakPtrHash<GameObject>, WeakPtrEqual<GameObject>> BobbleGrid::FindConnectedSameColorBobbles(const std::shared_ptr<GameObject>& startBobble) const
+{
+	std::unordered_set<std::weak_ptr<GameObject>, WeakPtrHash<GameObject>, WeakPtrEqual<GameObject>> result = {};
+
+	auto it = bobbleToPosition.find(startBobble);
+
+	if (it == bobbleToPosition.end())
+		return result;
+
+	auto[startRow, startCol] = it->second;
+
+	auto startController = startBobble->GetComponent<BobbleController>();
+
+	if (startController == nullptr)
+		return result;
+
+	const auto targetColor = startController->GetBobbleColor();
+
+	std::queue<std::pair<int, int>> toVisit;
+	std::unordered_set<std::pair<int, int>, PairHash> visited;
+
+	toVisit.emplace(std::make_pair(startRow, startCol));
+	visited.emplace(std::make_pair(startRow, startCol));
+
+	while (!toVisit.empty())
+	{
+		auto[row, col] = toVisit.front();
+		
+		toVisit.pop();
+
+		auto coord = std::make_pair(row, col);
+		
+		auto itBobble = positionToBobble.find(coord);
+		
+		if (itBobble == positionToBobble.end() || itBobble->second.lock() == nullptr)
+			continue;
+
+		const auto& bobble = itBobble->second;
+
+		auto controller = bobble.lock()->GetComponent<BobbleController>();
+		
+		if (controller == nullptr || controller->GetBobbleColor() != targetColor)
+			continue;
+
+		result.insert(bobble);
+
+		for (auto dir : BobbleConstants::BOBBLE_CONNECTION_DIRECTIONS)
+		{
+			auto neighborOpt = GetNeighborCoord(row, col, dir);
+		
+			if (!neighborOpt.has_value())
+				continue;
+
+			auto neighborCoord = neighborOpt.value();
+
+			if (visited.insert(neighborCoord).second)
+			{
+				toVisit.push(neighborCoord);
+			}
+		}
+	}
+
+	if (result.size() < BobbleConstants::MIN_BOBBLE_TO_SCORE)
+	{
+		result.clear();
+	}
+
+	return result;
+}
+
+std::unordered_set<std::weak_ptr<GameObject>, WeakPtrHash<GameObject>, WeakPtrEqual<GameObject>> BobbleGrid::FindDisconnectedBobbles() const
+{
+	std::queue<std::pair<int, int>> toVisit;
+	std::unordered_set<std::pair<int, int>, PairHash> visited;
+
+	// Start from top row (Only add the top ones)
+	for (const auto& [position, bobble] : positionToBobble)
+	{
+		if (position.first != 0 || bobble.lock() == nullptr)
+			continue;
+
+		toVisit.push(position);
+		visited.insert(position);
+	}
+
+	// Find all connected bobbles
+	while (!toVisit.empty())
+	{
+		auto [row, col] = toVisit.front();
+		toVisit.pop();
+
+		for (auto dir : BobbleConstants::BOBBLE_CONNECTION_DIRECTIONS)
+		{
+			auto neighborOpt = GetNeighborCoord(row, col, dir);
+			
+			if (!neighborOpt.has_value())
+				continue;
+
+			const auto& neighborCoord = neighborOpt.value();
+
+			auto it = positionToBobble.find(neighborCoord);
+			
+			if (it != positionToBobble.end() 
+				&& it->second.lock() != nullptr
+				&& visited.insert(neighborCoord).second) // if the element was not already in the set
+			{
+				toVisit.push(neighborCoord);
+			}
+		}
+	}
+
+	// Get everything that has not been visited (disconnected)
+	std::unordered_set<std::weak_ptr<GameObject>, WeakPtrHash<GameObject>, WeakPtrEqual<GameObject>> disconnected;
+
+	for (const auto& [coord, bobble] : positionToBobble)
+	{
+		if (visited.find(coord) != visited.end() || bobble.lock() == nullptr)
+			continue;
+		
+		disconnected.insert(bobble);
+	}
+
+	return disconnected;
 }
 
 void BobbleGrid::Init()
@@ -179,8 +334,6 @@ void BobbleGrid::SetNewGridLevel(std::string_view levelSource, int tileSize)
 			positionToBobble[coord] = bobble;
 			bobbleToPosition[bobble] = coord;
 
-			OwningObject.lock()->AddChildGameObject(bobble);
-
 			// Set Collision handlers 
 			auto collider = bobble.lock()->GetComponent<Collider2D>();
 			collider->RegisterCollisionEnterHandler(EventHelpers::BindFunction(this, &BobbleGrid::OnGridBobbleCollisionEnterHandler), reinterpret_cast<uintptr_t>(this));
@@ -194,20 +347,9 @@ void BobbleGrid::SetNewGridLevel(std::string_view levelSource, int tileSize)
 
 		assert(bobbleConnections != nullptr && "Bobble has no 'BobbleConnections' component!");
 
-		bobbleConnections->SetHanging(row == 0);
 		bobbleConnections->SetPartOfGrid(true);
 		
-		static const std::array<BobbleConnectionDirection, 6> BOBBLE_CONNECTION_DIRECTIONS
-		{
-			BobbleConnectionDirection::TOP_RIGHT,
-			BobbleConnectionDirection::RIGHT,
-			BobbleConnectionDirection::BOTTOM_RIGHT,
-			BobbleConnectionDirection::BOTTOM_LEFT,
-			BobbleConnectionDirection::LEFT,
-			BobbleConnectionDirection::TOP_LEFT
-		};
-
-		for (auto dir : BOBBLE_CONNECTION_DIRECTIONS)
+		for (auto dir : BobbleConstants::BOBBLE_CONNECTION_DIRECTIONS)
 		{
 			auto neighborCoordOpt = GetNeighborCoord(row, col, dir);
 			
