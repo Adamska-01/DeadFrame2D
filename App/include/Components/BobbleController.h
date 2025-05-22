@@ -2,25 +2,29 @@
 #include "Components/GameComponent.h"
 #include "Constants/BobbleConstants.h"
 #include "Generic/Bobble/BobbleConnectionDirection.h"
+#include "Generic/Bobble/BobbleColor.h"
 #include <array>
 #include <memory>
 
 
 class GameObject;
+class SpriteAnimator;
 
 
 class BobbleController : public GameComponent
 {
 private:
-	bool itsHanging;
-
 	bool partOfGrid;
+
+	BobbleColor bobbleColor;
 
 	std::array<std::weak_ptr<GameObject>, BobbleConstants::MAX_BOBBLE_NEIGHBOURS> connectionList;
 
+	SpriteAnimator* spriteAnimator;
+
 
 public:
-	BobbleController();
+	BobbleController(BobbleColor bobbleColor);
 
 	virtual ~BobbleController() override = default;
 	
@@ -32,11 +36,13 @@ public:
 	virtual void Draw() override;
 
 
+	BobbleColor GetBobbleColor() const;
+
 	bool IsPartOfGrid() const;
 
-	bool IsHanging() const;
+	std::weak_ptr<GameObject> GetConnectionAt(BobbleConnectionDirection connectionDirection) const;
 
-	void SetHanging(bool hanging);
+	void SetColor(BobbleColor newColor);
 
 	void SetPartOfGrid(bool partOfGrid);
 
