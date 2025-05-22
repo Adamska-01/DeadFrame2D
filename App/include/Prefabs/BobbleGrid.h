@@ -1,5 +1,6 @@
 #pragma once
 #include "Generic//Bobble/BobbleConnectionDirection.h"
+#include "Math/Vector2.h"
 #include <Components/GameComponent.h>
 #include <Data/Collision/CollisionInfo.h>
 #include <map>
@@ -9,7 +10,6 @@
 #include <Tools/Hashing/WeakPtrHash.h>
 #include <unordered_map>
 #include <unordered_set>
-#include <utility>
 
 
 class GameObject;
@@ -22,10 +22,10 @@ private:
 	int bobbleSize;
 
 	Transform* transform;
-	//TODO: Convert all the pairs into Vector2I
-	std::map<std::pair<int, int>, std::weak_ptr<GameObject>> positionToBobble;
 
-	std::unordered_map<std::weak_ptr<GameObject>, std::pair<int, int>, WeakPtrHash<GameObject>, WeakPtrEqual<GameObject>> bobbleToPosition;
+	std::map<Vector2I, std::weak_ptr<GameObject>> positionToBobble;
+
+	std::unordered_map<std::weak_ptr<GameObject>, Vector2I, WeakPtrHash<GameObject>, WeakPtrEqual<GameObject>> bobbleToPosition;
 
 
 	void DestroyGridLevel();
@@ -34,7 +34,7 @@ private:
 
 	void OnGridBobbleCollisionEnterHandler(const CollisionInfo& collisionInfo);
 
-	std::optional<std::pair<int, int>> GetNeighborCoord(int row, int col, BobbleConnectionDirection direction) const;
+	std::optional<Vector2I> GetNeighborCoord(Vector2I coord, BobbleConnectionDirection direction) const;
 
 	void PlaceBobbleAdjacentTo(const std::shared_ptr<GameObject>& referenceBobble, const std::shared_ptr<GameObject>& newBobble);
 

@@ -1,7 +1,6 @@
 #include "Components/BobbleController.h"
 #include "Components/Transform.h"
 #include "Constants/BobbleConstants.h"
-#include "Math/Vector2.h"
 #include "Models/BobbleGridLevel.h"
 #include "Prefabs/Bobble.h"
 #include "Prefabs/BobbleGrid.h"
@@ -9,7 +8,6 @@
 #include <Components/Physics/RigidBody2D.h>
 #include <queue>
 #include <random>
-#include <Tools/Hashing/PairHash.h>
 #include <Tools/Helpers/EventHelpers.h>
 #include <Tools/JsonSerializer.h>
 #include <unordered_set>
@@ -97,24 +95,24 @@ void BobbleGrid::OnGridBobbleCollisionEnterHandler(const CollisionInfo& collisio
 	RemoveAndDestroyBobbles(FindDisconnectedBobbles(), false);
 }
 
-std::optional<std::pair<int, int>> BobbleGrid::GetNeighborCoord(int row, int col, BobbleConnectionDirection direction) const
+std::optional<Vector2I> BobbleGrid::GetNeighborCoord(Vector2I coord, BobbleConnectionDirection direction) const
 {
-	auto isOddRow = (row % 2) != 0;
+	auto isOddRow = (coord.x % 2) != 0;
 
 	switch (direction)
 	{
 	case BobbleConnectionDirection::TOP_RIGHT:
-		return std::make_pair(row - 1, isOddRow ? col + 1 : col);
+		return Vector2I(coord.x - 1, isOddRow ? coord.y + 1 : coord.y);
 	case BobbleConnectionDirection::RIGHT:
-		return std::make_pair(row, col + 1);
+		return Vector2I(coord.x, coord.y + 1);
 	case BobbleConnectionDirection::BOTTOM_RIGHT:
-		return std::make_pair(row + 1, isOddRow ? col + 1 : col);
+		return Vector2I(coord.x + 1, isOddRow ? coord.y + 1 : coord.y);
 	case BobbleConnectionDirection::BOTTOM_LEFT:
-		return std::make_pair(row + 1, isOddRow ? col : col - 1);
+		return Vector2I(coord.x + 1, isOddRow ? coord.y : coord.y - 1);
 	case BobbleConnectionDirection::LEFT:
-		return std::make_pair(row, col - 1);
+		return Vector2I(coord.x, coord.y - 1);
 	case BobbleConnectionDirection::TOP_LEFT:
-		return std::make_pair(row - 1, isOddRow ? col : col - 1);
+		return Vector2I(coord.x - 1, isOddRow ? coord.y : coord.y - 1);
 	default:
 		return std::nullopt;
 	}
@@ -142,16 +140,15 @@ void BobbleGrid::PlaceBobbleAdjacentTo(const std::shared_ptr<GameObject>& refere
 		}
 	}
 
-	const auto& [row, col] = bobbleToPosition[referenceBobble];
-	auto newCoord = GetNeighborCoord(row, col, static_cast<BobbleConnectionDirection>(bestDirectionIndex)).value();
+	auto newCoord = GetNeighborCoord(bobbleToPosition[referenceBobble], static_cast<BobbleConnectionDirection>(bestDirectionIndex)).value();
 
 	newRigidBody->SetVelocity(Vector2F::Zero);
 	newRigidBody->ChangeBodyType(BodyType2D::Static);
 
 	auto placementOrigin = transform->GetWorldPosition();
-	auto displacement = (newCoord.first % 2) * bobbleSize / 2;
-	auto x = placementOrigin.x + newCoord.second * bobbleSize + displacement;
-	auto y = placementOrigin.y + newCoord.first * bobbleSize;
+	auto displacement = (newCoord.x % 2) * bobbleSize / 2;
+	auto x = placementOrigin.x + newCoord.y * bobbleSize + displacement;
+	auto y = placementOrigin.y + newCoord.x * bobbleSize;
 
 	newTransform->SetWorldPosition(Vector2F(x + bobbleSize / 2.0f, y + bobbleSize / 2.0f));
 
@@ -179,11 +176,11 @@ std::unordered_set<std::weak_ptr<GameObject>, WeakPtrHash<GameObject>, WeakPtrEq
 
 	const auto targetColor = startController->GetBobbleColor();
 
-	std::queue<std::pair<int, int>> toVisit;
-	std::unordered_set<std::pair<int, int>, PairHash> visited;
+	std::queue<Vector2I> toVisit;
+	std::unordered_set<Vector2I> visited;
 
-	toVisit.emplace(std::make_pair(startRow, startCol));
-	visited.emplace(std::make_pair(startRow, startCol));
+	toVisit.emplace(Vector2I(startRow, startCol));
+	visited.emplace(Vector2I(startRow, startCol));
 
 	while (!toVisit.empty())
 	{
@@ -191,7 +188,7 @@ std::unordered_set<std::weak_ptr<GameObject>, WeakPtrHash<GameObject>, WeakPtrEq
 		
 		toVisit.pop();
 
-		auto coord = std::make_pair(row, col);
+		auto coord = Vector2I(row, col);
 		
 		auto itBobble = positionToBobble.find(coord);
 		
@@ -209,7 +206,7 @@ std::unordered_set<std::weak_ptr<GameObject>, WeakPtrHash<GameObject>, WeakPtrEq
 
 		for (auto dir : BobbleConstants::BOBBLE_CONNECTION_DIRECTIONS)
 		{
-			auto neighborOpt = GetNeighborCoord(row, col, dir);
+			auto neighborOpt = GetNeighborCoord(coord, dir);
 		
 			if (!neighborOpt.has_value())
 				continue;
@@ -233,13 +230,13 @@ std::unordered_set<std::weak_ptr<GameObject>, WeakPtrHash<GameObject>, WeakPtrEq
 
 std::unordered_set<std::weak_ptr<GameObject>, WeakPtrHash<GameObject>, WeakPtrEqual<GameObject>> BobbleGrid::FindDisconnectedBobbles() const
 {
-	std::queue<std::pair<int, int>> toVisit;
-	std::unordered_set<std::pair<int, int>, PairHash> visited;
+	std::queue<Vector2I> toVisit;
+	std::unordered_set<Vector2I> visited;
 
 	// Start from top row (Only add the top ones)
 	for (const auto& [position, bobble] : positionToBobble)
 	{
-		if (position.first != 0 || bobble.lock() == nullptr)
+		if (position.x != 0 || bobble.lock() == nullptr)
 			continue;
 
 		toVisit.push(position);
@@ -249,12 +246,12 @@ std::unordered_set<std::weak_ptr<GameObject>, WeakPtrHash<GameObject>, WeakPtrEq
 	// Find all connected bobbles
 	while (!toVisit.empty())
 	{
-		auto [row, col] = toVisit.front();
+		auto coord = toVisit.front();
 		toVisit.pop();
 
 		for (auto dir : BobbleConstants::BOBBLE_CONNECTION_DIRECTIONS)
 		{
-			auto neighborOpt = GetNeighborCoord(row, col, dir);
+			auto neighborOpt = GetNeighborCoord(coord, dir);
 			
 			if (!neighborOpt.has_value())
 				continue;
@@ -329,7 +326,7 @@ void BobbleGrid::SetNewGridLevel(std::string_view levelSource, int tileSize)
 			auto y = placement.y + i * tileSize;
 
 			auto bobble = GameObject::Instantiate<Bobble>(Vector2F{ x + tileSize / 2.0f, y + tileSize / 2.0f }, static_cast<BobbleColor>(dist(gen)));
-			auto coord = std::make_pair(i, j % levelData.width);
+			auto coord = Vector2I(i, j % levelData.width);
 			
 			positionToBobble[coord] = bobble;
 			bobbleToPosition[bobble] = coord;
@@ -342,7 +339,6 @@ void BobbleGrid::SetNewGridLevel(std::string_view levelSource, int tileSize)
 	
 	for (const auto& [position, weakBobble] : positionToBobble)
 	{
-		const auto& [row, col] = position;
 		auto bobbleConnections = weakBobble.lock()->GetComponent<BobbleController>();
 
 		assert(bobbleConnections != nullptr && "Bobble has no 'BobbleConnections' component!");
@@ -351,7 +347,7 @@ void BobbleGrid::SetNewGridLevel(std::string_view levelSource, int tileSize)
 		
 		for (auto dir : BobbleConstants::BOBBLE_CONNECTION_DIRECTIONS)
 		{
-			auto neighborCoordOpt = GetNeighborCoord(row, col, dir);
+			auto neighborCoordOpt = GetNeighborCoord(position, dir);
 			
 			if (!neighborCoordOpt.has_value())
 				continue;
