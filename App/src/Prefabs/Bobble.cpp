@@ -17,10 +17,10 @@ Bobble::Bobble(Vector2F startPos, BobbleColor color)
 	transform->SetWorldPosition(startPos);
 
 	AddComponent<Sprite>(IDLE_BOBBLE_PATH);
-	AddComponent<SpriteAnimator>()->SetProp(true, (int)color, 10, (int)BobbleColor::ALL_COLOURS, 5);
+	AddComponent<SpriteAnimator>();
 	AddComponent<CircleCollider2D>(16.0f);
 	AddComponent<RigidBody2D>(BodyDefinition2D(), 0.0f);
-	AddComponent<BobbleController>();
-	
+	AddComponent<BobbleController>(color);
+
 	transform->Scale({ 2, 2 });
 }
