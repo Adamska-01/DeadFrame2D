@@ -2,6 +2,7 @@
 #include "Math/MathConstants.h"
 #include <cmath>
 #include <iostream>
+#include <tuple>
 
 
 template <typename T>
@@ -84,6 +85,9 @@ public:
 	constexpr Vector2<T>& operator/=(const Vector2<T>& other);
 
 	constexpr bool operator==(const Vector2<T>& other) const;
+
+	// Allow this to be used in an ordered map as key
+	constexpr bool operator<(const Vector2<T>& other) const; 
 
 
 	inline friend std::ostream& operator<<(std::ostream& out, const Vector2<T>& v)
@@ -305,8 +309,27 @@ inline constexpr Vector2<T>& Vector2<T>::operator/=(const Vector2<T>& other)
 template<typename T>
 inline constexpr bool Vector2<T>::operator==(const Vector2<T>& other) const
 {
-	if (this->x == other.x && this->y == other.y)
-		return true;
+	return this->x == other.x && this->y == other.y;
+}
 
-	return false;
+template<typename T>
+inline constexpr bool Vector2<T>::operator<(const Vector2<T>& other) const
+{
+	return std::tie(x, y) < std::tie(other.x, other.y);
+}
+
+
+namespace std 
+{
+	template<typename T>
+	struct hash<Vector2<T>> 
+	{
+		std::size_t operator()(const Vector2<T>& v) const noexcept 
+		{
+			std::size_t h1 = std::hash<T>{}(v.x);
+			std::size_t h2 = std::hash<T>{}(v.y);
+
+			return h1 ^ (h2 << 1);
+		}
+	};
 }
