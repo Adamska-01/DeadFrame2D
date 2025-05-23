@@ -33,20 +33,24 @@ project "App"
 	links { "2DGameEngine", "Box2D" }
 
 	-- Copy Assets and Shared files in the target dir
-	postbuildcommands {
-		-- Make sure destination folders exist
-		'{MKDIR} "%{cfg.targetdir}/Shared/Resources"',
-		'{MKDIR} "%{cfg.targetdir}/App/Assets"',
-
-		-- Use bash to copy contents of the folders, not the folders themselves
-		'bash -c "cp -rf ../Shared/Resources/* %{cfg.targetdir}/Shared/Resources/"',
-		'bash -c "cp -rf ./Assets/* %{cfg.targetdir}/App/Assets/"'
-	}
+	filter "system:windows"
+		postbuildcommands {
+			'{MKDIR} "%{cfg.targetdir}/Shared/Resources"',
+			'{MKDIR} "%{cfg.targetdir}/App/Assets"',
+			'xcopy /E /Y /I "..\\Shared\\Resources\\*" "%{cfg.targetdir}\\Shared\\Resources\\"',
+			'xcopy /E /Y /I "Assets\\*" "%{cfg.targetdir}\\App\\Assets\\"'
+		}
 
 
 	-- Linux
 	filter "system:linux"
 		links { "SDL2", "SDL2_image", "SDL2_ttf", "SDL2_mixer", "Box2D" }
+		postbuildcommands {
+			'{MKDIR} "%{cfg.targetdir}/Shared/Resources"',
+			'{MKDIR} "%{cfg.targetdir}/App/Assets"',
+			'cp -rf ../Shared/Resources/* %{cfg.targetdir}/Shared/Resources/',
+			'cp -rf ./Assets/* %{cfg.targetdir}/App/Assets/'
+		}
 
 	-- Linux x86
 	filter { "system:linux", "platforms:x86" }
