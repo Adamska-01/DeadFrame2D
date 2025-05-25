@@ -27,6 +27,10 @@ namespace AssetPaths
 
 		inline constexpr std::string_view ARROW_IMAGE_PATH = "App/Assets/Sprites/Arrow.png";
 
+		inline constexpr std::string_view IDLE_BOBBLE_PATH = "App/Assets/Sprites/IdleBobbles.png";
+
+		inline constexpr std::string_view POP_BOBBLE_PATH = "App/Assets/Sprites/BlowBobbles.png";
+
 		inline constexpr std::string_view BUTTON_IDLE_IMAGE_PATH = "App/Assets/Sprites/Buttons/Button_Idle.png";
 
 		inline constexpr std::string_view BUTTON_HOVERED_IMAGE_PATH = "App/Assets/Sprites/Buttons/Button_Hovered.png";
