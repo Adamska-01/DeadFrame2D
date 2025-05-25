@@ -8,7 +8,7 @@
 
 BobbleController::BobbleController(BobbleColor bobbleColor)
 	: partOfGrid(false),
-	isPopping(false),
+	pendingDestruction(false),
 	bobbleColor(bobbleColor),
 	sprite(nullptr),
 	spriteAnimator(nullptr)
@@ -32,7 +32,7 @@ void BobbleController::Init()
 
 void BobbleController::Update(float deltaTime)
 {
-	if (!isPopping)
+	if (!pendingDestruction)
 		return;
 
 	auto popAnimationProgress = spriteAnimator->GetAnimationProgressRatio();
@@ -62,7 +62,7 @@ void BobbleController::PopBobble()
 
 	spriteAnimator->SetAnimationProperties(properties);
 
-	isPopping = true;
+	pendingDestruction = true;
 }
 
 void BobbleController::SetConnectionAt(BobbleConnectionDirection connectionDirection, std::weak_ptr<GameObject> connection)

@@ -17,7 +17,7 @@ class BobbleController : public GameComponent
 private:
 	bool partOfGrid;
 
-	bool isPopping;
+	bool pendingDestruction;
 
 	BobbleColor bobbleColor;
 
