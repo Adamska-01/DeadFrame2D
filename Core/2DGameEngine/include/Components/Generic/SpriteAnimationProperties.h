@@ -4,28 +4,17 @@
 
 struct SpriteAnimationProperties
 {
-	bool loop;
+	bool loop = false;
 
-	float animSpeed;
+	float animSpeed = 1.0f;
 
-	int sourceRowNumber;
+	int sourceRowNumber = 0;
 
-	int columnCount;
+	int columnCount = 0;
 
-	int rowCount;
+	int rowCount = 0;
 
-	SDL_RendererFlip flip;
-
-
-	SpriteAnimationProperties();
-
-	SpriteAnimationProperties(
-		bool loop,
-		float animSpeed,
-		int sourceRowNumber,
-		int columnCount,
-		int rowCount,
-		SDL_RendererFlip flip);
+	SDL_RendererFlip flip = SDL_RendererFlip::SDL_FLIP_NONE;
 
 
 	void Reset();
