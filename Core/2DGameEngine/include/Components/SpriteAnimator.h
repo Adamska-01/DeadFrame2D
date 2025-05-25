@@ -35,7 +35,9 @@ public:
 	virtual void Draw() override;
 
 
-	void SetProp(bool p_repeat, int Row, int p_FrameCount, int Row_Count, int p_speed, SDL_RendererFlip p_flip = SDL_FLIP_NONE);
+	float GetAnimationProgressRatio();
+
+	void SetAnimationProperties(const SpriteAnimationProperties& newProperties);
 	
 	SDL_Rect GetFrameRect();
 	

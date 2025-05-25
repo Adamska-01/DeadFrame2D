@@ -9,7 +9,7 @@
 SpriteAnimator::SpriteAnimator()
 {
 	started = false;
-	started = 0;
+	spriteFrame = 0.0f;
 	animationProperties = SpriteAnimationProperties();
 	spriteTexture = nullptr;
 	transform = nullptr;
@@ -39,8 +39,6 @@ void SpriteAnimator::Update(float dt)
 
 	if (spriteFrame >= animationProperties.columnCount)
 	{
-		spriteFrame = 0;
-
 		// Reset started for non-repeating animations
 		if (!animationProperties.loop)
 		{
@@ -49,6 +47,7 @@ void SpriteAnimator::Update(float dt)
 	}
 	else if (!animationProperties.loop && !started)
 	{
+		spriteFrame = 0;
 		started = true;
 	}
 }
@@ -76,14 +75,14 @@ void SpriteAnimator::Draw()
 	TextureManager::DrawTexture(spriteTexture, &srcRect, &dstRect, transform->GetWorldRotation(), NULL, animationProperties.flip);
 }
 
-void SpriteAnimator::SetProp(bool repeat, int row, int frameCount, int rowCount, int speed, SDL_RendererFlip flip)
+float SpriteAnimator::GetAnimationProgressRatio()
 {
-	animationProperties.loop = repeat;
-	animationProperties.sourceRowNumber = row;
-	animationProperties.columnCount = frameCount;
-	animationProperties.rowCount = rowCount;
-	animationProperties.animSpeed = speed;
-	animationProperties.flip = flip;
+	return spriteFrame / static_cast<float>(animationProperties.columnCount);
+}
+
+void SpriteAnimator::SetAnimationProperties(const SpriteAnimationProperties& newProperties)
+{
+	animationProperties = newProperties;
 
 	spriteFrame = 0;
 	started = false;
