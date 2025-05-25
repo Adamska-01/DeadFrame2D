@@ -8,6 +8,7 @@
 
 
 class GameObject;
+class Sprite;
 class SpriteAnimator;
 
 
@@ -16,10 +17,14 @@ class BobbleController : public GameComponent
 private:
 	bool partOfGrid;
 
+	bool isPopping;
+
 	BobbleColor bobbleColor;
 
 	std::array<std::weak_ptr<GameObject>, BobbleConstants::MAX_BOBBLE_NEIGHBOURS> connectionList;
 
+	Sprite* sprite;
+	
 	SpriteAnimator* spriteAnimator;
 
 
@@ -34,6 +39,9 @@ public:
 	virtual void Update(float deltaTime) override;
 
 	virtual void Draw() override;
+
+
+	void PopBobble();
 
 
 	BobbleColor GetBobbleColor() const;

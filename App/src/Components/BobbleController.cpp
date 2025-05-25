@@ -1,11 +1,16 @@
 #include "Components/BobbleController.h"
+#include "Constants/AssetPaths.h"
+#include <cassert>
+#include <Components/Rendering/Sprite.h>
 #include <Components/SpriteAnimator.h>
 #include <GameObject.h>
 
 
 BobbleController::BobbleController(BobbleColor bobbleColor)
 	: partOfGrid(false),
+	isPopping(false),
 	bobbleColor(bobbleColor),
+	sprite(nullptr),
 	spriteAnimator(nullptr)
 {
 	for (size_t i = 0; i < BobbleConstants::MAX_BOBBLE_NEIGHBOURS; i++)
@@ -17,16 +22,47 @@ BobbleController::BobbleController(BobbleColor bobbleColor)
 void BobbleController::Init()
 {
 	spriteAnimator = OwningObject.lock()->GetComponent<SpriteAnimator>();
+	sprite = OwningObject.lock()->GetComponent<Sprite>();
+
+	assert(sprite != nullptr && "BobbleController needs a Sprite component.");
+	assert(spriteAnimator != nullptr && "BobbleController needs a spriteAnimator component.");
 
 	SetColor(bobbleColor);
 }
 
 void BobbleController::Update(float deltaTime)
 {
+	if (!isPopping)
+		return;
+
+	auto popAnimationProgress = spriteAnimator->GetAnimationProgressRatio();
+
+	if (popAnimationProgress < 1.0f)
+		return;
+
+	OwningObject.lock()->Destroy();
 }
 
 void BobbleController::Draw()
 {
+}
+
+void BobbleController::PopBobble()
+{
+	sprite->LoadSprite(AssetPaths::Sprites::POP_BOBBLE_PATH);
+
+	auto properties = SpriteAnimationProperties
+	{
+		.loop = false,
+		.animSpeed = 15.0f,
+		.sourceRowNumber = (int)bobbleColor,
+		.columnCount = 7,
+		.rowCount = (int)BobbleColor::ALL_COLOURS,
+	};
+
+	spriteAnimator->SetAnimationProperties(properties);
+
+	isPopping = true;
 }
 
 void BobbleController::SetConnectionAt(BobbleConnectionDirection connectionDirection, std::weak_ptr<GameObject> connection)
@@ -66,7 +102,16 @@ void BobbleController::SetColor(BobbleColor newColor)
 	if (spriteAnimator == nullptr)
 		return;
 
-	spriteAnimator->SetProp(false,(int)newColor, 10, (int)BobbleColor::ALL_COLOURS, 0);
+	auto properties = SpriteAnimationProperties
+	{
+		.loop = false,
+		.animSpeed = 0.0f,
+		.sourceRowNumber = (int)newColor,
+		.columnCount = 10,
+		.rowCount = (int)BobbleColor::ALL_COLOURS,
+	};
+
+	spriteAnimator->SetAnimationProperties(properties);
 }
 
 void BobbleController::SetPartOfGrid(bool partOfGrid)
