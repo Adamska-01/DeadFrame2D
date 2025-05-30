@@ -33,7 +33,7 @@ void GameManager::Init()
 		throw std::runtime_error("GameManager::Init: Player position group not found.");
 	}
 
-	auto player = SceneManager::FindObjectOfType<Cannon>();
+	auto player = OwningObject.lock()->GetComponentInChildren<Cannon>();
 	player->GetGameObject().lock()->GetComponent<Transform>()->SetWorldPosition(groupObject.value().points.front());
 
 	// Generate first level
@@ -45,7 +45,7 @@ void GameManager::Init()
 		throw std::runtime_error("GameManager::Init: Grid start object group not found.");
 	}
 
-	auto bobbleGrid = SceneManager::FindObjectOfType<BobbleGrid>();
+	auto bobbleGrid = OwningObject.lock()->GetComponentInChildren<BobbleGrid>();
 	bobbleGrid->GetGameObject().lock()->GetComponent<Transform>()->SetWorldPosition(placements.value().points.front());
 	bobbleGrid->SetNewGridLevel(levelSources.front(), tileSize);
 }
