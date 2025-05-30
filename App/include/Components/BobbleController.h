@@ -8,8 +8,11 @@
 
 
 class GameObject;
+class Transform;
 class Sprite;
 class SpriteAnimator;
+class RigidBody2D;
+class Collider2D;
 
 
 class BobbleController : public GameComponent
@@ -19,13 +22,23 @@ private:
 
 	bool pendingDestruction;
 
+	bool isDropping;
+
+	bool isShot;
+
 	BobbleColor bobbleColor;
 
 	std::array<std::weak_ptr<GameObject>, BobbleConstants::MAX_BOBBLE_NEIGHBOURS> connectionList;
 
+	Transform* transform;
+
 	Sprite* sprite;
 	
 	SpriteAnimator* spriteAnimator;
+
+	RigidBody2D* rigidBody;
+
+	Collider2D* collider;
 
 
 public:
@@ -41,12 +54,20 @@ public:
 	virtual void Draw() override;
 
 
+	void ShootBobble(Vector2F shootDirection);
+
 	void PopBobble();
+
+	void DropBobble();
 
 
 	BobbleColor GetBobbleColor() const;
 
+	bool IsDestructionPending() const;
+	
 	bool IsPartOfGrid() const;
+
+	bool IsBobbleShot() const;
 
 	std::weak_ptr<GameObject> GetConnectionAt(BobbleConnectionDirection connectionDirection) const;
 
