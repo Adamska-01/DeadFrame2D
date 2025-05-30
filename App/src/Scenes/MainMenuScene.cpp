@@ -7,6 +7,7 @@
 #include <Components/Rendering/Sprite.h>
 #include <Components/Transform.h>
 #include <Components/UI/Button.h>
+#include <Components/UI/Canvas.h>
 #include <Components/UI/Layout/VerticalLayoutGroup.h>
 #include <Constants/AssetPaths.h>
 #include <Management/SceneManager.h>
@@ -41,6 +42,9 @@ std::weak_ptr<ButtonBlueprint> MainMenuScene::CreateButton(const std::string& te
 
 void MainMenuScene::Enter()
 {
+	auto canvasObject = GameObject::Instantiate<GameObject>();
+	canvasObject.lock()->AddComponent<Canvas>();
+
 	auto renderTargetSize = Renderer::GetResolutionTarget();
 
 	// Create Background 
@@ -61,23 +65,27 @@ void MainMenuScene::Enter()
 
 	// Create Settings Menu
 	auto settingsMenuObject = GameObject::Instantiate<GameObject>();
+	
 	auto settingsMenuBase = settingsMenuObject.lock()->AddComponent<MenuBase>();
+
+	canvasObject.lock()->AddChildGameObject(settingsMenuObject);
 
 	// TODO: Create menu widgets
 	//auto fullscreenCheck = CreateButton(...);
 
 	auto settingsMenuLayout = GameObject::Instantiate<GameObject>();
+	
+	
 	settingsMenuLayout.lock()->AddComponent<VerticalLayoutGroup>(20.0f, LayoutPadding());
 	settingsMenuLayout.lock()->GetComponent<Transform>()->SetWorldPosition(layoutPosition);
 	// TODO: Add menu widgets to the layout
 	//settingsMenuLayout.lock()->AddChildGameObject(fullscreenCheck);
 
-	settingsMenuObject.lock()->AddChildGameObject(settingsMenuLayout);
-
-
 	// Create Main Menu
 	auto mainMenuObject = GameObject::Instantiate<GameObject>();
 	auto mainMenuBase = mainMenuObject.lock()->AddComponent<MenuBase>();
+
+	canvasObject.lock()->AddChildGameObject(mainMenuObject);
 
 	auto spButton = CreateButton("SinglePlayer", []() { SceneManager::LoadScene<SinglePlayerScene>(); });
 	auto mpButton = CreateButton("Multiplayer", []() { /* Multiplayer logic */ });
@@ -92,6 +100,7 @@ void MainMenuScene::Enter()
 	exitButton.lock()->GetComponent<Button>()->SetNavigableDownElement(spButton.lock()->GetComponent<Button>());
 
 	auto mainMenuLayout = GameObject::Instantiate<GameObject>();
+
 	mainMenuLayout.lock()->AddComponent<VerticalLayoutGroup>(20.0f, LayoutPadding());
 	mainMenuLayout.lock()->GetComponent<Transform>()->SetWorldPosition(layoutPosition);
 	mainMenuLayout.lock()->AddChildGameObject(spButton);
