@@ -1,8 +1,10 @@
+#include "Components/UI/Canvas.h"
 #include "EventSystem/EventDispatcher.h"
 #include "EventSystem/Events/GameObjectEvents/GameObjectCreatedEvent.h"
 #include "EventSystem/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
 #include "Management/Scene.h"
 #include "Tools/Helpers/EventHelpers.h"
+#include <algorithm>
 
 
 Scene::Scene()
@@ -41,6 +43,15 @@ void Scene::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatch
 	auto target = gameObjEvent->gameObjectCreated;
 
 	gameObjects.push_back(target);
+
+	// Render UI at the end (TEMPORARY)
+	std::stable_sort(gameObjects.begin(), gameObjects.end(), [](const auto& a, const auto& b) 
+		{
+			auto aIsUI = a->GetComponentInParent<Canvas>() != nullptr;
+			auto bIsUI = b->GetComponentInParent<Canvas>() != nullptr;
+
+			return aIsUI < bIsUI;
+		});
 
 	if (isRunning)
 	{
