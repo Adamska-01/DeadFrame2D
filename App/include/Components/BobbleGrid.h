@@ -14,6 +14,7 @@
 
 class GameObject;
 class Transform;
+class TiledMapCompatibleCollider2D;
 
 
 class BobbleGrid : public GameComponent
@@ -32,7 +33,11 @@ private:
 	
 	void RemoveAndDestroyBobbles(std::unordered_set<std::weak_ptr<GameObject>, WeakPtrHash<GameObject>, WeakPtrEqual<GameObject>> bobbles, bool canPop = true);
 
+	void PopulateBobbleConnections();
+
 	void OnGridBobbleCollisionEnterHandler(const CollisionInfo& collisionInfo);
+
+	void OnTopWallCollisionEnterHandler(const CollisionInfo& collisionInfo);
 
 	std::optional<Vector2I> GetNeighborCoord(Vector2I coord, BobbleConnectionDirection direction) const;
 
@@ -44,7 +49,7 @@ private:
 
 
 public:
-	BobbleGrid();
+	BobbleGrid(TiledMapCompatibleCollider2D* topWallCollider);
 
 	virtual ~BobbleGrid() override = default;
 
