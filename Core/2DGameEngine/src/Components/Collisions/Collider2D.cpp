@@ -9,7 +9,7 @@
 
 
 Collider2D::Collider2D(const PhysicsMaterial& physicsMaterial)
-	: transform(nullptr), fixture(nullptr), rigidBody(nullptr)
+	: transform(nullptr), fixture(nullptr), rigidBody(nullptr), physicsMaterial(physicsMaterial)
 {
 	OnCollisionEnterCallback.Clear();
 	OnCollisionExitCallback.Clear();
@@ -117,6 +117,13 @@ void Collider2D::Update(float dt)
 
 void Collider2D::Draw()
 {
+}
+
+void Collider2D::SetIsTrigger(bool value)
+{
+	physicsMaterial.isSensor = value;
+
+	MarkDirty();
 }
 
 void Collider2D::RegisterCollisionEnterHandler(const std::function<void(const CollisionInfo&)>& handler, std::uintptr_t identifier)
