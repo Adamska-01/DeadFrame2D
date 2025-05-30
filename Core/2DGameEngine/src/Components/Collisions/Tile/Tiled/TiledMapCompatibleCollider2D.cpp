@@ -1,15 +1,18 @@
 #include "Components/Collisions/Tile/Tiled/TiledMapCompatibleCollider2D.h"
 #include "Components/Physics/RigidBody2D.h"
 #include "Components/Transform.h"
+#include "Constants/TiledPropertyNames.h"
 #include "GameObject.h"
+#include "Tools/Helpers/Guards.h"
 #include "Tools/Helpers/Physics/PhysicsConversion.h"
 #include "Tools/Helpers/Physics/PhysicsShapeCreators.h"
 
 
-TiledMapCompatibleCollider2D::TiledMapCompatibleCollider2D(std::vector<TiledLayer> collisionLayers, const PhysicsMaterial& physicsMaterial)
-	: TileCollider2D(physicsMaterial), collisionLayers(collisionLayers)
+TiledMapCompatibleCollider2D::TiledMapCompatibleCollider2D(const PhysicsMaterial& physicsMaterial)
+	: TileCollider2D(physicsMaterial)
 {
 	fixtures.clear();
+	collisionLayers.clear();
 
 	tileSize = 0;
 	tileMapDimension = Vector2I::Zero;
@@ -47,7 +50,7 @@ void TiledMapCompatibleCollider2D::RebuildFixture()
 
 	auto angle = transform->GetWorldRotation() * (MathConstants::PI / 180.0f);
 
-	for (auto layer : collisionLayers)
+	for (const auto& layer : collisionLayers)
 	{
 		for (auto i = 0; i < tileMapDimension.y; ++i)
 		{
@@ -63,6 +66,12 @@ void TiledMapCompatibleCollider2D::RebuildFixture()
 					tileSize * 0.5f,
 					Vector2F((j * tileSize + tileSize * 0.5f), (i * tileSize + tileSize * 0.5f)),
 					angle);
+
+				physicsMaterial.density = layer.GetFloatProperty(Constants::TiledPropertyNames::DENSITY, 1.0f);
+				physicsMaterial.friction = layer.GetFloatProperty(Constants::TiledPropertyNames::FRICTION, 0.3f);
+				physicsMaterial.isSensor = layer.GetBoolProperty(Constants::TiledPropertyNames::IS_SENSOR, false);
+				physicsMaterial.restitution = layer.GetFloatProperty(Constants::TiledPropertyNames::RESTITUTION, 0.0f);
+				physicsMaterial.restitutionThreshold = layer.GetFloatProperty(Constants::TiledPropertyNames::RESTITUTION_THRESHOLD, 1.0f);
 
 				auto def = PhysicsConversion::ToB2FixtureDef(physicsMaterial, reinterpret_cast<uintptr_t>(this));
 
@@ -84,15 +93,17 @@ void TiledMapCompatibleCollider2D::Init()
 
 	tileMapRenderer = OwningObject.lock()->GetComponent<TiledMapCompatibleRenderer>();
 
-	// Shouldn't have a tile collider without a tile renderer
-	if (tileMapRenderer == nullptr)
-		throw std::runtime_error("Failed to get TiledMapCompatibleRenderer from OwningObject.");
+	Tools::Helpers::GuardAgainstNull(tileMapRenderer, "Failed to get TiledMapCompatibleRenderer from OwningObject");
 
 	const auto& tileMap = tileMapRenderer->GetTileMap();
 
 	tileSize = tileMap->tileSize;
 
 	tileMapDimension = Vector2I(tileMap->width, tileMap->height);
+
+	collisionLayers = tileMap->layers;
+
+	MarkDirty();
 }
 
 const std::vector<TiledLayer>& TiledMapCompatibleCollider2D::GetCollisionLayers() const

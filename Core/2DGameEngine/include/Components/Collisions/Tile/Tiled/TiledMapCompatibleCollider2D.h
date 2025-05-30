@@ -28,7 +28,7 @@ protected:
 
 
 public:
-	TiledMapCompatibleCollider2D(std::vector<TiledLayer> collisionLayers, const PhysicsMaterial& physicsMaterial = PhysicsMaterial());
+	TiledMapCompatibleCollider2D(const PhysicsMaterial& physicsMaterial = PhysicsMaterial());
 
 	virtual ~TiledMapCompatibleCollider2D() override;
 
