@@ -1,7 +1,9 @@
 #pragma once
 #include <Components/GameComponent.h>
 #include <memory>
-#include <TileEditors/Tiled/Models/TiledLayer.h>
+#include <optional>
+#include <string_view>
+#include <vector>
 
 
 struct TiledMap;
@@ -27,10 +29,8 @@ public:
 	virtual void Draw() override;
 
 
-	std::shared_ptr<TiledMap> RetrieveRenderMap();
+	std::shared_ptr<TiledMap> RetrieveRenderMap(std::vector<std::string_view> layerNames);
 	
-	std::vector<TiledLayer> RetrieveCollisionMap();
-
 	std::optional<TiledObjectGroup> RetrieveObjectGroup(std::string_view groupName);
 
 	int GetTileSize() const;

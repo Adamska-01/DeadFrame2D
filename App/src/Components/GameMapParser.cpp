@@ -1,7 +1,8 @@
 #include "Components/GameMapParser.h"
 #include <algorithm>
-#include <Constants/TiledPropertyNames.h>
+#include <TileEditors/Tiled/Models/TiledLayer.h>
 #include <TileEditors/Tiled/Models/TiledMap.h>
+#include <TileEditors/Tiled/Models/TiledObjectGroup.h>
 #include <TileEditors/Tiled/Parsers/TiledMapParser.h>
 
 
@@ -22,7 +23,7 @@ void GameMapParser::Draw()
 {
 }
 
-std::shared_ptr<TiledMap> GameMapParser::RetrieveRenderMap()
+std::shared_ptr<TiledMap> GameMapParser::RetrieveRenderMap(std::vector<std::string_view> layerNames)
 {
 	if (fullTileMap == nullptr)
 		throw std::runtime_error("Trying to access tile map but Tile Renderer component is null...");
@@ -31,9 +32,9 @@ std::shared_ptr<TiledMap> GameMapParser::RetrieveRenderMap()
 
 	for (const auto& layer : fullTileMap->layers)
 	{
-		auto renderEnabled = layer.GetProperty(TiledPropertyNames::RENDER_ENABLED);
+		auto it = std::find(layerNames.begin(), layerNames.end(), layer.name);
 
-		if (!renderEnabled.has_value() || !std::get<bool>(renderEnabled.value().Value))
+		if (it == layerNames.end())
 			continue;
 
 		renderLayer.push_back(layer);
@@ -45,26 +46,6 @@ std::shared_ptr<TiledMap> GameMapParser::RetrieveRenderMap()
 		fullTileMap->tileSize,
 		fullTileMap->tileSets,
 		renderLayer);
-}
-
-std::vector<TiledLayer> GameMapParser::RetrieveCollisionMap()
-{
-	if (fullTileMap == nullptr)
-		throw std::runtime_error("Trying to access tile map but Tile Renderer component is null...");
-
-	auto colliderMap = std::vector<TiledLayer>();
-
-	for (const auto& layer : fullTileMap->layers)
-	{
-		auto isSolid = layer.GetProperty(TiledPropertyNames::IS_SOLID);
-
-		if (!isSolid.has_value() || !std::get<bool>(isSolid.value().Value))
-			continue;
-
-		colliderMap.push_back(layer);
-	}
-
-	return colliderMap;
 }
 
 std::optional<TiledObjectGroup> GameMapParser::RetrieveObjectGroup(std::string_view groupName)
