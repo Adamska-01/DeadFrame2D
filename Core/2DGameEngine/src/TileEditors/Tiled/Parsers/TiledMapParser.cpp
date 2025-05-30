@@ -24,6 +24,8 @@ TiledLayer TiledMapParser::ParseLayers(tinyxml2::XMLElement* xmlLayer, int rowCo
 {
 	TiledLayer layer;
 
+	layer.name = xmlLayer->Attribute("name");
+
 	// Parse the tile map data
 	auto data = xmlLayer->FirstChildElement("data");
 	layer.Data.resize(rowCount, std::vector<int>(colCount, 0));
