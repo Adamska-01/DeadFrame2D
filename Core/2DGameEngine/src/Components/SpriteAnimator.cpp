@@ -27,6 +27,11 @@ void SpriteAnimator::Init()
 	sprite->SetActive(false);
 }
 
+void SpriteAnimator::Start()
+{
+
+}
+
 void SpriteAnimator::Update(float dt)
 {
 	spriteTexture = sprite->GetTexture();

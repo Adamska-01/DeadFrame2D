@@ -18,6 +18,6 @@ struct TextMeshComponentModel
 	unsigned int fontSize = 30;
 
 	Vector2F textObjectInitialScale = Vector2F::One;
-	
-	unsigned int linesNumber = 1;
+
+	bool isCentered = false;
 };

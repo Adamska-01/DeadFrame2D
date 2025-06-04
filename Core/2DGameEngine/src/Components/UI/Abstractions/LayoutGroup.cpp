@@ -69,6 +69,11 @@ void LayoutGroup::Init()
 	UpdateLayout();
 }
 
+void LayoutGroup::Start()
+{
+
+}
+
 void LayoutGroup::Update(float deltaTime)
 {
 	if (isDirty)

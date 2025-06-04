@@ -35,5 +35,5 @@ private:
 public:
 	static std::shared_ptr<TTF_Font> LoadFont(std::string_view textSource, int fontsize);
 
-	static std::shared_ptr<SDL_Texture> LoadText(std::shared_ptr<TTF_Font> font, std::string text, SDL_Color color, unsigned int linesNumber);
+	static std::shared_ptr<SDL_Texture> LoadText(std::shared_ptr<TTF_Font> font, std::string text, SDL_Color color, bool centerText = false);
 };

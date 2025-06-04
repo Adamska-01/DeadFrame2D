@@ -91,6 +91,7 @@ inline T* ComponentBucket::AddComponent(std::weak_ptr<GameObject> owner, bool ca
 		LinkComponentToOwner(owner, component);
 
 		component->Init();
+		component->Start();
 	}
 
 	return component;

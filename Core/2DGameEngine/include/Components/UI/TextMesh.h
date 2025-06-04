@@ -30,9 +30,9 @@ private:
 	
 	Vector2F textRectSize;
 
-	unsigned int fontSize;
+	bool centered;
 
-	unsigned int linesNumber;
+	unsigned int fontSize;
 
 
 public:
@@ -42,6 +42,8 @@ public:
 
 
 	virtual void Init() override;
+
+	virtual void Start() override;
 
 	virtual void Update(float deltaTime) override;
 
@@ -54,7 +56,9 @@ public:
 	
 	void SetFontStyle(FontStyle newFontStyle);
 
-	void SetText(std::string newText, unsigned int numRows);
+	void SetText(std::string newText);
+
+	void SetIsCentered(bool isCentered);
 
 	std::string GetText();
 

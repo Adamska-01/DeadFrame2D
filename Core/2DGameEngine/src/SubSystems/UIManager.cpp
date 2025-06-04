@@ -1,7 +1,7 @@
 #include "Debugging/Debug.h"
-#include "Math/Vector2.h"
 #include "SubSystems/Renderer.h"
 #include "SubSystems/UIManager.h"
+#include <sstream>
 
 
 std::unordered_map<std::pair<std::string, int>, std::shared_ptr<TTF_Font>, PairHash> UIManager::fontCache = {};
@@ -53,37 +53,83 @@ std::shared_ptr<TTF_Font> UIManager::LoadFont(std::string_view textSource, int f
 	return font;
 }
 
-std::shared_ptr<SDL_Texture> UIManager::LoadText(std::shared_ptr<TTF_Font> font, std::string text, SDL_Color color, unsigned int linesNumber)
+std::shared_ptr<SDL_Texture> UIManager::LoadText(std::shared_ptr<TTF_Font> font, std::string text, SDL_Color color, bool centerText)
 {
 	if (text.empty())
 		return nullptr;
 
-	auto totalWidth = 0, totalHeight = 0;
-	if (TTF_SizeText(font.get(), text.c_str(), &totalWidth, &totalHeight) != 0)
+	// Manual line wrapping (optional: improve this with word wrapping)
+	std::vector<std::string> lines;
+	std::istringstream stream(text);
+	std::string line;
+
+	while (std::getline(stream, line, '\n')) 
 	{
-		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to calculate text size: %s", TTF_GetError());
-		return nullptr;
+		lines.push_back(line);
 	}
 
-	Uint32 wrapSize = totalWidth / linesNumber;
+	if (lines.empty())
+		lines.push_back(text); // fallback in case no newline found
 
-	wrapSize = (wrapSize > 0) ? wrapSize : 1;
+	// Render each line to get total width and height
+	std::vector<SDL_Surface*> lineSurfaces;
+	int maxWidth = 0;
+	int totalHeight = 0;
 
-	auto textSurface = TTF_RenderText_Blended_Wrapped(font.get(), text.c_str(), color, wrapSize);
+	for (const auto& l : lines) 
+	{
+		auto surface = TTF_RenderText_Blended(font.get(), l.c_str(), color);
+		
+		if (surface == nullptr) 
+		{
+			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to render line: %s", TTF_GetError());
+			
+			continue;
+		}
 
-#if _DEBUG
-	DBG_ASSERT_MSG(textSurface, "Failed to load the texture: % s\n", TTF_GetError());
-#endif
+		maxWidth = std::max(maxWidth, surface->w);
+		totalHeight += surface->h;
+		lineSurfaces.push_back(surface);
+	}
 
-	auto textTexture = SDL_CreateTextureFromSurface(Renderer::GetRenderer(), textSurface);
+	if (lineSurfaces.empty())
+		return nullptr;
 
-#if _DEBUG
-	DBG_ASSERT_MSG(textTexture, "Failed to create the texture: % s\n", TTF_GetError());
-#endif
+	// Create final surface
+	SDL_Surface* finalSurface = SDL_CreateRGBSurfaceWithFormat(0, maxWidth, totalHeight, 32, SDL_PIXELFORMAT_RGBA32);
+	SDL_FillRect(finalSurface, nullptr, SDL_MapRGBA(finalSurface->format, 0, 0, 0, 0)); // transparent
 
-	// Deleting temp surface
-	SDL_FreeSurface(textSurface);
-	textSurface = nullptr;
+	auto y = 0;
+	for (SDL_Surface* lineSurface : lineSurfaces) 
+	{
+		SDL_Rect dstRect;
+		dstRect.y = y;
+		dstRect.w = lineSurface->w;
+		dstRect.h = lineSurface->h;
+
+		if (centerText)
+		{
+			dstRect.x = (maxWidth - lineSurface->w) / 2;
+		}
+		else
+		{
+			dstRect.x = 0;
+		}
+
+		SDL_BlitSurface(lineSurface, nullptr, finalSurface, &dstRect);
+		y += lineSurface->h;
+		SDL_FreeSurface(lineSurface);
+	}
+
+	SDL_Texture* textTexture = SDL_CreateTextureFromSurface(Renderer::GetRenderer(), finalSurface);
+	SDL_FreeSurface(finalSurface);
+
+	if (!textTexture) 
+	{
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to create texture: %s", TTF_GetError());
+	
+		return nullptr;
+	}
 
 	return std::shared_ptr<SDL_Texture>(textTexture, SDL_DestroyTexture);
 }

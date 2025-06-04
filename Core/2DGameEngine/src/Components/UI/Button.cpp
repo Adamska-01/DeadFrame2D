@@ -91,6 +91,11 @@ void Button::Init()
 	transform = OwningObject.lock()->GetComponent<Transform>();
 }
 
+void Button::Start()
+{
+
+}
+
 void Button::Update(float deltaTime)
 {
 }

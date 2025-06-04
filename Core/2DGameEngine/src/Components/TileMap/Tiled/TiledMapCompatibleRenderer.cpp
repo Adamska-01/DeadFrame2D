@@ -24,6 +24,11 @@ void TiledMapCompatibleRenderer::Init()
 	}
 }
 
+void TiledMapCompatibleRenderer::Start()
+{
+
+}
+
 void TiledMapCompatibleRenderer::Update(float dt)
 {
 }

@@ -30,6 +30,11 @@ void GameObject::PropagateActiveStateToChildren()
 	}	
 }
 
+void GameObject::ConstructGameObject()
+{
+
+}
+
 void GameObject::Init()
 {
 	if (isInitialized)
@@ -41,6 +46,14 @@ void GameObject::Init()
 	}
 
 	isInitialized = true;
+}
+
+void GameObject::Start()
+{
+	for (auto& component : componentBucket.GetComponents())
+	{
+		component->Start();
+	}
 }
 
 void GameObject::Update(float dt)

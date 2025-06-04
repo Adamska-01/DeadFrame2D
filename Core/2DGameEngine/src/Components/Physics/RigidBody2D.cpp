@@ -48,6 +48,11 @@ void RigidBody2D::Init()
 	body->SetTransform(b2Vec2(worldPos.x, worldPos.y), 0);
 }
 
+void RigidBody2D::Start()
+{
+
+}
+
 void RigidBody2D::Update(float deltaTime)
 {
 	if (!pendingActions.IsEmpty())

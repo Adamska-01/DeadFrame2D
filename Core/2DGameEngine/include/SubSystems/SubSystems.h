@@ -8,11 +8,13 @@ class UIManager;
 class TextureManager;
 class AudioManager;
 class PhysicsEngine2D;
+class CoroutineScheduler;
 
 
 class SubSystems
 {
 private:
+	// TODO: Create and interface to store all these
 	Window* window;
 
 	Renderer* renderer;
@@ -27,6 +29,8 @@ private:
 	
 	PhysicsEngine2D* physicsEngine2D;
 
+	CoroutineScheduler* coroutineScheduler;
+
 
 public:
 	SubSystems();
@@ -37,6 +41,8 @@ public:
 	void InitializeSubSystems();
 
 
+	void Update(float deltaTime);
+	
 	void BeginFrame();
 
 	void EndFrame();

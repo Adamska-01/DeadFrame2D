@@ -11,6 +11,11 @@ void Canvas::Init()
 
 }
 
+void Canvas::Start()
+{
+
+}
+
 void Canvas::Update(float deltaTime)
 {
 

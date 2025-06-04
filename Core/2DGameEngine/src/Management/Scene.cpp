@@ -56,6 +56,7 @@ void Scene::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatch
 	if (isRunning)
 	{
 		target->Init();
+		target->Start();
 
 		return;
 	}
@@ -120,6 +121,16 @@ void Scene::Init()
 		toInitPtr->Init();
 	}
 
+	for (const auto& toInitialize : currentToInitialize)
+	{
+		auto toInitPtr = toInitialize.lock();
+
+		if (toInitPtr == nullptr)
+			continue;
+
+		toInitPtr->Start();
+	}
+
 	isRunning = true;
 
 	for (const auto& toInitialize : gameObjectsToInitialize)
@@ -130,6 +141,16 @@ void Scene::Init()
 			continue;
 
 		toInitPtr->Init();
+	}
+
+	for (const auto& toInitialize : gameObjectsToInitialize)
+	{
+		auto toInitPtr = toInitialize.lock();
+
+		if (toInitPtr == nullptr)
+			continue;
+
+		toInitPtr->Start();
 	}
 
 	currentToInitialize.clear();

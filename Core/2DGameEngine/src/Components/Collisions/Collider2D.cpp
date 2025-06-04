@@ -107,6 +107,11 @@ void Collider2D::Init()
 	MarkDirty();
 }
 
+void Collider2D::Start()
+{
+
+}
+
 void Collider2D::Update(float dt)
 {
 	if (isDirty)

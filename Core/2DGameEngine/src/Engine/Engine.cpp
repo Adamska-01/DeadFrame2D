@@ -27,6 +27,8 @@ std::optional<int> Engine::Run()
 			return *ecode;
 
 		sceneManager->UpdateScene(deltaTime);
+		
+		engineSubSystems->Update(deltaTime);
 
 		Renderer::ClearBuffer();
 

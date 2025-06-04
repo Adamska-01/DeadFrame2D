@@ -40,11 +40,16 @@ protected:
 	GameObject();
 
 
+	virtual void ConstructGameObject();
+
+
 public:
 	virtual ~GameObject() override = default;
 
 
 	virtual void Init() override;
+
+	virtual void Start() override;
 
 	virtual void Update(float deltaTime) override;
 	
@@ -112,6 +117,8 @@ inline std::weak_ptr<T> GameObject::Instantiate(Args && ...args)
 	}
 
 	EventDispatcher::SendEvent(std::make_shared<GameObjectCreatedEvent>(obj));
+
+	obj->ConstructGameObject();
 
 	return obj;
 }

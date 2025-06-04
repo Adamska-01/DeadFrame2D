@@ -1,4 +1,5 @@
 #include "Constants/ScreenConstants.h"
+#include "Coroutines/CoroutineScheduler.h"
 #include "SubSystems/AudioManager.h"
 #include "SubSystems/Input/Input.h"
 #include "SubSystems/Physics/PhysicsEngine2D.h"
@@ -11,14 +12,15 @@
 
 
 SubSystems::SubSystems()
+	: renderer(nullptr),
+	window(nullptr),
+	input(nullptr),
+	textureManager(nullptr),
+	uiManager(nullptr),
+	audioManager(nullptr),
+	physicsEngine2D(nullptr),
+	coroutineScheduler(nullptr)
 {
-	renderer = nullptr;
-	window = nullptr;
-	input = nullptr;
-	textureManager = nullptr;
-	uiManager = nullptr;
-	audioManager = nullptr;
-	physicsEngine2D = nullptr;
 }
 
 SubSystems::~SubSystems()
@@ -43,6 +45,9 @@ SubSystems::~SubSystems()
 	
 	delete physicsEngine2D;
 	physicsEngine2D = nullptr;
+	
+	delete coroutineScheduler;
+	coroutineScheduler = nullptr;
 }
 
 void SubSystems::InitializeSubSystems()
@@ -65,8 +70,17 @@ void SubSystems::InitializeSubSystems()
 	audioManager = new AudioManager();
 
 	physicsEngine2D = new PhysicsEngine2D(Vector2F(PhysicsConstants::GRAVITY_X, PhysicsConstants::GRAVITY_Y));
+
+	coroutineScheduler = new CoroutineScheduler();
+	CoroutineScheduler::SetCurrent(coroutineScheduler);
 }
 
+void SubSystems::Update(float deltaTime)
+{
+	coroutineScheduler->Update(deltaTime);
+}
+
+// TODO: Create the interface with BeginFrame and EndFrame
 void SubSystems::BeginFrame()
 {
 	input->BeginFrame();

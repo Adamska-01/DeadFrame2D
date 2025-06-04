@@ -17,6 +17,11 @@ void Sprite::Init()
 	transform = OwningObject.lock()->GetComponent<Transform>();
 }
 
+void Sprite::Start()
+{
+
+}
+
 void Sprite::Update(float deltaTime)
 {
 }

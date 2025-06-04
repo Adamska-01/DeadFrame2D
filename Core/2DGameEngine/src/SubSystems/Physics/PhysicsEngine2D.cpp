@@ -18,6 +18,15 @@ PhysicsEngine2D::PhysicsEngine2D(const Vector2F& gravity)
 	world->SetContactListener(new ContactListener());
 
 	world->SetDebugDraw(ColliderDrawerFactory().CreateProduct());
+
+	std::cout << "[Info] SDL_image successfully initialized." << std::endl;
+}
+
+PhysicsEngine2D::~PhysicsEngine2D()
+{
+	world.reset();
+
+	std::cout << "[Info] PhysicsEngine2D subsystem successfully quit." << std::endl;
 }
 
 void PhysicsEngine2D::BeginFrame()

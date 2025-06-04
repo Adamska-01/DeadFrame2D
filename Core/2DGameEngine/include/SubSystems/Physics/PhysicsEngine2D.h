@@ -20,11 +20,12 @@ private:
 
 	PhysicsEngine2D(const Vector2F& gravity);
 
-	~PhysicsEngine2D() = default;
+	~PhysicsEngine2D();
 
 	PhysicsEngine2D(const PhysicsEngine2D&) = delete;
 
 	PhysicsEngine2D(PhysicsEngine2D&&) = delete;
+
 
 	// TODO: Make this an interface and share it with other subsystems
 	void BeginFrame();

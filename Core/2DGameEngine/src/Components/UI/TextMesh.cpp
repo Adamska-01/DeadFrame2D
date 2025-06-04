@@ -13,9 +13,13 @@ TextMesh::TextMesh(const TextMeshComponentModel& textMeshConfiguration)
 	
 	initialObjectScale = textMeshConfiguration.textObjectInitialScale;
 
-	SetText(text, textMeshConfiguration.linesNumber);
+	centered = false;
+	fontSize = 30;
+
+	SetText(text);
 	SetTextColor(textMeshConfiguration.textColor);
 	SetFontStyle(textMeshConfiguration.fontStyle);
+	SetIsCentered(textMeshConfiguration.isCentered);
 }
 
 void TextMesh::Init()
@@ -23,6 +27,11 @@ void TextMesh::Init()
 	transform = OwningObject.lock()->GetComponent<Transform>();
 
 	transform->SetLocalScale(initialObjectScale);
+}
+
+void TextMesh::Start()
+{
+
 }
 
 void TextMesh::Update(float deltaTime)
@@ -45,31 +54,34 @@ void TextMesh::SetTextColor(SDL_Color newColor)
 {
 	color = newColor;
 
-	textTexture = UIManager::LoadText(font, text, color, 1);
+	textTexture = UIManager::LoadText(font, text, color, centered);
 }
 
 void TextMesh::SetFontStyle(FontStyle newFontStyle)
 {
 	TTF_SetFontStyle(font.get(), newFontStyle);
 
-	textTexture = UIManager::LoadText(font, text, color, 1);
+	textTexture = UIManager::LoadText(font, text, color, centered);
 }
 
-void TextMesh::SetText(std::string newText, unsigned int newLinesNumber)
+void TextMesh::SetText(std::string newText)
 {
-	if (text == newText && linesNumber == newLinesNumber)
-		return;
-
 	text = newText;
-	linesNumber = newLinesNumber;
 
-	textTexture = UIManager::LoadText(font, text, color, linesNumber);
+	textTexture = UIManager::LoadText(font, text, color, centered);
 
 	int width = 0, height = 0;
 	SDL_QueryTexture(textTexture.get(), NULL, NULL, &width, &height);
 
 	textRectSize.x = static_cast<int>(width);
 	textRectSize.y = static_cast<int>(height);
+}
+
+void TextMesh::SetIsCentered(bool isCentered)
+{
+	centered = isCentered;
+
+	textTexture = UIManager::LoadText(font, text, color, centered);
 }
 
 std::string TextMesh::GetText()

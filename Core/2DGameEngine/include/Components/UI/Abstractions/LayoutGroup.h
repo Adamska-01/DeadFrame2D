@@ -33,6 +33,8 @@ public:
 
 	virtual void Init() override;
 
+	virtual void Start() override;
+
 	virtual void Update(float deltaTime) override;
 
 	virtual void Draw() override;

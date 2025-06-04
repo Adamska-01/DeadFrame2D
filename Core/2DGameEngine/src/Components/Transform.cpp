@@ -131,6 +131,12 @@ void Transform::RotateByDegrees(float degreeAngle)
 
 void Transform::Init()
 {
+
+}
+
+void Transform::Start()
+{
+
 }
 
 void Transform::Update(float dt)
@@ -140,6 +146,7 @@ void Transform::Update(float dt)
 
 void Transform::Draw()
 {
+
 }
 
 Vector2F Transform::GetStartFramePosition() const
