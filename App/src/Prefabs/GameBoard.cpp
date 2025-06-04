@@ -11,6 +11,11 @@
 
 
 GameBoard::GameBoard(std::string_view mapSource)
+	: mapSource(mapSource)
+{
+}
+
+void GameBoard::ConstructGameObject()
 {
 	AddComponent<GameManager>();
 
@@ -78,4 +83,7 @@ GameBoard::GameBoard(std::string_view mapSource)
 
 	// GroundDestroyTrigger
 	AddChildGameObject(GameObject::Instantiate<GroundDestroyTrigger>());
+
+
+	// UI
 }

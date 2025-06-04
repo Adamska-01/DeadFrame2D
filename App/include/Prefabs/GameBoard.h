@@ -5,8 +5,13 @@
 
 class GameBoard : public GameObject
 {
+private:
+	std::string_view mapSource;
+
+
 public:
 	GameBoard(std::string_view mapSource);
 
-	virtual ~GameBoard() override = default;
+
+	virtual void ConstructGameObject() override;
 };

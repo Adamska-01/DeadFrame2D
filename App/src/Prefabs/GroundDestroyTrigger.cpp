@@ -7,7 +7,7 @@
 #include <SubSystems/Renderer.h>
 
 
-GroundDestroyTrigger::GroundDestroyTrigger()
+void GroundDestroyTrigger::ConstructGameObject()
 {
 	auto renderTargetSize = Renderer::GetResolutionTarget();
 	auto colliderThickness = 1.0f;

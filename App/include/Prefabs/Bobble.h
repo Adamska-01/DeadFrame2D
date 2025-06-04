@@ -6,8 +6,13 @@
 
 class Bobble : public GameObject
 {
+private:
+	Vector2F startPos;
+
+
 public:
 	Bobble(Vector2F startPos, BobbleColor color);
-	
-	virtual ~Bobble() = default;
+
+
+	virtual void ConstructGameObject() override;
 };
