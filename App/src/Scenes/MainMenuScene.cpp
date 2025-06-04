@@ -19,21 +19,24 @@
 
 std::weak_ptr<ButtonBlueprint> MainMenuScene::CreateButton(const std::string& text, const std::function<void()>& onPressedHandler)
 {
-	ButtonBlueprintModel buttonConfiguration = {
-		ButtonComponentModel{
+	ButtonBlueprintModel buttonConfiguration = 
+	{
+		ButtonComponentModel
+		{
 			.onPressedHandler = onPressedHandler,
 			.idleButtonSource = AssetPaths::Sprites::BUTTON_IDLE_IMAGE_PATH,
 			.hoveredButtonSource = AssetPaths::Sprites::BUTTON_PRESSED_IMAGE_PATH,
 			.pressedButtonSource = AssetPaths::Sprites::BUTTON_PRESSED_IMAGE_PATH,
 			.buttonSize = Vector2F{ 275.0f, 80.0f }
 		},
-		TextMeshComponentModel{
+		TextMeshComponentModel
+		{
 			.fontSource = AssetPaths::Fonts::THE_BLAST_FONT_PATH,
 			.text = text,
 			.textColor = SDL_Color(255, 132, 31),
 			.fontSize = 100,
 			.textObjectInitialScale = Vector2F(0.25f, 0.25f),
-			.linesNumber = 1
+			.isCentered = true
 		}
 	};
 
