@@ -1,10 +1,10 @@
 #include "Components/MenuManager.h"
 #include "Components/PlayerInputMainMenu.h"
 #include "Management/SceneManager.h"
-#include <cassert>
 #include <Components/Transform.h>
 #include <GameObject.h>
 #include <SubSystems/Input/Input.h>
+#include <Tools/Helpers/Guards.h>
 
 
 PlayerInputMainMenu::PlayerInputMainMenu()
@@ -18,7 +18,12 @@ void PlayerInputMainMenu::Init()
 	transform = OwningObject.lock()->GetComponent<Transform>();
 	menuManager = SceneManager::FindObjectOfType<MenuManager>();
 
-	assert(menuManager != nullptr && "MenuManager not found in scene!");
+	Tools::Helpers::GuardAgainstNull(menuManager, "MenuManager not found in scene!");
+}
+
+void PlayerInputMainMenu::Start()
+{
+
 }
 
 void PlayerInputMainMenu::Update(float deltaTime)

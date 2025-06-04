@@ -21,12 +21,19 @@ void MenuManager::Init()
 	}
 }
 
+void MenuManager::Start()
+{
+
+}
+
 void MenuManager::Update(float deltaTime)
 {
+
 }
 
 void MenuManager::Draw()
 {
+
 }
 
 void MenuManager::PushMenu(MenuBase* menu)

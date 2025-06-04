@@ -1,9 +1,9 @@
 #include "Components/Abstractions/MenuBase.h"
 #include "Components/MenuManager.h"
-#include <cassert>
 #include <Components/UI/Abstractions/IInteractableUI.h>
 #include <GameObject.h>
 #include <Management/SceneManager.h>
+#include <Tools/Helpers/Guards.h>
 
 
 MenuBase::MenuBase()
@@ -44,7 +44,12 @@ void MenuBase::Init()
 	menuManager = SceneManager::FindObjectOfType<MenuManager>();
 	allInteractables = SceneManager::FindObjectsOfType<IInteractableUI>();
 
-	assert(menuManager != nullptr && "MenuManager not found in scene!");
+	Tools::Helpers::GuardAgainstNull(menuManager, "MenuManager not found in scene!");
+}
+
+void MenuBase::Start()
+{
+
 }
 
 void MenuBase::Update(float deltaTime)

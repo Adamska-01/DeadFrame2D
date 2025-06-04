@@ -26,6 +26,11 @@ void DestroyTrigger::Init()
 	collider->RegisterCollisionExitHandler(EventHelpers::BindFunction(this, &DestroyTrigger::OnTriggerExitHandler), reinterpret_cast<uintptr_t>(this));
 }
 
+void DestroyTrigger::Start()
+{
+
+}
+
 void DestroyTrigger::Update(float deltaTime)
 {
 }

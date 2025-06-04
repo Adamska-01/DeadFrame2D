@@ -24,6 +24,8 @@ public:
 
 	virtual void Init() override;
 
+	virtual void Start() override;
+
 	virtual void Update(float dt) override;
 
 	virtual void Draw() override;

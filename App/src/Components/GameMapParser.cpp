@@ -13,14 +13,22 @@ GameMapParser::GameMapParser(std::string_view mapSource)
 
 void GameMapParser::Init()
 {
+
+}
+
+void GameMapParser::Start()
+{
+
 }
 
 void GameMapParser::Update(float dt)
 {
+
 }
 
 void GameMapParser::Draw()
 {
+
 }
 
 std::shared_ptr<TiledMap> GameMapParser::RetrieveRenderMap(std::vector<std::string_view> layerNames)

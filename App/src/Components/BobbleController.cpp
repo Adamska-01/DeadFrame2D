@@ -44,6 +44,11 @@ void BobbleController::Init()
 	SetColor(bobbleColor);
 }
 
+void BobbleController::Start()
+{
+
+}
+
 void BobbleController::Update(float deltaTime)
 {
 	if (!pendingDestruction)
