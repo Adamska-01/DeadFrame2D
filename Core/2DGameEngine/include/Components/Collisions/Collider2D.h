@@ -56,6 +56,8 @@ public:
 	virtual void Draw();
 
 
+	bool IsTrigger() const;
+
 	void SetIsTrigger(bool value);
 
 	void RegisterCollisionEnterHandler(const std::function<void(const CollisionInfo&)>& handler, std::uintptr_t identifier);

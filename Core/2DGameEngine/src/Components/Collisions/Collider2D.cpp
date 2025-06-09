@@ -124,6 +124,11 @@ void Collider2D::Draw()
 {
 }
 
+bool Collider2D::IsTrigger() const
+{
+	return physicsMaterial.isSensor;
+}
+
 void Collider2D::SetIsTrigger(bool value)
 {
 	physicsMaterial.isSensor = value;
