@@ -26,9 +26,9 @@ std::optional<int> Engine::Run()
 		if (const auto ecode = eventManager.ProcessEvents())
 			return *ecode;
 
-		sceneManager->UpdateScene(deltaTime);
-		
 		engineSubSystems->Update(deltaTime);
+		
+		sceneManager->UpdateScene(deltaTime);
 
 		Renderer::ClearBuffer();
 
