@@ -41,6 +41,21 @@ bool Task::IsDone() const
 	return promiseHandle == nullptr || promiseHandle.done();
 }
 
+bool Task::await_ready() const noexcept
+{
+	return false;
+}
+
+void Task::await_suspend(std::coroutine_handle<> awaitingCoroutine) noexcept
+{
+	promiseHandle.promise().continuation = awaitingCoroutine;
+}
+
+void Task::await_resume() const noexcept
+{
+
+}
+
 
 Task Task::promise_type::get_return_object()
 {
@@ -52,9 +67,9 @@ std::suspend_never Task::promise_type::initial_suspend() noexcept
 	return {};
 }
 
-std::suspend_always Task::promise_type::final_suspend() noexcept
+Task::promise_type::Awaiter Task::promise_type::final_suspend() noexcept
 {
-	return {};
+	return Awaiter{ continuation };
 }
 
 void Task::promise_type::return_void() noexcept
@@ -64,4 +79,23 @@ void Task::promise_type::return_void() noexcept
 void Task::promise_type::unhandled_exception()
 {
 	std::terminate();
+}
+
+
+bool Task::promise_type::Awaiter::await_ready() const noexcept
+{
+	return false;
+}
+
+void Task::promise_type::Awaiter::await_suspend(std::coroutine_handle<>) const noexcept
+{
+	if (continuation == nullptr)
+		return;
+
+	continuation.resume();
+}
+
+void Task::promise_type::Awaiter::await_resume() const noexcept
+{
+
 }

@@ -39,5 +39,5 @@ public:
 
 	static void AddAwaitable(ICoroutineAwaitable* awaitable);
 
-	static void StartCoroutine(Task&& task);
+	static Task& StartCoroutine(Task&& task);
 };

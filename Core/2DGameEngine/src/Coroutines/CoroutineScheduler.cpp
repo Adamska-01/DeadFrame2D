@@ -40,7 +40,7 @@ void CoroutineScheduler::AddAwaitable(ICoroutineAwaitable* awaitable)
 	current->awaitables.push_back(awaitable);
 }
 
-void CoroutineScheduler::StartCoroutine(Task&& task)
+Task& CoroutineScheduler::StartCoroutine(Task&& task)
 {
 	Tools::Helpers::GuardAgainstNull(current, "CoroutineScheduler::current is null.");
 
@@ -48,6 +48,8 @@ void CoroutineScheduler::StartCoroutine(Task&& task)
 	auto* heapTask = new Task(std::move(task));
 
 	current->tasks.emplace_back(heapTask);
+
+	return *heapTask;
 }
 
 void CoroutineScheduler::Update(float deltaTime)
@@ -61,7 +63,7 @@ void CoroutineScheduler::Update(float deltaTime)
 	{
 		if (!awaitable->Tick(deltaTime))
 			continue;
-	
+
 		finished.push_back(awaitable);
 	}
 
