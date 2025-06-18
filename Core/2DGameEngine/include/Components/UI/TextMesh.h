@@ -28,8 +28,6 @@ private:
 	
 	SDL_Color color;
 	
-	Vector2F textRectSize;
-
 	bool centered;
 
 	unsigned int fontSize;

@@ -1,6 +1,5 @@
 #pragma once
 #include "Components/UI/Abstractions/IInteractableUI.h"
-#include "Math/Vector2.h"
 #include "SubSystems//Events/Interfaces/IEventProcessor.h"
 #include "Tools/MulticastDelegate.h"
 #include <functional>
@@ -13,8 +12,6 @@ struct ButtonComponentModel;
 class Button : public IInteractableUI, public IEventProcessor
 {
 private:
-	Transform* transform;
-
 	MultiCastVoid onPressedCallback;
 
 	std::shared_ptr<SDL_Texture> currentButtonImage;
@@ -58,6 +55,4 @@ public:
 	SDL_Rect GetBoundingBox() const;
 
 	void SetButtonImageSources(std::string_view idleButtonSource, std::string_view hoveredButtonSource, std::string_view pressedButtonSource);
-
-	void SetButtonSize(Vector2F size);
 };

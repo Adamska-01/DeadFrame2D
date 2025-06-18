@@ -1,6 +1,5 @@
 #include "Components/Transform.h"
 #include "Components/UI/Button.h"
-#include "GameObject.h"
 #include "Models/Components/UI/ButtonComponentModel.h"
 #include "SubSystems/TextureManager.h"
 #include "Tools/Collisions/CollisionUtils.h"
@@ -10,7 +9,6 @@ Button::Button(const ButtonComponentModel& buttonConfiguration)
 {
 	isPressed = false;
 	isHovered = false;
-	transform = nullptr;
 
 	this->widgetSize = buttonConfiguration.buttonSize;
 
@@ -88,7 +86,7 @@ std::optional<int> Button::ProcessEvents(const SDL_Event& sdlEvent)
 
 void Button::Init()
 {
-	transform = OwningObject.lock()->GetComponent<Transform>();
+	UIComponent::Init();
 }
 
 void Button::Start()
@@ -155,12 +153,13 @@ void Button::AddPressedCallback(std::function<void()> onPressedHandler, std::uin
 SDL_Rect Button::GetBoundingBox() const
 {
 	auto currentPosition = transform->GetWorldPosition();
-	auto scaledSize = widgetSize * transform->GetWorldScale();
+	auto scaledSize = GetWidgetSize();
+	auto anchorVector = GetAnchorFromPreset(anchor);
 
 	return SDL_Rect
 	{
-		static_cast<int>(currentPosition.x - ((scaledSize.x) / 2.0f)),
-		static_cast<int>(currentPosition.y - ((scaledSize.y) / 2.0f)),
+		static_cast<int>(currentPosition.x - ((scaledSize.x) * anchorVector.x)),
+		static_cast<int>(currentPosition.y - ((scaledSize.y) * anchorVector.y)),
 		static_cast<int>(scaledSize.x),
 		static_cast<int>(scaledSize.y)
 	};
@@ -171,9 +170,4 @@ void Button::SetButtonImageSources(std::string_view idleButtonSource, std::strin
 	currentButtonImage = buttonIdleImage = TextureManager::LoadTexture(idleButtonSource);
 	buttonHoveredImage = TextureManager::LoadTexture(hoveredButtonSource);
 	buttonPressedImage = TextureManager::LoadTexture(pressedButtonSource);
-}
-
-void Button::SetButtonSize(Vector2F size)
-{
-	this->widgetSize = size;
 }

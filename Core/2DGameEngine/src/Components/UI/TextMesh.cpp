@@ -24,6 +24,8 @@ TextMesh::TextMesh(const TextMeshComponentModel& textMeshConfiguration)
 
 void TextMesh::Init()
 {
+	UIComponent::Init();
+
 	transform = OwningObject.lock()->GetComponent<Transform>();
 
 	transform->SetLocalScale(initialObjectScale);
@@ -70,11 +72,11 @@ void TextMesh::SetText(std::string newText)
 
 	textTexture = UIManager::LoadText(font, text, color, centered);
 
-	int width = 0, height = 0;
+	auto width = 0, height = 0;
 	SDL_QueryTexture(textTexture.get(), NULL, NULL, &width, &height);
 
-	textRectSize.x = static_cast<int>(width);
-	textRectSize.y = static_cast<int>(height);
+	widgetSize.x = static_cast<int>(width);
+	widgetSize.y = static_cast<int>(height);
 }
 
 void TextMesh::SetIsCentered(bool isCentered)
@@ -92,12 +94,13 @@ std::string TextMesh::GetText()
 SDL_Rect TextMesh::GetTextBoundingBox()
 {
 	auto currentPosition = transform->GetWorldPosition();
-	auto scaledSize = textRectSize * transform->GetWorldScale();
+	auto scaledSize = GetWidgetSize();
+	auto anchorVector = GetAnchorFromPreset(anchor);
 
 	return SDL_Rect
 	{
-		static_cast<int>(currentPosition.x - ((scaledSize.x) / 2.0f)),
-		static_cast<int>(currentPosition.y - ((scaledSize.y) / 2.0f)),
+		static_cast<int>(currentPosition.x - ((scaledSize.x) * anchorVector.x)),
+		static_cast<int>(currentPosition.y - ((scaledSize.y) * anchorVector.y)),
 		static_cast<int>(scaledSize.x),
 		static_cast<int>(scaledSize.y)
 	};
