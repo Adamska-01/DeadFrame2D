@@ -220,6 +220,8 @@ inline std::vector<T*> GameObject::GetComponentsInParent(bool recursive) const
 template<typename T, typename... TArgs>
 inline T* GameObject::AddComponent(TArgs&& ...args)
 {
+	static_assert(std::is_base_of_v<GameComponent, T>, "T must derive from GameComponent");
+
 	auto newComponent = componentBucket.AddComponent<T>(thisWeak, isInitialized, std::forward<TArgs>(args)...);
 
 	OnNewComponentAdded(newComponent);
