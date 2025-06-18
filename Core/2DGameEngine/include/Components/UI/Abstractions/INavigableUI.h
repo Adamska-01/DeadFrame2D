@@ -13,22 +13,22 @@ protected:
 	/**
 	 * @brief Pointer to the interactable UI element that is navigated to when moving up.
 	 */
-	IInteractableUI* up;
+	IInteractableUI* up = nullptr;
 
 	/**
 	 * @brief Pointer to the interactable UI element that is navigated to when moving down.
 	 */
-	IInteractableUI* down;
+	IInteractableUI* down = nullptr;
 
 	/**
 	 * @brief Pointer to the interactable UI element that is navigated to when moving right.
 	 */
-	IInteractableUI* right;
+	IInteractableUI* right = nullptr;
 
 	/**
 	 * @brief Pointer to the interactable UI element that is navigated to when moving left.
 	 */
-	IInteractableUI* left;
+	IInteractableUI* left = nullptr;
 
 
 public:
