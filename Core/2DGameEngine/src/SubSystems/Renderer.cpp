@@ -34,6 +34,8 @@ Renderer::Renderer(SDL_Window* window)
 
 	SetResolutionTarget({ ScreenConstants::DEFAULT_RENDERER_X_SIZE, ScreenConstants::DEFAULT_RENDERER_Y_SIZE });
 
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
 	std::cout << "[Info] SDL_VIDEO successfully initialized." << std::endl;
 }
 
