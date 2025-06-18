@@ -83,7 +83,7 @@ void BobbleController::PopBobble()
 		.animSpeed = 15.0f,
 		.sourceRowNumber = (int)bobbleColor,
 		.columnCount = 7,
-		.rowCount = (int)BobbleColor::ALL_COLOURS,
+		.rowCount = (int)BobbleColor::MAX_COLORS,
 	};
 
 	spriteAnimator->SetAnimationProperties(properties);
@@ -154,7 +154,7 @@ void BobbleController::SetColor(BobbleColor newColor)
 		.animSpeed = 0.0f,
 		.sourceRowNumber = (int)newColor,
 		.columnCount = 10,
-		.rowCount = (int)BobbleColor::ALL_COLOURS,
+		.rowCount = (int)BobbleColor::MAX_COLORS,
 	};
 
 	spriteAnimator->SetAnimationProperties(properties);

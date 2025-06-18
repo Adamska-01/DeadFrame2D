@@ -11,5 +11,5 @@ enum class BobbleColor
 	Purple,
 	Red,
 	Yellow,
-	ALL_COLOURS
+	MAX_COLORS
 };

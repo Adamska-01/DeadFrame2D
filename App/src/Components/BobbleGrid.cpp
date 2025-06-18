@@ -397,7 +397,7 @@ void BobbleGrid::SetNewGridLevel(std::string_view levelSource, int tileSize)
 		{
 			auto color = levelData.grid[j];
 
-			if (levelData.grid[j] >= (int)BobbleColor::ALL_COLOURS)
+			if (currentLevelSpec.grid[j] >= (int)BobbleColor::MAX_COLORS)
 				continue;
 
 			auto x = placement.x + (j - start) * tileSize + displacement;

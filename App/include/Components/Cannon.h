@@ -11,6 +11,9 @@ class Transform;
 class Cannon : public GameComponent
 {
 private:
+	static constexpr int MAX_COLORS = (int)BobbleColor::MAX_COLORS;
+
+
 	Transform* transform;
 
 	std::weak_ptr<GameObject> loadedBobble;
