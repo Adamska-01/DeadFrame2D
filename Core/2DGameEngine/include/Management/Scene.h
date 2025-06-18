@@ -18,10 +18,14 @@ private:
 protected:
 	std::vector<std::shared_ptr<GameObject>> gameObjects;
 
+	std::vector<std::shared_ptr<GameObject>> gameObjectParents;
+
 
 	void GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
 
 	void GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
+
+	void ChildGameObjectAddedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
 
 
 	void CleanupDestroyedObjects();

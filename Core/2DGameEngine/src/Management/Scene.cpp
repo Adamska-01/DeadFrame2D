@@ -1,5 +1,6 @@
 #include "Components/UI/Canvas.h"
 #include "EventSystem/EventDispatcher.h"
+#include "EventSystem/Events/GameObjectEvents/ChildGameObjectAddedEvent.h"
 #include "EventSystem/Events/GameObjectEvents/GameObjectCreatedEvent.h"
 #include "EventSystem/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
 #include "Management/Scene.h"
@@ -19,6 +20,7 @@ Scene::Scene()
 	
 	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &Scene::GameObjectCreatedHandler), identifier);
 	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &Scene::GameObjectDestroyedHandler), identifier);
+	EventDispatcher::RegisterEventHandler(std::type_index(typeid(ChildGameObjectAddedEvent)), EventHelpers::BindFunction(this, &Scene::ChildGameObjectAddedHandler), identifier);
 }
 
 Scene::~Scene()
@@ -31,6 +33,7 @@ Scene::~Scene()
 	
 	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), identifier);
 	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), identifier);
+	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(ChildGameObjectAddedEvent)), identifier);
 }
 
 void Scene::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
@@ -43,14 +46,14 @@ void Scene::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatch
 	auto target = gameObjEvent->gameObjectCreated;
 
 	gameObjects.push_back(target);
+	gameObjectParents.push_back(target);
 
-	// Render UI at the end (TEMPORARY)
-	std::stable_sort(gameObjects.begin(), gameObjects.end(), [](const auto& a, const auto& b) 
+	std::stable_partition(
+		gameObjectParents.begin(),
+		gameObjectParents.end(),
+		[](const std::shared_ptr<GameObject>& obj)
 		{
-			auto aIsUI = a->GetComponentInParent<Canvas>() != nullptr;
-			auto bIsUI = b->GetComponentInParent<Canvas>() != nullptr;
-
-			return aIsUI < bIsUI;
+			return obj->GetComponent<Canvas>() == nullptr;
 		});
 
 	if (isRunning)
@@ -72,8 +75,38 @@ void Scene::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispat
 	if (!gameObjEvent || gameObjEvent->gameObjectDestroyed.lock() == nullptr)
 		return;
 
+	auto toDestroyPtr = gameObjEvent->gameObjectDestroyed;
+
 	// Mark for destruction
-	objectsPendingDestroy.push_back(gameObjEvent->gameObjectDestroyed);
+	objectsPendingDestroy.push_back(toDestroyPtr);
+}
+
+void Scene::ChildGameObjectAddedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
+{
+	auto gameObjEvent = DispatchableEvent::SafeCast<ChildGameObjectAddedEvent>(dispatchableEvent);
+
+	if (!gameObjEvent || gameObjEvent->childGameObject.lock() == nullptr)
+		return;
+
+	auto childGameObject = gameObjEvent->childGameObject;
+
+	gameObjectParents.erase(
+		std::remove_if(
+			gameObjectParents.begin(),
+			gameObjectParents.end(),
+			[&childGameObject](const auto& obj)
+			{
+				return obj.get() == childGameObject.lock().get();
+			}),
+		gameObjectParents.end());
+
+	std::stable_partition(
+		gameObjectParents.begin(),
+		gameObjectParents.end(),
+		[](const std::shared_ptr<GameObject>& obj)
+		{
+			return obj->GetComponent<Canvas>() == nullptr;
+		});
 }
 
 void Scene::CleanupDestroyedObjects()
@@ -81,22 +114,33 @@ void Scene::CleanupDestroyedObjects()
 	if (objectsPendingDestroy.empty())
 		return;
 
-	for (const auto& target : objectsPendingDestroy)
+	for (const auto& weakTarget : objectsPendingDestroy)
 	{
-		auto targetPtr = target.lock();
-		if (targetPtr == nullptr)
+		auto targetPtr = weakTarget.lock();
+		if (!targetPtr)
 			continue;
 
-		// Remove GameObject
-		auto objIt = std::remove_if(
-			gameObjects.begin(), 
-			gameObjects.end(),
-			[targetPtr](const std::shared_ptr<GameObject>& obj)
+		const auto matchesTarget = [&targetPtr](const std::shared_ptr<GameObject>& obj)
 			{
 				return obj.get() == targetPtr.get();
-			});
-		
-		gameObjects.erase(objIt, gameObjects.end());
+			};
+
+		gameObjects.erase(
+			std::remove_if(
+				gameObjects.begin(), 
+				gameObjects.end(), 
+				matchesTarget),
+			gameObjects.end());
+
+		if (targetPtr->GetParent().expired())
+		{
+			gameObjectParents.erase(
+				std::remove_if(
+					gameObjectParents.begin(), 
+					gameObjectParents.end(), 
+					matchesTarget),
+				gameObjectParents.end());
+		}
 	}
 
 	objectsPendingDestroy.clear();
@@ -159,14 +203,14 @@ void Scene::Init()
 
 void Scene::Update(float deltaTime)
 {
-	auto gameobjectSize = gameObjects.size();
+	auto gameobjectSize = gameObjectParents.size();
 
-	for (size_t i = 0; i < gameobjectSize; i++)
+	for (const auto& obj : gameObjectParents)
 	{
-		if (!gameObjects[i]->IsActive())
+		if (!obj->IsActive())
 			continue;
 
-		gameObjects[i]->Update(deltaTime);
+		obj->Update(deltaTime);
 	}
 
 	CleanupDestroyedObjects();
@@ -174,7 +218,7 @@ void Scene::Update(float deltaTime)
 
 void Scene::Draw()
 {
-	for (const auto& obj : gameObjects)
+	for (const auto& obj : gameObjectParents)
 	{
 		if (!obj->IsActive())
 			continue;
@@ -186,6 +230,7 @@ void Scene::Draw()
 void Scene::Exit()
 {
 	gameObjects.clear();
+	gameObjectParents.clear();
 	gameObjectsToInitialize.clear();
 	objectsPendingDestroy.clear();
 }
