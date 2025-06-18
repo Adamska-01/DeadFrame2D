@@ -24,6 +24,7 @@ void VerticalLayoutGroup::UpdateLayout()
 	}
 
 	auto groupSize = interactables.size();
+	
 	if (groupSize == 0)
 		return;
 
@@ -33,24 +34,30 @@ void VerticalLayoutGroup::UpdateLayout()
 	{
 		totalHeight += interactable->GetWidgetSize().y;
 	}
+	
 	totalHeight += layoutSpacing * (groupSize - 1);
 
-	// Get half of the height of the first element
-	auto firstElementHalfHeight = interactables.front()->GetWidgetSize().y / 2.0f;
-
-	// Start centered
+	// Start at top (centered layout origin minus half height)
 	auto currentPosition = Vector2F
-	{ 
-		0.0f, 
-		-totalHeight / 2.0f + firstElementHalfHeight 
+	{
+		0.0f,
+		-totalHeight / 2.0f
 	};
 
 	for (auto& interactable : interactables)
 	{
-		auto transform = interactable->GetGameObject().lock()->GetComponent<Transform>();
-		transform->SetLocalPosition(currentPosition);
+		auto size = interactable->GetWidgetSize();
 
-		currentPosition.y += interactable->GetWidgetSize().y + layoutSpacing;
+		auto transform = interactable->GetGameObject().lock()->GetComponent<Transform>();
+		
+		if (transform == nullptr)
+			continue;
+
+		// Set local position to center the widget at current position + half its height
+		transform->SetLocalPosition(currentPosition + Vector2F(0.0f, size.y / 2.0f));
+
+		// Move down by full height + spacing
+		currentPosition.y += size.y + layoutSpacing;
 	}
 
 	isDirty = false;
