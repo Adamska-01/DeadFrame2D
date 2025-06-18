@@ -23,6 +23,8 @@ namespace AssetPaths
 
 	namespace Sprites
 	{
+		inline constexpr std::string_view MAP_TILES_PATH = "App/Assets/Sprites/MapTiles.png";
+
 		inline constexpr std::string_view TITLE_IMAGE_PATH = "App/Assets/Sprites/Title.png";
 
 		inline constexpr std::string_view ARROW_IMAGE_PATH = "App/Assets/Sprites/Arrow.png";
