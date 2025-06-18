@@ -1,4 +1,5 @@
 #include "Components/Transform.h"
+#include "EventSystem/Events/GameObjectEvents/ChildGameObjectAddedEvent.h"
 #include "EventSystem/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
 #include "GameObject.h"
 
@@ -17,6 +18,8 @@ GameObject::GameObject()
 void GameObject::PropagateActiveStateToChildren()
 {
 	bool newParentState = IsActive(); // This object’s own active state including its parents
+
+	OnActiveStateChanged(this, newParentState);
 
 	for (const auto& child : children)
 	{
@@ -40,7 +43,7 @@ void GameObject::Init()
 	if (isInitialized)
 		return;
 
-	for (auto& component : componentBucket.GetComponents())
+	for (const auto& component : componentBucket.GetComponents())
 	{
 		component->Init();
 	}
@@ -50,25 +53,48 @@ void GameObject::Init()
 
 void GameObject::Start()
 {
-	for (auto& component : componentBucket.GetComponents())
+	for (const auto& component : componentBucket.GetComponents())
 	{
 		component->Start();
 	}
 }
 
-void GameObject::Update(float dt)
+void GameObject::Update(float deltaTime)
 {
-	for (auto& component : componentBucket.GetComponents())
+	for (const auto& component : componentBucket.GetComponents())
 	{
 		if (!component->IsActive())
 			continue;
 
-		component->Update(dt);
+		component->Update(deltaTime);
+	}
+
+	for (const auto& child : children)
+	{
+		child.lock()->Update(deltaTime);
 	}
 }
 
 void GameObject::LateUpdate(float deltaTime)
 {
+	for (const auto& component : componentBucket.GetComponents())
+	{
+		if (!component->IsActive())
+			continue;
+
+		// TODO: implement late update in GameComponents
+		//component->LateUpdate(deltaTime);
+	}
+
+	for (const auto& child : children)
+	{
+		auto childPtr = child.lock();
+
+		if (childPtr == nullptr)
+			continue;
+
+		child.lock()->LateUpdate(deltaTime);
+	}
 }
 
 void GameObject::Draw()
@@ -79,6 +105,16 @@ void GameObject::Draw()
 			continue;
 
 		component->Draw();
+	}
+
+	for (const auto& child : children)
+	{
+		auto childPtr = child.lock();
+		
+		if (childPtr == nullptr || !childPtr->IsActive())
+			continue;
+
+		child.lock()->Draw();
 	}
 }
 
@@ -126,6 +162,8 @@ void GameObject::AddChildGameObject(std::weak_ptr<GameObject> child)
 
 	// Clear 'OnActiveStateChanged' callback
 	OnActiveStateChanged.Clear();
+
+	EventDispatcher::SendEvent(std::make_shared<ChildGameObjectAddedEvent>(child));
 }
 
 bool GameObject::IsChildOf(std::weak_ptr<GameObject> potentialChild, bool recursive) const
