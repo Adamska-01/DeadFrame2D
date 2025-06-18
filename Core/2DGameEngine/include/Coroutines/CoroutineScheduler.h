@@ -40,4 +40,6 @@ public:
 	static void AddAwaitable(ICoroutineAwaitable* awaitable);
 
 	static Task& StartCoroutine(Task&& task);
+
+	static void Reset();
 };

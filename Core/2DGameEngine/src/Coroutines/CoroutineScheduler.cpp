@@ -15,20 +15,7 @@ CoroutineScheduler::~CoroutineScheduler()
 		throw std::runtime_error("CoroutineScheduler::current does not match this instance.");
 	}
 
-	for (auto awaitable : awaitables)
-	{
-		delete awaitable;
-		awaitable = nullptr;
-	}
-
-	for (auto task : tasks)
-	{
-		delete task;
-		task = nullptr;
-	}
-
-	awaitables.clear();
-	tasks.clear();
+	Reset();
 
 	current = nullptr;
 }
@@ -105,4 +92,22 @@ void CoroutineScheduler::Update(float deltaTime)
 void CoroutineScheduler::SetCurrent(CoroutineScheduler* scheduler)
 {
 	current = scheduler;
+}
+
+void CoroutineScheduler::Reset()
+{
+	for (auto awaitable : current->awaitables)
+	{
+		delete awaitable;
+		awaitable = nullptr;
+	}
+
+	for (auto task : current->tasks)
+	{
+		delete task;
+		task = nullptr;
+	}
+
+	current->awaitables.clear();
+	current->tasks.clear();
 }
