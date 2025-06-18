@@ -9,7 +9,7 @@ Engine::Engine()
 
 	sceneManager = std::make_unique<SceneManager>();
 	
-	ft.SetTargetFramerate(60);
+	ft.SetTargetFramerate(180);
 }
 
 std::optional<int> Engine::Run()
