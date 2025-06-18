@@ -93,4 +93,6 @@ void LayoutGroup::UpdateLayout()
 		DeregisterAllHandlers(ui->GetGameObject());
 		RegisterAllHandlers(ui->GetGameObject());
 	}
+
+	isDirty = false;
 }
