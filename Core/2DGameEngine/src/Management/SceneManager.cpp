@@ -1,5 +1,6 @@
 #include "Management/Scene.h"
 #include "Management/SceneManager.h"
+#include "Coroutines/CoroutineScheduler.h"
 
 
 std::unique_ptr<Scene> SceneManager::currentScene;
@@ -33,10 +34,12 @@ void SceneManager::DrawScene() const
 	currentScene->Draw();
 }
 
-void SceneManager::LoadNewSceneIfAvailable()
+bool SceneManager::LoadNewSceneIfAvailable()
 {
 	if (newSceneFactory == nullptr)
-		return;
+		return false;
+
+	CoroutineScheduler::Reset();
 
 	if (currentScene != nullptr)
 	{
@@ -52,4 +55,6 @@ void SceneManager::LoadNewSceneIfAvailable()
 	currentScene->Init();
 
 	newSceneFactory = nullptr;
+
+	return true;
 }

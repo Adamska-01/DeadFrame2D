@@ -19,7 +19,7 @@ private:
 
 	void DrawScene() const;
 
-	void LoadNewSceneIfAvailable();
+	bool LoadNewSceneIfAvailable();
 
 
 public:
