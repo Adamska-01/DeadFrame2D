@@ -5,7 +5,7 @@
 GameComponent::GameComponent()
 {
 	isActive = true;
-	isDirty = true;
+	isDirty = false;
 }
 
 void GameComponent::MarkDirty()
