@@ -87,7 +87,12 @@ void SubSystems::BeginFrame()
 	physicsEngine2D->BeginFrame();
 }
 
-void SubSystems::EndFrame()
+void SubSystems::EndUpdate()
 {
-	physicsEngine2D->EndFrame();
+	physicsEngine2D->EndUpdate();
+}
+
+void SubSystems::EndDraw()
+{
+	physicsEngine2D->EndDraw();
 }

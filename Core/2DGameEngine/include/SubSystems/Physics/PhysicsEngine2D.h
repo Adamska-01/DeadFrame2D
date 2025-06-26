@@ -30,7 +30,9 @@ private:
 	// TODO: Make this an interface and share it with other subsystems
 	void BeginFrame();
 
-	void EndFrame();
+	void EndUpdate();
+
+	void EndDraw();
 
 
 public:

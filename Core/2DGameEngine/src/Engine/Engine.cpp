@@ -30,11 +30,15 @@ std::optional<int> Engine::Run()
 		
 		sceneManager->UpdateScene(deltaTime);
 
+		engineSubSystems->EndUpdate();
+
+		sceneManager->LateUpdateScene(deltaTime);
+
 		Renderer::ClearBuffer();
 
 		sceneManager->DrawScene();
 
-		engineSubSystems->EndFrame();
+		engineSubSystems->EndDraw();
 
 		Renderer::PresentBuffer();
 

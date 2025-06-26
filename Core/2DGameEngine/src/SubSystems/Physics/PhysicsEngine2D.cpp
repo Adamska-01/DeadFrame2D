@@ -31,10 +31,14 @@ PhysicsEngine2D::~PhysicsEngine2D()
 
 void PhysicsEngine2D::BeginFrame()
 {
+}
+
+void PhysicsEngine2D::EndUpdate()
+{
 	world->Step(FrameTimer::DeltaTime(), PhysicsConstants::VELOCITY_ITERATIONS, PhysicsConstants::POSITION_ITERATIONS);
 }
 
-void PhysicsEngine2D::EndFrame()
+void PhysicsEngine2D::EndDraw()
 {
 	world->DebugDraw();
 }

@@ -45,5 +45,7 @@ public:
 	
 	void BeginFrame();
 
-	void EndFrame();
+	void EndUpdate();
+
+	void EndDraw();
 };
