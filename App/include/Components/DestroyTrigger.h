@@ -9,9 +9,6 @@ class Collider2D;
 class DestroyTrigger : public GameComponent
 {
 private:
-	Collider2D* collider;
-
-
 	void OnTriggerExitHandler(const CollisionInfo& collisionInfo);
 
 
