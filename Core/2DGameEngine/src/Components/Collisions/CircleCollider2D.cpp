@@ -8,7 +8,7 @@ CircleCollider2D::CircleCollider2D(float radius, Vector2F offsetFromCenter, cons
 	SetNewCircleShape(radius, offsetFromCenter);
 }
 
-CircleCollider2D:: ~CircleCollider2D()
+CircleCollider2D::~CircleCollider2D()
 {
 	DeleteShape();
 }
