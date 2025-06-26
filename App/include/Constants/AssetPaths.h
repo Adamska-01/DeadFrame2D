@@ -44,4 +44,9 @@ namespace AssetPaths
 	{
 		inline constexpr std::string_view THE_BLAST_FONT_PATH = "App/Assets/Fonts/The Blast.otf";
 	}
+
+	namespace Audio
+	{
+		inline constexpr std::string_view MENU_MUSIC = "App/Assets/Audio/AIr Room.wav";
+	}
 }
