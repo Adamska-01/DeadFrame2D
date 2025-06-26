@@ -1,13 +1,17 @@
 #pragma once
 #include "Components/Abstractions/MenuBase.h"
 #include <Components/GameComponent.h>
+#include <Data/UI/MenuID.h>
 #include <stack>
+#include <unordered_map>
 
 
 class MenuManager : public GameComponent
 {
 private:
-	std::stack<MenuBase*> menuStack;
+	std::unordered_map<MenuID, MenuBase*> allMenus;
+	
+	std::vector<MenuBase*> activeMenus;
 
 
 public:
@@ -25,9 +29,15 @@ public:
 	virtual void Draw() override;
 
 
-	void PushMenu(MenuBase* menu);
+	void ShowMenu(MenuID menuID);
 
-	void PopMenu();
+	void HideMenu(MenuID menuID);
 
-	MenuBase* GetCurrentMenu() const;
+	void HideAll();
+
+	void RegisterMenu(MenuID menuID, MenuBase* menu);
+
+	MenuBase* GetMenu(MenuID menuID);
+
+	const std::vector<MenuBase*>& GetActiveMenus();
 };

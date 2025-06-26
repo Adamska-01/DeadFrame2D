@@ -1,24 +1,15 @@
 #include "Components/MenuManager.h"
-#include <Management/SceneManager.h>
+#include <SubSystems/Input/Input.h>
 
 
 MenuManager::MenuManager()
+	: allMenus(), 
+	activeMenus()
 {
-	menuStack = std::stack<MenuBase*>();
 }
 
 void MenuManager::Init()
 {
-	// Deactivate all menus
-	for (auto menu : SceneManager::FindObjectsOfType<MenuBase>())
-	{
-		menu->Hide();
-	}
-
-	if (!menuStack.empty())
-	{
-		menuStack.top()->Show();
-	}
 }
 
 void MenuManager::Start()
@@ -28,7 +19,23 @@ void MenuManager::Start()
 
 void MenuManager::Update(float deltaTime)
 {
-
+	for (auto currentMenu : activeMenus)
+	{
+		if (Input::IsButtonPressed(PlayerInputSlot::PLAYER_1, "Up")
+			|| Input::IsButtonPressed(PlayerInputSlot::PLAYER_1, "Up2"))
+		{
+			currentMenu->NavigateUp();
+		}
+		if (Input::IsButtonPressed(PlayerInputSlot::PLAYER_1, "Down")
+			|| Input::IsButtonPressed(PlayerInputSlot::PLAYER_1, "Down2"))
+		{
+			currentMenu->NavigateDown();
+		}
+		if (Input::IsButtonPressed(PlayerInputSlot::PLAYER_1, "Jump"))
+		{
+			currentMenu->Confirm();
+		}
+	}
 }
 
 void MenuManager::Draw()
@@ -36,31 +43,61 @@ void MenuManager::Draw()
 
 }
 
-void MenuManager::PushMenu(MenuBase* menu)
+void MenuManager::ShowMenu(MenuID menuID)
 {
-	if (menu == nullptr)
+	auto it = allMenus.find(menuID);
+
+	if (it == allMenus.end())
 		return;
+
+	auto menu = it->second;
 
 	menu->Show();
-
-	if (!menuStack.empty())
-	{
-		menuStack.top()->Hide();
-	}
-
-	menuStack.push(menu);
+	activeMenus.push_back(menu);
 }
 
-void MenuManager::PopMenu()
+void MenuManager::HideMenu(MenuID menuID)
 {
-	if (menuStack.empty())
+	auto it = allMenus.find(menuID);
+
+	if (it == allMenus.end())
 		return;
 
-	menuStack.top()->Hide();
-	menuStack.pop();
+	auto menu = it->second;
+
+	menu->Hide();
+
+	activeMenus.erase(
+		std::remove(
+			activeMenus.begin(), 
+			activeMenus.end(), 
+			menu),
+		activeMenus.end());
 }
 
-MenuBase* MenuManager::GetCurrentMenu() const
+void MenuManager::HideAll()
 {
-	return menuStack.top();
+	for (auto* menu : activeMenus) 
+	{
+		menu->Hide();
+	}
+
+	activeMenus.clear();
+}
+
+void MenuManager::RegisterMenu(MenuID menuID, MenuBase* menu)
+{
+	allMenus[menuID] = menu;
+}
+
+MenuBase* MenuManager::GetMenu(MenuID menuID)
+{
+	auto it = allMenus.find(menuID);
+
+	return it != allMenus.end() ? it->second : nullptr;
+}
+
+const std::vector<MenuBase*>& MenuManager::GetActiveMenus()
+{
+	return activeMenus;
 }
