@@ -122,11 +122,3 @@ void AudioListener::Draw()
 	lastTransformPosition = transform->GetWorldPosition();
 	lastTransformRotation = transform->GetWorldRotation();
 }
-
-void AudioListener::SetVel(Vector2F vel)
-{
-	if (collisionBody == nullptr)
-		return;
-
-	collisionBody->SetLinearVelocity(b2Vec2(vel.x, vel.y));
-}

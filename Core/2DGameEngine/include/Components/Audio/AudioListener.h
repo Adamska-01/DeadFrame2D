@@ -41,7 +41,4 @@ public:
 	virtual void Update(float deltaTime) override;
 
 	virtual void Draw() override;
-
-
-	void SetVel(Vector2F vel);
 };
