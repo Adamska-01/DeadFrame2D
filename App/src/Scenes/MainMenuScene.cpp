@@ -1,5 +1,4 @@
 #include "Components/MenuManager.h"
-#include "Components/PlayerInputMainMenu.h"
 #include "Scenes/MainMenuScene.h"
 #include "Scenes/SinglePlayerScene.h"
 #include <Blueprints/UI/ButtonBlueprint.h>
@@ -113,12 +112,15 @@ void MainMenuScene::Enter()
 
 	mainMenuObject.lock()->AddChildGameObject(mainMenuLayout);
 
-
-	// Input
-	auto inputObject = GameObject::Instantiate<GameObject>();
-	auto inputComponent = inputObject.lock()->AddComponent<PlayerInputMainMenu>();
-
+	auto buttonPos = mpButton.lock()->GetTransform()->GetWorldPosition();
+ 
 	// Create MenuManager and push the initial menu onto the stack
 	auto menuManagerObject = GameObject::Instantiate<GameObject>();
-	menuManagerObject.lock()->AddComponent<MenuManager>()->PushMenu(mainMenuBase);
+	auto menuManagerComponent = menuManagerObject.lock()->AddComponent<MenuManager>();
+	
+	menuManagerComponent->RegisterMenu(MenuID::MAIN_MENU, mainMenuBase);
+	menuManagerComponent->ShowMenu(MenuID::MAIN_MENU);
+
+	//Window::SetWindowMode(WindowMode::BORDERLESS);
+	//Window::SetResolution(Vector2I(2560, 1440));
 }
