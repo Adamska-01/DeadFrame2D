@@ -4,6 +4,7 @@
 #include "Data/Physics/BodyDefinition2D.h"
 #include "GameObject.h"
 #include "SubSystems/Physics/PhysicsEngine2D.h"
+#include "Tools/Helpers/Guards.h"
 #include "Tools/Helpers/Physics/PhysicsConversion.h"
 #include <box2d/b2_body.h>
 
@@ -43,9 +44,12 @@ void RigidBody2D::Init()
 {
 	transform = OwningObject.lock()->GetTransform();
 	
-	auto worldPos = transform->GetWorldPosition() * PhysicsConstants::PIXEL_TO_METER;
+	Tools::Helpers::GuardAgainstNull(transform, "Failed to get Transform from OwningObject");
 
-	body->SetTransform(b2Vec2(worldPos.x, worldPos.y), 0);
+	lastTransformPosition = transform->GetWorldPosition();
+	lastTransformRotation = transform->GetWorldRotation();
+
+	body->SetTransform(b2Vec2(lastTransformPosition.x * PhysicsConstants::PIXEL_TO_METER, lastTransformPosition.y * PhysicsConstants::PIXEL_TO_METER), lastTransformRotation * (MathConstants::PI / 180.0f));
 }
 
 void RigidBody2D::Start()
@@ -55,6 +59,12 @@ void RigidBody2D::Start()
 
 void RigidBody2D::Update(float deltaTime)
 {
+	
+}
+
+void RigidBody2D::Draw()
+{
+	// TODO: Move this stuff in the LateUpdate!!!!
 	if (!pendingActions.IsEmpty())
 	{
 		pendingActions();
@@ -84,10 +94,7 @@ void RigidBody2D::Update(float deltaTime)
 	// Sync transform to physics body
 	transform->SetWorldPosition(Vector2F(pos.x, pos.y));
 	transform->SetLocalRotation(angle * (180.0f / MathConstants::PI));
-}
 
-void RigidBody2D::Draw()
-{
 	lastTransformPosition = transform->GetWorldPosition();
 	lastTransformRotation = transform->GetWorldRotation();
 }
