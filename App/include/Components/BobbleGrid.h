@@ -1,10 +1,13 @@
 #pragma once
 #include "Generic//Bobble/BobbleConnectionDirection.h"
+#include "Generic/Bobble/BobbleColor.h"
 #include "Math/Vector2.h"
+#include "Models/BobbleGridLevel.h"
 #include <Components/GameComponent.h>
 #include <Data/Collision/CollisionInfo.h>
 #include <map>
 #include <optional>
+#include <set>
 #include <string_view>
 #include <Tools/Hashing/WeakPtrEqual.h>
 #include <Tools/Hashing/WeakPtrHash.h>
@@ -15,6 +18,9 @@
 class GameObject;
 class Transform;
 class TiledMapCompatibleCollider2D;
+class Cannon;
+class GridCeiling;
+class GameManager;
 
 
 class BobbleGrid : public GameComponent
@@ -22,7 +28,19 @@ class BobbleGrid : public GameComponent
 private:
 	int bobbleSize;
 
+	int shotCount;
+
+	int maxHeight;
+
 	Transform* transform;
+
+	GameManager* gameManager;
+
+	Cannon* cannon;
+
+	GridCeiling* gridCeiling;
+
+	BobbleGridLevel currentLevelSpec;
 
 	std::map<Vector2I, std::weak_ptr<GameObject>> positionToBobble;
 
@@ -30,14 +48,12 @@ private:
 
 
 	void DestroyGridLevel();
-	
+
 	void RemoveAndDestroyBobbles(std::unordered_set<std::weak_ptr<GameObject>, WeakPtrHash<GameObject>, WeakPtrEqual<GameObject>> bobbles, bool canPop = true);
 
 	void PopulateBobbleConnections();
 
 	void OnGridBobbleCollisionEnterHandler(const CollisionInfo& collisionInfo);
-
-	void OnTopWallCollisionEnterHandler(const CollisionInfo& collisionInfo);
 
 	std::optional<Vector2I> GetNeighborCoord(Vector2I coord, BobbleConnectionDirection direction) const;
 
@@ -49,7 +65,7 @@ private:
 
 
 public:
-	BobbleGrid(TiledMapCompatibleCollider2D* topWallCollider);
+	BobbleGrid();
 
 	virtual ~BobbleGrid() override = default;
 
@@ -63,5 +79,12 @@ public:
 	virtual void Draw() override;
 
 
+	void OnCeilingCollisionEnterHandler(const CollisionInfo& collisionInfo);
+
+
 	void SetNewGridLevel(std::string_view levelSource, int tileSize);
+
+	std::set<BobbleColor> GetAvailableColors();
+
+	BobbleGridLevel GetCurrentLevel();
 };

@@ -1,14 +1,16 @@
 #include "Components/BobbleController.h"
 #include "Components/BobbleGrid.h"
+#include "Components/Cannon.h"
+#include "Components/GameFlow/GameManager.h"
+#include "Components/GridCeiling.h"
 #include "Components/Transform.h"
 #include "Constants/BobbleConstants.h"
-#include "Models/BobbleGridLevel.h"
+#include "Events/LoadNewBobbleEvent.h"
 #include "Prefabs/Bobble.h"
 #include <Components/Collisions/Collider2D.h>
-#include <Components/Collisions/Tile/Tiled/TiledMapCompatibleCollider2D.h>
 #include <Components/Physics/RigidBody2D.h>
+#include <Coroutines/CoroutineScheduler.h>
 #include <GameObject.h>
-#include <math.h> 
 #include <queue>
 #include <Tools/Helpers/EventHelpers.h>
 #include <Tools/Helpers/Guards.h>
@@ -16,11 +18,15 @@
 #include <unordered_set>
 
 
-BobbleGrid::BobbleGrid(TiledMapCompatibleCollider2D* topWallCollider)
+BobbleGrid::BobbleGrid()
+	: bobbleSize(1), 
+	shotCount(0),
+	maxHeight(0),
+	transform(nullptr),
+	gameManager(nullptr), 
+	cannon(nullptr),
+	gridCeiling(nullptr)
 {
-	bobbleSize = 1;
-	transform = nullptr;
-
 	positionToBobble.clear();
 	bobbleToPosition.clear();
 
@@ -28,8 +34,6 @@ BobbleGrid::BobbleGrid(TiledMapCompatibleCollider2D* topWallCollider)
 	{
 		throw std::runtime_error("BobbleGridLevel is not serializable.");
 	}
-
-	topWallCollider->RegisterCollisionEnterHandler(EventHelpers::BindFunction(this, &BobbleGrid::OnTopWallCollisionEnterHandler), reinterpret_cast<uintptr_t>(this));
 }
 
 void BobbleGrid::DestroyGridLevel()
@@ -48,6 +52,11 @@ void BobbleGrid::DestroyGridLevel()
 
 void BobbleGrid::RemoveAndDestroyBobbles(std::unordered_set<std::weak_ptr<GameObject>, WeakPtrHash<GameObject>, WeakPtrEqual<GameObject>> bobbles, bool canPop)
 {
+	auto scoreMuliplier = canPop ? BobbleConstants::SCORE_MULTIPLIER_POP : BobbleConstants::SCORE_MULTIPLIER_DROP;
+	auto score = bobbles.size() * scoreMuliplier;
+	
+	gameManager->AddScore(score);
+
 	for (const auto& bobble : bobbles)
 	{
 		auto bobblePtr = bobble.lock();
@@ -103,23 +112,34 @@ void BobbleGrid::PopulateBobbleConnections()
 
 void BobbleGrid::OnGridBobbleCollisionEnterHandler(const CollisionInfo& collisionInfo)
 {
-	if (collisionInfo.thisCollider == nullptr 
-		|| collisionInfo.thisCollider->GetGameObject().lock() == nullptr
-		|| collisionInfo.otherCollider == nullptr
-		|| collisionInfo.otherCollider->GetGameObject().lock() == nullptr)
+	if (collisionInfo.thisGameObject.expired() || collisionInfo.otherGameObject.expired())
 		return;
 
-	auto thisBobble = collisionInfo.thisCollider->GetGameObject().lock();
-	auto otherBobble = collisionInfo.otherCollider->GetGameObject().lock();
+	auto thisBobble = collisionInfo.thisGameObject.lock();
+	auto otherBobble = collisionInfo.otherGameObject.lock();
 	auto thisBobbleController = thisBobble->GetComponent<BobbleController>();
 	auto otherBobbleController = otherBobble->GetComponent<BobbleController>();
 
 	if (thisBobbleController == nullptr 
 		|| otherBobbleController == nullptr
 		|| otherBobbleController->IsPartOfGrid()
-		|| !otherBobbleController->IsDestructionPending()
-		|| !thisBobbleController->IsDestructionPending())
+		|| otherBobbleController->IsDestructionPending()
+		|| thisBobbleController->IsDestructionPending())
 		return;
+
+	auto rigidBody = otherBobble->GetComponent<RigidBody2D>();
+
+	if (rigidBody != nullptr)
+	{
+		rigidBody->ChangeBodyType(BodyType2D::Static);
+	}
+
+	auto collider = otherBobble->GetComponent<Collider2D>();
+	
+	if (collider != nullptr)
+	{
+		collider->RegisterContactEnterHandler(EventHelpers::BindFunction(this, &BobbleGrid::OnGridBobbleCollisionEnterHandler), reinterpret_cast<uintptr_t>(this));
+	}
 
 	PlaceBobbleAdjacentTo(thisBobble, otherBobble);
 
@@ -128,52 +148,8 @@ void BobbleGrid::OnGridBobbleCollisionEnterHandler(const CollisionInfo& collisio
 	RemoveAndDestroyBobbles(FindDisconnectedBobbles(), false);
 
 	PopulateBobbleConnections();
-}
 
-void BobbleGrid::OnTopWallCollisionEnterHandler(const CollisionInfo& collisionInfo)
-{
-	if (collisionInfo.otherCollider == nullptr || collisionInfo.otherCollider->GetGameObject().lock() == nullptr)
-		return;
-
-	auto otherBobble = collisionInfo.otherCollider->GetGameObject().lock();
-	auto otherBobbleController = otherBobble->GetComponent<BobbleController>();
-
-	if (otherBobbleController == nullptr
-		|| otherBobbleController->IsPartOfGrid()
-		|| !otherBobbleController->IsDestructionPending())
-		return;
-
-	auto newRigidBody = otherBobble->GetComponent<RigidBody2D>();
-	
-	newRigidBody->SetVelocity(Vector2F::Zero);
-	newRigidBody->ChangeBodyType(BodyType2D::Static);
-
-	auto bobblePos = otherBobble->GetComponent<Transform>()->GetWorldPosition();
-	
-	auto coordX = static_cast<int>((bobblePos.x - transform->GetWorldPosition().x) / bobbleSize);
-	auto coordY = 0;
-
-	auto placementOrigin = transform->GetWorldPosition();
-	auto displacement = (coordY % 2) * bobbleSize / 2;
-	auto x = placementOrigin.x + coordX * bobbleSize + displacement;
-	auto y = placementOrigin.y + coordY * bobbleSize;
-
-	otherBobble->GetComponent<Transform>()->SetWorldPosition(Vector2F(x + bobbleSize / 2.0f, y + bobbleSize / 2.0f));
-
-	auto coord = Vector2I(coordY, coordX);
-
-	positionToBobble[coord] = otherBobble;
-	bobbleToPosition[otherBobble] = coord;
-
-	otherBobbleController->SetPartOfGrid(true);
-
-	PopulateBobbleConnections();
-
-	RemoveAndDestroyBobbles(FindConnectedSameColorBobbles(otherBobble));
-
-	RemoveAndDestroyBobbles(FindDisconnectedBobbles(), false);
-
-	PopulateBobbleConnections();
+	MarkDirty();
 }
 
 std::optional<Vector2I> BobbleGrid::GetNeighborCoord(Vector2I coord, BobbleConnectionDirection direction) const
@@ -226,12 +202,14 @@ void BobbleGrid::PlaceBobbleAdjacentTo(const std::shared_ptr<GameObject>& refere
 	newRigidBody->SetVelocity(Vector2F::Zero);
 	newRigidBody->ChangeBodyType(BodyType2D::Static);
 
-	auto placementOrigin = transform->GetWorldPosition();
+	auto placementOrigin = transform->GetWorldPosition() + Vector2F::Down * bobbleSize * gridCeiling->GetCeilingLevel();
 	auto displacement = (newCoord.x % 2) * bobbleSize / 2;
 	auto x = placementOrigin.x + newCoord.y * bobbleSize + displacement;
 	auto y = placementOrigin.y + newCoord.x * bobbleSize;
 
 	newTransform->SetWorldPosition(Vector2F(x + bobbleSize / 2.0f, y + bobbleSize / 2.0f));
+
+	auto a = newTransform->GetWorldPosition();
 
 	newBobbleController->SetPartOfGrid(true);
 
@@ -367,35 +345,160 @@ std::unordered_set<std::weak_ptr<GameObject>, WeakPtrHash<GameObject>, WeakPtrEq
 void BobbleGrid::Init()
 {
 	transform = OwningObject.lock()->GetComponent<Transform>();
+	cannon = OwningObject.lock()->GetParent().lock()->GetComponentInChildren<Cannon>();
+	gameManager = OwningObject.lock()->GetComponentInParent<GameManager>();
+	gridCeiling = OwningObject.lock()->GetComponentInChildren<GridCeiling>();
+
+	Tools::Helpers::GuardAgainstNull(transform, "BobbleGrid::Init: Transform not found from BobbleGrid.");
+	Tools::Helpers::GuardAgainstNull(cannon, "BobbleGrid::Init: Cannon not found from BobbleGrid.");
+	Tools::Helpers::GuardAgainstNull(gameManager, "BobbleGrid::Init: GameManager not found from BobbleGrid.");
+	Tools::Helpers::GuardAgainstNull(gridCeiling, "BobbleGrid::Init: GridCeiling not found from BobbleGrid.");
+}
+
+void BobbleGrid::Start()
+{
+	EventDispatcher::SendEvent(std::make_shared<LoadNewBobbleEvent>(cannon));
 }
 
 void BobbleGrid::Update(float deltaTime)
 {
+	if (!isDirty)
+		return;
+
+	shotCount++;
+
+	if (positionToBobble.size() <= 0)
+	{
+		CoroutineScheduler::StartCoroutine(gameManager->StartNextLevel(true));
+
+		isDirty = false;
+		
+		return;
+	}
+
+	if (shotCount > BobbleConstants::SHOTS_REQUIRED_FOR_CEALING_FALL)
+	{
+		gridCeiling->CollapseCeiling();
+
+		for (auto& [pos, bobbleWeak] : positionToBobble)
+		{
+			auto bobble = bobbleWeak.lock();
+			
+			if (bobble == nullptr)
+				continue;
+
+			bobble->GetTransform()->TranslateY(bobbleSize);
+		}
+
+		shotCount = 0;
+		maxHeight--;
+	}
+
+	for (const auto& [pos, bobble] : positionToBobble)
+	{
+		if (pos.x < maxHeight)
+			continue;
+
+		gameManager->ShowGameOverScreen();
+
+		isDirty = false;
+
+		return;
+	}
+
+	EventDispatcher::SendEvent(std::make_shared<LoadNewBobbleEvent>(cannon));
+		
+	isDirty = false;
 }
 
 void BobbleGrid::Draw()
 {
 }
 
+void BobbleGrid::OnCeilingCollisionEnterHandler(const CollisionInfo& collisionInfo)
+{
+	if (collisionInfo.otherGameObject.expired())
+		return;
+
+	auto otherBobble = collisionInfo.otherGameObject.lock();
+	auto otherBobbleController = otherBobble->GetComponent<BobbleController>();
+
+	if (otherBobbleController == nullptr
+		|| otherBobbleController->IsPartOfGrid()
+		|| otherBobbleController->IsDestructionPending())
+		return;
+
+	auto newRigidBody = otherBobble->GetComponent<RigidBody2D>();
+
+	newRigidBody->SetVelocity(Vector2F::Zero);
+	newRigidBody->ChangeBodyType(BodyType2D::Static);
+
+	auto bobblePos = otherBobble->GetComponent<Transform>()->GetWorldPosition();
+
+	auto coordX = static_cast<int>((bobblePos.x - transform->GetWorldPosition().x) / bobbleSize);
+	auto coordY = 0;
+
+	auto placementOrigin = transform->GetWorldPosition() + Vector2F::Down * bobbleSize * gridCeiling->GetCeilingLevel();
+	auto displacement = (coordY % 2) * bobbleSize / 2;
+	auto x = placementOrigin.x + coordX * bobbleSize + displacement;
+	auto y = placementOrigin.y + coordY * bobbleSize;
+
+	otherBobble->GetComponent<Transform>()->SetWorldPosition(Vector2F(x + bobbleSize / 2.0f, y + bobbleSize / 2.0f));
+
+	auto coord = Vector2I(coordY, coordX);
+
+	positionToBobble[coord] = otherBobble;
+	bobbleToPosition[otherBobble] = coord;
+
+	otherBobbleController->SetPartOfGrid(true);
+
+	auto rigidBody = otherBobble->GetComponent<RigidBody2D>();
+
+	if (rigidBody != nullptr)
+	{
+		rigidBody->ChangeBodyType(BodyType2D::Static);
+	}
+
+	auto collider = otherBobble->GetComponent<Collider2D>();
+
+	if (collider != nullptr)
+	{
+		collider->RegisterContactEnterHandler(EventHelpers::BindFunction(this, &BobbleGrid::OnGridBobbleCollisionEnterHandler), reinterpret_cast<uintptr_t>(this));
+	}
+
+	PopulateBobbleConnections();
+
+	RemoveAndDestroyBobbles(FindConnectedSameColorBobbles(otherBobble));
+
+	RemoveAndDestroyBobbles(FindDisconnectedBobbles(), false);
+
+	PopulateBobbleConnections();
+
+	MarkDirty();
+}
+
 void BobbleGrid::SetNewGridLevel(std::string_view levelSource, int tileSize)
 {
 	DestroyGridLevel();
 
-	auto levelData = JsonSerializer::DeserializeFromFile<BobbleGridLevel>(levelSource);
+	currentLevelSpec = JsonSerializer::DeserializeFromFile<BobbleGridLevel>(levelSource);
 
 	bobbleSize = tileSize;
+	maxHeight = currentLevelSpec.height;
+
+	gridCeiling->SetCeilingTileSize(tileSize);
 
 	auto placement = transform->GetWorldPosition();
 
-	for (auto i = 0; i < levelData.height; i++)
+	for (auto i = 0; i < currentLevelSpec.height; i++)
 	{
 		auto displacement = (i % 2) * tileSize / 2;
-		auto start = i * levelData.width;
-		auto end = start + (levelData.width - 1) - (i % 2);
+		auto start = i * currentLevelSpec.width;
+		auto end = start + (currentLevelSpec.width - 1) - (i % 2);
 
 		for (auto j = start; j <= end; j++)
 		{
-			auto color = levelData.grid[j];
+			auto color = currentLevelSpec.grid[j];
 
 			if (currentLevelSpec.grid[j] >= (int)BobbleColor::MAX_COLORS)
 				continue;
@@ -404,16 +507,45 @@ void BobbleGrid::SetNewGridLevel(std::string_view levelSource, int tileSize)
 			auto y = placement.y + i * tileSize;
 
 			auto bobble = GameObject::Instantiate<Bobble>(Vector2F{ x + tileSize / 2.0f, y + tileSize / 2.0f }, static_cast<BobbleColor>(color));
-			auto coord = Vector2I(i, j % levelData.width);
+			auto coord = Vector2I(i, j % currentLevelSpec.width);
 			
 			positionToBobble[coord] = bobble;
 			bobbleToPosition[bobble] = coord;
 
 			// Set Collision handlers 
 			auto collider = bobble.lock()->GetComponent<Collider2D>();
-			collider->RegisterCollisionEnterHandler(EventHelpers::BindFunction(this, &BobbleGrid::OnGridBobbleCollisionEnterHandler), reinterpret_cast<uintptr_t>(this));
+			collider->RegisterContactEnterHandler(EventHelpers::BindFunction(this, &BobbleGrid::OnGridBobbleCollisionEnterHandler), reinterpret_cast<uintptr_t>(this));
 		}
 	}
 	
 	PopulateBobbleConnections();
+
+	shotCount = 0;
+}
+
+std::set<BobbleColor> BobbleGrid::GetAvailableColors()
+{
+	std::set<BobbleColor> result;
+
+	for (const auto& [coord, bobble] : positionToBobble)
+	{
+		auto bobblePtr = bobble.lock();
+
+		if (bobblePtr == nullptr)
+			continue;
+
+		auto bobbleController = bobble.lock()->GetComponent<BobbleController>();
+
+		if (bobbleController == nullptr)
+			continue;
+
+		result.insert(bobbleController->GetBobbleColor());
+	}
+
+	return result;
+}
+
+BobbleGridLevel BobbleGrid::GetCurrentLevel()
+{
+	return currentLevelSpec;
 }
