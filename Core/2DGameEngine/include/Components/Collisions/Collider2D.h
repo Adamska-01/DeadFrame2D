@@ -1,5 +1,5 @@
 #pragma once
-#include "Components/GameComponent.h"
+#include "Components/Abstractions/ContactEventProvider.h"
 #include "Data/Collision/CollisionInfo.h"
 #include "Data/Collision/PhysicsMaterial.h"
 #include "EventSystem/DispatchableEvent.h"
@@ -11,9 +11,10 @@ class Transform;
 class RigidBody2D;
 
 
-class Collider2D : public GameComponent
+class Collider2D : public ContactEventProvider
 {
 	friend class ContactListener;
+
 
 private:
 	void GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
@@ -30,10 +31,6 @@ protected:
 
 	PhysicsMaterial physicsMaterial;
 
-	MulticastDelegate<const CollisionInfo&> OnCollisionEnterCallback;
-
-	MulticastDelegate<const CollisionInfo&> OnCollisionExitCallback;
-
 
 	Collider2D(const PhysicsMaterial& physicsMaterial);
 
@@ -42,7 +39,7 @@ protected:
 
 	virtual void RebuildFixture();
 
-	
+
 	void SearchRigidBody();
 
 
@@ -50,7 +47,7 @@ public:
 	virtual void Init();
 
 	virtual void Start();
-	
+
 	virtual void Update(float dt);
 
 	virtual void Draw();
@@ -59,14 +56,6 @@ public:
 	bool IsTrigger() const;
 
 	void SetIsTrigger(bool value);
-
-	void RegisterCollisionEnterHandler(const std::function<void(const CollisionInfo&)>& handler, std::uintptr_t identifier);
-
-	void RegisterCollisionExitHandler(const std::function<void(const CollisionInfo&)>& handler, std::uintptr_t identifier);
-	
-	void DeregisterCollisionEnterHandler(std::uintptr_t identifier);
-	
-	void DeregisterCollisionExitHandler(std::uintptr_t identifier);
 
 
 	Transform* GetTranform() const;
