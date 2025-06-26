@@ -1,6 +1,19 @@
-#include <Debugging/Debug.h>
 #include <iostream>
 #include <SubSystems/AudioManager.h>
+#include <algorithm>
+
+
+std::unordered_map<std::string, std::weak_ptr<Mix_Music>> AudioManager::musicCache;
+
+std::unordered_map<std::string, std::weak_ptr<Mix_Chunk>> AudioManager::sfxCache;
+
+std::mutex AudioManager::audioMutex;
+
+float AudioManager::musicVolume = MIX_MAX_VOLUME;
+
+float AudioManager::sfxVolume = MIX_MAX_VOLUME;
+
+float AudioManager::masterVolume = MIX_MAX_VOLUME;
 
 
 AudioManager::AudioManager()
@@ -17,68 +30,176 @@ AudioManager::AudioManager()
 
 AudioManager::~AudioManager()
 {
-	// TODO: Implementing a music/sfx cache is a good idea (use shared_ptr)
+	musicCache.clear();
+	sfxCache.clear();
 
 	Mix_CloseAudio();
 
 	std::cout << "[Info] SDL_Mixer subsystem successfully quit." << std::endl;
 }
 
-Mix_Music* AudioManager::LoadMusic(const char* filepath)
+std::shared_ptr<Mix_Music> AudioManager::LoadMusic(const std::string_view& filepath)
 {
-	auto music = Mix_LoadMUS(filepath);
+	auto filePathString = std::string(filepath);
 
-	if (music == nullptr) 
+	std::lock_guard<std::mutex> lock(audioMutex);
+
+	auto it = musicCache.find(filePathString);
+
+	if (it != musicCache.end())
+	{
+		if (auto cached = it->second.lock())
+			return cached;
+	}
+
+	auto raw = Mix_LoadMUS(filePathString.c_str());
+
+	if (raw == nullptr)
 	{
 		std::cerr << "Failed to load music: " << Mix_GetError() << std::endl;
+		
+		return nullptr;
 	}
 
-	return music;
+	auto shared = std::shared_ptr<Mix_Music>(raw, Mix_FreeMusic);
+
+	musicCache[filePathString] = shared;
+	
+	return shared;
 }
 
-Mix_Chunk* AudioManager::LoadSFX(const char* filepath, int volume)
+std::shared_ptr<Mix_Chunk> AudioManager::LoadSFX(const std::string_view& filepath)
 {
-	auto sfx = Mix_LoadWAV(filepath);
+	auto filePathString = std::string(filepath);
+	
+	std::lock_guard<std::mutex> lock(audioMutex);
 
-	if (sfx == nullptr)
+	auto it = sfxCache.find(filePathString);
+
+	if (it != sfxCache.end())
 	{
-		std::cerr << "Failed to load music: " << Mix_GetError() << std::endl;
+		if (auto cached = it->second.lock())
+			return cached;
 	}
 
-	Mix_VolumeChunk(sfx, volume);
-
-	return sfx;
-}
-
-bool AudioManager::PlayMusicTrack(Mix_Music* music, int loopNumber)
-{
-	return Mix_PlayMusic(music, loopNumber) == 0;
-}
-
-void AudioManager::PlaySFX(Mix_Chunk* sfx, int loopNumber)
-{
-	auto channel = 0;
-
-	while (Mix_Playing(channel))
+	auto raw = Mix_LoadWAV(filePathString.c_str());
+	
+	if (raw == nullptr)
 	{
-		++channel;
+		std::cerr << "Failed to load SFX: " << Mix_GetError() << std::endl;
+		
+		return nullptr;
 	}
 
-	Mix_PlayChannel(channel, sfx, loopNumber);
+	auto shared = std::shared_ptr<Mix_Chunk>(raw, Mix_FreeChunk);
+	
+	Mix_VolumeChunk(raw, sfxVolume);
+
+	sfxCache[filePathString] = shared;
+
+	return shared;
 }
 
-void AudioManager::FadeInMusicTrack(Mix_Music* music, int loopNumber, int fadeLenght)
+bool AudioManager::PlayMusicTrack(const std::shared_ptr<Mix_Music>& music, int loopCount)
 {
-	if (Mix_PlayingMusic() != 0)
+	Mix_VolumeMusic(static_cast<int>((musicVolume * masterVolume) * MIX_MAX_VOLUME));
+	
+	return Mix_PlayMusic(music.get(), loopCount) == 0;
+}
+
+int AudioManager::PlaySFX(const std::shared_ptr<Mix_Chunk>& sfx, int loopCount)
+{
+	auto channel = -1;
+	
+	// Play on the first free channel (-1)
+	channel = Mix_PlayChannel(-1, sfx.get(), loopCount);
+
+	if (channel == -1)
 	{
-		Mix_FadeOutMusic(fadeLenght);
+		std::cerr << "Failed to play SFX: " << Mix_GetError() << std::endl;
+		
+		return -1;
+	}
+	
+	Mix_Volume(channel, static_cast<int>((sfxVolume * masterVolume) * MIX_MAX_VOLUME));
+
+	return channel;
+}
+
+void AudioManager::FadeInMusicTrack(const std::shared_ptr<Mix_Music>& music, int loopCount, int fadeTimeMs)
+{
+	if (Mix_PlayingMusic())
+	{
+		Mix_FadeOutMusic(fadeTimeMs);
 	}
 
-	// Fade in milliseconds
-	Mix_FadeInMusic(music, loopNumber, fadeLenght);
+	Mix_VolumeMusic((musicVolume * masterVolume) / MIX_MAX_VOLUME);
+	Mix_FadeInMusic(music.get(), loopCount, fadeTimeMs);
 }
 
 void AudioManager::StopMusic()
 {
 	Mix_HaltMusic();
+}
+
+void AudioManager::StopSFX(int sfxChannel)
+{
+	Mix_HaltChannel(sfxChannel);
+}
+
+void AudioManager::PauseMusic()
+{
+	Mix_PauseMusic();
+}
+
+void AudioManager::PauseSFX(int sfxChannel)
+{
+	Mix_Pause(sfxChannel);
+}
+
+void AudioManager::ResumeMusic()
+{
+	Mix_ResumeMusic();
+}
+
+void AudioManager::SetMusicVolume(float volume)
+{
+	volume = std::clamp(volume, 0.0f, 1.0f);
+
+	Mix_VolumeMusic(static_cast<int>((volume * musicVolume * masterVolume) * MIX_MAX_VOLUME));
+}
+
+void AudioManager::SetGlobalSFXVolume(int volume)
+{
+}
+
+void AudioManager::SetSFXVolume(float volume, int sfxChannel)
+{
+	volume = std::clamp(volume, 0.0f, 1.0f);
+
+	// If sfxChannel == -1, it will set the volume of all channels
+	Mix_Volume(sfxChannel, static_cast<int>((volume * sfxVolume * masterVolume) * MIX_MAX_VOLUME));
+}
+
+void AudioManager::SetMasterVolume(float volume)
+{
+	masterVolume = std::clamp(volume, 0.0f, 1.0f);
+
+	SetMusicVolume(musicVolume);
+	SetSFXVolume(sfxVolume);
+}
+
+float AudioManager::GetMasterVolume()
+{
+	return masterVolume;
+}
+
+float AudioManager::GetMusicGlobalVolume()
+{
+	return musicVolume;
+}
+
+float AudioManager::GetGlobalSFXVolume()
+{
+	return sfxVolume;
 }
