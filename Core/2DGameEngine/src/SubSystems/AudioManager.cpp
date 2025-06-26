@@ -9,16 +9,16 @@ std::unordered_map<std::string, std::weak_ptr<Mix_Chunk>> AudioManager::sfxCache
 
 std::mutex AudioManager::audioMutex;
 
-float AudioManager::musicVolume = MIX_MAX_VOLUME;
+float AudioManager::musicVolume = 1.0f;
 
-float AudioManager::sfxVolume = MIX_MAX_VOLUME;
+float AudioManager::sfxVolume = 1.0f;
 
-float AudioManager::masterVolume = MIX_MAX_VOLUME;
+float AudioManager::masterVolume = 1.0f;
 
 
 AudioManager::AudioManager()
 {
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 512) < 0)
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
 	{
 		std::cerr << "SDL_Mixer could not initialize! SDL_mixer Error: " << Mix_GetError() << std::endl;
 
@@ -102,6 +102,9 @@ std::shared_ptr<Mix_Chunk> AudioManager::LoadSFX(const std::string_view& filepat
 
 bool AudioManager::PlayMusicTrack(const std::shared_ptr<Mix_Music>& music, int loopCount)
 {
+	if (music == nullptr)
+		return;
+
 	Mix_VolumeMusic(static_cast<int>((musicVolume * masterVolume) * MIX_MAX_VOLUME));
 	
 	return Mix_PlayMusic(music.get(), loopCount) == 0;
@@ -109,6 +112,9 @@ bool AudioManager::PlayMusicTrack(const std::shared_ptr<Mix_Music>& music, int l
 
 int AudioManager::PlaySFX(const std::shared_ptr<Mix_Chunk>& sfx, int loopCount)
 {
+	if (sfx == nullptr)
+		return;
+
 	auto channel = -1;
 	
 	// Play on the first free channel (-1)
@@ -122,6 +128,9 @@ int AudioManager::PlaySFX(const std::shared_ptr<Mix_Chunk>& sfx, int loopCount)
 	}
 	
 	Mix_Volume(channel, static_cast<int>((sfxVolume * masterVolume) * MIX_MAX_VOLUME));
+
+	// Set the chunk volume to max by default (let the volume be controlled by the channel)
+	Mix_VolumeChunk(sfx.get(), MIX_MAX_VOLUME);
 
 	return channel;
 }
@@ -164,13 +173,16 @@ void AudioManager::ResumeMusic()
 
 void AudioManager::SetMusicVolume(float volume)
 {
-	volume = std::clamp(volume, 0.0f, 1.0f);
+	musicVolume = std::clamp(volume, 0.0f, 1.0f);
 
-	Mix_VolumeMusic(static_cast<int>((volume * musicVolume * masterVolume) * MIX_MAX_VOLUME));
+	Mix_VolumeMusic(static_cast<int>((musicVolume * masterVolume) * MIX_MAX_VOLUME));
 }
 
-void AudioManager::SetGlobalSFXVolume(int volume)
+void AudioManager::SetGlobalSFXVolume(float volume)
 {
+	sfxVolume = std::clamp(volume, 0.0f, 1.0f);
+
+	SetSFXVolume(sfxVolume);
 }
 
 void AudioManager::SetSFXVolume(float volume, int sfxChannel)

@@ -62,7 +62,7 @@ public:
 
 	static void SetMusicVolume(float volume /*[0-1]*/);
 
-	static void SetGlobalSFXVolume(int volume /*[0-1]*/); 
+	static void SetGlobalSFXVolume(float volume /*[0-1]*/); 
 
 	static void SetSFXVolume(float volume /*[0-1]*/, int sfxChannel = -1);
 
