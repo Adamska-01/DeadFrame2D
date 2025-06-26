@@ -13,6 +13,7 @@ class Sprite;
 class SpriteAnimator;
 class RigidBody2D;
 class Collider2D;
+class BobbleLoader;
 
 
 class BobbleController : public GameComponent
@@ -39,6 +40,8 @@ private:
 	RigidBody2D* rigidBody;
 
 	Collider2D* collider;
+
+	BobbleLoader* bobbleLoader;
 
 
 public:

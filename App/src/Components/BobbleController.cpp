@@ -19,7 +19,8 @@ BobbleController::BobbleController(BobbleColor bobbleColor)
 	sprite(nullptr),
 	spriteAnimator(nullptr),
 	rigidBody(nullptr),
-	collider(nullptr)
+	collider(nullptr),
+	bobbleLoader(nullptr)
 {
 	for (size_t i = 0; i < BobbleConstants::MAX_BOBBLE_NEIGHBOURS; i++)
 	{
@@ -88,6 +89,8 @@ void BobbleController::PopBobble()
 
 	spriteAnimator->SetAnimationProperties(properties);
 
+	collider->SetIsTrigger(true);
+
 	pendingDestruction = true;
 }
 
@@ -118,7 +121,7 @@ BobbleColor BobbleController::GetBobbleColor() const
 
 bool BobbleController::IsDestructionPending() const
 {
-	return !pendingDestruction && !isDropping;
+	return pendingDestruction || isDropping;
 }
 
 bool BobbleController::IsPartOfGrid() const
