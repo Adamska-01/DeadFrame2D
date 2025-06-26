@@ -12,9 +12,7 @@ Scene::Scene()
 {
 	isRunning = false;
 
-	gameObjects.clear();
-	gameObjectsToInitialize.clear();
-	objectsPendingDestroy.clear();
+	Exit();
 
 	auto identifier = reinterpret_cast<uintptr_t>(this);
 	
@@ -25,9 +23,7 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-	gameObjects.clear();
-	gameObjectsToInitialize.clear();
-	objectsPendingDestroy.clear();
+	Exit();
 
 	auto identifier = reinterpret_cast<uintptr_t>(this);
 	
@@ -203,14 +199,23 @@ void Scene::Init()
 
 void Scene::Update(float deltaTime)
 {
-	auto gameobjectSize = gameObjectParents.size();
-
 	for (const auto& obj : gameObjectParents)
 	{
 		if (!obj->IsActive())
 			continue;
 
 		obj->Update(deltaTime);
+	}
+}
+
+void Scene::LateUpdate(float deltaTime)
+{
+	for (const auto& obj : gameObjectParents)
+	{
+		if (!obj->IsActive())
+			continue;
+
+		obj->LateUpdate(deltaTime);
 	}
 
 	CleanupDestroyedObjects();

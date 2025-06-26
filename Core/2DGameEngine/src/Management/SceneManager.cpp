@@ -26,6 +26,14 @@ void SceneManager::UpdateScene(float deltaTime) const
 	currentScene->Update(deltaTime);
 }
 
+void SceneManager::LateUpdateScene(float deltaTime) const
+{
+	if (currentScene == nullptr)
+		return;
+
+	currentScene->LateUpdate(deltaTime);
+}
+
 void SceneManager::DrawScene() const
 {
 	if (currentScene == nullptr)

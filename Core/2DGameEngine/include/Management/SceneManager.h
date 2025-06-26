@@ -16,6 +16,8 @@ private:
 
 
 	void UpdateScene(float deltaTime) const;
+	
+	void LateUpdateScene(float deltaTime) const;
 
 	void DrawScene() const;
 
