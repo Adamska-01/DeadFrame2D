@@ -1,27 +1,27 @@
+#include "Components/Audio/AudioListener.h"
+#include "Components/Audio/AudioSource.h"
 #include "Components/Collisions/Collider2D.h"
 #include "Data/Collision/CollisionInfo.h"
 #include "Data/Collision/ContactListener.h"
+#include "GameObject.h"
 
 
-std::pair<Collider2D*, Collider2D*> ContactListener::GetCollidersFromContact(b2Contact* contact)
+std::pair<ContactEventProvider*, ContactEventProvider*> ContactListener::GetUserDataFromContact(b2Contact* contact)
 {
 	auto* fixtureA = contact->GetFixtureA();
 	auto* fixtureB = contact->GetFixtureB();
 
-	auto* colA = reinterpret_cast<Collider2D*>(fixtureA->GetUserData().pointer);
-	auto* colB = reinterpret_cast<Collider2D*>(fixtureB->GetUserData().pointer);
+	auto* objA = reinterpret_cast<ContactEventProvider*>(fixtureA->GetUserData().pointer);
+	auto* objB = reinterpret_cast<ContactEventProvider*>(fixtureB->GetUserData().pointer);
 
-	if (!colA || !colB)
-		return { nullptr, nullptr };
-
-	return { colA, colB };
+	return { objA, objB };
 }
 
 void ContactListener::BeginContact(b2Contact* contact)
 {
-	auto [colA, colB] = GetCollidersFromContact(contact);
+	auto [colA, colB] = GetUserDataFromContact(contact);
 
-	if (!colA || !colB)
+	if (colA == nullptr || colB == nullptr)
 		return;
 
 	// Get world manifold for contact points and normal
@@ -35,25 +35,25 @@ void ContactListener::BeginContact(b2Contact* contact)
 	{
 		.contactPoint = contactPoint,
 		.normal = normal,
-		.thisCollider = colA,
-		.otherCollider = colB,
+		.thisGameObject = colA->GetGameObject(),
+		.otherGameObject = colB->GetGameObject(),
 	};
-	
+
 	auto infoB = CollisionInfo
 	{
 		.contactPoint = contactPoint,
 		.normal = normal * -1,
-		.thisCollider = colB,
-		.otherCollider = colA
+		.thisGameObject = colB->GetGameObject(),
+		.otherGameObject = colA->GetGameObject()
 	};
 
-	colA->OnCollisionEnterCallback(infoA);
-	colB->OnCollisionEnterCallback(infoB);
+	colA->InvokeCollisionEnter(infoA);
+	colB->InvokeCollisionEnter(infoB);
 }
 
 void ContactListener::EndContact(b2Contact* contact)
 {
-	auto [colA, colB] = GetCollidersFromContact(contact);
+	auto [colA, colB] = GetUserDataFromContact(contact);
 
 	if (!colA || !colB)
 		return;
@@ -62,18 +62,18 @@ void ContactListener::EndContact(b2Contact* contact)
 	{
 		.contactPoint = Vector2F(),
 		.normal = Vector2F(),
-		.thisCollider = colA,
-		.otherCollider = colB
+		.thisGameObject = colA->GetGameObject(),
+		.otherGameObject = colB->GetGameObject(),
 	};
 
 	CollisionInfo infoB
 	{
 		.contactPoint = Vector2F(),
 		.normal = Vector2F(),
-		.thisCollider = colB,
-		.otherCollider = colA
+		.thisGameObject = colB->GetGameObject(),
+		.otherGameObject = colA->GetGameObject()
 	};
 
-	colA->OnCollisionExitCallback(infoA);
-	colB->OnCollisionExitCallback(infoB);
+	colA->InvokeCollisionExit(infoA);
+	colB->InvokeCollisionExit(infoB);
 }

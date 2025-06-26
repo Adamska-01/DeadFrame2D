@@ -3,7 +3,7 @@
 #include <utility>
 
 
-class Collider2D;
+class ContactEventProvider;
 
 
 /**
@@ -15,7 +15,7 @@ class Collider2D;
 class ContactListener : public b2ContactListener
 {
 private:
-	std::pair<Collider2D*, Collider2D*> GetCollidersFromContact(b2Contact* contact);
+	std::pair<ContactEventProvider*, ContactEventProvider*> GetUserDataFromContact(b2Contact* contact);
 
 
 public:
