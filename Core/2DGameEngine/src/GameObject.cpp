@@ -35,7 +35,7 @@ void GameObject::PropagateActiveStateToChildren()
 
 void GameObject::ConstructGameObject()
 {
-
+	// Meant for prefabs/blueprints
 }
 
 void GameObject::Init()
@@ -71,7 +71,12 @@ void GameObject::Update(float deltaTime)
 
 	for (const auto& child : children)
 	{
-		child.lock()->Update(deltaTime);
+		auto childPtr = child.lock();
+
+		if (childPtr == nullptr)
+			continue;
+
+		childPtr->Update(deltaTime);
 	}
 }
 
