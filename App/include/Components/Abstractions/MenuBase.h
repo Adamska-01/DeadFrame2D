@@ -16,6 +16,8 @@ private:
 protected:
 	MenuManager* menuManager;
 
+	MenuBase* previousMenu;
+
 	std::vector<IInteractableUI*> allInteractables;
 
 	IInteractableUI* selectedInteractable;
@@ -49,8 +51,11 @@ public:
 	virtual void NavigateUp();
 	
 	virtual void NavigateDown();
-	
+	 
 	virtual void Confirm();
 	
 	virtual void GoBack();
+
+
+	void SetPreviousMenu(MenuBase* previousMenu);
 };

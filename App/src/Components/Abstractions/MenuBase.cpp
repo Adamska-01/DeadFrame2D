@@ -11,6 +11,7 @@ MenuBase::MenuBase()
 	allInteractables.clear();
 
 	menuManager = nullptr;
+	previousMenu = nullptr;
 	selectedInteractable = nullptr;
 }
 
@@ -42,7 +43,7 @@ void MenuBase::Navigate(IInteractableUI* (*getNext)(IInteractableUI*))
 void MenuBase::Init()
 {
 	menuManager = SceneManager::FindObjectOfType<MenuManager>();
-	allInteractables = SceneManager::FindObjectsOfType<IInteractableUI>();
+	allInteractables = OwningObject.lock()->GetComponentsInChildren<IInteractableUI>(true);
 
 	Tools::Helpers::GuardAgainstNull(menuManager, "MenuManager not found in scene!");
 }
@@ -121,5 +122,14 @@ void MenuBase::Confirm()
 
 void MenuBase::GoBack()
 {
-	menuManager->PopMenu();
+	if (previousMenu == nullptr)
+		return;
+
+	Hide();
+	previousMenu->Show();
+}
+
+void MenuBase::SetPreviousMenu(MenuBase* previousMenu)
+{
+	previousMenu = previousMenu;
 }
