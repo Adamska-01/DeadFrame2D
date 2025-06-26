@@ -1,17 +1,19 @@
 #pragma once
 #include <GameObject.h>
-#include <string_view>
+
+
+class GameManager;
 
 
 class GameBoard : public GameObject
 {
 private:
-	std::string_view mapSource;
+	GameManager* scoreManager;
 
 
 public:
-	GameBoard(std::string_view mapSource);
-
-
 	virtual void ConstructGameObject() override;
+
+
+	GameManager* GetScoreManager();
 };
