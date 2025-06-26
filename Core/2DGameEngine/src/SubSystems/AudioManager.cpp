@@ -103,7 +103,7 @@ std::shared_ptr<Mix_Chunk> AudioManager::LoadSFX(const std::string_view& filepat
 bool AudioManager::PlayMusicTrack(const std::shared_ptr<Mix_Music>& music, int loopCount)
 {
 	if (music == nullptr)
-		return;
+		return false;
 
 	Mix_VolumeMusic(static_cast<int>((musicVolume * masterVolume) * MIX_MAX_VOLUME));
 	
@@ -113,7 +113,7 @@ bool AudioManager::PlayMusicTrack(const std::shared_ptr<Mix_Music>& music, int l
 int AudioManager::PlaySFX(const std::shared_ptr<Mix_Chunk>& sfx, int loopCount)
 {
 	if (sfx == nullptr)
-		return;
+		return -1;
 
 	auto channel = -1;
 	
