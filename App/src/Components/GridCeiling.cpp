@@ -44,7 +44,7 @@ void GridCeiling::Init()
 	Tools::Helpers::GuardAgainstNull(bobbleGrid, "GridCeiling::Init: BobbleGrid not found from GridCeiling.");
 	Tools::Helpers::GuardAgainstNull(collider, "GridCeiling::Init: BoxCollider2D not found from GridCeiling.");
 
-	collider->RegisterCollisionEnterHandler(EventHelpers::BindFunction(this, &GridCeiling::OnCeilingCollisionEnterHandler), reinterpret_cast<uintptr_t>(this));
+	collider->RegisterContactEnterHandler(EventHelpers::BindFunction(this, &GridCeiling::OnCeilingCollisionEnterHandler), reinterpret_cast<uintptr_t>(this));
 }
 
 void GridCeiling::Start()
