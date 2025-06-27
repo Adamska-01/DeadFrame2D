@@ -16,7 +16,6 @@ AudioSource::AudioSource()
 	collisionBody(nullptr),
 	collisionFixture(nullptr),
 	isMusic(false),
-	loop(false), 
 	minReachingDistance(1),
 	maxReachingDistance(std::numeric_limits<float>::max()),
 	volume(1.0f),
@@ -29,11 +28,10 @@ AudioSource::AudioSource()
 	RegisterContactExitHandler(EventHelpers::BindFunction(this, &AudioSource::OnAudioSourceExitHandler), reinterpret_cast<uintptr_t>(this));
 }
 
-AudioSource::AudioSource(const std::string& audioSource, bool isMusic, bool loop, float volume)
+AudioSource::AudioSource(const std::string& audioSource, bool isMusic, float volume)
 	: AudioSource()
 {
 	this->isMusic = isMusic;
-	this->loop = loop;
 	this->volume = std::clamp(volume, 0.0f, 1.0f);
 
 	LoadAudio(audioSource, isMusic);
@@ -191,8 +189,6 @@ void AudioSource::Update(float deltaTime)
 
 	auto attenuatedVolume = (1.0f - t) * volume;
 
-	std::cout << t << std::endl;
-
 	if (playingChannel != -1)
 	{
 		AudioManager::SetSFXVolume(attenuatedVolume, playingChannel);
@@ -227,7 +223,7 @@ void AudioSource::LoadAudio(const std::string_view& audioSource, bool isMusic)
 	// Could handle errors here
 }
 
-void AudioSource::Play()
+void AudioSource::Play(bool loop)
 {
 	if (isMusic && musicTrack != nullptr)
 	{
@@ -279,11 +275,6 @@ void AudioSource::SetVolume(float vol)
 	}
 }
 
-void AudioSource::SetLoop(bool shouldLoop)
-{
-	loop = shouldLoop;
-}
-
 void AudioSource::SetMaxDistance(float newMaxDistance)
 {
 	maxReachingDistance	= newMaxDistance;
@@ -296,11 +287,6 @@ void AudioSource::SetMinDistance(float newMinDistance)
 	minReachingDistance = newMinDistance;
 	
 	isDirty = true;
-}
-
-bool AudioSource::IsLooping() const
-{
-	return loop;
 }
 
 int AudioSource::GetVolume() const

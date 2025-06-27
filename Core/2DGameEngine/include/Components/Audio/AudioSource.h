@@ -34,8 +34,6 @@ protected:
 
 	bool isMusic;
 
-	bool loop;
-
 	float minReachingDistance;
 
 	float maxReachingDistance;
@@ -61,7 +59,7 @@ protected:
 public:
 	AudioSource();
 
-	AudioSource(const std::string& audioSource, bool isMusic = false, bool loop = false, float volume = 1.0f);
+	AudioSource(const std::string& audioSource, bool isMusic = false, float volume = 1.0f);
 
 	virtual ~AudioSource() override;
 
@@ -77,7 +75,7 @@ public:
 
 	void LoadAudio(const std::string_view& audioSource, bool isMusic = false);
 
-	void Play();
+	void Play(bool loop = false);
 
 	void Pause();
 
@@ -85,14 +83,10 @@ public:
 
 
 	void SetVolume(float vol);
-	
-	void SetLoop(bool shouldLoop);
 
 	void SetMaxDistance(float newMaxDistance);
 
 	void SetMinDistance(float newMinDistance);
-
-	bool IsLooping() const;
 
 	int GetVolume() const;
 };
