@@ -2,6 +2,8 @@
 #include "Scenes/MainMenuScene.h"
 #include "Scenes/SinglePlayerScene.h"
 #include <Blueprints/UI/ButtonBlueprint.h>
+#include <Components/Audio/AudioListener.h>
+#include <Components/Audio/AudioSource.h>
 #include <Components/Rendering/ImageScroller.h>
 #include <Components/Rendering/Sprite.h>
 #include <Components/Transform.h>
@@ -120,6 +122,16 @@ void MainMenuScene::Enter()
 	
 	menuManagerComponent->RegisterMenu(MenuID::MAIN_MENU, mainMenuBase);
 	menuManagerComponent->ShowMenu(MenuID::MAIN_MENU);
+
+	// Sound
+	auto soundSourceObj = GameObject::Instantiate<GameObject>();
+	auto audioSource = soundSourceObj.lock()->AddComponent<AudioSource>();
+	audioSource->LoadAudio(AssetPaths::Audio::MENU_MUSIC, true);
+	audioSource->SetVolume(0.4f);
+	audioSource->Play(true);
+
+	auto soundListenerObj = GameObject::Instantiate<GameObject>();
+	auto listener = soundListenerObj.lock()->AddComponent<AudioListener>();
 
 	//Window::SetWindowMode(WindowMode::BORDERLESS);
 	//Window::SetResolution(Vector2I(2560, 1440));
