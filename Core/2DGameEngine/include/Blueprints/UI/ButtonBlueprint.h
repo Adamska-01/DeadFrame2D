@@ -1,14 +1,12 @@
 #pragma once
 #include "GameObject.h"
-
-
-struct ButtonBlueprintModel;
+#include "Models/Blueprints/UI/ButtonBlueprintModel.h"
 
 
 class ButtonBlueprint : public GameObject
 {
 private:
-	std::function<void()> childObjectCreation;
+	ButtonBlueprintModel buttonBlueprintConfiguration;
 
 
 public:
@@ -17,5 +15,5 @@ public:
 	virtual ~ButtonBlueprint() override = default;
 
 
-	virtual void Init() override;
+	virtual void ConstructGameObject() override;
 };

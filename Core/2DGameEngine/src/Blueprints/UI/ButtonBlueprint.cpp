@@ -2,28 +2,23 @@
 #include "Components/Transform.h"
 #include "Components/UI/Button.h"
 #include "Components/UI/TextMesh.h"
-#include "Models/Blueprints/UI/ButtonBlueprintModel.h"
 
 
 ButtonBlueprint::ButtonBlueprint(const ButtonBlueprintModel& buttonBlueprintConfiguration)
+	: buttonBlueprintConfiguration(buttonBlueprintConfiguration)
+{
+	
+}
+
+void ButtonBlueprint::ConstructGameObject()
 {
 	AddComponent<Button>(buttonBlueprintConfiguration.buttonComponentModel);
 
-	childObjectCreation = [=]() 
-		{
-			auto textMeshObject = GameObject::Instantiate<GameObject>();
+	auto textMeshObject = GameObject::Instantiate<GameObject>();
 
-			auto comp = textMeshObject.lock()->AddComponent<TextMesh>(buttonBlueprintConfiguration.textMeshComponentModel);
+	auto comp = textMeshObject.lock()->AddComponent<TextMesh>(buttonBlueprintConfiguration.textMeshComponentModel);
 
-			AddChildGameObject(textMeshObject);
+	AddChildGameObject(textMeshObject);
 
-			textMeshObject.lock()->GetComponent<Transform>()->SetLocalPosition(Vector2F::Zero);
-		};
-}
-
-void ButtonBlueprint::Init()
-{
-	GameObject::Init();
-
-	childObjectCreation();
+	textMeshObject.lock()->GetComponent<Transform>()->SetLocalPosition(Vector2F::Zero);
 }
