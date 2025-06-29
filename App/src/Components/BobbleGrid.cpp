@@ -4,8 +4,10 @@
 #include "Components/GameFlow/GameManager.h"
 #include "Components/GridCeiling.h"
 #include "Components/Transform.h"
+#include "Constants/AssetPaths.h"
 #include "Constants/BobbleConstants.h"
 #include "Events/LoadNewBobbleEvent.h"
+#include "Prefabs/AudioClipObject.h"
 #include "Prefabs/Bobble.h"
 #include <Components/Collisions/Collider2D.h>
 #include <Components/Physics/RigidBody2D.h>
@@ -56,6 +58,17 @@ void BobbleGrid::RemoveAndDestroyBobbles(std::unordered_set<std::weak_ptr<GameOb
 	auto score = bobbles.size() * scoreMuliplier;
 	
 	gameManager->AddScore(score);
+
+	if (score > 0 && canPop)
+	{
+		auto soundSourceObj = GameObject::Instantiate<AudioClipObject>(
+			AssetPaths::Audio::BOBBLE_POP,
+			Vector2F::Zero,
+			0.4f,
+			true);
+
+		CoroutineScheduler::StartCoroutine(soundSourceObj.lock()->Destroy(1.0f));
+	}
 
 	for (const auto& bobble : bobbles)
 	{
