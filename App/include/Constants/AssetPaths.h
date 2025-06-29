@@ -48,5 +48,15 @@ namespace AssetPaths
 	namespace Audio
 	{
 		inline constexpr std::string_view MENU_MUSIC = "App/Assets/Audio/AIr Room.wav";
+
+		inline constexpr std::string_view GAME_MUSIC = "App/Assets/Audio/Blazer Rail 2.wav";
+
+		inline constexpr std::string_view GAMEOVER_MUSIC = "App/Assets/Audio/GameOver.mp3";
+
+		inline constexpr std::string_view VICTORY_MUSIC = "App/Assets/Audio/orchestral-win.mp3";
+
+		inline constexpr std::string_view BOBBLE_SHOT = "App/Assets/Audio/bubble-shot.wav";
+		
+		inline constexpr std::string_view BOBBLE_POP = "App/Assets/Audio/Bubble Blow.wav";
 	}
 }
