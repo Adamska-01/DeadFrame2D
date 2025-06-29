@@ -1,9 +1,9 @@
 #include "Components/MenuManager.h"
+#include "Prefabs/AudioClipObject.h"
 #include "Scenes/MainMenuScene.h"
 #include "Scenes/SinglePlayerScene.h"
 #include <Blueprints/UI/ButtonBlueprint.h>
 #include <Components/Audio/AudioListener.h>
-#include <Components/Audio/AudioSource.h>
 #include <Components/Rendering/ImageScroller.h>
 #include <Components/Rendering/Sprite.h>
 #include <Components/Transform.h>
@@ -12,37 +12,9 @@
 #include <Components/UI/Layout/VerticalLayoutGroup.h>
 #include <Constants/AssetPaths.h>
 #include <Management/SceneManager.h>
-#include <Math/Vector2.h>
-#include <Models/Blueprints/UI/ButtonBlueprintModel.h>
 #include <SubSystems/Events/EventManager.h>
 #include <SubSystems/Renderer.h>
 
-
-std::weak_ptr<ButtonBlueprint> MainMenuScene::CreateButton(const std::string& text, const std::function<void()>& onPressedHandler)
-{
-	ButtonBlueprintModel buttonConfiguration = 
-	{
-		ButtonComponentModel
-		{
-			.onPressedHandler = onPressedHandler,
-			.idleButtonSource = AssetPaths::Sprites::BUTTON_IDLE_IMAGE_PATH,
-			.hoveredButtonSource = AssetPaths::Sprites::BUTTON_PRESSED_IMAGE_PATH,
-			.pressedButtonSource = AssetPaths::Sprites::BUTTON_PRESSED_IMAGE_PATH,
-			.buttonSize = Vector2F{ 275.0f, 80.0f }
-		},
-		TextMeshComponentModel
-		{
-			.fontSource = AssetPaths::Fonts::THE_BLAST_FONT_PATH,
-			.text = text,
-			.textColor = SDL_Color(255, 132, 31),
-			.fontSize = 100,
-			.textObjectInitialScale = Vector2F(0.25f, 0.25f),
-			.isCentered = true
-		}
-	};
-
-	return GameObject::Instantiate<ButtonBlueprint>(buttonConfiguration);
-}
 
 void MainMenuScene::Enter()
 {
@@ -91,16 +63,19 @@ void MainMenuScene::Enter()
 
 	canvasObject.lock()->AddChildGameObject(mainMenuObject);
 
-	auto spButton = CreateButton("SinglePlayer", []() { SceneManager::LoadScene<SinglePlayerScene>(); });
-	auto mpButton = CreateButton("Multiplayer", []() { /* Multiplayer logic */ });
+	auto enterCallback = MakeAudioPlayAndDestroyCallback(AssetPaths::Audio::BOBBLE_POP, Vector2F::Zero, 0.5f, false, false, 1.0f);
+
+	auto spButton = CreateButton("Play Game", []() { SceneManager::LoadScene<SinglePlayerScene>(); }, enterCallback);
+	//auto mpButton = CreateButton("Multiplayer", []() { /* Multiplayer logic */ }, enterCallback);
 	//auto settingsButton = CreateButton("Settings", [menuManagerComponent, settingsMenuBase]() { menuManagerComponent->PushMenu(settingsMenuBase); });
-	auto exitButton = CreateButton("Exit", []() { EventManager::SendSystemEvent(SDL_EventType::SDL_QUIT); });
+	auto exitButton = CreateButton("Exit", []() { EventManager::SendSystemEvent(SDL_EventType::SDL_QUIT); }, enterCallback);
+
 
 	spButton.lock()->GetComponent<Button>()->SetNavigableUpElement(exitButton.lock()->GetComponent<Button>());
-	spButton.lock()->GetComponent<Button>()->SetNavigableDownElement(mpButton.lock()->GetComponent<Button>());
-	mpButton.lock()->GetComponent<Button>()->SetNavigableUpElement(spButton.lock()->GetComponent<Button>());
-	mpButton.lock()->GetComponent<Button>()->SetNavigableDownElement(exitButton.lock()->GetComponent<Button>());
-	exitButton.lock()->GetComponent<Button>()->SetNavigableUpElement(mpButton.lock()->GetComponent<Button>());
+	spButton.lock()->GetComponent<Button>()->SetNavigableDownElement(exitButton.lock()->GetComponent<Button>());
+	//mpButton.lock()->GetComponent<Button>()->SetNavigableUpElement(spButton.lock()->GetComponent<Button>());
+	//mpButton.lock()->GetComponent<Button>()->SetNavigableDownElement(exitButton.lock()->GetComponent<Button>());
+	exitButton.lock()->GetComponent<Button>()->SetNavigableUpElement(spButton.lock()->GetComponent<Button>());
 	exitButton.lock()->GetComponent<Button>()->SetNavigableDownElement(spButton.lock()->GetComponent<Button>());
 
 	auto mainMenuLayout = GameObject::Instantiate<GameObject>();
@@ -108,14 +83,11 @@ void MainMenuScene::Enter()
 	mainMenuLayout.lock()->AddComponent<VerticalLayoutGroup>(20.0f, LayoutPadding());
 	mainMenuLayout.lock()->GetComponent<Transform>()->SetWorldPosition(layoutPosition);
 	mainMenuLayout.lock()->AddChildGameObject(spButton);
-	mainMenuLayout.lock()->AddChildGameObject(mpButton);
+	//mainMenuLayout.lock()->AddChildGameObject(mpButton);
 	//mainMenuLayout.lock()->AddChildGameObject(settingsButton);
 	mainMenuLayout.lock()->AddChildGameObject(exitButton);
-
 	mainMenuObject.lock()->AddChildGameObject(mainMenuLayout);
 
-	auto buttonPos = mpButton.lock()->GetTransform()->GetWorldPosition();
- 
 	// Create MenuManager and push the initial menu onto the stack
 	auto menuManagerObject = GameObject::Instantiate<GameObject>();
 	auto menuManagerComponent = menuManagerObject.lock()->AddComponent<MenuManager>();
@@ -124,11 +96,13 @@ void MainMenuScene::Enter()
 	menuManagerComponent->ShowMenu(MenuID::MAIN_MENU);
 
 	// Sound
-	auto soundSourceObj = GameObject::Instantiate<GameObject>();
-	auto audioSource = soundSourceObj.lock()->AddComponent<AudioSource>();
-	audioSource->LoadAudio(AssetPaths::Audio::MENU_MUSIC, true);
-	audioSource->SetVolume(0.4f);
-	audioSource->Play(true);
+	auto soundSourceObj = GameObject::Instantiate<AudioClipObject>(
+		AssetPaths::Audio::MENU_MUSIC,
+		Vector2F::Zero,
+		0.3f,
+		true,
+		true);
+
 
 	auto soundListenerObj = GameObject::Instantiate<GameObject>();
 	auto listener = soundListenerObj.lock()->AddComponent<AudioListener>();

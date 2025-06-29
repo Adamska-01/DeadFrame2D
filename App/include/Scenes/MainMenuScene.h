@@ -1,17 +1,16 @@
 #pragma once
+#include "Scenes/Abstractions/BaseGameScene.h"
 #include <Management/Scene.h>
+#include <Math/Vector2.h>
 #include <memory>
+#include <string_view>
 
 
 class ButtonBlueprint;
 
 
-class MainMenuScene : public Scene
+class MainMenuScene : public BaseGameScene
 {
-private:
-	std::weak_ptr<ButtonBlueprint> CreateButton(const std::string& text, const std::function<void()>& onPressedHandler);
-
-
 public:
 	MainMenuScene() = default;
 
