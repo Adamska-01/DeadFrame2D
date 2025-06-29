@@ -1,7 +1,9 @@
 #include "Components/BobbleGrid.h"
 #include "Components/Cannon.h"
 #include "Components/GameFlow/GameManager.h"
+#include "Constants/AssetPaths.h"
 #include "Events/LoadNewBobbleEvent.h"
+#include "Prefabs/AudioClipObject.h"
 #include "Prefabs/Bobble.h"
 #include <algorithm>
 #include <Components/BobbleController.h>
@@ -12,6 +14,7 @@
 #include <Constants/PlayerInputConstants.h>
 #include <Data/Collision/CollisionInfo.h>
 #include <SubSystems/Input/Input.h>
+#include <Tools/Helpers/Coroutines/CoroutineHelpers.h>
 #include <Tools/Helpers/EventHelpers.h>
 #include <Tools/Helpers/Guards.h>
 
@@ -244,4 +247,12 @@ void Cannon::ShootBobble()
 	auto forward = transform->GetForward().Rotated(-90.0f);
 
 	bobblePtr->GetComponent<BobbleController>()->ShootBobble(forward * bobbleSpeed);
+
+	auto soundSourceObj = GameObject::Instantiate<AudioClipObject>(
+		AssetPaths::Audio::BOBBLE_SHOT,
+		Vector2F::Zero,
+		0.4f,
+		true);
+
+	CoroutineScheduler::StartCoroutine(soundSourceObj.lock()->Destroy(1.0f));
 }

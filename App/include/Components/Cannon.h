@@ -1,6 +1,7 @@
 #pragma once
 #include "Generic/Bobble/BobbleColor.h"
 #include <Components/GameComponent.h>
+#include <Coroutines/Task.h>
 #include <Math/Vector2.h>
 #include <memory>
 
@@ -66,6 +67,8 @@ public:
 
 	virtual void Draw() override;
 
+
+	Task StartNextLevel(bool displayEndLevelText);
 
 	void ShootBobble();
 
