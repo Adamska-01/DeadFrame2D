@@ -8,12 +8,12 @@ class GameManager;
 class GameBoard : public GameObject
 {
 private:
-	GameManager* scoreManager;
+	GameManager* gameManager;
 
 
 public:
 	virtual void ConstructGameObject() override;
 
 
-	GameManager* GetScoreManager();
+	GameManager* GetGameManager();
 };

@@ -10,7 +10,7 @@
 
 void GameBoard::ConstructGameObject()
 {
-	scoreManager = AddComponent<GameManager>();
+	gameManager = AddComponent<GameManager>();
 
 	auto bodyDef = BodyDefinition2D();
 	bodyDef.type = BodyType2D::Static;
@@ -35,12 +35,9 @@ void GameBoard::ConstructGameObject()
 
 	// GroundDestroyTrigger
 	AddChildGameObject(GameObject::Instantiate<GroundDestroyTrigger>());
-	
-	
-	// UI
 }
 
-GameManager* GameBoard::GetScoreManager()
+GameManager* GameBoard::GetGameManager()
 {
-	return scoreManager;
+	return gameManager;
 }
