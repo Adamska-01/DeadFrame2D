@@ -12,6 +12,10 @@ private:
 
 	std::vector<std::weak_ptr<GameObject>> gameObjectsToInitialize;
 
+	std::vector<std::shared_ptr<GameObject>> objectsPendingCreation;
+
+	std::vector<std::weak_ptr<GameObject>> childAddedPendingAction;
+
 	std::vector<std::weak_ptr<GameObject>> objectsPendingDestroy;
 
 

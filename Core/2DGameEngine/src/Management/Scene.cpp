@@ -42,15 +42,7 @@ void Scene::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatch
 	auto target = gameObjEvent->gameObjectCreated;
 
 	gameObjects.push_back(target);
-	gameObjectParents.push_back(target);
-
-	std::stable_partition(
-		gameObjectParents.begin(),
-		gameObjectParents.end(),
-		[](const std::shared_ptr<GameObject>& obj)
-		{
-			return obj->GetComponent<Canvas>() == nullptr;
-		});
+	objectsPendingCreation.push_back(target);
 
 	if (isRunning)
 	{
@@ -60,7 +52,6 @@ void Scene::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatch
 		return;
 	}
 
-	// Store for late-initialization
 	gameObjectsToInitialize.push_back(target);
 }
 
@@ -84,25 +75,8 @@ void Scene::ChildGameObjectAddedHandler(std::shared_ptr<DispatchableEvent> dispa
 	if (!gameObjEvent || gameObjEvent->childGameObject.lock() == nullptr)
 		return;
 
-	auto childGameObject = gameObjEvent->childGameObject;
-
-	gameObjectParents.erase(
-		std::remove_if(
-			gameObjectParents.begin(),
-			gameObjectParents.end(),
-			[&childGameObject](const auto& obj)
-			{
-				return obj.get() == childGameObject.lock().get();
-			}),
-		gameObjectParents.end());
-
-	std::stable_partition(
-		gameObjectParents.begin(),
-		gameObjectParents.end(),
-		[](const std::shared_ptr<GameObject>& obj)
-		{
-			return obj->GetComponent<Canvas>() == nullptr;
-		});
+	childAddedPendingAction.push_back(gameObjEvent->childGameObject);
+	
 }
 
 void Scene::CleanupDestroyedObjects()
@@ -199,8 +173,64 @@ void Scene::Init()
 
 void Scene::Update(float deltaTime)
 {
-	for (const auto& obj : gameObjectParents)
+	auto creationPendingSize = objectsPendingCreation.size();
+
+	if (creationPendingSize > 0)
 	{
+		for (size_t i = 0; i < creationPendingSize; ++i)
+		{
+			auto& obj = objectsPendingCreation[i];
+
+			gameObjectParents.push_back(obj);
+
+			std::stable_partition(
+				gameObjectParents.begin(),
+				gameObjectParents.end(),
+				[](const std::shared_ptr<GameObject>& obj)
+				{
+					return obj->GetComponent<Canvas>() == nullptr;
+				});
+		}
+
+		objectsPendingCreation.clear();
+	}
+	
+	auto childAddedPendingActionSize = childAddedPendingAction.size();
+
+	if (childAddedPendingActionSize > 0)
+	{
+		for (size_t i = 0; i < childAddedPendingActionSize; ++i)
+		{
+			auto& childObj = childAddedPendingAction[i];
+
+			gameObjectParents.erase(
+				std::remove_if(
+					gameObjectParents.begin(),
+					gameObjectParents.end(),
+					[&childObj](const auto& obj)
+					{
+						return obj.get() == childObj.lock().get();
+					}),
+				gameObjectParents.end());
+
+			std::stable_partition(
+				gameObjectParents.begin(),
+				gameObjectParents.end(),
+				[](const std::shared_ptr<GameObject>& obj)
+				{
+					return obj->GetComponent<Canvas>() == nullptr;
+				});
+		}
+
+		childAddedPendingAction.clear();
+	}
+
+	auto parentsSize = gameObjectParents.size();
+
+	for (size_t i = 0; i < parentsSize; ++i)
+	{
+		auto& obj = gameObjectParents[i];
+		
 		if (!obj->IsActive())
 			continue;
 
@@ -210,8 +240,12 @@ void Scene::Update(float deltaTime)
 
 void Scene::LateUpdate(float deltaTime)
 {
-	for (const auto& obj : gameObjectParents)
+	auto parentsSize = gameObjectParents.size();
+
+	for (size_t i = 0; i < parentsSize; ++i)
 	{
+		auto& obj = gameObjectParents[i];
+		
 		if (!obj->IsActive())
 			continue;
 
@@ -237,5 +271,6 @@ void Scene::Exit()
 	gameObjects.clear();
 	gameObjectParents.clear();
 	gameObjectsToInitialize.clear();
+	objectsPendingCreation.clear();
 	objectsPendingDestroy.clear();
 }
