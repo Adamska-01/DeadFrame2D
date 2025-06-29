@@ -209,6 +209,8 @@ void AudioSource::Draw()
 
 void AudioSource::LoadAudio(const std::string_view& audioSource, bool isMusic)
 {
+	Stop();
+
 	this->isMusic = isMusic;
 
 	if (isMusic)
@@ -225,6 +227,8 @@ void AudioSource::LoadAudio(const std::string_view& audioSource, bool isMusic)
 
 void AudioSource::Play(bool loop)
 {
+	Stop();
+
 	if (isMusic && musicTrack != nullptr)
 	{
 		AudioManager::PlayMusicTrack(musicTrack, loop ? -1 : 0);
