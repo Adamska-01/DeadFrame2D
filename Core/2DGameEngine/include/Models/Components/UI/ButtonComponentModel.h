@@ -10,6 +10,8 @@ struct ButtonComponentModel
 
 	std::function<void()> onPressedHandler = []() {};
 
+	std::function<void()> onEnterHandler = []() {};
+
 	std::string_view idleButtonSource = "";
 	
 	std::string_view hoveredButtonSource = "";

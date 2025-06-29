@@ -14,6 +14,8 @@ class Button : public IInteractableUI, public IEventProcessor
 private:
 	MultiCastVoid onPressedCallback;
 
+	MultiCastVoid onEnterCallback;
+
 	std::shared_ptr<SDL_Texture> currentButtonImage;
 
 	std::shared_ptr<SDL_Texture> buttonIdleImage;
@@ -51,6 +53,8 @@ public:
 
 
 	void AddPressedCallback(std::function<void()> onPressedHandler, std::uintptr_t identifier);
+
+	void AddEnterCallback(std::function<void()> onEnterCallback, std::uintptr_t identifier);
 	
 	SDL_Rect GetBoundingBox() const;
 

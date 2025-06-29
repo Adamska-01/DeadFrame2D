@@ -13,6 +13,7 @@ Button::Button(const ButtonComponentModel& buttonConfiguration)
 	this->widgetSize = buttonConfiguration.buttonSize;
 
 	AddPressedCallback(buttonConfiguration.onPressedHandler, buttonConfiguration.identifier);
+	AddEnterCallback(buttonConfiguration.onEnterHandler, buttonConfiguration.identifier);
 	SetButtonImageSources(
 		buttonConfiguration.idleButtonSource, 
 		buttonConfiguration.hoveredButtonSource, 
@@ -109,6 +110,8 @@ void Button::OnPointerEnter()
 {
 	isHovered = true;
 
+	onEnterCallback();
+
 	currentButtonImage = buttonHoveredImage;
 }
 
@@ -148,6 +151,11 @@ void Button::OnPointerUp()
 void Button::AddPressedCallback(std::function<void()> onPressedHandler, std::uintptr_t identifier)
 {
 	this->onPressedCallback.RegisterCallback(onPressedHandler, identifier);
+}
+
+void Button::AddEnterCallback(std::function<void()> onEnterCallback, std::uintptr_t identifier)
+{
+	this->onEnterCallback.RegisterCallback(onEnterCallback, identifier);
 }
 
 SDL_Rect Button::GetBoundingBox() const
