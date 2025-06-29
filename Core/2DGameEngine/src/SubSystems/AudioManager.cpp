@@ -1,6 +1,7 @@
+#include <algorithm>
+#include <Constants/AudioConstants.h>
 #include <iostream>
 #include <SubSystems/AudioManager.h>
-#include <algorithm>
 
 
 std::unordered_map<std::string, std::weak_ptr<Mix_Music>> AudioManager::musicCache;
@@ -24,6 +25,8 @@ AudioManager::AudioManager()
 
 		return;
 	}
+
+	Mix_AllocateChannels(AudioConstants::MAX_SFX_CHANNEL_ALLOCATION);
 
 	std::cout << "[Info] SDL_Mixer successfully initialized." << std::endl;
 }
