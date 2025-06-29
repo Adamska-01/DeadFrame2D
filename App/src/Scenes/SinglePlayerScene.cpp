@@ -2,7 +2,9 @@
 #include "Constants/AssetPaths.h"
 #include "Prefabs/GameBoard.h"
 #include "Scenes/SinglePlayerScene.h"
+#include <Blueprints/UI/ButtonBlueprint.h>
 #include <Components/Abstractions/MenuBase.h>
+#include <Components/Audio/AudioListener.h>
 #include <Components/MenuManager.h>
 #include <Components/Rendering/ImageScroller.h>
 #include <Components/Transform.h>
@@ -13,62 +15,13 @@
 #include <Components/UI/LevelTextController.h>
 #include <Components/UI/TextMesh.h>
 #include <Management/SceneManager.h>
-#include <Models/Blueprints/UI/ButtonBlueprintModel.h>
-#include <Models/Components/UI/ButtonComponentModel.h>
 #include <Models/Components/UI/TextMeshComponentModel.h>
+#include <Prefabs/AudioClipObject.h>
 #include <Prefabs/GameMap.h>
 #include <Scenes/MainMenuScene.h>
 #include <SubSystems/Events/EventManager.h>
 #include <SubSystems/Renderer.h>
-#include <Components/Audio/AudioSource.h>
-#include <Components/Audio/AudioListener.h>
-#include <Components/TestAudioInput.h>
-#include <Components/Physics/RigidBody2D.h>
-#include <Components/Collisions/CircleCollider2D.h>
 
-
-std::weak_ptr<GameObject> SinglePlayerScene::CreateText(const std::string& text)
-{
-	auto textMeshObject = GameObject::Instantiate<GameObject>();
-
-	textMeshObject.lock()->AddComponent<TextMesh>(TextMeshComponentModel
-		{
-			.fontSource = AssetPaths::Fonts::THE_BLAST_FONT_PATH,
-			.text = text,
-			.textColor = SDL_Color(255, 132, 31),
-			.fontSize = 100,
-			.textObjectInitialScale = Vector2F(0.25f, 0.25f),
-			.isCentered = true
-		});
-
-	return textMeshObject;
-}
-
-std::weak_ptr<ButtonBlueprint> SinglePlayerScene::CreateButton(const std::string& text, const std::function<void()>& onPressedHandler)
-{
-	ButtonBlueprintModel buttonConfiguration =
-	{
-		ButtonComponentModel
-		{
-			.onPressedHandler = onPressedHandler,
-			.idleButtonSource = AssetPaths::Sprites::BUTTON_IDLE_IMAGE_PATH,
-			.hoveredButtonSource = AssetPaths::Sprites::BUTTON_PRESSED_IMAGE_PATH,
-			.pressedButtonSource = AssetPaths::Sprites::BUTTON_PRESSED_IMAGE_PATH,
-			.buttonSize = Vector2F{ 275.0f, 80.0f }
-		},
-		TextMeshComponentModel
-		{
-			.fontSource = AssetPaths::Fonts::THE_BLAST_FONT_PATH,
-			.text = text,
-			.textColor = SDL_Color(255, 132, 31),
-			.fontSize = 100,
-			.textObjectInitialScale = Vector2F(0.25f, 0.25f),
-			.isCentered = true
-		}
-	};
-
-	return GameObject::Instantiate<ButtonBlueprint>(buttonConfiguration);
-}
 
 MenuBase* SinglePlayerScene::CreateEndScreen(std::string menuTitle, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
@@ -83,9 +36,10 @@ MenuBase* SinglePlayerScene::CreateEndScreen(std::string menuTitle, uint8_t r, u
 	imageBackground->SetAnchor(UIAnchor::TOP_LEFT);
 	imageBackground->SetColor(r, g, b, a);
 
+	auto enterCallback = MakeAudioPlayAndDestroyCallback(AssetPaths::Audio::BOBBLE_POP, Vector2F::Zero, 0.5f, false, false, 1.0f);
 	auto title = CreateText(menuTitle);
-	auto spButton = CreateButton("Back To Menu", []() { SceneManager::LoadScene<MainMenuScene>(); });
-	auto exitButton = CreateButton("Exit", []() { EventManager::SendSystemEvent(SDL_EventType::SDL_QUIT); });
+	auto spButton = CreateButton("Back To Menu", []() { SceneManager::LoadScene<MainMenuScene>(); }, enterCallback);
+	auto exitButton = CreateButton("Exit", []() { EventManager::SendSystemEvent(SDL_EventType::SDL_QUIT); }, enterCallback);
 
 	spButton.lock()->GetComponent<Button>()->SetNavigableUpElement(exitButton.lock()->GetComponent<Button>());
 	spButton.lock()->GetComponent<Button>()->SetNavigableDownElement(exitButton.lock()->GetComponent<Button>());
@@ -162,6 +116,18 @@ void SinglePlayerScene::Enter()
 
 	menuManagerComponent->ShowMenu(MenuID::HUD);
 
+	// Sound
+	auto soundSourceObj = GameObject::Instantiate<AudioClipObject>(
+		AssetPaths::Audio::GAME_MUSIC,
+		Vector2F::Zero,
+		0.2f, 
+		false,
+		true);
 
-	gameBoard.lock()->GetScoreManager()->SetScoreTextMesh(hud->GetGameObject().lock()->GetComponentInChildren<TextMesh>());
+	auto soundListenerObj = GameObject::Instantiate<GameObject>();
+	auto listener = soundListenerObj.lock()->AddComponent<AudioListener>();
+
+
+	gameBoard.lock()->GetGameManager()->SetGameMusicSource(soundSourceObj.lock()->GetAudioSource());
+	gameBoard.lock()->GetGameManager()->SetScoreTextMesh(hud->GetGameObject().lock()->GetComponentInChildren<TextMesh>());
 }
