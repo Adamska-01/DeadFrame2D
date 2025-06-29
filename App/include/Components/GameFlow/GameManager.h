@@ -6,6 +6,7 @@
 #include <vector>
 
 
+class AudioSource;
 class Cannon;
 class BobbleGrid;
 class GridCeiling;
@@ -22,6 +23,8 @@ private:
 
 	int currentLevelIndex;
 
+	AudioSource* gameMusicSource;
+	
 	Cannon* player;
 
 	BobbleGrid* bobbleGrid;
@@ -55,6 +58,8 @@ public:
 	bool IsInputAllowed();
 
 	void SetScoreTextMesh(TextMesh* textMesh);
+
+	void SetGameMusicSource(AudioSource* gameMusicSource);
 
 	void AddScore(int scoreToAdd);
 

@@ -14,6 +14,7 @@
 #include <TileEditors/Tiled/Models/TiledObjectGroup.h>
 #include <Tools/Helpers/Guards.h>
 #include <Tools/IO/FileSystemUtils.h>
+#include <Components/Audio/AudioSource.h>
 
 
 GameManager::GameManager()
@@ -31,6 +32,8 @@ GameManager::GameManager()
 
 void GameManager::Init()
 {
+	Tools::Helpers::GuardAgainstNull(gameMusicSource, "gameMusicSource was not assigned.");
+
 	inputAllowed = false;
 
 	// Get Map Parser
@@ -97,6 +100,11 @@ void GameManager::SetScoreTextMesh(TextMesh* textMesh)
 	scoreCounter.SetTextMesh(textMesh);
 }
 
+void GameManager::SetGameMusicSource(AudioSource* gameMusicSource)
+{
+	this->gameMusicSource = gameMusicSource;
+}
+
 void GameManager::AddScore(int scoreToAdd)
 {
 	scoreCounter.AddScore(scoreToAdd);
@@ -113,6 +121,10 @@ Task GameManager::StartNextLevel(bool displayEndLevelText)
 	if (currentLevelIndex >= levelSources.size())
 	{
 		// TODO: Show scoreboard
+		gameMusicSource->LoadAudio(AssetPaths::Audio::VICTORY_MUSIC, true);
+
+		gameMusicSource->Play();
+
 		menuManager->ShowMenu(MenuID::VICTORY_MENU);
 
 		co_return;
@@ -158,5 +170,9 @@ Task GameManager::StartNextLevel(bool displayEndLevelText)
 
 void GameManager::ShowGameOverScreen()
 {
+	gameMusicSource->LoadAudio(AssetPaths::Audio::GAMEOVER_MUSIC);
+
+	gameMusicSource->Play();
+
 	menuManager->ShowMenu(MenuID::GAME_OVER_MENU);
 }
