@@ -1,5 +1,6 @@
 #pragma once
 #include "ComponentBucket.h"
+#include "Coroutines/Task.h"
 #include "EventSystem/EventDispatcher.h"
 #include "EventSystem/Events/GameObjectEvents/GameObjectCreatedEvent.h"
 #include "GameObjectNotifier.h"
@@ -85,6 +86,8 @@ public:
 	bool IsChildOf(std::weak_ptr<GameObject> potentialChild, bool recursive = false) const;
 
 	void Destroy();
+
+	Task Destroy(float delaySeconds);
 
 
 	std::weak_ptr<GameObject> GetThisWeak() const;

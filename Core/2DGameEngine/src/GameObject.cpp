@@ -2,6 +2,7 @@
 #include "EventSystem/Events/GameObjectEvents/ChildGameObjectAddedEvent.h"
 #include "EventSystem/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
 #include "GameObject.h"
+#include "Tools/Helpers/Coroutines/CoroutineHelpers.h"
 
 
 GameObject::GameObject()
@@ -199,6 +200,23 @@ void GameObject::Destroy()
 
 	EventDispatcher::SendEvent(std::make_shared<GameObjectDestroyedEvent>(thisWeak));
 
+	auto parentPtr = parent.lock();
+	if (parentPtr != nullptr)
+	{
+		auto it = std::find_if(
+			parentPtr->children.begin(),
+			parentPtr->children.end(),
+			[this](const std::weak_ptr<GameObject>& child)
+			{
+				return child.lock() == thisWeak.lock();
+			});
+
+		if (it != parentPtr->children.end())
+		{
+			parentPtr->children.erase(it);
+		}
+	}
+
 	for (auto& child : children)
 	{
 		auto childPtr = child.lock();
@@ -206,6 +224,16 @@ void GameObject::Destroy()
 		if (childPtr != nullptr)
 			childPtr->Destroy();
 	}
+}
+
+Task GameObject::Destroy(float delaySeconds)
+{
+	if (delaySeconds > 0.0f)
+	{
+		co_await Tools::Helpers::Coroutines::WaitSeconds(delaySeconds);
+	}
+
+	Destroy();
 }
 
 std::weak_ptr<GameObject> GameObject::GetThisWeak() const
