@@ -9,6 +9,7 @@
  <layer id="1" name="Base" width="40" height="23" locked="1">
   <properties>
    <property name="isSolid" type="bool" value="true"/>
+   <property name="isTrigger" type="bool" value="true"/>
    <property name="renderEnabled" type="bool" value="true"/>
   </properties>
   <data encoding="csv">
