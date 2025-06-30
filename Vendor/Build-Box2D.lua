@@ -4,6 +4,7 @@ project "Box2D"
 	cppdialect "C++17"
 	staticruntime "on"
 	defines { "_Static_assert=static_assert" }
+
 	targetdir ("./Box2D/Binaries/" .. OutputDir)
 	objdir ("./Box2D/Binaries/Intermediates/" .. OutputDir)
 
