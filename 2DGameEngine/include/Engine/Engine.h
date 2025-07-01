@@ -4,6 +4,7 @@
 #include "SubSystems/Events/EventManager.h"
 #include "SubSystems/SubSystems.h"
 #include "Tools/FrameTimer.h"
+#include <Models/Engine/EngineConfig.h>
 
 
 class Engine
@@ -15,7 +16,9 @@ protected:
 
 	EventManager eventManager;
 
-	FrameTimer ft;
+	FrameTimer frameTimer;
+
+	EngineConfig engineConfig;
 
 
 public:
