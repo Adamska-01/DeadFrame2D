@@ -1,0 +1,18 @@
+{
+	"window": {
+		"title": "DeadFrame2D",
+		"iconPath": "Resources/Icons/window_icon.png",
+		"width": 1280,
+		"height": 720,
+		"fullscreen": false
+	},
+	"rendering": {
+		"rendererWidth": 1280,
+		"rendererHeight": 720,
+		"targetFramerate": 140
+	},
+	"splashScreen": {
+		"imagePath": "Resources/Images/splash_screen.png",
+		"durationSeconds": 4
+	}
+}
