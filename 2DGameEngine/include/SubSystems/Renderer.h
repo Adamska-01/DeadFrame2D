@@ -1,8 +1,9 @@
 #pragma once
+#include "Math/Vector2.h"
 #include "SubSystems/Abstractions/ISubSystem.h"
-#include "Window.h"
 #include <cstdint>
 #include <Models/Engine/RendererConfig.h>
+#include <SDL.h>
 
 
 struct SDL_Window;
@@ -17,7 +18,7 @@ class Renderer : public ISubSystem
 private:
 	Renderer(SDL_Window* window, RendererConfig config);
 
-	~Renderer();
+	virtual ~Renderer() override;
 
 	Renderer(const Renderer&) = delete;
 
@@ -43,9 +44,9 @@ private:
 
 public:
 	static void ClearBuffer();
-	
+
 	static void PresentBuffer();
-	
+
 	static SDL_Renderer* GetRenderer();
 
 	static SDL_Color GetDisplayColor();

@@ -28,7 +28,7 @@ private:
 
 	AudioManager();
 
-	~AudioManager();
+	virtual ~AudioManager() override;
 
 	AudioManager(const AudioManager&) = delete;
 

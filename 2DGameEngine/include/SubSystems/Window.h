@@ -4,7 +4,6 @@
 #include "SubSystems/Abstractions/ISubSystem.h"
 #include "SubSystems/Events/Interfaces/IEventProcessor.h"
 #include <Models/Engine/WindowConfig.h>
-#include <string>
 #include <vector>
 
 
@@ -16,7 +15,7 @@ class Window : public IEventProcessor, public ISubSystem
 private:
 	Window(WindowConfig windowConfig);
 
-	~Window();
+	virtual ~Window() override;
 
 	Window(const Window&) = delete;
 

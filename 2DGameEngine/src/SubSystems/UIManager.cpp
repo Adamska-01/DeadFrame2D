@@ -1,6 +1,7 @@
 #include "Debugging/Debug.h"
 #include "SubSystems/Renderer.h"
 #include "SubSystems/UIManager.h"
+#include <iostream>
 #include <sstream>
 
 

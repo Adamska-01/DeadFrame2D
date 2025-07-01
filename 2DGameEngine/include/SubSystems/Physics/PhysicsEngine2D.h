@@ -21,7 +21,7 @@ private:
 
 	PhysicsEngine2D(const Vector2F& gravity);
 
-	~PhysicsEngine2D();
+	virtual ~PhysicsEngine2D() override;
 
 	PhysicsEngine2D(const PhysicsEngine2D&) = delete;
 

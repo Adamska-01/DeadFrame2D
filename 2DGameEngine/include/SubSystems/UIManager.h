@@ -18,7 +18,7 @@ class UIManager : public ISubSystem
 private:
 	UIManager();
 
-	~UIManager();
+	virtual ~UIManager() override;
 
 	UIManager(const UIManager&) = delete;
 	

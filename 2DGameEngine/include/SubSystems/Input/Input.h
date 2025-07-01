@@ -16,7 +16,7 @@ class Input : public IEventProcessor, public ISubSystem
 private:
 	Input();
 
-	~Input();
+	virtual ~Input() override;
 
 	Input(Input&&) = delete;
 

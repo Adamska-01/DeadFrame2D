@@ -16,7 +16,7 @@ class TextureManager : public ISubSystem
 private:
 	TextureManager();
 
-	~TextureManager();
+	virtual ~TextureManager() override;
 
 	TextureManager(const TextureManager&) = delete;
 

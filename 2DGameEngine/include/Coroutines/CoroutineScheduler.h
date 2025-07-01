@@ -23,7 +23,7 @@ private:
 
 	CoroutineScheduler() = default;
 
-	~CoroutineScheduler();
+	virtual ~CoroutineScheduler() override;
 
 
 	virtual void Update(float deltaTime) override;

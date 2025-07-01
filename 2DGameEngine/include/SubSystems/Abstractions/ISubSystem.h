@@ -5,8 +5,11 @@ class ISubSystem
 {
 	friend class SubSystems;
 
-
+	
 protected:
+	virtual ~ISubSystem() = default;
+
+
 	virtual void Update(float deltaTime) = 0;
 
 	virtual void BeginFrame() = 0;
