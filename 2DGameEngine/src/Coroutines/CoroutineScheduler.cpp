@@ -89,6 +89,21 @@ void CoroutineScheduler::Update(float deltaTime)
 		current->tasks.end());
 }
 
+void CoroutineScheduler::BeginFrame()
+{
+
+}
+
+void CoroutineScheduler::EndUpdate()
+{
+
+}
+
+void CoroutineScheduler::EndDraw()
+{
+
+}
+
 void CoroutineScheduler::SetCurrent(CoroutineScheduler* scheduler)
 {
 	current = scheduler;

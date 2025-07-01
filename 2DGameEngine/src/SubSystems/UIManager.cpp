@@ -28,6 +28,26 @@ UIManager::~UIManager()
 	std::cout << "[Info] SDL_TTF subsystem successfully quit." << std::endl;
 }
 
+void UIManager::Update(float deltaTime)
+{
+
+}
+
+void UIManager::BeginFrame()
+{
+
+}
+
+void UIManager::EndUpdate()
+{
+
+}
+
+void UIManager::EndDraw()
+{
+
+}
+
 std::shared_ptr<TTF_Font> UIManager::LoadFont(std::string_view textSource, int fontsize)
 {
 	auto filenameString = std::string(textSource);

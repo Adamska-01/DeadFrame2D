@@ -1,19 +1,21 @@
 #pragma once
+#include "SubSystems/Abstractions/ISubSystem.h"
 #include "Window.h"
 #include <cstdint>
+#include <Models/Engine/RendererConfig.h>
 
 
 struct SDL_Window;
 struct SDL_Renderer;
 
 
-class Renderer
+class Renderer : public ISubSystem
 {
 	friend class SubSystems;
 
 
 private:
-	Renderer(SDL_Window* window);
+	Renderer(SDL_Window* window, RendererConfig config);
 
 	~Renderer();
 
@@ -28,6 +30,15 @@ private:
 
 
 	static SDL_Renderer* renderer;
+
+
+	virtual void Update(float deltaTime) override;
+
+	virtual void BeginFrame() override;
+
+	virtual void EndUpdate() override;
+
+	virtual void EndDraw() override;
 
 
 public:

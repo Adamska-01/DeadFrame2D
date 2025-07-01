@@ -30,6 +30,26 @@ TextureManager::~TextureManager()
 	std::cout << "[Info] SDL_image subsystem successfully quit." << std::endl;
 }
 
+void TextureManager::Update(float deltaTime)
+{
+
+}
+
+void TextureManager::BeginFrame()
+{
+
+}
+
+void TextureManager::EndUpdate()
+{
+
+}
+
+void TextureManager::EndDraw()
+{
+
+}
+
 std::shared_ptr<SDL_Texture> TextureManager::LoadTexture(std::string_view filename)
 {
 	auto filenameString = std::string(filename);

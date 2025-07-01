@@ -1,4 +1,5 @@
 #pragma once
+#include "SubSystems/Abstractions/ISubSystem.h"
 #include "Tools/Hashing/PairHash.h"
 #include <memory>
 #include <SDL_ttf.h>
@@ -9,7 +10,7 @@
 struct SDL_Texture;
 
 
-class UIManager
+class UIManager : public ISubSystem
 {
 	friend class SubSystems;
 
@@ -30,6 +31,15 @@ private:
 
 
 	static std::unordered_map<std::pair<std::string, int>, std::shared_ptr<TTF_Font>, PairHash> fontCache;
+
+
+	virtual void Update(float deltaTime) override;
+
+	virtual void BeginFrame() override;
+
+	virtual void EndUpdate() override;
+
+	virtual void EndDraw() override;
 
 
 public:

@@ -41,6 +41,26 @@ AudioManager::~AudioManager()
 	std::cout << "[Info] SDL_Mixer subsystem successfully quit." << std::endl;
 }
 
+void AudioManager::Update(float deltaTime)
+{
+
+}
+
+void AudioManager::BeginFrame()
+{
+
+}
+
+void AudioManager::EndUpdate()
+{
+
+}
+
+void AudioManager::EndDraw()
+{
+
+}
+
 std::shared_ptr<Mix_Music> AudioManager::LoadMusic(const std::string_view& filepath)
 {
 	auto filePathString = std::string(filepath);

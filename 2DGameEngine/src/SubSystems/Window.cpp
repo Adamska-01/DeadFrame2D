@@ -2,25 +2,37 @@
 #include "SubSystems/Window.h"
 #include <algorithm>
 #include <set>
+#include <SDL_image.h>
 
 
 SDL_Window* Window::window = nullptr;
 
 
-Window::Window(int width, int height, const char* title)
+Window::Window(WindowConfig windowConfig)
 {
 	window = SDL_CreateWindow(
-		title,
+		windowConfig.title.c_str(),
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		width,
-		height,
+		windowConfig.width,
+		windowConfig.height,
 		// Window behaviour flag (not used "0")
 		0);
 
 #if _DEBUG
 	DBG_ASSERT_MSG(window, "Window initialisation failed: %s\n", SDL_GetError());
 #endif
+
+	SetWindowIcon(windowConfig.iconSourcePath);
+
+	if (windowConfig.fullscreen)
+	{
+		SetWindowMode(WindowMode::BORDERLESS);
+
+		auto maxRes = GetSupportedResolutions().back();
+
+		SetResolution(Vector2I(maxRes.w, maxRes.h));
+	}
 
 	std::cout << "[Info] Window successfully initialized." << std::endl;
 }
@@ -37,6 +49,26 @@ Window::~Window()
 	SDL_DestroyWindow(window);
 	
 	std::cout << "[Info] Window successfully destroyed." << std::endl;
+}
+
+void Window::Update(float deltaTime)
+{
+
+}
+
+void Window::BeginFrame()
+{
+
+}
+
+void Window::EndUpdate()
+{
+
+}
+
+void Window::EndDraw()
+{
+
 }
 
 std::optional<int> Window::ProcessEvents(const SDL_Event& sdlEvent)
@@ -122,6 +154,30 @@ std::vector<SDL_DisplayMode> Window::GetSupportedResolutions()
 	}
 
 	return resolutions;
+}
+
+void Window::SetWindowIcon(std::string_view iconSource)
+{
+	if (window == nullptr)
+	{
+		std::cerr << "[Error] Cannot set icon, window is nullptr." << std::endl;
+		
+		return;
+	}
+
+	auto iconSurface = IMG_Load(std::string(iconSource).c_str());
+	
+	if (iconSurface == nullptr)
+	{
+		std::cerr << "[Error] Failed to load window icon from '" << iconSource << "': " << IMG_GetError() << std::endl;
+	
+		return;
+	}
+
+	SDL_SetWindowIcon(window, iconSurface);
+	SDL_FreeSurface(iconSurface);
+
+	std::cout << "[Info] Window icon set from '" << iconSource << "'." << std::endl;
 }
 
 void Window::SetWindowMode(WindowMode mode)

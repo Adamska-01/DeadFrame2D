@@ -1,35 +1,12 @@
 #pragma once
-
-
-class Window;
-class Renderer;
-class Input;
-class UIManager;
-class TextureManager;
-class AudioManager;
-class PhysicsEngine2D;
-class CoroutineScheduler;
+#include <Models/Engine/EngineConfig.h>
+#include "SubSystems/Abstractions/ISubSystem.h"
 
 
 class SubSystems
 {
 private:
-	// TODO: Create and interface to store all these
-	Window* window;
-
-	Renderer* renderer;
-
-	Input* input;
-
-	UIManager* uiManager;
-
-	TextureManager* textureManager;
-
-	AudioManager* audioManager;
-	
-	PhysicsEngine2D* physicsEngine2D;
-
-	CoroutineScheduler* coroutineScheduler;
+	std::array<ISubSystem*, 8> subSystems;
 
 
 public:
@@ -38,11 +15,11 @@ public:
 	~SubSystems();
 
 
-	void InitializeSubSystems();
+	void InitializeSubSystems(EngineConfig config);
 
 
 	void Update(float deltaTime);
-	
+
 	void BeginFrame();
 
 	void EndUpdate();

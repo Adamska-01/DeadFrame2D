@@ -68,16 +68,6 @@ Input::~Input()
 	}
 }
 
-void Input::BeginFrame()
-{
-	for (const auto& device : controllerDevices)
-	{
-		device->BeginInputFrame();
-	}
-	keyboardDevice->BeginInputFrame();
-	mouseDevice->BeginInputFrame();
-}
-
 void Input::DisconnectControllerHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
 {
 	auto controllerDisconnectedEvent = DispatchableEvent::SafeCast<ControllerDisconnectedEvent>(dispatchableEvent);
@@ -99,6 +89,33 @@ void Input::DisconnectControllerHandler(std::shared_ptr<DispatchableEvent> dispa
 		return;
 
 	controllerDevices.erase(it, controllerDevices.end());
+}
+
+
+void Input::Update(float deltaTime)
+{
+
+}
+
+void Input::BeginFrame()
+{
+	for (const auto& device : controllerDevices)
+	{
+		device->BeginInputFrame();
+	}
+
+	keyboardDevice->BeginInputFrame();
+	mouseDevice->BeginInputFrame();
+}
+
+void Input::EndUpdate()
+{
+
+}
+
+void Input::EndDraw()
+{
+
 }
 
 std::optional<int> Input::ProcessEvents(const SDL_Event& sdlEvent)

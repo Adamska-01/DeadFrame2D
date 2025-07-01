@@ -1,13 +1,14 @@
 #pragma once
 #include "Devices/InputDevice.h"
 #include "EventSystem/DispatchableEvent.h"
+#include "SubSystems/Abstractions/ISubSystem.h"
 #include "SubSystems/Events/Interfaces/IEventProcessor.h"
 #include "SubSystems/Input/Generic/PlayerInputSlot.h"
 #include <memory>
 #include <vector>
 
 
-class Input : public IEventProcessor
+class Input : public IEventProcessor, public ISubSystem
 {
 	friend class SubSystems;
 
@@ -32,9 +33,16 @@ private:
 	static std::vector<std::unique_ptr<InputDevice>> controllerDevices;
 
 
-	void BeginFrame();
-
 	void DisconnectControllerHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
+
+
+	virtual void Update(float deltaTime) override;
+
+	virtual void BeginFrame() override;
+
+	virtual void EndUpdate() override;
+
+	virtual void EndDraw() override;
 
 
 public:

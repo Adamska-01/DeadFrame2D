@@ -1,4 +1,3 @@
-#include "Constants/ScreenConstants.h"
 #include "Coroutines/CoroutineScheduler.h"
 #include "SubSystems/AudioManager.h"
 #include "SubSystems/Input/Input.h"
@@ -12,87 +11,73 @@
 
 
 SubSystems::SubSystems()
-	: renderer(nullptr),
-	window(nullptr),
-	input(nullptr),
-	textureManager(nullptr),
-	uiManager(nullptr),
-	audioManager(nullptr),
-	physicsEngine2D(nullptr),
-	coroutineScheduler(nullptr)
 {
+	subSystems.fill(nullptr);
 }
 
 SubSystems::~SubSystems()
 {
-	delete renderer;
-	renderer = nullptr;
-
-	delete window;
-	window = nullptr;
-
-	delete input;
-	input = nullptr;
-
-	delete textureManager;
-	textureManager = nullptr;
-
-	delete uiManager;
-	uiManager = nullptr;
-
-	delete audioManager;
-	audioManager = nullptr;
-	
-	delete physicsEngine2D;
-	physicsEngine2D = nullptr;
-	
-	delete coroutineScheduler;
-	coroutineScheduler = nullptr;
+	for (const auto& subSystem : subSystems)
+	{
+		delete subSystem;
+	}
 }
 
-void SubSystems::InitializeSubSystems()
+void SubSystems::InitializeSubSystems(EngineConfig config)
 {
 	// TODO: Create a config file to set the default values for window and renderer 
 
-	window = new Window(
-		ScreenConstants::DEFAULT_SCREENWIDTH,
-		ScreenConstants::DEFAULT_SCREENHEIGHT,
-		"App");
+	auto window = new Window(config.window);
 
-	renderer = new Renderer(window->GetWindow());
+	subSystems[0] = window;
 
-	input = new Input();
+	subSystems[1] = new Renderer(window->GetWindow(), config.rendering);
 
-	textureManager = new TextureManager();
+	subSystems[2] = new Input();
 
-	uiManager = new UIManager();
+	subSystems[3] = new TextureManager();
 
-	audioManager = new AudioManager();
+	subSystems[4] = new UIManager();
 
-	physicsEngine2D = new PhysicsEngine2D(Vector2F(PhysicsConstants::GRAVITY_X, PhysicsConstants::GRAVITY_Y));
+	subSystems[5] = new AudioManager();
 
-	coroutineScheduler = new CoroutineScheduler();
+	subSystems[6] = new PhysicsEngine2D(Vector2F(PhysicsConstants::GRAVITY_X, PhysicsConstants::GRAVITY_Y));
+
+	auto coroutineScheduler = new CoroutineScheduler();
 	CoroutineScheduler::SetCurrent(coroutineScheduler);
+	
+	subSystems[7] = coroutineScheduler;
 }
 
 void SubSystems::Update(float deltaTime)
 {
-	coroutineScheduler->Update(deltaTime);
+	for (const auto& subSystem : subSystems)
+	{
+		subSystem->Update(deltaTime);
+	}
 }
 
 // TODO: Create the interface with BeginFrame and EndFrame
 void SubSystems::BeginFrame()
 {
-	input->BeginFrame();
-	physicsEngine2D->BeginFrame();
+	for (const auto& subSystem : subSystems)
+	{
+		subSystem->BeginFrame();
+	}
 }
 
 void SubSystems::EndUpdate()
 {
-	physicsEngine2D->EndUpdate();
+	for (const auto& subSystem : subSystems)
+	{
+		subSystem->EndUpdate();
+	}
 }
 
 void SubSystems::EndDraw()
 {
-	physicsEngine2D->EndDraw();
+	for (const auto& subSystem : subSystems)
+	{
+		subSystem->EndDraw();
+	}
 }

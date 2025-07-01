@@ -1,18 +1,20 @@
 #pragma once
 #include "Generic/WindowMode.h"
 #include "Math/Vector2.h"
+#include "SubSystems/Abstractions/ISubSystem.h"
 #include "SubSystems/Events/Interfaces/IEventProcessor.h"
+#include <Models/Engine/WindowConfig.h>
 #include <string>
 #include <vector>
 
 
-class Window : public IEventProcessor
+class Window : public IEventProcessor, public ISubSystem
 {
 	friend class SubSystems;
 
 
 private:
-	Window(int width, int height, const char* title);
+	Window(WindowConfig windowConfig);
 
 	~Window();
 
@@ -27,7 +29,16 @@ private:
 
 
 	static SDL_Window* window;
-	
+
+
+	virtual void Update(float deltaTime) override;
+
+	virtual void BeginFrame() override;
+
+	virtual void EndUpdate() override;
+
+	virtual void EndDraw() override;
+
 
 public:
 	std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
@@ -38,6 +49,8 @@ public:
 	static Vector2I GetResolution();
 
 	static std::vector<SDL_DisplayMode> GetSupportedResolutions();
+
+	static void SetWindowIcon(std::string_view iconSource);
 
 	static void SetWindowMode(WindowMode mode);
 

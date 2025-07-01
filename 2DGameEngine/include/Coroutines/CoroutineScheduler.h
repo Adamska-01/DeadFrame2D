@@ -1,12 +1,13 @@
 #pragma once
 #include "Coroutines/Task.h"
+#include "SubSystems/Abstractions/ISubSystem.h"
 #include <vector>
 
 
 class ICoroutineAwaitable;
 
 
-class CoroutineScheduler 
+class CoroutineScheduler : public ISubSystem
 {
 	friend class SubSystems;
 
@@ -25,9 +26,15 @@ private:
 	~CoroutineScheduler();
 
 
-	void Update(float deltaTime);
+	virtual void Update(float deltaTime) override;
 
-	
+	virtual void BeginFrame() override;
+
+	virtual void EndUpdate() override;
+
+	virtual void EndDraw() override;
+
+
 	static void SetCurrent(CoroutineScheduler* scheduler);
 
 

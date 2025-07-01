@@ -29,6 +29,11 @@ PhysicsEngine2D::~PhysicsEngine2D()
 	std::cout << "[Info] PhysicsEngine2D subsystem successfully quit." << std::endl;
 }
 
+void PhysicsEngine2D::Update(float deltaTime)
+{
+
+}
+
 void PhysicsEngine2D::BeginFrame()
 {
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/Vector2.h"
+#include "SubSystems/Abstractions/ISubSystem.h"
 #include <memory>
 
 
@@ -9,7 +10,7 @@ class b2World;
 class b2ContactListener;
 
 
-class PhysicsEngine2D
+class PhysicsEngine2D : public ISubSystem
 {
 	friend class SubSystems;
 
@@ -27,12 +28,13 @@ private:
 	PhysicsEngine2D(PhysicsEngine2D&&) = delete;
 
 
-	// TODO: Make this an interface and share it with other subsystems
-	void BeginFrame();
+	virtual void Update(float deltaTime) override;
 
-	void EndUpdate();
+	virtual void BeginFrame() override;
 
-	void EndDraw();
+	virtual void EndUpdate() override;
+
+	virtual void EndDraw() override;
 
 
 public:

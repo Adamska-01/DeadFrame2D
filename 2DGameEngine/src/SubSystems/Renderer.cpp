@@ -1,4 +1,3 @@
-#include "Constants/ScreenConstants.h"
 #include "Debugging/Debug.h"
 #include "EventSystem/EventDispatcher.h"
 #include "EventSystem/Events/SubSystems/Renderer/RenderTargetSizeChangedEvent.h"
@@ -10,7 +9,7 @@
 SDL_Renderer* Renderer::renderer = nullptr;
 
 
-Renderer::Renderer(SDL_Window* window)
+Renderer::Renderer(SDL_Window* window, RendererConfig config)
 {
 #if _DEBUG
 	DBG_ASSERT_MSG(window, "Window initialisation failed: %s\n", SDL_GetError());
@@ -32,7 +31,7 @@ Renderer::Renderer(SDL_Window* window)
 	DBG_ASSERT_MSG(renderer, "Renderer initialisation failed: %s\n", SDL_GetError());
 #endif
 
-	SetResolutionTarget({ ScreenConstants::DEFAULT_RENDERER_X_SIZE, ScreenConstants::DEFAULT_RENDERER_Y_SIZE });
+	SetResolutionTarget({ config.width, config.height });
 
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
@@ -53,6 +52,26 @@ Renderer::~Renderer()
 	SDL_Quit();
 
 	std::cout << "[Info] Renderer successfully destroyed and SDL_VIDEO successfully quit." << std::endl;
+}
+
+void Renderer::Update(float deltaTime)
+{
+
+}
+
+void Renderer::BeginFrame()
+{
+
+}
+
+void Renderer::EndUpdate()
+{
+
+}
+
+void Renderer::EndDraw()
+{
+
 }
 
 void Renderer::ClearBuffer()

@@ -1,4 +1,5 @@
 #pragma once
+#include "SubSystems/Abstractions/ISubSystem.h"
 #include <memory>
 #include <mutex>
 #include <SDL_mixer.h>
@@ -6,7 +7,7 @@
 #include <unordered_map>
 
 
-class AudioManager
+class AudioManager : public ISubSystem
 {
 	friend class SubSystems;
 
@@ -37,6 +38,15 @@ private:
 	AudioManager& operator=(const AudioManager&) = delete;
 
 	AudioManager& operator=(AudioManager&&) = delete;
+
+
+	virtual void Update(float deltaTime) override;
+
+	virtual void BeginFrame() override;
+
+	virtual void EndUpdate() override;
+
+	virtual void EndDraw() override;
 
 
 public:

@@ -1,13 +1,14 @@
 #pragma once
 #include "Components/Generic/Circle.h"
 #include "Constants/CommonColors.h"
+#include "SubSystems/Abstractions/ISubSystem.h"
 #include <memory>
 #include <SDL_image.h>
 #include <string>
 #include <unordered_map>
 
 
-class TextureManager
+class TextureManager : public ISubSystem
 {
 	friend class SubSystems;
 
@@ -28,6 +29,15 @@ private:
 
 
 	static std::unordered_map<std::string, std::weak_ptr<SDL_Texture>> textureCache;
+
+
+	virtual void Update(float deltaTime) override;
+
+	virtual void BeginFrame() override;
+
+	virtual void EndUpdate() override;
+
+	virtual void EndDraw() override;
 
 
 public:
