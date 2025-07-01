@@ -13,4 +13,5 @@ project "Shared"
 
 	includedirs {
 		"include",
+		"../Vendor/nlohmann-3.11.3"
 	}
