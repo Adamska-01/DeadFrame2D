@@ -1,8 +1,8 @@
 #include "Components/Rendering/ImageScroller.h"
 #include "Components/Transform.h"
-#include "Constants/ScreenConstants.h"
 #include "EventSystem/EventDispatcher.h"
 #include "EventSystem/Events/SubSystems/Renderer/RenderTargetSizeChangedEvent.h"
+#include "SubSystems/Renderer.h"
 #include "SubSystems/TextureManager.h"
 #include "Tools/Helpers/EventHelpers.h"
 
@@ -10,8 +10,7 @@
 ImageScroller::ImageScroller(std::string_view textureSource, ScrollDirection scrollDirection, float scrollSpeed)
 	: Sprite(textureSource), scrollDirection(scrollDirection), scrollSpeed(scrollSpeed)
 {
-	renderTargetSize.x = ScreenConstants::DEFAULT_RENDERER_X_SIZE;
-	renderTargetSize.y = ScreenConstants::DEFAULT_RENDERER_Y_SIZE;
+	renderTargetSize = Renderer::GetResolutionTarget();
 
 	scrollOffset = 0;
 
