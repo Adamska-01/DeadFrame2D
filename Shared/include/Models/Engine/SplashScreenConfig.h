@@ -5,10 +5,14 @@
 
 struct SplashScreenConfig
 {
-	std::string_view imageSourcePath;
+	std::string imageSourcePath;
 
-	int durationSeconds = 0;
+	float fadeInDurationSeconds = 1.0f;
+
+	float holdVisibleDurationSeconds = 1.0f;
+	
+	float fadeOutDurationSeconds = 1.0f;
 
 
-	NLOHMANN_DEFINE_TYPE_INTRUSIVE(SplashScreenConfig, imageSourcePath, durationSeconds)
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(SplashScreenConfig, imageSourcePath, fadeInDurationSeconds, holdVisibleDurationSeconds, fadeOutDurationSeconds)
 };
