@@ -1,7 +1,7 @@
 {
 	"window": {
 		"title": "DeadFrame2D",
-		"iconPath": "Resources/Icons/window_icon.png",
+		"iconSourcePath": "Core/Shared/Resources/Logos/window_icon.png",
 		"width": 1280,
 		"height": 720,
 		"fullscreen": false
@@ -12,7 +12,9 @@
 		"targetFramerate": 140
 	},
 	"splashScreen": {
-		"imagePath": "Resources/Images/splash_screen.png",
-		"durationSeconds": 4
+		"imageSourcePath": "Core/Shared/Resources/Logos/splash_screen.png",
+		"fadeInDurationSeconds": 1.0,
+		"holdVisibleDurationSeconds": 1.5,
+		"fadeOutDurationSeconds": 0.5
 	}
 }

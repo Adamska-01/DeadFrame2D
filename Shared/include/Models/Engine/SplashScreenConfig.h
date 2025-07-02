@@ -1,6 +1,6 @@
 #pragma once
 #include <nlohmann/json.hpp>
-#include <string_view>
+#include <string>
 
 
 struct SplashScreenConfig
