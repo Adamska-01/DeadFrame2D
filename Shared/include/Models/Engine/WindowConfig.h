@@ -7,8 +7,6 @@ struct WindowConfig
 {
 	std::string title = "DeadFrame2D";
 
-	std::string iconSourcePath;
-
 	int width = 1920;
 
 	int height = 1080;
@@ -16,5 +14,5 @@ struct WindowConfig
 	bool fullscreen = false;
 	
 
-	NLOHMANN_DEFINE_TYPE_INTRUSIVE(WindowConfig, title, iconSourcePath, width, height, fullscreen)
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(WindowConfig, title, width, height, fullscreen)
 };
