@@ -6,7 +6,7 @@
 #include "SubSystems/Input/Input.h"
 #include "SubSystems/Input/InputControls.h"
 #include "Tools/Helpers/EventHelpers.h"
-#include <Constants/SharedResourcePaths.h>
+#include <Constants/ResourcePaths.h>
 #include <iostream>
 #include <unordered_set>
 
@@ -41,7 +41,7 @@ Input::Input()
 	// and once through XInput, which can lead to duplicate devices being detected.
 	SDL_SetHint(SDL_HINT_JOYSTICK_RAWINPUT_CORRELATE_XINPUT, "0");
 
-	InputControls::Deserialize(SharedResourcePaths::Configurations::INPUT_CONTROLS_CONFIGURATION_PATH);
+	InputControls::Deserialize(Constants::ResourcePaths::Files::INPUT_CONTROLS);
 
 	// Initialize default devices
 	keyboardDevice = std::make_unique<KeyboardInputDevice>();

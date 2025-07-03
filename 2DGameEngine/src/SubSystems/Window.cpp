@@ -1,8 +1,9 @@
 #include "Debugging/Debug.h"
 #include "SubSystems/Window.h"
 #include <algorithm>
-#include <set>
+#include <Constants/ResourcePaths.h>
 #include <SDL_image.h>
+#include <set>
 
 
 SDL_Window* Window::window = nullptr;
@@ -23,7 +24,7 @@ Window::Window(WindowConfig windowConfig)
 	DBG_ASSERT_MSG(window, "Window initialisation failed: %s\n", SDL_GetError());
 #endif
 
-	SetWindowIcon(windowConfig.iconSourcePath);
+	SetWindowIcon(Constants::ResourcePaths::Files::WINDOW_ICON);
 
 	if (windowConfig.fullscreen)
 	{

@@ -9,6 +9,10 @@
 
 class Engine
 {
+private:
+	std::optional<int> RenderSplashScreen();
+
+
 protected:
 	std::unique_ptr<SubSystems> engineSubSystems;
 
