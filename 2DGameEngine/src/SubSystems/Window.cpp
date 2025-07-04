@@ -30,7 +30,7 @@ Window::Window(WindowConfig windowConfig)
 	{
 		SetWindowMode(WindowMode::BORDERLESS);
 
-		auto maxRes = GetSupportedResolutions().back();
+		auto maxRes = GetSupportedResolutions().front();
 
 		SetResolution(Vector2I(maxRes.w, maxRes.h));
 	}
