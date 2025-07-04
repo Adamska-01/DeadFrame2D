@@ -1,5 +1,5 @@
 # DeadFrame2D
-![Alt text](./Shared/Resources/Logos/Splash_Screen.png "a title")
+![Logo not found :(](./Shared/Resources/Logos/Splash_Screen.png "DeadFrame2D")
 
 **DeadFrame2D** is a lightweight 2D game engine built with C++ and SDL2, optimized for fast prototyping and high-performance development.
 
