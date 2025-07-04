@@ -1,10 +1,11 @@
 #pragma once
+#include <filesystem>
 #include <string>
 #include <unordered_map>
-#include <filesystem>
 
 
-class ResourceMount;
+struct ResourceMount;
+struct ResolvedPath;
 
 
 class PathMountResolver
@@ -31,7 +32,7 @@ private:
 public:
 	static void Mount(const ResourceMount& resourceMount);
 
-	static std::filesystem::path Resolve(const std::string& alias, const std::string& fileName);
+	static std::filesystem::path Resolve(const ResolvedPath& resolvedPath);
 
 
 	static void SetMountPrefix(std::string mountPrefix);

@@ -1,4 +1,5 @@
 #include "Tools/FileSystem/PathMountResolver.h"
+#include "Tools/FileSystem/resolvedPath.h"
 #include "Tools/FileSystem/ResourceMount.h"
 
 
@@ -7,8 +8,11 @@ void PathMountResolver::Mount(const ResourceMount& resourceMount)
 	mounts[resourceMount.alias] = resourceMount.path;
 }
 
-std::filesystem::path PathMountResolver::Resolve(const std::string& alias, const std::string& fileName)
+std::filesystem::path PathMountResolver::Resolve(const ResolvedPath& resolvedPath)
 {
+	const auto& alias = resolvedPath.alias;
+	const auto& fileName = resolvedPath.fileName;
+
 	auto it = mounts.find(alias);
 
 	if (it == mounts.end())

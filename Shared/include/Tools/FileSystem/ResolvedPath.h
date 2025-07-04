@@ -12,14 +12,14 @@ struct ResolvedPath
 
 	inline operator std::string() const
 	{
-		return PathMountResolver::Resolve(alias, fileName).string();
+		return PathMountResolver::Resolve(*this).string();
 	}
 
 	operator std::string_view() const
 	{
 		static thread_local std::string cached;
 
-		cached = PathMountResolver::Resolve(alias, fileName).string();
+		cached = PathMountResolver::Resolve(*this).string();
 
 		return cached;
 	}
