@@ -49,6 +49,8 @@ public:
 
 	static std::vector<SDL_DisplayMode> GetSupportedResolutions();
 
+	static void SetWindowTitle(const std::string& title);
+
 	static void SetWindowIcon(std::string_view iconSource);
 
 	static void SetWindowMode(WindowMode mode);

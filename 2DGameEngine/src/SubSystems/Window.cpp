@@ -157,6 +157,20 @@ std::vector<SDL_DisplayMode> Window::GetSupportedResolutions()
 	return resolutions;
 }
 
+void Window::SetWindowTitle(const std::string& title)
+{
+	if (window == nullptr)
+	{
+		std::cerr << "[Error] Cannot set window title: window is nullptr." << std::endl;
+		
+		return;
+	}
+
+	SDL_SetWindowTitle(window, title.c_str());
+
+	std::cout << "[Info] Window title changed to: " << title << std::endl;
+}
+
 void Window::SetWindowIcon(std::string_view iconSource)
 {
 	if (window == nullptr)
