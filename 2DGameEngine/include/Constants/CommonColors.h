@@ -22,7 +22,7 @@ namespace CommonColors
 	
 	constexpr SDL_Color GRAY = { 169, 169, 169, 255 };
 	
-	constexpr SDL_Color DARK_GRAY = { 169, 169, 169, 255 };
+	constexpr SDL_Color DARK_GRAY = { 105, 105, 105, 255 };
 	
 	constexpr SDL_Color LIGHT_GRAY = { 211, 211, 211, 255 };
 	
