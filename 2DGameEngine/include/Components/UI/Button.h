@@ -24,6 +24,12 @@ private:
 
 	std::shared_ptr<SDL_Texture> buttonPressedImage;
 
+	SDL_Color idleFillColor;
+
+	SDL_Color hoveredFillColor;
+
+	SDL_Color pressedFillColor;
+
 
 public:
 	Button(const ButtonComponentModel& buttonConfiguration);
@@ -58,5 +64,21 @@ public:
 	
 	SDL_Rect GetBoundingBox() const;
 
-	void SetButtonImageSources(std::string_view idleButtonSource, std::string_view hoveredButtonSource, std::string_view pressedButtonSource);
+	SDL_Color GetIdleFillColor() const;
+
+	SDL_Color GetHoveredFillColor() const;
+
+	SDL_Color GetPressedFillColor() const;
+
+	void SetIdleFillColor(const SDL_Color& color);
+	
+	void SetHoveredFillColor(const SDL_Color& color);
+	
+	void SetPressedFillColor(const SDL_Color& color);
+
+	void SetIdleButtonImageSource(std::string_view idleButtonSource);
+
+	void SetHoveredButtonImageSource(std::string_view hoveredButtonSource);
+	
+	void SetPressedButtonImageSource(std::string_view pressedButtonSource);
 };

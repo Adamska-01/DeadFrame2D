@@ -1,5 +1,6 @@
 #include "Components/Transform.h"
 #include "Components/UI/Button.h"
+#include "Constants/CommonColors.h"
 #include "Models/Components/UI/ButtonComponentModel.h"
 #include "SubSystems/TextureManager.h"
 #include "Tools/Collisions/CollisionUtils.h"
@@ -14,10 +15,14 @@ Button::Button(const ButtonComponentModel& buttonConfiguration)
 
 	AddPressedCallback(buttonConfiguration.onPressedHandler, buttonConfiguration.identifier);
 	AddEnterCallback(buttonConfiguration.onEnterHandler, buttonConfiguration.identifier);
-	SetButtonImageSources(
-		buttonConfiguration.idleButtonSource, 
-		buttonConfiguration.hoveredButtonSource, 
-		buttonConfiguration.pressedButtonSource);
+	
+	SetIdleButtonImageSource(buttonConfiguration.idleButtonSource);
+	SetHoveredButtonImageSource(buttonConfiguration.hoveredButtonSource);
+	SetPressedButtonImageSource(buttonConfiguration.pressedButtonSource);
+
+	idleFillColor = CommonColors::GRAY;
+	hoveredFillColor = CommonColors::LIGHT_GRAY;
+	pressedFillColor = CommonColors::DARK_GRAY;
 }
 
 std::optional<int> Button::ProcessEvents(const SDL_Event& sdlEvent)
@@ -103,7 +108,29 @@ void Button::Draw()
 {
 	auto destRect = GetBoundingBox();
 
-	TextureManager::DrawTexture(currentButtonImage, NULL, &destRect, transform->GetWorldRotation());
+	if (currentButtonImage)
+	{
+		TextureManager::DrawTexture(currentButtonImage, nullptr, &destRect, transform->GetWorldRotation());
+	}
+	else
+	{
+		SDL_Color fillColor;
+
+		if (isPressed)
+		{
+			fillColor = pressedFillColor;
+		}
+		else if (isHovered)
+		{
+			fillColor = hoveredFillColor;
+		}
+		else
+		{
+			fillColor = idleFillColor;
+		}
+
+		TextureManager::DrawRect(destRect, transform->GetWorldRotation(), fillColor, true);
+	}
 }
 
 void Button::OnPointerEnter()
@@ -173,9 +200,56 @@ SDL_Rect Button::GetBoundingBox() const
 	};
 }
 
-void Button::SetButtonImageSources(std::string_view idleButtonSource, std::string_view hoveredButtonSource, std::string_view pressedButtonSource)
+SDL_Color Button::GetIdleFillColor() const
 {
-	currentButtonImage = buttonIdleImage = TextureManager::LoadTexture(idleButtonSource);
-	buttonHoveredImage = TextureManager::LoadTexture(hoveredButtonSource);
-	buttonPressedImage = TextureManager::LoadTexture(pressedButtonSource);
+	return idleFillColor;
+}
+
+SDL_Color Button::GetHoveredFillColor() const
+{
+	return hoveredFillColor;
+}
+
+SDL_Color Button::GetPressedFillColor() const
+{
+	return pressedFillColor;
+}
+
+void Button::SetIdleFillColor(const SDL_Color& color)
+{
+	idleFillColor = color;
+}
+
+void Button::SetHoveredFillColor(const SDL_Color& color)
+{
+	hoveredFillColor = color;
+}
+
+void Button::SetPressedFillColor(const SDL_Color& color)
+{
+	pressedFillColor = color;
+}
+
+void Button::SetIdleButtonImageSource(std::string_view idleButtonSource)
+{
+	if (!idleButtonSource.empty())
+	{
+		currentButtonImage = buttonIdleImage = TextureManager::LoadTexture(idleButtonSource);
+	}
+}
+
+void Button::SetHoveredButtonImageSource(std::string_view hoveredButtonSource)
+{
+	if (!hoveredButtonSource.empty())
+	{
+		buttonHoveredImage = TextureManager::LoadTexture(hoveredButtonSource);
+	}
+}
+
+void Button::SetPressedButtonImageSource(std::string_view pressedButtonSource)
+{
+	if (!pressedButtonSource.empty())
+	{
+		buttonPressedImage = TextureManager::LoadTexture(pressedButtonSource);
+	}
 }
