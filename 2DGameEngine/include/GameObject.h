@@ -204,9 +204,9 @@ template<typename T>
 inline std::vector<T*> GameObject::GetComponentsInParent(bool recursive) const
 {
 	std::vector<T*> results;
-	auto current = parent;
+	auto current = parent.lock();
 
-	while (current)
+	while (current != nullptr)
 	{
 		if (T* comp = current->GetComponent<T>())
 			results.push_back(comp);
