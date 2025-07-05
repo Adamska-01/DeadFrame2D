@@ -23,15 +23,9 @@ LIB_ROOT_DESTINATION[SDL_image]="SDL2_image-${SDL_LIBS[SDL_image]}"
 LIB_ROOT_DESTINATION[SDL_mixer]="SDL2_mixer-${SDL_LIBS[SDL_mixer]}"
 LIB_ROOT_DESTINATION[SDL_ttf]="SDL2_ttf-${SDL_LIBS[SDL_ttf]}"
 
-declare -A SDL_LIB_PREFIXES
-SDL_LIB_PREFIXES[SDL]="libSDL2"
-SDL_LIB_PREFIXES[SDL_image]="libSDL2_image"
-SDL_LIB_PREFIXES[SDL_mixer]="libSDL2_mixer"
-SDL_LIB_PREFIXES[SDL_ttf]="libSDL2_ttf"
-
 
 prompt_install_dependencies() {
-	echo "❓ Install required system packages (build tools, freetype, etc)? [y/N]"
+	echo -n "❓ Install required system packages (build tools, freetype, etc)? [y/N] "
 	read -r answer
 	if [[ "$answer" =~ ^[Yy]$ ]]; then
 		sudo apt update
@@ -85,12 +79,12 @@ build_library() {
 	fi
 	
 	 # Run autogen.sh if it exists
-    if [ -f "${BUILD_ROOT}/${src_dir}/autogen.sh" ]; then
-        echo "⚙️ Running autogen.sh for ${name}..."
-        pushd "${BUILD_ROOT}/${src_dir}" > /dev/null
-        ./autogen.sh
-        popd > /dev/null
-    fi
+	if [ -f "${BUILD_ROOT}/${src_dir}/autogen.sh" ]; then
+		echo "⚙️ Running autogen.sh for ${name}..."
+		pushd "${BUILD_ROOT}/${src_dir}" > /dev/null
+		./autogen.sh
+		popd > /dev/null
+	fi
 	
 	# Special handling for SDL_ttf to avoid harfbuzz and link issues
 	local extra_args=""
@@ -107,11 +101,8 @@ build_library() {
 	
 	make -j"$(nproc)"
 	make install
-
-	local lib_prefix="${SDL_LIB_PREFIXES[$name]}"
-	find "${install_dir}/lib" -name "${lib_prefix}.so*" -exec cp {} "$output_dir/" \;
-
-	ldd "$output_dir/${lib_prefix}.so" || echo "⚠️  Could not verify shared libs"
+	
+	cp -a "${install_dir}/lib"/libSDL2*.so* "$output_dir/" 2>/dev/null || true
 	
 	if [ "$name" != "SDL" ]; then
 		unset SDL2_CONFIG
@@ -128,18 +119,27 @@ main() {
 	
 	mkdir -p "$BUILD_TMP" "$TEMP_OUTPUT"
 
-	# Clone all
-	for lib in "${!SDL_LIBS[@]}"; do
-		clone_repo "$lib" "${SDL_LIBS[$lib]}"
-	done
+	for lib in SDL SDL_image SDL_mixer SDL_ttf; do
+		output_dirx86="${BUILD_ROOT}/../${LIB_ROOT_DESTINATION[$lib]}/lib/Linux/x86"
+		output_dirx64="${BUILD_ROOT}/../${LIB_ROOT_DESTINATION[$lib]}/lib/Linux/x64"
 
-	# Build all (x86 + x64)
-	for arch in x86 x64; do
-		cflags=$([ "$arch" == "x86" ] && echo "-m32" || echo "-m64")
-		# This sucks, but SDL must be built first
-		for lib in SDL SDL_image SDL_mixer SDL_ttf; do
-			build_library "$lib" "$arch" "$cflags"
-		done
+		# Check if both x86 and x64 builds already exist
+		if compgen -G "${output_dirx86}/libSDL2*.so*" > /dev/null && \
+		   compgen -G "${output_dirx64}/libSDL2*.so*" > /dev/null; then
+			echo "⏩ Skipping ${lib} - already built for both x86 and x64"
+			continue
+		fi
+
+		# Clone if either is missing
+		clone_repo "$lib" "${SDL_LIBS[$lib]}"
+
+		# Build missing architectures
+		if ! compgen -G "${output_dirx86}/libSDL2*.so*" > /dev/null; then
+			build_library "$lib" "x86" "-m32"
+		fi
+		if ! compgen -G "${output_dirx64}/libSDL2*.so*" > /dev/null; then
+			build_library "$lib" "x64" "-m64"
+		fi
 	done
 
 	echo "🧹 Cleaning up..."
