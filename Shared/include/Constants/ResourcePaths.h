@@ -24,8 +24,8 @@ namespace Constants::ResourcePaths
 
 		static const ResolvedPath ENGINE_CONFIGURATION = { Folders::SHARED_ENGINE_CONFIG.alias, "Manifest.json" };
 
-		static const ResolvedPath WINDOW_ICON = { Folders::LOGOS.alias, "window_icon.png" };
+		static const ResolvedPath WINDOW_ICON = { Folders::LOGOS.alias, "Window_Icon.png" };
 
-		static const ResolvedPath SPLASH_SCREEN = { Folders::LOGOS.alias, "splash_screen.png" };
+		static const ResolvedPath SPLASH_SCREEN = { Folders::LOGOS.alias, "Splash_Screen.png" };
 	}
 }
