@@ -30,7 +30,20 @@ SDL_LIB_PREFIXES[SDL_mixer]="libSDL2_mixer"
 SDL_LIB_PREFIXES[SDL_ttf]="libSDL2_ttf"
 
 
-# 1. Clone with submodules if needed
+prompt_install_dependencies() {
+	echo "❓ Install required system packages (build tools, freetype, etc)? [y/N]"
+	read -r answer
+	if [[ "$answer" =~ ^[Yy]$ ]]; then
+		sudo apt update
+		sudo apt install -y build-essential gcc-multilib g++-multilib pkg-config autoconf automake libtool
+		sudo dpkg --add-architecture i386
+		sudo apt update
+		sudo apt install -y libfreetype6-dev libfreetype6-dev:i386
+	else
+		echo "⚠️  Skipping dependency installation. Make sure they're installed!"
+	fi
+}
+
 clone_repo() {
 	local name=$1 version=$2
 	local dir_name="${name}-release-${version}"
@@ -43,7 +56,6 @@ clone_repo() {
 	fi
 }
 
-# 2. Build function
 build_library() {
 	local name=$1 arch=$2 cflags=$3
 	local src_dir="${name}-release-${SDL_LIBS[$name]}"
@@ -57,11 +69,28 @@ build_library() {
 
 	local sdl_prefix="${TEMP_OUTPUT}/SDL/${arch}"
 	local pkg_config_path=""
+	local sdl2_config="${sdl_prefix}/bin/sdl2-config"
 
-	# Set pkg-config path
+	# Set pkg-config path and SDL2_CONFIG for non-SDL libs
 	if [ "$name" != "SDL" ]; then
-		pkg_config_path="${sdl_prefix}/lib/pkgconfig"
+		export SDL2_CONFIG="$sdl2_config"
+		export PATH="$(dirname "$sdl2_config"):$PATH"
+		export PKG_CONFIG_PATH="${sdl_prefix}/lib/pkgconfig"
+
+		echo "🔎 Verifying sdl2-config: $SDL2_CONFIG"
+		"$SDL2_CONFIG" --version || {
+			echo "❌ sdl2-config not found or not working"
+			exit 1
+		}
 	fi
+	
+	 # Run autogen.sh if it exists
+    if [ -f "${BUILD_ROOT}/${src_dir}/autogen.sh" ]; then
+        echo "⚙️ Running autogen.sh for ${name}..."
+        pushd "${BUILD_ROOT}/${src_dir}" > /dev/null
+        ./autogen.sh
+        popd > /dev/null
+    fi
 	
 	# Special handling for SDL_ttf to avoid harfbuzz and link issues
 	local extra_args=""
@@ -83,13 +112,20 @@ build_library() {
 	find "${install_dir}/lib" -name "${lib_prefix}.so*" -exec cp {} "$output_dir/" \;
 
 	ldd "$output_dir/${lib_prefix}.so" || echo "⚠️  Could not verify shared libs"
+	
+	if [ "$name" != "SDL" ]; then
+		unset SDL2_CONFIG
+		unset PKG_CONFIG_PATH
+	fi
 
 	popd > /dev/null
 	echo "✅ ${name} ${arch} build complete"
 }
 
-# 3. Build process
+
 main() {
+	prompt_install_dependencies
+	
 	mkdir -p "$BUILD_TMP" "$TEMP_OUTPUT"
 
 	# Clone all
