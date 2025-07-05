@@ -1,5 +1,5 @@
 #include "Tools/FileSystem/PathMountResolver.h"
-#include "Tools/FileSystem/resolvedPath.h"
+#include "Tools/FileSystem/ResolvedPath.h"
 #include "Tools/FileSystem/ResourceMount.h"
 
 

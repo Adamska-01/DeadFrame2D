@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <functional>
 #include <unordered_map>
 
@@ -8,7 +9,7 @@ class MulticastDelegate
 {
 private:
 	// TODO: it should be a list of std::function paired with their identifier.
-	std::unordered_map<std::uintptr_t, std::function<void(Args...)>> listeners;
+	std::unordered_map<uintptr_t, std::function<void(Args...)>> listeners;
 
 
 public:
@@ -22,9 +23,9 @@ public:
 	void Clear();
 
 
-	void RegisterCallback(const std::function<void(Args...)>& func, std::uintptr_t identifier);
+	void RegisterCallback(const std::function<void(Args...)>& func, uintptr_t identifier);
 
-	void DeregisterCallback(std::uintptr_t identifier);
+	void DeregisterCallback(uintptr_t identifier);
 
 
 	void operator() (Args... params);
@@ -47,13 +48,13 @@ inline void MulticastDelegate<Args...>::Clear()
 }
 
 template<typename ...Args>
-inline void MulticastDelegate<Args...>::RegisterCallback(const std::function<void(Args...)>& func, std::uintptr_t identifier)
+inline void MulticastDelegate<Args...>::RegisterCallback(const std::function<void(Args...)>& func, uintptr_t identifier)
 {
 	listeners[identifier] = func;
 }
 
 template<typename ...Args>
-inline void MulticastDelegate<Args...>::DeregisterCallback(std::uintptr_t identifier)
+inline void MulticastDelegate<Args...>::DeregisterCallback(uintptr_t identifier)
 {
 	listeners.erase(identifier);
 }

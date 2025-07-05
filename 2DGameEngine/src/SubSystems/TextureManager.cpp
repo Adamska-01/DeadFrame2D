@@ -105,10 +105,10 @@ void TextureManager::DrawRect(SDL_Rect rect, float angleDegrees, SDL_Color color
 
 	SDL_FPoint corners[4] = 
 	{
-		{-rect.w / 2, -rect.h / 2},
-		{ rect.w / 2, -rect.h / 2},
-		{ rect.w / 2,  rect.h / 2},
-		{-rect.w / 2,  rect.h / 2}
+		{ -rect.w / 2.0f, -rect.h / 2.0f },
+		{  rect.w / 2.0f, -rect.h / 2.0f },
+		{  rect.w / 2.0f,  rect.h / 2.0f },
+		{ -rect.w / 2.0f,  rect.h / 2.0f }
 	};
 
 	for (auto& p : corners)

@@ -214,7 +214,7 @@ inline std::vector<T*> GameObject::GetComponentsInParent(bool recursive) const
 		if (!recursive)
 			break;
 
-		current = current->parent;
+		current = current->parent.lock();
 	}
 
 	return results;
