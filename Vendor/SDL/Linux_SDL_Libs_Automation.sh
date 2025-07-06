@@ -25,13 +25,16 @@ LIB_ROOT_DESTINATION[SDL_ttf]="SDL2_ttf-${SDL_LIBS[SDL_ttf]}"
 
 
 prompt_install_dependencies() {
-	echo -n "❓ Install required system packages (build tools, freetype, etc)? [y/N] "
+	echo -n "❓ Install required system packages (build tools, SDL dependencies, etc)? [y/N] "
 	read -r answer
 	if [[ "$answer" =~ ^[Yy]$ ]]; then
-		sudo apt update
-		sudo apt install -y build-essential gcc-multilib g++-multilib pkg-config autoconf automake libtool
 		sudo dpkg --add-architecture i386
 		sudo apt update
+
+		# 🛠 Build tools
+		sudo apt install -y build-essential gcc-multilib g++-multilib pkg-config autoconf automake libtool
+
+		# 🔤 Freetype (used by SDL_ttf)
 		sudo apt install -y libfreetype6-dev libfreetype6-dev:i386
 	else
 		echo "⚠️  Skipping dependency installation. Make sure they're installed!"
