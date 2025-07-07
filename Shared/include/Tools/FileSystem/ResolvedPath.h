@@ -5,19 +5,36 @@
 
 struct ResolvedPath
 {
+private:
+	mutable std::string cached = "";
+
+
+public:
 	std::string alias;
 
 	std::string fileName;
 
 
+	ResolvedPath(const std::string& alias, const std::string& fileName)
+		: alias(alias), fileName(fileName)
+	{
+	}
+
+
 	inline operator std::string() const
 	{
-		return PathMountResolver::Resolve(*this).string();
+		if (!cached.empty())
+			return cached;
+
+		cached = PathMountResolver::Resolve(*this).string();
+	
+		return cached;
 	}
 
 	operator std::string_view() const
 	{
-		static thread_local std::string cached;
+		if (!cached.empty())
+			return cached;
 
 		cached = PathMountResolver::Resolve(*this).string();
 
