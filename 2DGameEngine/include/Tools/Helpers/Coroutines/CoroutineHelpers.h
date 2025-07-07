@@ -6,7 +6,7 @@
 
 namespace Tools::Helpers::Coroutines
 {
-	inline auto& WaitFrame() 
+	inline WaitOneFrame& WaitFrame()
 	{
 		auto awaitable = new WaitOneFrame();
 
@@ -15,7 +15,7 @@ namespace Tools::Helpers::Coroutines
 		return *awaitable;
 	}
 
-	inline auto& WaitSeconds(float seconds) 
+	inline WaitForSeconds& WaitSeconds(float seconds)
 	{
 		auto awaitable = new WaitForSeconds(seconds);
 		
