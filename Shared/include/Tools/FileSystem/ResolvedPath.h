@@ -9,6 +9,15 @@ private:
 	mutable std::string cached = "";
 
 
+	inline void StoreCache() const
+	{
+		if (!cached.empty())
+			return;
+
+		cached = PathMountResolver::Resolve(*this).string();
+	}
+
+
 public:
 	std::string alias;
 
@@ -23,20 +32,14 @@ public:
 
 	inline operator std::string() const
 	{
-		if (!cached.empty())
-			return cached;
+		StoreCache();
 
-		cached = PathMountResolver::Resolve(*this).string();
-	
 		return cached;
 	}
 
 	operator std::string_view() const
 	{
-		if (!cached.empty())
-			return cached;
-
-		cached = PathMountResolver::Resolve(*this).string();
+		StoreCache();
 
 		return cached;
 	}

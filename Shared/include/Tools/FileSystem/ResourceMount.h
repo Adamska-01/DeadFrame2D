@@ -9,8 +9,8 @@ struct ResourceMount
 	std::filesystem::path path;
 
 
-	ResourceMount(const std::string& a, const std::filesystem::path& p)
-		: alias(a), path(p)
+	ResourceMount(const std::string& alias, const std::filesystem::path& path)
+		: alias(alias), path(path)
 	{
 		PathMountResolver::Mount(*this);
 	}
