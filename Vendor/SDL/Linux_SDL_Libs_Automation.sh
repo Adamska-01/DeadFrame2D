@@ -31,11 +31,14 @@ prompt_install_dependencies() {
 		sudo dpkg --add-architecture i386
 		sudo apt update
 
-		# 🛠 Build tools
+		# Build tools
 		sudo apt install -y build-essential gcc-multilib g++-multilib pkg-config autoconf automake libtool
 
-		# 🔤 Freetype (used by SDL_ttf)
+		# Freetype (used by SDL_ttf)
 		sudo apt install -y libfreetype6-dev libfreetype6-dev:i386
+		
+		# SDL_Mixer dependencies
+		sudo apt install libasound2-dev libasound2-dev:i386 libpulse-dev libpulse-dev:i386
 	else
 		echo "⚠️  Skipping dependency installation. Make sure they're installed!"
 	fi
