@@ -77,5 +77,35 @@
 			"inputDeviceType": "CONTROLLER",
 			"inputKey": 0
 		}
+	],
+	"Pause": [
+		{
+			"inputDeviceType": "KEYBOARD",
+			"inputKey": 41 // Escape
+		}, 
+		{
+			"inputDeviceType": "CONTROLLER",
+			"inputKey": 6
+		}
+	],
+	"Confirm": [
+		{
+			"inputDeviceType": "KEYBOARD",
+			"inputKey": 40 // Escape
+		},
+		{
+			"inputDeviceType": "CONTROLLER",
+			"inputKey": 0
+		}
+	],
+	"Back": [
+		{
+			"inputDeviceType": "KEYBOARD",
+			"inputKey": 41 // Escape
+		},
+		{
+			"inputDeviceType": "CONTROLLER",
+			"inputKey": 1
+		}
 	]
 }
