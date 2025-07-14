@@ -42,9 +42,10 @@ void EventManager::RemoveEventProcessor(IEventProcessor* eventProcessor)
 
 void EventManager::SendSystemEvent(SDL_EventType eventType)
 {
-	SDL_Event quitEvent;
-	
-	quitEvent.type = eventType;
+	auto toSend = SDL_Event
+	{
+		.type = (uint32_t)eventType
+	};
 
-	SDL_PushEvent(&quitEvent);
+	SDL_PushEvent(&toSend);
 }
