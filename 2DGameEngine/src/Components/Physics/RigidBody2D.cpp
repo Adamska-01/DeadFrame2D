@@ -10,15 +10,18 @@
 
 
 RigidBody2D::RigidBody2D(const BodyDefinition2D& bodyDefinition)
+	: transform(nullptr),
+	body(nullptr),
+	velocity(Vector2F::Zero),
+	acceleration(Vector2F::Zero),
+	lastTransformPosition(Vector2F::Zero),
+	lastTransformRotation(0.0f)
 {
+	pendingActions.Clear();
+
 	auto bodyDef = PhysicsConversion::ToB2BodyDef(bodyDefinition);
 
 	body = PhysicsEngine2D::CreateBody(&bodyDef);
-
-	pendingActions.Clear();
-
-	lastTransformPosition = Vector2F::Zero;
-	lastTransformRotation = 0.0f;
 }
 
 RigidBody2D::~RigidBody2D()
@@ -36,6 +39,8 @@ RigidBody2D::~RigidBody2D()
 		
 		fixture = next;
 	}
+
+	PhysicsEngine2D::DestroyBody(body);
 }
 
 void RigidBody2D::Init()

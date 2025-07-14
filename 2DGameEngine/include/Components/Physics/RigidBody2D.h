@@ -19,9 +19,9 @@ private:
 
 	b2Body* body;
 
-	mutable Vector2F velocity = Vector2F::Zero;
+	mutable Vector2F velocity;
 	
-	mutable Vector2F acceleration = Vector2F::Zero;
+	mutable Vector2F acceleration;
 
 	MultiCastVoid pendingActions;
 
