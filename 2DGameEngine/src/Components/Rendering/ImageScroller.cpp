@@ -97,7 +97,7 @@ void ImageScroller::Draw()
 				.h = scaledTileHeight
 			};
 
-			TextureManager::DrawTexture(spriteTexture, NULL, &destRect, transform->GetWorldRotation());
+			TextureManager::DrawTextureWorldSpace(spriteTexture, NULL, &destRect, transform->GetWorldRotation());
 		}
 	}
 }

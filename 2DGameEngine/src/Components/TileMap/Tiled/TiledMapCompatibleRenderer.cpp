@@ -65,7 +65,7 @@ void TiledMapCompatibleRenderer::Draw()
 				SDL_Rect src{ tileCol * tileSetSize, tileRow * tileSetSize, tileSetSize, tileSetSize };
 				SDL_Rect dest{ j * tileSetSize, i * tileSetSize, tileSetSize, tileSetSize };
 
-				TextureManager::DrawTexture(tileSet.tileSetTexture, &src, &dest);
+				TextureManager::DrawTextureWorldSpace(tileSet.tileSetTexture, &src, &dest);
 			}
 		}
 	}

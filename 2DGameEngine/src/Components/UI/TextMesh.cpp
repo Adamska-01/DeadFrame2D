@@ -44,7 +44,7 @@ void TextMesh::Draw()
 {
 	auto destRect = GetTextBoundingBox();
 
-	TextureManager::DrawTexture(textTexture, NULL, &destRect, transform->GetWorldRotation());
+	TextureManager::DrawTextureScreenSpace(textTexture, NULL, &destRect, transform->GetWorldRotation());
 }
 
 void TextMesh::SetFontSize(unsigned int newFontSize)

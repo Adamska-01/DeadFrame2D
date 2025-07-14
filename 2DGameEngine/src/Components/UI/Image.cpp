@@ -36,7 +36,7 @@ void Image::Draw()
 
 	if (sourceImage != nullptr)
 	{
-		TextureManager::DrawTexture(
+		TextureManager::DrawTextureScreenSpace(
 			sourceImage,
 			NULL,
 			&destRect,
@@ -48,7 +48,7 @@ void Image::Draw()
 	}
 	else
 	{
-		TextureManager::DrawRect(destRect, worldRotation, color, true);
+		TextureManager::DrawRectScreenSpace(destRect, worldRotation, color, true);
 	}
 }
 

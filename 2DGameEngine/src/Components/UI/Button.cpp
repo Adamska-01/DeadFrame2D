@@ -110,7 +110,7 @@ void Button::Draw()
 
 	if (currentButtonImage)
 	{
-		TextureManager::DrawTexture(currentButtonImage, nullptr, &destRect, transform->GetWorldRotation());
+		TextureManager::DrawTextureScreenSpace(currentButtonImage, nullptr, &destRect, transform->GetWorldRotation());
 	}
 	else
 	{
@@ -129,7 +129,7 @@ void Button::Draw()
 			fillColor = idleFillColor;
 		}
 
-		TextureManager::DrawRect(destRect, transform->GetWorldRotation(), fillColor, true);
+		TextureManager::DrawRectScreenSpace(destRect, transform->GetWorldRotation(), fillColor, true);
 	}
 }
 

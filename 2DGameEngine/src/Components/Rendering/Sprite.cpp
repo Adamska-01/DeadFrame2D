@@ -40,7 +40,7 @@ void Sprite::Draw()
 		static_cast<int>(spriteSize.y * worldScale.y)
 	};
 
-	TextureManager::DrawTexture(spriteTexture, NULL, &scaledDest, worldRotation);
+	TextureManager::DrawTextureWorldSpace(spriteTexture, NULL, &scaledDest, worldRotation);
 }
 
 void Sprite::LoadSprite(std::string_view texturePath)
