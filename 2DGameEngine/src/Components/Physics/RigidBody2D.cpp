@@ -9,13 +9,11 @@
 #include <box2d/b2_body.h>
 
 
-RigidBody2D::RigidBody2D(const BodyDefinition2D& bodyDefinition, float gravityScale)
+RigidBody2D::RigidBody2D(const BodyDefinition2D& bodyDefinition)
 {
 	auto bodyDef = PhysicsConversion::ToB2BodyDef(bodyDefinition);
 
 	body = PhysicsEngine2D::CreateBody(&bodyDef);
-
-	SetGravityScale(gravityScale);
 
 	pendingActions.Clear();
 
@@ -59,12 +57,8 @@ void RigidBody2D::Start()
 
 void RigidBody2D::Update(float deltaTime)
 {
-	
-}
-
-void RigidBody2D::Draw()
-{
-	// TODO: Move this stuff in the LateUpdate!!!!
+	// TODO: Move this stuff in the LateUpdate!!!! (Leaving it here could break transform movement)
+	// Edit: Fucking do this already!!!!!
 	if (!pendingActions.IsEmpty())
 	{
 		pendingActions();
@@ -99,6 +93,11 @@ void RigidBody2D::Draw()
 	lastTransformRotation = transform->GetWorldRotation();
 }
 
+void RigidBody2D::Draw()
+{
+	
+}
+
 b2Fixture* RigidBody2D::CreateFixture(const b2FixtureDef* fixtureDef)
 {
 	return body->CreateFixture(fixtureDef);
@@ -121,7 +120,7 @@ void RigidBody2D::DestroyFixture(b2Fixture* fixtureDef)
 Vector2F RigidBody2D::GetVelocity() const
 {
 	auto v = body->GetLinearVelocity();
-	
+
 	return Vector2F(v.x, v.y);
 }
 
@@ -130,14 +129,38 @@ void RigidBody2D::SetVelocity(const Vector2F& velocity)
 	body->SetLinearVelocity(b2Vec2(velocity.x, velocity.y));
 }
 
+void RigidBody2D::SetVelocityX(float velX)
+{
+	const auto& currentVelocity = body->GetLinearVelocity();
+
+	body->SetLinearVelocity(b2Vec2(velX, currentVelocity.y));
+}
+
+void RigidBody2D::SetVelocityY(float velY)
+{
+	const auto& currentVelocity = body->GetLinearVelocity();
+
+	body->SetLinearVelocity(b2Vec2(currentVelocity.x, velY));
+}
+
+void RigidBody2D::AddImpulse(const Vector2F& impulse)
+{
+	body->ApplyLinearImpulseToCenter(b2Vec2(impulse.x, impulse.y), true);
+}
+
+void RigidBody2D::AddImpulseX(float impulseX)
+{
+	body->ApplyLinearImpulseToCenter(b2Vec2(impulseX, 0.0f), true);
+}
+
+void RigidBody2D::AddImpulseY(float impulseY)
+{
+	body->ApplyLinearImpulseToCenter(b2Vec2(0.0f, impulseY), true);
+}
+
 void RigidBody2D::AddForce(const Vector2F& force)
 {
 	body->ApplyForceToCenter(b2Vec2(force.x, force.y), true);
-}
-
-void RigidBody2D::AddLinearImpulse(const Vector2F& impulse)
-{
-	body->ApplyLinearImpulseToCenter(b2Vec2(impulse.x, impulse.y), true);
 }
 
 void RigidBody2D::SetGravityScale(float newGravityScale)

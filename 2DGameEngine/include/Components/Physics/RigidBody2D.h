@@ -31,7 +31,7 @@ private:
 
 	
 public:
-	RigidBody2D(const BodyDefinition2D& bodyDefinition, float gravityScale = 1.0f);
+	RigidBody2D(const BodyDefinition2D& bodyDefinition);
 
 	RigidBody2D(RigidBody2D&& other) = default;
 	
@@ -58,9 +58,17 @@ public:
 
 	void SetVelocity(const Vector2F& velocity);
 
-	void AddForce(const Vector2F& force);
+	void SetVelocityX(float velX);
 	
-	void AddLinearImpulse(const Vector2F& impulse);
+	void SetVelocityY(float velY);
+
+	void AddImpulse(const Vector2F& impulse);
+
+	void AddImpulseX(float impulseX);
+	
+	void AddImpulseY(float impulseY);
+
+	void AddForce(const Vector2F& force);
 
 	void SetGravityScale(float newGravityScale);
 };
