@@ -4,6 +4,7 @@
 #include "EventSystem/Events/SubSystems/Renderer/RenderTargetSizeChangedEvent.h"
 #include "GameObject.h"
 #include "SubSystems/Renderer.h"
+#include "Tools/Collisions/CollisionUtils.h"
 #include "Tools/Helpers/EventHelpers.h"
 #include "Tools/Helpers/Guards.h"
 #include <typeindex>
@@ -116,4 +117,25 @@ Vector2F Camera::ScreenToWorld(const Vector2F& screenPos) const
 	auto localY = (screenPos.y - viewport.y - viewport.h * 0.5f) / zoom;
 
 	return transform->GetWorldPosition() + Vector2(localX, localY);
+}
+
+bool Camera::IsVisible(const SDL_Rect& screenRect) const
+{
+	auto viewBox = GetViewBox();
+
+	return CollisionUtils::RectVsRect(&viewBox, &screenRect);
+}
+
+bool Camera::IsVisible(const Circle& circle) const
+{
+	auto viewBox = GetViewBox();
+
+	return CollisionUtils::CircleVsRect(&circle, &viewBox);
+}
+
+bool Camera::IsVisible(const Vector2F& p1, const Vector2F& p2) const
+{
+	auto viewBox = GetViewBox();
+
+	return CollisionUtils::SegmentVsRect(p1, p2, &viewBox);
 }

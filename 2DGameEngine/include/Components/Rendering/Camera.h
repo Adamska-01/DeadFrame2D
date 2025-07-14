@@ -8,6 +8,7 @@
 
 
 class Transform;
+struct Circle;
 
 
 class Camera : public GameComponent
@@ -63,4 +64,26 @@ public:
 
 	/** @brief Converts screen position to world position. */
 	Vector2F ScreenToWorld(const Vector2F& screenPos) const;
+
+	/**
+	 * @brief Checks if the given screen-space rectangle is visible within this camera's view box.
+	 * @param screenRect The non-rotated rectangle in screen coordinates.
+	 * @return True if any part of the rectangle is inside the camera's viewport.
+	 */
+	bool IsVisible(const SDL_Rect& screenRect) const;
+
+	/**
+	 * @brief Checks if the given screen-space rectangle is visible within this camera's view box.
+	 * @param circle The circle in screen coordinates.
+	 * @return True if any part of the circle is inside the camera's viewport.
+	 */
+	bool IsVisible(const Circle& circle) const;
+	
+	/**
+	 * @brief Checks if the given screen-space line segment is visible within this camera's view box.
+	 * @param p1 The first endpoint of the line segment in screen coordinates.
+	 * @param p2 The second endpoint of the line segment in screen coordinates.
+	 * @return True if any part of the line segment is inside the camera's viewport.
+	 */
+	bool IsVisible(const Vector2F& p1, const Vector2F& p2) const;
 };
