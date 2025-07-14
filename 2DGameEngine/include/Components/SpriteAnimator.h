@@ -1,7 +1,8 @@
 #pragma once
-#include "Generic/SpriteAnimationProperties.h"
-#include <Components/GameComponent.h>
-#include <memory>
+#include "Components/GameComponent.h"
+#include "Data/Animation/SpriteAnimationProperties.h"
+#include "Data/Animation/SpriteAnimationState.h"
+#include <unordered_map>
 
 
 class Transform;
@@ -11,17 +12,15 @@ class Sprite;
 class SpriteAnimator : public GameComponent
 {
 protected:
-	bool started;
-
-	float spriteFrame;
-
-	SpriteAnimationProperties animationProperties;
-
-	std::shared_ptr<SDL_Texture> spriteTexture;
-
 	Transform* transform;
 
 	Sprite* sprite;
+
+	std::unordered_map<std::string, SpriteAnimationProperties> animations;
+
+	std::string currentAnimationID;
+
+	SpriteAnimationState animState;
 
 
 public:
@@ -37,11 +36,17 @@ public:
 	virtual void Draw() override;
 
 
-	float GetAnimationProgressRatio();
+	void AddAnimation(const SpriteAnimationProperties& properties);
 
-	void SetAnimationProperties(const SpriteAnimationProperties& newProperties);
+	void PlayAnimation(const std::string& name, bool restartIfPlaying = false);
 	
-	SDL_Rect GetFrameRect();
-	
-	const SpriteAnimationProperties& GetProp();
+	bool IsPlaying(const std::string& name) const;
+
+	void SetFlipState(SDL_RendererFlip flipState);
+
+	float GetAnimationProgressRatio() const;
+
+	const SpriteAnimationProperties* GetCurrentAnimationProperties() const;
+
+	SDL_Rect GetFrameRect() const;
 };

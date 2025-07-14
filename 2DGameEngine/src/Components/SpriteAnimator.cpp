@@ -7,13 +7,12 @@
 
 
 SpriteAnimator::SpriteAnimator()
+	: transform(nullptr),
+	sprite(nullptr),
+	currentAnimationID(""),
+	animState(SpriteAnimationState())
 {
-	started = false;
-	spriteFrame = 0.0f;
-	animationProperties = SpriteAnimationProperties();
-	spriteTexture = nullptr;
-	transform = nullptr;
-	sprite = nullptr;
+	animations.clear();
 }
 
 void SpriteAnimator::Init()
@@ -34,78 +33,129 @@ void SpriteAnimator::Start()
 
 void SpriteAnimator::Update(float dt)
 {
-	spriteTexture = sprite->GetTexture();
+	auto spriteTexture = sprite->GetTexture();
 
-	if (!spriteTexture) 
+	if (!spriteTexture || animations.empty())
 		return;
 
-	// Increment sprite frame
-	spriteFrame += animationProperties.animSpeed * dt;
+	const auto& props = animations.at(currentAnimationID);
 
-	if (spriteFrame >= animationProperties.columnCount)
+	animState.currentFrame += props.animSpeed * dt;
+
+	if (animState.currentFrame >= props.columnCount)
 	{
-		// Reset started for non-repeating animations
-		if (!animationProperties.loop)
+		if (props.loop)
 		{
-			started = false;
+			animState.currentFrame = 0;
+		}
+		else
+		{
+			animState.currentFrame = static_cast<float>(props.columnCount - 1);
+			animState.started = false;
 		}
 	}
-	else if (!animationProperties.loop && !started)
+	else if (!props.loop && !animState.started)
 	{
-		spriteFrame = 0;
-		started = true;
+		animState.currentFrame = 0;
+		animState.started = true;
 	}
 }
 
 void SpriteAnimator::Draw()
 {
+	auto spriteTexture = sprite->GetTexture();
+
+	if (!spriteTexture || animations.empty())
+		return;
+
+	const auto& props = animations.at(currentAnimationID);
 	auto dstRect = GetFrameRect();
 	auto currentPosition = transform->GetWorldPosition();
 	auto currentScale = transform->GetWorldScale();
 
-	dstRect.x = round(currentPosition.x - ((float)dstRect.w * currentScale.x) / 2);
-	dstRect.y = round(currentPosition.y - ((float)dstRect.h * currentScale.y) / 2);
+	dstRect.x = static_cast<int>(round(currentPosition.x - (dstRect.w * currentScale.x / 2)));
+	dstRect.y = static_cast<int>(round(currentPosition.y - (dstRect.h * currentScale.y / 2)));
 
 	auto srcRect = SDL_Rect
 	{
-		dstRect.w * (int)spriteFrame,
-		dstRect.h * animationProperties.sourceRowNumber,
+		dstRect.w * static_cast<int>(animState.currentFrame),
+		dstRect.h * props.sourceRowNumber,
 		dstRect.w,
 		dstRect.h
 	};
 
-	dstRect.w *= currentScale.x;
-	dstRect.h *= currentScale.y;
+	dstRect.w = static_cast<int>(dstRect.w * currentScale.x);
+	dstRect.h = static_cast<int>(dstRect.h * currentScale.y);
 
-	TextureManager::DrawTexture(spriteTexture, &srcRect, &dstRect, transform->GetWorldRotation(), NULL, animationProperties.flip);
+	TextureManager::DrawTextureWorldSpace(spriteTexture, &srcRect, &dstRect, transform->GetWorldRotation(), nullptr, animState.flipState);
 }
 
-float SpriteAnimator::GetAnimationProgressRatio()
+void SpriteAnimator::AddAnimation(const SpriteAnimationProperties& properties)
 {
-	return spriteFrame / static_cast<float>(animationProperties.columnCount);
+	if (properties.name.empty())
+		return;
+	
+	animations[properties.name] = properties;
+
+	if (animations.size() == 1)
+	{
+		currentAnimationID = properties.name;
+		
+		animState = SpriteAnimationState();
+	}
 }
 
-void SpriteAnimator::SetAnimationProperties(const SpriteAnimationProperties& newProperties)
+void SpriteAnimator::PlayAnimation(const std::string& name, bool restartIfPlaying)
 {
-	animationProperties = newProperties;
+	if (currentAnimationID == name && !restartIfPlaying)
+		return;
 
-	spriteFrame = 0;
-	started = false;
+	auto it = animations.find(name);
+	
+	if (it == animations.end())
+		return;
+
+	sprite->LoadSprite(it->second.spriteSource);
+	currentAnimationID = name;
+	animState = SpriteAnimationState{};
 }
 
-SDL_Rect SpriteAnimator::GetFrameRect()
+bool SpriteAnimator::IsPlaying(const std::string& name) const
+{
+	return currentAnimationID == name;
+}
+
+void SpriteAnimator::SetFlipState(SDL_RendererFlip flipState)
+{
+	animState.flipState = flipState;
+}
+
+float SpriteAnimator::GetAnimationProgressRatio() const
+{
+	if (animations.empty())
+		return 0.0f;
+
+	const auto& props = animations.at(currentAnimationID);
+
+	return animState.currentFrame / static_cast<float>(props.columnCount);
+}
+
+const SpriteAnimationProperties* SpriteAnimator::GetCurrentAnimationProperties() const
+{
+	if (animations.find(currentAnimationID) != animations.end())
+		return &animations.at(currentAnimationID);
+
+	return nullptr;
+}
+
+SDL_Rect SpriteAnimator::GetFrameRect() const
 {
 	SDL_Rect srcRect;
 	SDL_QueryTexture(sprite->GetTexture().get(), NULL, NULL, &srcRect.w, &srcRect.h);
 
 	//Get the size of a single frame in a sprite sheet
-	srcRect.w = static_cast<int>(round((float)srcRect.w / animationProperties.columnCount));
-	srcRect.h = static_cast<int>(round((float)srcRect.h / animationProperties.rowCount));
+	srcRect.w = static_cast<int>(round((float)srcRect.w / animations[currentAnimationID].columnCount));
+	srcRect.h = static_cast<int>(round((float)srcRect.h / animations[currentAnimationID].rowCount));
 
 	return srcRect;
-}
-
-const SpriteAnimationProperties& SpriteAnimator::GetProp()
-{
-	return animationProperties;
 }
