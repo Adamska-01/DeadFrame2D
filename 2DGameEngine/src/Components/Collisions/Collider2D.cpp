@@ -1,9 +1,11 @@
 #include "Components/Collisions/Collider2D.h"
 #include "Components/Physics/RigidBody2D.h"
 #include "Components/Transform.h"
+#include "Coroutines/CoroutineScheduler.h"
 #include "EventSystem/Events/GameObjectEvents/GameObjectCreatedEvent.h"
 #include "EventSystem/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
 #include "GameObject.h"
+#include "Tools/Helpers/Coroutines/CoroutineHelpers.h"
 #include "Tools/Helpers/Physics/PhysicsConversion.h"
 
 
@@ -19,7 +21,7 @@ Collider2D::~Collider2D()
 {
 	if (fixture == nullptr || rigidBody == nullptr)
 		return;
-	
+
 	// THIS CAUSES NULL REF ERRORS! MAKE COMPONENTS SMART POINTERS!!!!!!!!
 	rigidBody->DestroyFixture(fixture);
 }
@@ -62,6 +64,16 @@ void Collider2D::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> d
 	MarkDirty();
 }
 
+Task Collider2D::Disable()
+{
+	// Can't delete a fixture during a Box2D callback (e.g., BeginContact)
+	// because the world is locked. Defer deletion until the next frame update.
+	co_await Tools::Helpers::Coroutines::WaitFrame();
+
+	rigidBody->DestroyFixture(fixture);
+	fixture = nullptr;
+}
+
 void Collider2D::RebuildFixture()
 {
 	if (fixture != nullptr && rigidBody != nullptr)
@@ -93,7 +105,19 @@ void Collider2D::SearchRigidBody()
 	if (rigidBody != nullptr)
 		return;
 
-	rigidBody = OwningObject.lock()->GetComponentInParent<RigidBody2D>();
+	rigidBody = OwningObject.lock()->GetComponentInParent<RigidBody2D>(true);
+}
+
+void Collider2D::OnGameObjectActiveStateChangedHandler(GameObject* obj, bool isActive)
+{
+	if (isActive)
+	{
+		MarkDirty();
+	}
+	else
+	{
+		CoroutineScheduler::StartCoroutine(Disable());
+	}
 }
 
 void Collider2D::Init()

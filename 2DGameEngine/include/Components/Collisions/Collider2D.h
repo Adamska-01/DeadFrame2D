@@ -1,5 +1,6 @@
 #pragma once
 #include "Components/Abstractions/ContactEventProvider.h"
+#include "Coroutines/Task.h"
 #include "Data/Collision/CollisionInfo.h"
 #include "Data/Collision/PhysicsMaterial.h"
 #include "EventSystem/DispatchableEvent.h"
@@ -21,6 +22,8 @@ private:
 
 	void GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
 
+	Task Disable();
+
 
 protected:
 	b2Fixture* fixture;
@@ -41,6 +44,9 @@ protected:
 
 
 	void SearchRigidBody();
+
+
+	virtual void OnGameObjectActiveStateChangedHandler(GameObject* obj, bool isActive) override;
 
 
 public:
