@@ -92,6 +92,7 @@ SDL_Renderer* Renderer::GetRenderer()
 SDL_Color Renderer::GetDisplayColor()
 {
 	Uint8 r, g, b, a;
+
 	SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
 
 	return SDL_Color(r, g, b, a);
@@ -99,8 +100,8 @@ SDL_Color Renderer::GetDisplayColor()
 
 Vector2I Renderer::GetResolutionTarget()
 {
-	int width = 0;
-	int height = 0;
+	auto width = 0;
+	auto height = 0;
 
 	if (renderer != nullptr)
 	{
@@ -108,6 +109,11 @@ Vector2I Renderer::GetResolutionTarget()
 	}
 
 	return Vector2I(width, height);
+}
+
+void Renderer::SetViewport(const SDL_Rect& viewPort)
+{
+	SDL_RenderSetViewport(renderer, &viewPort);
 }
 
 void Renderer::SetDisplayColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)

@@ -16,6 +16,9 @@ class Renderer : public ISubSystem
 
 
 private:
+	static SDL_Renderer* renderer;
+
+
 	Renderer(SDL_Window* window, RendererConfig config);
 
 	virtual ~Renderer() override;
@@ -24,13 +27,9 @@ private:
 
 	Renderer(Renderer&&) = delete;
 
-
 	Renderer& operator=(const Renderer&) = delete;
 
 	Renderer& operator=(Renderer&&) = delete;
-
-
-	static SDL_Renderer* renderer;
 
 
 	virtual void Update(float deltaTime) override;
@@ -52,6 +51,8 @@ public:
 	static SDL_Color GetDisplayColor();
 
 	static Vector2I GetResolutionTarget();
+
+	static void SetViewport(const SDL_Rect& viewPort);
 
 	static void SetDisplayColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 
