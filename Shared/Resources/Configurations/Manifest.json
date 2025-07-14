@@ -6,8 +6,8 @@
 		"fullscreen": false
 	},
 	"rendering": {
-		"rendererWidth": 1280,
-		"rendererHeight": 720,
+		"width": 1280,
+		"height": 720,
 		"targetFramerate": 140
 	},
 	"splashScreen": {
