@@ -66,12 +66,11 @@ void LayoutGroup::OnGameObjectActiveStateChangedHandler(GameObject* child, bool 
 
 void LayoutGroup::Init()
 {
-	UpdateLayout();
 }
 
 void LayoutGroup::Start()
 {
-
+	UpdateLayout();
 }
 
 void LayoutGroup::Update(float deltaTime)
