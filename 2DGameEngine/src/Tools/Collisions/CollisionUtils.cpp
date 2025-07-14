@@ -1,5 +1,6 @@
 #include "Components/Generic/Circle.h"
 #include "Tools/Collisions/CollisionUtils.h"
+#include <algorithm>
 #include <SDL.h>
 
 
@@ -36,6 +37,86 @@ bool CollisionUtils::RectVsRect(const SDL_Rect* boxA, const SDL_Rect* boxB)
 		&& boxB->x < boxA->x + boxA->w
 		&& boxA->y < boxB->y + boxB->h 
 		&& boxB->y < boxA->y + boxA->h;
+}
+
+bool CollisionUtils::CircleVsRect(const Circle* circle, const SDL_Rect* rect)
+{
+	// Clamp circle center to the closest point on the rectangle
+	auto closestX = std::clamp(circle->position.x, static_cast<float>(rect->x), static_cast<float>(rect->x + rect->w));
+	auto closestY = std::clamp(circle->position.y, static_cast<float>(rect->y), static_cast<float>(rect->y + rect->h));
+
+	// Compute distance from circle center to closest point
+	auto dx = circle->position.x - closestX;
+	auto dy = circle->position.y - closestY;
+
+	// Check if distance is less than or equal to radius squared
+	return (dx * dx + dy * dy) <= (circle->radius * circle->radius);
+}
+
+bool CollisionUtils::SegmentVsRect(const Vector2F& p0, const Vector2F& p1, const SDL_Rect* rect)
+{
+	// Compute the min and max of the segment
+	auto minX = std::min(p0.x, p1.x);
+	auto maxX = std::max(p0.x, p1.x);
+	auto minY = std::min(p0.y, p1.y);
+	auto maxY = std::max(p0.y, p1.y);
+
+	// Early AABB rejection
+	if (maxX < rect->x 
+		|| minX > rect->x + rect->w 
+		|| maxY < rect->y 
+		|| minY > rect->y + rect->h)
+	{
+		return false;
+	}
+
+	// Liang-Barsky line clipping algorithm
+	auto dx = p1.x - p0.x;
+	auto dy = p1.y - p0.y;
+
+	auto p = { -dx,  dx, -dy,  dy };
+	auto q = { p0.x - rect->x, (rect->x + rect->w) - p0.x, p0.y - rect->y, (rect->y + rect->h) - p0.y };
+
+	float u1 = 0.0f;
+	float u2 = 1.0f;
+
+	auto itP = p.begin();
+	auto itQ = q.begin();
+
+	for (auto i = 0; i < 4; ++i, ++itP, ++itQ)
+	{
+		auto pi = *itP;
+		auto qi = *itQ;
+
+		if (pi == 0.0f)
+		{
+			// Line is parallel and outside the rect
+			if (qi < 0.0f)
+				return false;
+			
+			continue;
+		}
+
+		auto u = qi / pi;
+		if (pi < 0.0f)
+		{
+			if (u > u2)
+				return false;
+
+			if (u > u1)
+				u1 = u;
+		}
+		else
+		{
+			if (u < u1)
+				return false;
+
+			if (u < u2)
+				u2 = u;
+		}
+	}
+
+	return true;
 }
 
 bool CollisionUtils::RayVsRect(const Vector2F& ray_origin, const Vector2F& ray_dir, const SDL_Rect* target, Vector2F& contact_point, Vector2F& contact_normal, float& t_hit_near)
