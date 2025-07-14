@@ -2,6 +2,7 @@
 #include "Components/GameComponent.h"
 #include "Data/Animation/SpriteAnimationProperties.h"
 #include "Data/Animation/SpriteAnimationState.h"
+#include <string>
 #include <unordered_map>
 
 

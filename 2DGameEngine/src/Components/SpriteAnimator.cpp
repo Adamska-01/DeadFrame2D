@@ -154,8 +154,8 @@ SDL_Rect SpriteAnimator::GetFrameRect() const
 	SDL_QueryTexture(sprite->GetTexture().get(), NULL, NULL, &srcRect.w, &srcRect.h);
 
 	//Get the size of a single frame in a sprite sheet
-	srcRect.w = static_cast<int>(round((float)srcRect.w / animations[currentAnimationID].columnCount));
-	srcRect.h = static_cast<int>(round((float)srcRect.h / animations[currentAnimationID].rowCount));
+	srcRect.w = static_cast<int>(round((float)srcRect.w / animations.at(currentAnimationID).columnCount));
+	srcRect.h = static_cast<int>(round((float)srcRect.h / animations.at(currentAnimationID).rowCount));
 
 	return srcRect;
 }
