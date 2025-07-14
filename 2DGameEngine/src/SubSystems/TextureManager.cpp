@@ -96,15 +96,20 @@ void TextureManager::DrawLine(const Vector2F& p1, const Vector2F& p2, SDL_Color 
 {
 	auto renderer = Renderer::GetRenderer();
 	
-	if (!renderer)
+	if (renderer == nullptr)
 		return;
-	
-	auto screenP1 = p1, screenP2 = p2;
+
+	auto screenP1 = p1;
+	auto screenP2 = p2;
 
 	if (camera != nullptr)
 	{
 		screenP1 = camera->WorldToScreen(p1);
 		screenP2 = camera->WorldToScreen(p2);
+
+		// Culling: skip if line is not visible on the screen
+		if (!camera->IsVisible(screenP1, screenP2))
+			return;
 	}
 
 	auto oldRenderColor = Renderer::GetDisplayColor();
@@ -122,9 +127,9 @@ void TextureManager::DrawLine(const Vector2F& p1, const Vector2F& p2, SDL_Color 
 void TextureManager::DrawRect(SDL_Rect rect, float angleDegrees, SDL_Color color, bool filled, Camera* camera)
 {
 	auto renderer = Renderer::GetRenderer();
-	auto oldRenderColor = Renderer::GetDisplayColor();
 
-	Renderer::SetDisplayColor(color.r, color.g, color.b, color.a);
+	if (renderer == nullptr)
+		return;
 
 	auto cx = rect.x + rect.w * 0.5f;
 	auto cy = rect.y + rect.h * 0.5f;
@@ -160,6 +165,33 @@ void TextureManager::DrawRect(SDL_Rect rect, float angleDegrees, SDL_Color color
 		}
 	}
 
+	if (camera != nullptr)
+	{
+		// AABB-based culling from polygon points
+		// (Convert to non-rotated rect)
+		auto minX = corners[0].x, maxX = corners[0].x;
+		auto minY = corners[0].y, maxY = corners[0].y;
+
+		for (auto i = 1; i < 4; ++i)
+		{
+			if (corners[i].x < minX) minX = corners[i].x;
+			if (corners[i].x > maxX) maxX = corners[i].x;
+			if (corners[i].y < minY) minY = corners[i].y;
+			if (corners[i].y > maxY) maxY = corners[i].y;
+		}
+
+		SDL_Rect screenBounds = 
+		{
+			static_cast<int>(minX),
+			static_cast<int>(minY),
+			static_cast<int>(maxX - minX),
+			static_cast<int>(maxY - minY)
+		};
+
+		if (!camera->IsVisible(screenBounds))
+			return;
+	}
+
 	if (filled)
 	{
 		SDL_Vertex vertices[6]
@@ -176,6 +208,10 @@ void TextureManager::DrawRect(SDL_Rect rect, float angleDegrees, SDL_Color color
 	}
 	else
 	{
+		auto oldRenderColor = Renderer::GetDisplayColor();
+
+		Renderer::SetDisplayColor(color.r, color.g, color.b, color.a);
+
 		for (auto i = 0; i < 4; ++i)
 		{
 			SDL_RenderDrawLineF(
@@ -183,72 +219,84 @@ void TextureManager::DrawRect(SDL_Rect rect, float angleDegrees, SDL_Color color
 				corners[i].x, corners[i].y,
 				corners[(i + 1) % 4].x, corners[(i + 1) % 4].y);
 		}
+	
+		Renderer::SetDisplayColor(oldRenderColor.r, oldRenderColor.g, oldRenderColor.b, oldRenderColor.a);
 	}
-
-	Renderer::SetDisplayColor(oldRenderColor.r, oldRenderColor.g, oldRenderColor.b, oldRenderColor.a);
 }
 
 void TextureManager::DrawCircle(Circle circle, SDL_Color color, bool filled, Camera* camera)
 {
 	auto renderer = Renderer::GetRenderer();
-	auto oldRenderColor = Renderer::GetDisplayColor();
 
-	Renderer::SetDisplayColor(color.r, color.g, color.b, color.a);
+	if (renderer == nullptr)
+		return;
 
 	auto screenCenter = circle.position;
 	auto radius = static_cast<int>(circle.radius);
 	
 	if (camera != nullptr)
 	{
+		// Transform to screen space
 		screenCenter = camera->WorldToScreen(circle.position);
 		radius *= camera->GetZoom();
+
+		// Culling: skip if circle is fully outside the camera's view
+		if (!camera->IsVisible(Circle(screenCenter, radius)))
+			return;
 	}
 
-	auto x = radius - 1;
-	auto y = 0;
-	auto tx = 1;
-	auto ty = 1;
-	auto error = tx - (radius << 1);
+	// Increase segments for smoother circles
+	const auto segments = 64;
 
-	const int cx = static_cast<int>(screenCenter.x);
-	const int cy = static_cast<int>(screenCenter.y);
-
-	while (x >= y)
+	if (filled)
 	{
-		if (filled)
+		std::vector<SDL_Vertex> vertices(segments + 2);
+		std::vector<int> indices(segments * 3);
+
+		vertices[0] = { {screenCenter.x, screenCenter.y}, color, {0.5f, 0.5f} };
+
+		// Vertices
+		for (auto i = 0; i <= segments; ++i)
 		{
-			SDL_RenderDrawLine(renderer, cx - x, cy - y, cx + x, cy - y);
-			SDL_RenderDrawLine(renderer, cx - x, cy + y, cx + x, cy + y);
-			SDL_RenderDrawLine(renderer, cx - y, cy - x, cx + y, cy - x);
-			SDL_RenderDrawLine(renderer, cx - y, cy + x, cx + y, cy + x);
-		}
-		else
-		{
-			SDL_RenderDrawPoint(renderer, cx + x, cy - y);
-			SDL_RenderDrawPoint(renderer, cx + x, cy + y);
-			SDL_RenderDrawPoint(renderer, cx - x, cy - y);
-			SDL_RenderDrawPoint(renderer, cx - x, cy + y);
-			SDL_RenderDrawPoint(renderer, cx + y, cy - x);
-			SDL_RenderDrawPoint(renderer, cx + y, cy + x);
-			SDL_RenderDrawPoint(renderer, cx - y, cy - x);
-			SDL_RenderDrawPoint(renderer, cx - y, cy + x);
+			float angle = 2.0f * MathConstants::PI * i / segments;
+			vertices[i + 1] = 
+			{
+				{ screenCenter.x + cosf(angle) * radius, screenCenter.y + sinf(angle) * radius },
+				color,
+				{ (cosf(angle) + 1) * 0.5f, (sinf(angle) + 1) * 0.5f }
+			};
 		}
 
-		if (error <= 0)
+		// Indices (Each triangle connects the center to 2 outer points)
+		for (auto i = 0; i < segments; ++i)
 		{
-			y++;
-			error += ty;
-			ty += 2;
+			indices[i * 3 + 0] = 0;
+			indices[i * 3 + 1] = i + 1;
+			indices[i * 3 + 2] = i + 2;
 		}
-		if (error > 0)
-		{
-			x--;
-			tx += 2;
-			error += (tx - (radius << 1));
-		}
+
+		SDL_RenderGeometry(renderer, nullptr, vertices.data(), (int)vertices.size(), indices.data(), (int)indices.size());
 	}
+	else
+	{
+		auto oldRenderColor = Renderer::GetDisplayColor();
 
-	Renderer::SetDisplayColor(oldRenderColor.r, oldRenderColor.g, oldRenderColor.b, oldRenderColor.a);
+		Renderer::SetDisplayColor(color.r, color.g, color.b, color.a);
+
+		std::vector<SDL_Point> points(segments + 1);
+		
+		for (auto i = 0; i <= segments; ++i)
+		{
+			float angle = 2.0f * MathConstants::PI * i / segments;
+			
+			points[i].x = static_cast<int>(screenCenter.x + cosf(angle) * radius);
+			points[i].y = static_cast<int>(screenCenter.y + sinf(angle) * radius);
+		}
+
+		SDL_RenderDrawLines(renderer, points.data(), (int)points.size());
+		
+		Renderer::SetDisplayColor(oldRenderColor.r, oldRenderColor.g, oldRenderColor.b, oldRenderColor.a);
+	}
 }
 
 void TextureManager::DrawTexture(
@@ -287,13 +335,11 @@ void TextureManager::DrawTexture(
 
 	if (camera != nullptr)
 	{
-		// Transform position to screen space
 		floatPos = camera->WorldToScreen(floatPos);
-
-		// Apply zoom to size
 		floatSize *= camera->GetZoom();
 	}
 
+	// Convert to SDL_Rect after camera adjustments
 	SDL_Rect transformedDst
 	{
 		static_cast<int>(std::floor(floatPos.x)),
@@ -301,6 +347,9 @@ void TextureManager::DrawTexture(
 		static_cast<int>(std::ceil(floatSize.x)),
 		static_cast<int>(std::ceil(floatSize.y))
 	};
+
+	if (camera != nullptr && !camera->IsVisible(transformedDst))
+		return;
 
 	// Backup texture state
 	Uint8 oldAlpha, oldR, oldG, oldB;
