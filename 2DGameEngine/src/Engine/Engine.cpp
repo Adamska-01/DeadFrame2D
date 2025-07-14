@@ -28,10 +28,10 @@ std::optional<int> Engine::RenderSplashScreen()
 
 	auto destRect = SDL_Rect
 	{
-		static_cast<int>(renderTargetSize.x * 0.5f - width * 0.25f),
-		static_cast<int>(renderTargetSize.y * 0.5f - height * 0.25f),
-		static_cast<int>(width * 0.5f),
-		static_cast<int>(height * 0.5f)
+		static_cast<int>(renderTargetSize.x * 0.5f - width * 0.2f),
+		static_cast<int>(renderTargetSize.y * 0.5f - height * 0.2f),
+		static_cast<int>(width * 0.4f),
+		static_cast<int>(height * 0.4f)
 	};
 
 	constexpr uint8_t MaxAlpha = 255;
