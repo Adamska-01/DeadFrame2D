@@ -14,5 +14,5 @@ struct EngineConfig
 	SplashScreenConfig splashScreen;
 
 
-	NLOHMANN_DEFINE_TYPE_INTRUSIVE(EngineConfig, window, splashScreen)
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(EngineConfig, window, rendering, splashScreen)
 };
