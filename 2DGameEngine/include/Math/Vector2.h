@@ -57,6 +57,8 @@ public:
 
 	static constexpr T Dot(const Vector2<T>& a, const Vector2<T>& b);
 
+	static constexpr Vector2<T> Lerp(const Vector2<T>& a, const Vector2<T>& b, T t);
+
 
 	constexpr Vector2<T>& operator=(const Vector2<T>& other);
 
@@ -205,6 +207,12 @@ template<typename T>
 inline constexpr T Vector2<T>::Dot(const Vector2<T>& a, const Vector2<T>& b)
 {
 	return a.x * b.x + a.y * b.y;
+}
+
+template<typename T>
+inline constexpr Vector2<T> Vector2<T>::Lerp(const Vector2<T>& a, const Vector2<T>& b, T t)
+{
+	return a + (b - a) * t;
 }
 
 template<typename T>
