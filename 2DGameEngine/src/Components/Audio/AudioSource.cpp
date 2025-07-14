@@ -17,7 +17,7 @@ AudioSource::AudioSource()
 	collisionFixture(nullptr),
 	isMusic(false),
 	minReachingDistance(1),
-	maxReachingDistance(std::numeric_limits<float>::max()),
+	maxReachingDistance(9999.0f),
 	volume(1.0f),
 	loops(0),
 	playingChannel(-1),
@@ -55,6 +55,8 @@ AudioSource::~AudioSource()
 
 		fixture = next;
 	}
+
+	PhysicsEngine2D::DestroyBody(collisionBody);
 
 	DeregisterContactEnterHandler(reinterpret_cast<uintptr_t>(this));
 	DeregisterContactExitHandler(reinterpret_cast<uintptr_t>(this));
