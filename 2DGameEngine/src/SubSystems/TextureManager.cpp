@@ -1,3 +1,4 @@
+#include "Components/Rendering/Camera.h"
 #include "SubSystems/Renderer.h"
 #include "SubSystems/TextureManager.h"
 #include <Debugging/Debug.h>
@@ -6,6 +7,8 @@
 
 
 std::unordered_map<std::string, std::weak_ptr<SDL_Texture>> TextureManager::textureCache = {};
+
+Camera* TextureManager::currentCamera = nullptr;
 
 
 TextureManager::TextureManager()
@@ -89,7 +92,34 @@ std::shared_ptr<SDL_Texture> TextureManager::LoadTexture(std::string_view filena
 	return sharedPtr;
 }
 
-void TextureManager::DrawRect(SDL_Rect rect, float angleDegrees, SDL_Color color, bool filled)
+void TextureManager::DrawLine(const Vector2F& p1, const Vector2F& p2, SDL_Color color, Camera* camera)
+{
+	auto renderer = Renderer::GetRenderer();
+	
+	if (!renderer)
+		return;
+	
+	auto screenP1 = p1, screenP2 = p2;
+
+	if (camera != nullptr)
+	{
+		screenP1 = camera->WorldToScreen(p1);
+		screenP2 = camera->WorldToScreen(p2);
+	}
+
+	auto oldRenderColor = Renderer::GetDisplayColor();
+	
+	Renderer::SetDisplayColor(color.r, color.g, color.b, color.a);
+
+	SDL_RenderDrawLineF(
+		renderer,
+		screenP1.x, screenP1.y,
+		screenP2.x, screenP2.y);
+
+	Renderer::SetDisplayColor(oldRenderColor.r, oldRenderColor.g, oldRenderColor.b, oldRenderColor.a);
+}
+
+void TextureManager::DrawRect(SDL_Rect rect, float angleDegrees, SDL_Color color, bool filled, Camera* camera)
 {
 	auto renderer = Renderer::GetRenderer();
 	auto oldRenderColor = Renderer::GetDisplayColor();
@@ -118,21 +148,29 @@ void TextureManager::DrawRect(SDL_Rect rect, float angleDegrees, SDL_Color color
 
 		p.x = x + cx;
 		p.y = y + cy;
+
+		if (camera != nullptr)
+		{
+			auto pVec = Vector2F(p.x, p.y);
+
+			pVec = camera->WorldToScreen(pVec);
+
+			p.x = pVec.x;
+			p.y = pVec.y;
+		}
 	}
 
 	if (filled)
 	{
-		SDL_Vertex vertices[6];
-
-		SDL_Color vertexColor = color;
-
-		vertices[0] = { corners[0], vertexColor, {0, 0} };
-		vertices[1] = { corners[1], vertexColor, {0, 0} };
-		vertices[2] = { corners[2], vertexColor, {0, 0} };
-
-		vertices[3] = { corners[2], vertexColor, {0, 0} };
-		vertices[4] = { corners[3], vertexColor, {0, 0} };
-		vertices[5] = { corners[0], vertexColor, {0, 0} };
+		SDL_Vertex vertices[6]
+		{
+			{ corners[0], color, {0, 0} },
+			{ corners[1], color, {0, 0} },
+			{ corners[2], color, {0, 0} },
+			{ corners[2], color, {0, 0} },
+			{ corners[3], color, {0, 0} },
+			{ corners[0], color, {0, 0} }
+		};
 
 		SDL_RenderGeometry(renderer, nullptr, vertices, 6, nullptr, 0);
 	}
@@ -150,47 +188,50 @@ void TextureManager::DrawRect(SDL_Rect rect, float angleDegrees, SDL_Color color
 	Renderer::SetDisplayColor(oldRenderColor.r, oldRenderColor.g, oldRenderColor.b, oldRenderColor.a);
 }
 
-void TextureManager::DrawCircle(Circle circle, SDL_Color color, bool filled)
+void TextureManager::DrawCircle(Circle circle, SDL_Color color, bool filled, Camera* camera)
 {
-	auto radius = circle.radius;
-	auto position = circle.position;
-
+	auto renderer = Renderer::GetRenderer();
 	auto oldRenderColor = Renderer::GetDisplayColor();
-	
+
 	Renderer::SetDisplayColor(color.r, color.g, color.b, color.a);
 
-	SDL_Renderer* renderer = Renderer::GetRenderer();
-	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	auto screenCenter = circle.position;
+	auto radius = static_cast<int>(circle.radius);
+	
+	if (camera != nullptr)
+	{
+		screenCenter = camera->WorldToScreen(circle.position);
+		radius *= camera->GetZoom();
+	}
 
-	const int diameter = (radius * 2);
+	auto x = radius - 1;
+	auto y = 0;
+	auto tx = 1;
+	auto ty = 1;
+	auto error = tx - (radius << 1);
 
-	int x = radius - 1;
-	int y = 0;
-	int tx = 1;
-	int ty = 1;
-	int error = (tx - diameter);
+	const int cx = static_cast<int>(screenCenter.x);
+	const int cy = static_cast<int>(screenCenter.y);
 
 	while (x >= y)
 	{
 		if (filled)
 		{
-			// Draw horizontal lines between points to fill the circle
-			SDL_RenderDrawLine(renderer, position.x - x, position.y - y, position.x + x, position.y - y);
-			SDL_RenderDrawLine(renderer, position.x - x, position.y + y, position.x + x, position.y + y);
-			SDL_RenderDrawLine(renderer, position.x - y, position.y - x, position.x + y, position.y - x);
-			SDL_RenderDrawLine(renderer, position.x - y, position.y + x, position.x + y, position.y + x);
+			SDL_RenderDrawLine(renderer, cx - x, cy - y, cx + x, cy - y);
+			SDL_RenderDrawLine(renderer, cx - x, cy + y, cx + x, cy + y);
+			SDL_RenderDrawLine(renderer, cx - y, cy - x, cx + y, cy - x);
+			SDL_RenderDrawLine(renderer, cx - y, cy + x, cx + y, cy + x);
 		}
 		else
 		{
-			// Draw outline points
-			SDL_RenderDrawPoint(renderer, position.x + x, position.y - y);
-			SDL_RenderDrawPoint(renderer, position.x + x, position.y + y);
-			SDL_RenderDrawPoint(renderer, position.x - x, position.y - y);
-			SDL_RenderDrawPoint(renderer, position.x - x, position.y + y);
-			SDL_RenderDrawPoint(renderer, position.x + y, position.y - x);
-			SDL_RenderDrawPoint(renderer, position.x + y, position.y + x);
-			SDL_RenderDrawPoint(renderer, position.x - y, position.y - x);
-			SDL_RenderDrawPoint(renderer, position.x - y, position.y + x);
+			SDL_RenderDrawPoint(renderer, cx + x, cy - y);
+			SDL_RenderDrawPoint(renderer, cx + x, cy + y);
+			SDL_RenderDrawPoint(renderer, cx - x, cy - y);
+			SDL_RenderDrawPoint(renderer, cx - x, cy + y);
+			SDL_RenderDrawPoint(renderer, cx + y, cy - x);
+			SDL_RenderDrawPoint(renderer, cx + y, cy + x);
+			SDL_RenderDrawPoint(renderer, cx - y, cy - x);
+			SDL_RenderDrawPoint(renderer, cx - y, cy + x);
 		}
 
 		if (error <= 0)
@@ -199,28 +240,27 @@ void TextureManager::DrawCircle(Circle circle, SDL_Color color, bool filled)
 			error += ty;
 			ty += 2;
 		}
-
 		if (error > 0)
 		{
 			x--;
 			tx += 2;
-			error += (tx - diameter);
+			error += (tx - (radius << 1));
 		}
 	}
 
-	// Reset Display Color
 	Renderer::SetDisplayColor(oldRenderColor.r, oldRenderColor.g, oldRenderColor.b, oldRenderColor.a);
 }
 
 void TextureManager::DrawTexture(
 	std::shared_ptr<SDL_Texture> texture,
-	const SDL_Rect* srcRect, 
-	const SDL_Rect* dstRect, 
+	const SDL_Rect* srcRect,
+	const SDL_Rect* dstRect,
 	float angle,
-	SDL_Point* rotationOrigin, 
-	SDL_RendererFlip flip, 
-	Uint8 alpha, 
-	SDL_Color colorMod)
+	SDL_Point* rotationOrigin,
+	SDL_RendererFlip flip,
+	Uint8 alpha,
+	SDL_Color colorMod, 
+	Camera* camera)
 {
 	auto renderer = Renderer::GetRenderer();
 
@@ -229,40 +269,119 @@ void TextureManager::DrawTexture(
 
 	auto texturePtr = texture.get();
 
-	if (dstRect == NULL)
-	{
-		auto localDst = SDL_Rect{ 0, 0, 0, 0 };
-		
-		SDL_QueryTexture(texturePtr, nullptr, nullptr, &localDst.w, &localDst.h);
+	auto floatPos = Vector2F::Zero;
+	auto floatSize = Vector2F::Zero;
 
-		dstRect = &localDst;
+	if (!dstRect)
+	{
+		auto texW = 0, texH = 0;
+		SDL_QueryTexture(texturePtr, nullptr, nullptr, &texW, &texH);
+
+		floatSize = { static_cast<float>(texW), static_cast<float>(texH) };
+	}
+	else
+	{
+		floatPos = { static_cast<float>(dstRect->x), static_cast<float>(dstRect->y) };
+		floatSize = { static_cast<float>(dstRect->w), static_cast<float>(dstRect->h) };
 	}
 
-	// Backup current texture state
+	if (camera != nullptr)
+	{
+		// Transform position to screen space
+		floatPos = camera->WorldToScreen(floatPos);
+
+		// Apply zoom to size
+		floatSize *= camera->GetZoom();
+	}
+
+	SDL_Rect transformedDst
+	{
+		static_cast<int>(std::floor(floatPos.x)),
+		static_cast<int>(std::floor(floatPos.y)),
+		static_cast<int>(std::ceil(floatSize.x)),
+		static_cast<int>(std::ceil(floatSize.y))
+	};
+
+	// Backup texture state
 	Uint8 oldAlpha, oldR, oldG, oldB;
 	SDL_GetTextureAlphaMod(texturePtr, &oldAlpha);
 	SDL_GetTextureColorMod(texturePtr, &oldR, &oldG, &oldB);
 
-	// Apply new modulation
 	SDL_SetTextureAlphaMod(texturePtr, alpha);
 	SDL_SetTextureColorMod(texturePtr, colorMod.r, colorMod.g, colorMod.b);
 
-	// Default to center if NULL
-	auto rotationOriginFallback = SDL_Point
+	SDL_Point fallbackOrigin
 	{
-		static_cast<int>(dstRect->w * 0.5f),
-		static_cast<int>(dstRect->h * 0.5f)
+		static_cast<int>(std::roundf(floatSize.x * 0.5f)),
+		static_cast<int>(std::roundf(floatSize.y * 0.5f))
 	};
 
-	if (rotationOrigin == NULL)
-	{
-		rotationOrigin = &rotationOriginFallback;
-	}
+	SDL_RenderCopyEx(
+		renderer, 
+		texturePtr, 
+		srcRect, 
+		&transformedDst, 
+		angle,
+		rotationOrigin ? rotationOrigin : &fallbackOrigin, 
+		flip);
 
-	// Render
-	SDL_RenderCopyEx(renderer, texturePtr, srcRect, dstRect, angle, rotationOrigin, flip);
-
-	// Restore previous modulation
+	// Restore texture state
 	SDL_SetTextureAlphaMod(texturePtr, oldAlpha);
 	SDL_SetTextureColorMod(texturePtr, oldR, oldG, oldB);
+}
+
+void TextureManager::DrawLineWorldSpace(const Vector2F& p1, const Vector2F& p2, SDL_Color color)
+{
+	DrawLine(p1, p2, color, currentCamera);
+}
+
+void TextureManager::DrawLineScreenSpace(const Vector2F& p1, const Vector2F& p2, SDL_Color color)
+{
+	DrawLine(p1, p2, color);
+}
+
+void TextureManager::DrawRectWorldSpace(SDL_Rect rect, float angleDegrees, SDL_Color color, bool filled)
+{
+	DrawRect(rect, angleDegrees, color, filled, currentCamera);
+}
+
+void TextureManager::DrawRectScreenSpace(SDL_Rect rect, float angleDegrees, SDL_Color color, bool filled)
+{
+	DrawRect(rect, angleDegrees, color, filled);
+}
+
+void TextureManager::DrawCircleWorldSpace(Circle circle, SDL_Color color, bool filled)
+{
+	DrawCircle(circle, color, filled, currentCamera);
+}
+
+void TextureManager::DrawCircleScreenSpace(Circle circle, SDL_Color color, bool filled)
+{
+	DrawCircle(circle, color, filled);
+}
+
+void TextureManager::DrawTextureWorldSpace(
+	std::shared_ptr<SDL_Texture> texture, 
+	const SDL_Rect* srcRect, 
+	const SDL_Rect* dstRect, 
+	float angle, 
+	SDL_Point* rotationOrigin, 
+	SDL_RendererFlip flip, 
+	Uint8 alpha, 
+	SDL_Color colorMod)
+{
+	DrawTexture(texture, srcRect, dstRect, angle, rotationOrigin, flip, alpha, colorMod, currentCamera);
+}
+
+void TextureManager::DrawTextureScreenSpace(
+	std::shared_ptr<SDL_Texture> texture, 
+	const SDL_Rect* srcRect, 
+	const SDL_Rect* dstRect, 
+	float angle, 
+	SDL_Point* rotationOrigin, 
+	SDL_RendererFlip flip, 
+	Uint8 alpha, 
+	SDL_Color colorMod)
+{
+	DrawTexture(texture, srcRect, dstRect, angle, rotationOrigin, flip, alpha, colorMod);
 }
