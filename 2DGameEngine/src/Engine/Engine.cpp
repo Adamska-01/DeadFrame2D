@@ -1,3 +1,4 @@
+#include "Components/Rendering/Camera.h"
 #include "Engine/Engine.h"
 #include "SubSystems/Renderer.h"
 #include <Constants/ResourcePaths.h>
@@ -103,9 +104,21 @@ std::optional<int> Engine::Run()
 
 		Renderer::ClearBuffer();
 
-		sceneManager->DrawScene();
+		for (const auto& camera : Camera::cameras)
+		{
+			if (!camera->IsActive())
+				continue;
 
-		engineSubSystems->EndDraw();
+			TextureManager::currentCamera = camera;
+
+			Renderer::SetViewport(camera->GetViewBox());
+
+			sceneManager->DrawScene();
+
+			engineSubSystems->EndDraw();
+
+			TextureManager::currentCamera = nullptr;
+		}
 
 		Renderer::PresentBuffer();
 
