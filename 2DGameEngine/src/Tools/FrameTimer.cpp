@@ -1,11 +1,14 @@
+#include "Tools/FrameTimer.h"
+#include <algorithm>
 #include <thread>
-#include <Tools/FrameTimer.h>
 
 
 using namespace std::chrono;
 
 
 float FrameTimer::deltaTime = 0;
+
+float FrameTimer::timeScale = 1.0f;
 
 int FrameTimer::currentFPS = 0;
 
@@ -78,10 +81,20 @@ void FrameTimer::UnlockFramerate()
 
 float FrameTimer::DeltaTime()
 {
-	return deltaTime;
+	return deltaTime * timeScale;
 }
 
 int FrameTimer::Framerate()
 {
 	return currentFPS;
+}
+
+void FrameTimer::SetTimeScale(float scale)
+{
+	timeScale = std::max(0.0f, scale);
+}
+
+float FrameTimer::GetTimeScale()
+{
+	return timeScale;
 }

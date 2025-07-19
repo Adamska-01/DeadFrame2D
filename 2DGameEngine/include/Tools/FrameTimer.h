@@ -7,6 +7,8 @@ class FrameTimer
 private:
 	static float deltaTime;
 
+	static float timeScale;
+
 	static int currentFPS;
 
 
@@ -45,4 +47,8 @@ public:
 	static float DeltaTime();
 
 	static int Framerate();
+
+	static void SetTimeScale(float scale);
+
+	static float GetTimeScale();
 };
