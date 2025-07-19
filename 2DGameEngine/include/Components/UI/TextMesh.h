@@ -21,13 +21,13 @@ private:
 	Vector2F initialObjectScale;
 
 	std::shared_ptr<SDL_Texture> textTexture;
-	
+
 	std::shared_ptr<TTF_Font> font;
 
 	std::string text;
-	
+
 	SDL_Color color;
-	
+
 	bool centered;
 
 	unsigned int fontSize;
@@ -35,7 +35,7 @@ private:
 
 public:
 	TextMesh(const TextMeshComponentModel& textMeshConfiguration);
-	
+
 	virtual ~TextMesh() override = default;
 
 
@@ -49,9 +49,9 @@ public:
 
 
 	void SetFontSize(unsigned int newFontSize);
-	
+
 	void SetTextColor(SDL_Color newColor);
-	
+
 	void SetFontStyle(FontStyle newFontStyle);
 
 	void SetText(std::string newText);
@@ -60,5 +60,5 @@ public:
 
 	std::string GetText();
 
-	SDL_Rect GetTextBoundingBox();
+	SDL_Rect GetTextDestRect();
 };

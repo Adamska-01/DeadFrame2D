@@ -42,7 +42,7 @@ void TextMesh::Update(float deltaTime)
 
 void TextMesh::Draw()
 {
-	auto destRect = GetTextBoundingBox();
+	auto destRect = GetTextDestRect();
 
 	TextureManager::DrawTextureScreenSpace(textTexture, NULL, &destRect, transform->GetWorldRotation());
 }
@@ -91,7 +91,7 @@ std::string TextMesh::GetText()
 	return text;
 }
 
-SDL_Rect TextMesh::GetTextBoundingBox()
+SDL_Rect TextMesh::GetTextDestRect()
 {
 	auto currentPosition = transform->GetWorldPosition();
 	auto scaledSize = GetWidgetSize();
