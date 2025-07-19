@@ -1,44 +1,59 @@
+#include "Coroutines/Abstractions/ICoroutineAwaitable.h"
 #include "Coroutines/Task.h"
 #include <exception>
 
 
+thread_local Task* Task::currentTask = nullptr;
+
+
+/// =========================================================================================
+/// ========================================= Task =========================================
+/// =========================================================================================
 Task::Task(std::coroutine_handle<promise_type> promiseHandle)
 	: promiseHandle(promiseHandle)
 {
+	awaitables.clear();
 }
 
 Task::Task(Task&& other) noexcept
-	: promiseHandle(other.promiseHandle) 
+	: promiseHandle(other.promiseHandle), 
+	awaitables(std::move(other.awaitables))
 {
 	other.promiseHandle = nullptr;
 }
 
 Task::~Task()
 {
-	if (promiseHandle == nullptr)
-		return;
+	for (auto* awaitable : awaitables)
+	{
+		delete awaitable;
+	}
 
-	promiseHandle.destroy();
-	promiseHandle = nullptr;
-}
-
-Task& Task::operator=(Task&& other) noexcept
-{
-	if (this == &other)
-		return *this;
+	awaitables.clear();
 
 	if (promiseHandle)
 	{
 		promiseHandle.destroy();
+		promiseHandle = nullptr;
 	}
-	
-	promiseHandle = other.promiseHandle;
-	other.promiseHandle = nullptr;
 }
 
-bool Task::IsDone() const
+Task& Task::operator=(Task&& other) noexcept
 {
-	return promiseHandle == nullptr || promiseHandle.done();
+	if (this != &other)
+	{
+		if (promiseHandle)
+		{
+			promiseHandle.destroy();
+			promiseHandle = nullptr;
+		}
+
+		promiseHandle = other.promiseHandle;
+		awaitables = std::move(other.awaitables);
+		other.promiseHandle = nullptr;
+	}
+
+	return *this;
 }
 
 bool Task::await_ready() const noexcept
@@ -48,6 +63,9 @@ bool Task::await_ready() const noexcept
 
 void Task::await_suspend(std::coroutine_handle<> awaitingCoroutine) noexcept
 {
+	if (promiseHandle == nullptr)
+		return;
+
 	promiseHandle.promise().continuation = awaitingCoroutine;
 }
 
@@ -56,24 +74,83 @@ void Task::await_resume() const noexcept
 
 }
 
-
-Task Task::promise_type::get_return_object()
+bool Task::IsDone() const
 {
-	return Task(std::coroutine_handle<promise_type>::from_promise(*this));
+	return !promiseHandle || promiseHandle.done();
 }
 
-std::suspend_never Task::promise_type::initial_suspend() noexcept
+bool Task::IsCancelled() const
+{
+	return promiseHandle != nullptr && promiseHandle.promise().is_cancelled();
+}
+
+void Task::Cancel()
+{
+	if (promiseHandle == nullptr)
+		return;
+
+	promiseHandle.promise().cancel();
+}
+
+void Task::AddAwaitable(ICoroutineAwaitable* awaitable)
+{
+	awaitable->SetOwner(this);
+	awaitables.push_back(awaitable);
+}
+
+bool Task::TickAwaitables(float deltaTime)
+{
+	if (IsCancelled())
+		return true; // Task should be removed
+
+	std::vector<ICoroutineAwaitable*> finished;
+
+	// Pass 1: Tick and collect finished
+	for (auto* awaitable : awaitables)
+	{
+		if (awaitable->Tick(deltaTime))
+		{
+			finished.push_back(awaitable);
+		}
+	}
+
+	// Pass 2: Erase and delete
+	for (auto* awaitable : finished)
+	{
+		auto it = std::find(awaitables.begin(), awaitables.end(), awaitable);
+		if (it != awaitables.end())
+		{
+			awaitables.erase(it);
+			delete awaitable;
+		}
+	}
+
+	return IsDone() || IsCancelled();
+}
+
+
+
+/// =========================================================================================
+/// ===================================== promise_type ======================================
+/// =========================================================================================
+Task Task::promise_type::get_return_object()
+{
+	return Task{ std::coroutine_handle<promise_type>::from_promise(*this) };
+}
+
+std::suspend_always Task::promise_type::initial_suspend() noexcept
 {
 	return {};
 }
 
-Task::promise_type::Awaiter Task::promise_type::final_suspend() noexcept
+Task::promise_type::final_awaiter Task::promise_type::final_suspend() noexcept
 {
-	return Awaiter{ continuation };
+	return final_awaiter{ continuation };
 }
 
 void Task::promise_type::return_void() noexcept
 {
+
 }
 
 void Task::promise_type::unhandled_exception()
@@ -81,21 +158,37 @@ void Task::promise_type::unhandled_exception()
 	std::terminate();
 }
 
+void Task::promise_type::cancel() noexcept
+{
+	cancelled.store(true, std::memory_order_relaxed);
+}
 
-bool Task::promise_type::Awaiter::await_ready() const noexcept
+bool Task::promise_type::is_cancelled() const noexcept
+{
+	return cancelled.load(std::memory_order_relaxed);
+}
+
+
+
+/// =========================================================================================
+/// ===================================== final_awaiter =====================================
+/// =========================================================================================
+bool Task::promise_type::final_awaiter::await_ready() const noexcept
 {
 	return false;
 }
 
-void Task::promise_type::Awaiter::await_suspend(std::coroutine_handle<>) const noexcept
+void Task::promise_type::final_awaiter::await_suspend(std::coroutine_handle<promise_type> promiseHandle) const noexcept
 {
-	if (continuation == nullptr)
+	auto& promise = promiseHandle.promise();
+
+	if (!promise.continuation)
 		return;
 
-	continuation.resume();
+	promise.continuation.resume();
 }
 
-void Task::promise_type::Awaiter::await_resume() const noexcept
+void Task::promise_type::final_awaiter::await_resume() const noexcept
 {
 
 }

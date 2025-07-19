@@ -1,10 +1,12 @@
 #pragma once
-#include "Coroutines/Task.h"
 #include "SubSystems/Abstractions/ISubSystem.h"
+#include <coroutine>
+#include <memory>
 #include <vector>
 
 
 class ICoroutineAwaitable;
+struct Task;
 
 
 class CoroutineScheduler : public ISubSystem
@@ -13,17 +15,19 @@ class CoroutineScheduler : public ISubSystem
 
 
 private:
-	static CoroutineScheduler* current;
+	static CoroutineScheduler* instance;
 
 
-	std::vector<ICoroutineAwaitable*> awaitables;
-	
 	std::vector<Task*> tasks;
-	
 
-	CoroutineScheduler() = default;
+
+	CoroutineScheduler();
 
 	virtual ~CoroutineScheduler() override;
+
+	CoroutineScheduler(const CoroutineScheduler&) = delete;
+
+	CoroutineScheduler& operator=(const CoroutineScheduler&) = delete;
 
 
 	virtual void Update(float deltaTime) override;
@@ -35,17 +39,7 @@ private:
 	virtual void EndDraw() override;
 
 
-	static void SetCurrent(CoroutineScheduler* scheduler);
-
-
 public:
-	CoroutineScheduler(const CoroutineScheduler&) = delete;
-
-	CoroutineScheduler& operator=(const CoroutineScheduler&) = delete;
-
-
-	static void AddAwaitable(ICoroutineAwaitable* awaitable);
-
 	static Task& StartCoroutine(Task&& task);
 
 	static void Reset();

@@ -1,92 +1,59 @@
 #include "Coroutines/Abstractions/ICoroutineAwaitable.h"
 #include "Coroutines/CoroutineScheduler.h"
+#include "Coroutines/Task.h"
 #include "Tools/Helpers/Guards.h"
 #include <algorithm>
+#include <cassert>
 #include <stdexcept>
 
 
-CoroutineScheduler* CoroutineScheduler::current = nullptr;
+CoroutineScheduler* CoroutineScheduler::instance = nullptr;
 
+
+CoroutineScheduler::CoroutineScheduler()
+{
+	assert(instance == nullptr && "CoroutineScheduler was already initialized!");
+
+	instance = this;
+}
 
 CoroutineScheduler::~CoroutineScheduler()
 {
-	if (current != this)
+	if (instance != this)
 	{
 		throw std::runtime_error("CoroutineScheduler::current does not match this instance.");
 	}
 
 	Reset();
 
-	current = nullptr;
-}
-
-void CoroutineScheduler::AddAwaitable(ICoroutineAwaitable* awaitable)
-{
-	Tools::Helpers::GuardAgainstNull(current, "CoroutineScheduler::current is null.");
-
-	current->awaitables.push_back(awaitable);
-}
-
-Task& CoroutineScheduler::StartCoroutine(Task&& task)
-{
-	Tools::Helpers::GuardAgainstNull(current, "CoroutineScheduler::current is null.");
-
-	// Move onto heap so it doesn't go out of scope
-	auto* heapTask = new Task(std::move(task));
-
-	current->tasks.emplace_back(heapTask);
-
-	return *heapTask;
+	instance = nullptr;
 }
 
 void CoroutineScheduler::Update(float deltaTime)
 {
-	Tools::Helpers::GuardAgainstNull(current, "CoroutineScheduler::current is null.");
+	Tools::Helpers::GuardAgainstNull(instance, "CoroutineScheduler::current is null.");
 
-	// First, collect which awaitables finished
-	std::vector<ICoroutineAwaitable*> finished;
-
-	for (auto* awaitable : current->awaitables)
+	for (auto it = instance->tasks.begin(); it != instance->tasks.end();)
 	{
-		if (!awaitable->Tick(deltaTime))
-			continue;
+		auto task = *it;
 
-		finished.push_back(awaitable);
-	}
+		Task::currentTask = task;
 
-	// Now, erase those from the vector (
-	for (auto* awaitable : finished)
-	{
-		auto it = std::find(
-			current->awaitables.begin(), 
-			current->awaitables.end(), 
-			awaitable);
+		auto isDoneOrCancelled = task->TickAwaitables(deltaTime);
 
-		if (it != current->awaitables.end())
+		if (isDoneOrCancelled)
 		{
-			current->awaitables.erase(it);
+			delete task;
+			it = instance->tasks.erase(it);
 		}
-
-		delete awaitable;
+		else
+		{
+			++it;
+		}
 	}
 
-	current->tasks.erase(
-		std::remove_if(
-			current->tasks.begin(), 
-			current->tasks.end(),
-			[](Task* task) 
-			{
-				if (task->IsDone())
-				{
-					delete task;
-					task = nullptr;
-				
-					return true;
-				}
-			
-				return false;
-			}),
-		current->tasks.end());
+	// Reset currentTask after ticking all
+	Task::currentTask = nullptr;
 }
 
 void CoroutineScheduler::BeginFrame()
@@ -104,25 +71,34 @@ void CoroutineScheduler::EndDraw()
 
 }
 
-void CoroutineScheduler::SetCurrent(CoroutineScheduler* scheduler)
+Task& CoroutineScheduler::StartCoroutine(Task&& task)
 {
-	current = scheduler;
+	Tools::Helpers::GuardAgainstNull(instance, "CoroutineScheduler::current is null.");
+
+	auto* heapTask = new Task(std::move(task));
+
+	// Set current task so WaitFrame() works during first resume
+	Task::currentTask = heapTask;
+
+	// Now manually resume
+	heapTask->promiseHandle.resume();
+
+	// Reset
+	Task::currentTask = nullptr;
+
+	instance->tasks.push_back(heapTask);
+
+	return *heapTask;
 }
 
 void CoroutineScheduler::Reset()
 {
-	for (auto awaitable : current->awaitables)
-	{
-		delete awaitable;
-		awaitable = nullptr;
-	}
+	Tools::Helpers::GuardAgainstNull(instance, "CoroutineScheduler::current is null.");
 
-	for (auto task : current->tasks)
+	for (auto* task : instance->tasks)
 	{
 		delete task;
-		task = nullptr;
 	}
 
-	current->awaitables.clear();
-	current->tasks.clear();
+	instance->tasks.clear();
 }
