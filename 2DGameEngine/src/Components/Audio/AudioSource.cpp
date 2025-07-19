@@ -113,7 +113,12 @@ void AudioSource::RebuildFixture()
 	auto physicsMat = PhysicsMaterial
 	{
 		.shape = PhysicsShapeCreators::CreateCircleShape(maxReachingDistance),
-		.isSensor = true
+		.isSensor = true,
+		.filter = FilterData
+		{
+			.categoryBits = PhysicsEngine2D::GetCollisionMasks().GetMaskFlagByName("AUDIO"),
+			.maskBits = PhysicsEngine2D::GetCollisionMasks().GetMaskFlagByName("AUDIO")
+		}
 	};
 
 	auto fixtureDef = PhysicsConversion::ToB2FixtureDef(physicsMat, reinterpret_cast<uintptr_t>(this));
@@ -148,30 +153,18 @@ void AudioSource::Update(float deltaTime)
 	// TODO: Use LateUpdate for this!!!
 	auto safeDelta = std::max(deltaTime, std::numeric_limits<float>::epsilon());
 
-	// Convert positions from pixels to meters
 	auto currentTransformPosition = transform->GetWorldPosition();
-	auto posNow = b2Vec2(
-		currentTransformPosition.x * PhysicsConstants::PIXEL_TO_METER,
-		currentTransformPosition.y * PhysicsConstants::PIXEL_TO_METER);
+	auto currentTransformRotation = transform->GetWorldRotation();
 
-	auto posLast = b2Vec2(
-		lastTransformPosition.x * PhysicsConstants::PIXEL_TO_METER,
-		lastTransformPosition.y * PhysicsConstants::PIXEL_TO_METER);
+	if (currentTransformPosition != lastTransformPosition || currentTransformRotation != currentTransformRotation)
+	{
+		currentTransformPosition *= PhysicsConstants::PIXEL_TO_METER;
 
-	// Velocity = (position_now - position_last) / deltaTime
-	auto velocity = posNow - posLast;
-	velocity.x /= safeDelta;
-	velocity.y /= safeDelta;
+		collisionBody->SetTransform(b2Vec2(currentTransformPosition.x, currentTransformPosition.y), currentTransformRotation * (MathConstants::PI / 180.0f));
+		collisionBody->SetAwake(true);
+	}
 
-	// Angular velocity in radians/sec
-	auto currentRotationRadians = transform->GetWorldRotation() * (MathConstants::PI / 180.0f);
-	auto lastRotationRadians = lastTransformRotation * (MathConstants::PI / 180.0f);
-	auto angularVelocity = (currentRotationRadians - lastRotationRadians) / safeDelta;
-
-	collisionBody->SetLinearVelocity(velocity);
-	collisionBody->SetAngularVelocity(angularVelocity);
-
-	// Audio attenuation logic unchanged...
+	// Audio attenuation logic 
 	if (audioListenerInContact == nullptr || sfxClip == nullptr)
 		return;
 
@@ -199,12 +192,6 @@ void AudioSource::Update(float deltaTime)
 
 void AudioSource::Draw()
 {
-	auto pos = collisionBody->GetPosition();
-	auto angle = collisionBody->GetAngle();
-
-	transform->SetWorldPosition(Vector2F(pos.x, pos.y) * PhysicsConstants::METER_TO_PIXEL);
-	transform->SetLocalRotation(angle * (180.0f / MathConstants::PI));
-
 	lastTransformPosition = transform->GetWorldPosition();
 	lastTransformRotation = transform->GetWorldRotation();
 }

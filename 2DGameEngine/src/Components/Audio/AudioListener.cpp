@@ -60,7 +60,12 @@ void AudioListener::RebuildFixture()
 	{
 		// Tiny circle (box2d doesn't support dots)
 		.shape = PhysicsShapeCreators::CreateCircleShape(50.0001f),
-		.isSensor = true
+		.isSensor = true,
+		.filter = FilterData
+		{
+			.categoryBits = PhysicsEngine2D::GetCollisionMasks().GetMaskFlagByName("AUDIO"),
+			.maskBits = PhysicsEngine2D::GetCollisionMasks().GetMaskFlagByName("AUDIO")
+		}
 	};
 
 	auto fixtureDef = PhysicsConversion::ToB2FixtureDef(physicsMat, reinterpret_cast<uintptr_t>(this));
@@ -92,32 +97,21 @@ void AudioListener::Update(float deltaTime)
 	{
 		RebuildFixture();
 	}
+
+	auto currentTransformPosition = transform->GetWorldPosition();
+	auto currentTransformRotation = transform->GetWorldRotation();
+
+	if (currentTransformPosition == lastTransformPosition && currentTransformRotation == currentTransformRotation)
+		return;
+
+	currentTransformPosition *= PhysicsConstants::PIXEL_TO_METER;
+
+	collisionBody->SetTransform(b2Vec2(currentTransformPosition.x, currentTransformPosition.y), currentTransformRotation * (MathConstants::PI / 180.0f));
+	collisionBody->SetAwake(true);
 }
 
 void AudioListener::Draw()
 {
-	// TODO: Use LateUpdate for this!!!
-	auto safeDelta = std::max(FrameTimer::DeltaTime(), std::numeric_limits<float>::epsilon());
-
-	auto currentTransformPosition = transform->GetWorldPosition();
-	auto posNow = b2Vec2(
-		currentTransformPosition.x * PhysicsConstants::PIXEL_TO_METER,
-		currentTransformPosition.y * PhysicsConstants::PIXEL_TO_METER);
-
-	auto posLast = b2Vec2(
-		lastTransformPosition.x * PhysicsConstants::PIXEL_TO_METER,
-		lastTransformPosition.y * PhysicsConstants::PIXEL_TO_METER);
-
-	auto velocity = posNow - posLast;
-	velocity.x /= safeDelta;
-	velocity.y /= safeDelta;
-
-	auto currentRotationRadians = transform->GetWorldRotation() * (MathConstants::PI / 180.0f);
-	auto lastRotationRadians = lastTransformRotation * (MathConstants::PI / 180.0f);
-	auto angularVelocity = (currentRotationRadians - lastRotationRadians) / safeDelta;
-
-	collisionBody->SetLinearVelocity(velocity);
-	collisionBody->SetAngularVelocity(angularVelocity);
 
 	lastTransformPosition = transform->GetWorldPosition();
 	lastTransformRotation = transform->GetWorldRotation();
