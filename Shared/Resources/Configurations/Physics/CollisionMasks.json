@@ -1,0 +1,28 @@
+{
+	"categories": [
+		// No Collisions
+		{ "name": "NONE",					"value": 0 },
+
+		// Default Collision Layer
+		{ "name": "DEFAULT",			"value": 1 },
+		{ "name": "PLAYER",				"value": 2 },
+		{ "name": "AUDIO",				"value": 4 },
+		{ "name": "UI",						"value": 8 },
+		
+		// You can change and use these
+		{ "name": "MASK_5",				"value": 16 },
+		{ "name": "MASK_6",				"value": 32 },
+		{ "name": "MASK_7",				"value": 64 },
+		{ "name": "MASK_8",				"value": 128 },
+		{ "name": "MASK_9",				"value": 256 },
+		{ "name": "MASK_10",			"value": 512 },
+		{ "name": "MASK_11",			"value": 1024 },
+		{ "name": "MASK_12",			"value": 2048 },
+		{ "name": "MASK_13",			"value": 4096 },
+		{ "name": "MASK_14",			"value": 8192 },
+		{ "name": "MASK_15",			"value": 16384 },
+		{ "name": "MASK_16",			"value": 32768 },
+
+		{ "name": "ALL",					"value": 65535 }
+	]
+}
