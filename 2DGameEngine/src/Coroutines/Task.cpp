@@ -1,5 +1,6 @@
 #include "Coroutines/Abstractions/ICoroutineAwaitable.h"
 #include "Coroutines/Task.h"
+#include <algorithm>
 
 
 thread_local Task* Task::currentTask = nullptr;
