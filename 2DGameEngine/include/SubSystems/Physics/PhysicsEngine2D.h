@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/Vector2.h"
+#include "Models/Physics/CollisionMasks.h"
 #include "SubSystems/Abstractions/ISubSystem.h"
 #include <memory>
 
@@ -8,6 +9,7 @@ struct b2BodyDef;
 class b2Body;
 class b2World;
 class b2ContactListener;
+class b2Draw;
 
 
 class PhysicsEngine2D : public ISubSystem
@@ -16,7 +18,16 @@ class PhysicsEngine2D : public ISubSystem
 
 
 private:
-	static std::unique_ptr<b2World> world;
+	static PhysicsEngine2D* instance;
+
+
+	std::unique_ptr<b2World> world;
+
+	std::unique_ptr<b2ContactListener> contactListener;
+
+	std::unique_ptr<b2Draw> debugDrawer;
+
+	CollisionMasks collisionMasks;
 
 
 	PhysicsEngine2D(const Vector2F& gravity);
@@ -45,4 +56,6 @@ public:
 	static b2Body* CreateBody(const b2BodyDef* bodyDef);
 
 	static void DestroyBody(b2Body* bodyToDestroy);
+
+	static const CollisionMasks& GetCollisionMasks();
 };
