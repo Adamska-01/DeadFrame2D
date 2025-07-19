@@ -12,7 +12,7 @@ private:
 
 
 public:
-	BoxCollider2D(Vector2F boxSize, Vector2F offsetFromCenter, float initialAngle, const PhysicsMaterial& physicsMaterial = PhysicsMaterial());
+	BoxCollider2D(Vector2F boxSize, Vector2F offsetFromCenter = Vector2F::Zero, float initialAngle = 0.0f, const PhysicsMaterial& physicsMaterial = PhysicsMaterial());
 
 	virtual ~BoxCollider2D() override;
 
