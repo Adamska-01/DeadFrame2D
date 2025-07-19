@@ -25,8 +25,6 @@ SubSystems::~SubSystems()
 
 void SubSystems::InitializeSubSystems(EngineConfig config)
 {
-	// TODO: Create a config file to set the default values for window and renderer 
-
 	auto window = new Window(config.window);
 
 	subSystems[0] = window;
@@ -43,10 +41,7 @@ void SubSystems::InitializeSubSystems(EngineConfig config)
 
 	subSystems[6] = new PhysicsEngine2D(Vector2F(PhysicsConstants::GRAVITY_X, PhysicsConstants::GRAVITY_Y));
 
-	auto coroutineScheduler = new CoroutineScheduler();
-	CoroutineScheduler::SetCurrent(coroutineScheduler);
-	
-	subSystems[7] = coroutineScheduler;
+	subSystems[7] = new CoroutineScheduler();
 }
 
 void SubSystems::Update(float deltaTime)
