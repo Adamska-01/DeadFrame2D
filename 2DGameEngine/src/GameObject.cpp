@@ -18,10 +18,6 @@ GameObject::GameObject()
 
 void GameObject::PropagateActiveStateToChildren()
 {
-	bool newParentState = IsActive(); // This object’s own active state including its parents
-
-	OnActiveStateChanged(this, newParentState);
-
 	for (const auto& child : children)
 	{
 		auto childPtr = child.lock();
@@ -29,9 +25,20 @@ void GameObject::PropagateActiveStateToChildren()
 		if (childPtr == nullptr || childPtr->isDestroyed)
 			continue;
 
-		childPtr->hasActiveParent = newParentState;
-		childPtr->PropagateActiveStateToChildren();
-	}	
+		bool oldState = childPtr->IsActive();
+
+		// Update child's parent state before re-evaluating
+		childPtr->hasActiveParent = IsActive();
+
+		bool newState = childPtr->IsActive();
+
+		if (oldState != newState)
+		{
+			childPtr->OnActiveStateChanged(childPtr.get(), newState);
+
+			childPtr->PropagateActiveStateToChildren();
+		}
+	}
 }
 
 void GameObject::ConstructGameObject()
@@ -163,11 +170,8 @@ void GameObject::AddChildGameObject(std::weak_ptr<GameObject> child)
 	transform->SetWorldRotation(worldRot);
 
 	// Propagate active state
-	childPtr->hasActiveParent = this->IsActive();
+	childPtr->hasActiveParent = IsActive();
 	PropagateActiveStateToChildren();
-
-	// Clear 'OnActiveStateChanged' callback
-	OnActiveStateChanged.Clear();
 
 	EventDispatcher::SendEvent(std::make_shared<ChildGameObjectAddedEvent>(child));
 }
@@ -263,12 +267,17 @@ bool GameObject::IsActive() const
 
 void GameObject::SetActive(bool value)
 {
+	auto oldState = IsActive();
+
 	isActive = value;
 
-	// this includes our own parent's state
-	auto newParentState = IsActive(); 
+	auto newState = IsActive();
 
-	OnActiveStateChanged(this, newParentState);
+	// Only notify if it changed
+	if (oldState != newState)
+	{
+		OnActiveStateChanged(this, newState);
+	}
 
 	for (const auto& child : children) 
 	{
@@ -277,7 +286,7 @@ void GameObject::SetActive(bool value)
 		if (childPtr == nullptr || childPtr->isDestroyed)
 			continue;
 
-		childPtr->hasActiveParent = newParentState;
+		childPtr->hasActiveParent = newState;
 		childPtr->PropagateActiveStateToChildren();
 	}
 }
