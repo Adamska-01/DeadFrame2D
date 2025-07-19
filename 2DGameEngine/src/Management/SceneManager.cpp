@@ -1,6 +1,7 @@
+#include "Coroutines/CoroutineScheduler.h"
 #include "Management/Scene.h"
 #include "Management/SceneManager.h"
-#include "Coroutines/CoroutineScheduler.h"
+#include "Tools/FrameTimer.h"
 
 
 std::unique_ptr<Scene> SceneManager::currentScene;
@@ -48,6 +49,7 @@ bool SceneManager::LoadNewSceneIfAvailable()
 		return false;
 
 	CoroutineScheduler::Reset();
+	FrameTimer::SetTimeScale(1.0f);
 
 	if (currentScene != nullptr)
 	{
