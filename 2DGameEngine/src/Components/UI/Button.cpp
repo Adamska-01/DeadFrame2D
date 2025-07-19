@@ -1,6 +1,7 @@
 #include "Components/Transform.h"
 #include "Components/UI/Button.h"
 #include "Constants/CommonColors.h"
+#include "GameObject.h"
 #include "Models/Components/UI/ButtonComponentModel.h"
 #include "SubSystems/TextureManager.h"
 #include "Tools/Collisions/CollisionUtils.h"
@@ -27,6 +28,9 @@ Button::Button(const ButtonComponentModel& buttonConfiguration)
 
 std::optional<int> Button::ProcessEvents(const SDL_Event& sdlEvent)
 {
+	if (!IsActive() || !OwningObject.lock()->IsActive())
+		return std::nullopt;
+
 	switch (sdlEvent.type)
 	{
 	case SDL_MOUSEBUTTONDOWN:
