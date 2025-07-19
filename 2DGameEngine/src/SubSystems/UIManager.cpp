@@ -79,32 +79,60 @@ std::shared_ptr<SDL_Texture> UIManager::LoadText(std::shared_ptr<TTF_Font> font,
 	if (text.empty())
 		return nullptr;
 
-	// Manual line wrapping (optional: improve this with word wrapping)
+	// Helper: Expand tab characters to spaces
+	auto ExpandTabs = [](const std::string& line, int tabWidth = 4) -> std::string
+		{
+			std::string result;
+			auto col = 0;
+
+			for (auto ch : line)
+			{
+				if (ch == '\t')
+				{
+					auto spaces = tabWidth - (col % tabWidth);
+					result.append(spaces, ' ');
+					col += spaces;
+				}
+				else
+				{
+					result += ch;
+					++col;
+				}
+			}
+
+			return result;
+		};
+
+	// Split into lines (preserve blank lines and trailing newlines)
 	std::vector<std::string> lines;
 	std::istringstream stream(text);
 	std::string line;
 
-	while (std::getline(stream, line, '\n')) 
+	while (std::getline(stream, line))
 	{
+		if (line.empty())
+		{
+			line = " ";
+		}
+
 		lines.push_back(line);
 	}
 
-	if (lines.empty())
-		lines.push_back(text); // fallback in case no newline found
 
 	// Render each line to get total width and height
 	std::vector<SDL_Surface*> lineSurfaces;
-	int maxWidth = 0;
-	int totalHeight = 0;
+	auto maxWidth = 0;
+	auto totalHeight = 0;
 
-	for (const auto& l : lines) 
+	for (const auto& rawLine : lines)
 	{
-		auto surface = TTF_RenderText_Blended(font.get(), l.c_str(), color);
-		
-		if (surface == nullptr) 
+		auto expanded = ExpandTabs(rawLine); // expand tabs
+
+		auto surface = TTF_RenderText_Blended(font.get(), expanded.c_str(), color);
+
+		if (surface == nullptr)
 		{
 			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to render line: %s", TTF_GetError());
-			
 			continue;
 		}
 
@@ -117,38 +145,34 @@ std::shared_ptr<SDL_Texture> UIManager::LoadText(std::shared_ptr<TTF_Font> font,
 		return nullptr;
 
 	// Create final surface
-	SDL_Surface* finalSurface = SDL_CreateRGBSurfaceWithFormat(0, maxWidth, totalHeight, 32, SDL_PIXELFORMAT_RGBA32);
+	auto finalSurface = SDL_CreateRGBSurfaceWithFormat(0, maxWidth, totalHeight, 32, SDL_PIXELFORMAT_RGBA32);
 	SDL_FillRect(finalSurface, nullptr, SDL_MapRGBA(finalSurface->format, 0, 0, 0, 0)); // transparent
 
 	auto y = 0;
-	for (SDL_Surface* lineSurface : lineSurfaces) 
+	for (auto lineSurface : lineSurfaces)
 	{
-		SDL_Rect dstRect;
-		dstRect.y = y;
-		dstRect.w = lineSurface->w;
-		dstRect.h = lineSurface->h;
-
-		if (centerText)
+		auto dstRect = SDL_Rect
 		{
-			dstRect.x = (maxWidth - lineSurface->w) / 2;
-		}
-		else
-		{
-			dstRect.x = 0;
-		}
+			.x = centerText ? (maxWidth - lineSurface->w) / 2 : 0,
+			.y = y,
+			.w = lineSurface->w,
+			.h = lineSurface->h
+		};
 
 		SDL_BlitSurface(lineSurface, nullptr, finalSurface, &dstRect);
+		
 		y += lineSurface->h;
+
 		SDL_FreeSurface(lineSurface);
 	}
 
-	SDL_Texture* textTexture = SDL_CreateTextureFromSurface(Renderer::GetRenderer(), finalSurface);
+	auto textTexture = SDL_CreateTextureFromSurface(Renderer::GetRenderer(), finalSurface);
 	SDL_FreeSurface(finalSurface);
 
-	if (!textTexture) 
+	if (!textTexture)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to create texture: %s", TTF_GetError());
-	
+
 		return nullptr;
 	}
 
