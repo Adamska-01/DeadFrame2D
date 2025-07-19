@@ -1,5 +1,7 @@
 #pragma once
+#include <atomic>
 #include <coroutine>
+#include <exception>
 #include <memory>
 #include <vector>
 
