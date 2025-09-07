@@ -2,7 +2,7 @@
 #include <string_view>
 
 
-namespace Constants::TiledPropertyNames
+namespace DeadFrame2D::Constants::TiledPropertyNames
 {
 	inline constexpr std::string_view DENSITY = "density";
 	

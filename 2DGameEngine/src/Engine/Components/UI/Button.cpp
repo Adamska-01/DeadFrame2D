@@ -7,6 +7,9 @@
 #include "Utilities/Collisions/CollisionUtils.h"
 
 
+using namespace DeadFrame2D::Constants;
+
+
 Button::Button(const ButtonComponentModel& buttonConfiguration)
 {
 	isPressed = false;

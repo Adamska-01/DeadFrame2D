@@ -46,11 +46,11 @@ private:
 	virtual void EndDraw() override;
 
 
-	static void DrawLine(const Vector2F& p1, const Vector2F& p2, SDL_Color color = CommonColors::WHITE, Camera* camera = nullptr);
+	static void DrawLine(const Vector2F& p1, const Vector2F& p2, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, Camera* camera = nullptr);
 
-	static void DrawRect(SDL_Rect rect, float angleDegrees, SDL_Color color = CommonColors::WHITE, bool filled = false, Camera* camera = nullptr);
+	static void DrawRect(SDL_Rect rect, float angleDegrees, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false, Camera* camera = nullptr);
 
-	static void DrawCircle(Circle circle, SDL_Color color = CommonColors::WHITE, bool filled = false, Camera* camera = nullptr);
+	static void DrawCircle(Circle circle, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false, Camera* camera = nullptr);
 
 	static void DrawTexture(
 		std::shared_ptr<SDL_Texture> texture,
@@ -60,7 +60,7 @@ private:
 		SDL_Point* rotationOrigin = NULL,
 		SDL_RendererFlip flip = SDL_FLIP_NONE,
 		Uint8 alpha = 255,
-		SDL_Color colorMod = CommonColors::WHITE,
+		SDL_Color colorMod = DeadFrame2D::Constants::CommonColors::WHITE,
 		Camera* camera = nullptr);
 
 
@@ -68,17 +68,17 @@ public:
 	static std::shared_ptr<SDL_Texture> LoadTexture(std::string_view filename);
 
 
-	static void DrawLineWorldSpace(const Vector2F& p1, const Vector2F& p2, SDL_Color color = CommonColors::WHITE);
+	static void DrawLineWorldSpace(const Vector2F& p1, const Vector2F& p2, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE);
 
-	static void DrawLineScreenSpace(const Vector2F& p1, const Vector2F& p2, SDL_Color color = CommonColors::WHITE);
+	static void DrawLineScreenSpace(const Vector2F& p1, const Vector2F& p2, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE);
 
-	static void DrawRectWorldSpace(SDL_Rect rect, float angleDegrees, SDL_Color color = CommonColors::WHITE, bool filled = false);
+	static void DrawRectWorldSpace(SDL_Rect rect, float angleDegrees, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false);
 
-	static void DrawRectScreenSpace(SDL_Rect rect, float angleDegrees, SDL_Color color = CommonColors::WHITE, bool filled = false);
+	static void DrawRectScreenSpace(SDL_Rect rect, float angleDegrees, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false);
 	
-	static void DrawCircleWorldSpace(Circle circle, SDL_Color color = CommonColors::WHITE, bool filled = false);
+	static void DrawCircleWorldSpace(Circle circle, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false);
 
-	static void DrawCircleScreenSpace(Circle circle, SDL_Color color = CommonColors::WHITE, bool filled = false);
+	static void DrawCircleScreenSpace(Circle circle, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false);
 	
 	static void DrawTextureWorldSpace(
 		std::shared_ptr<SDL_Texture> texture,
@@ -88,7 +88,7 @@ public:
 		SDL_Point* rotationOrigin = NULL,
 		SDL_RendererFlip flip = SDL_FLIP_NONE, 
 		Uint8 alpha = 255, 
-		SDL_Color colorMod = CommonColors::WHITE);
+		SDL_Color colorMod = DeadFrame2D::Constants::CommonColors::WHITE);
 
 	static void DrawTextureScreenSpace(
 		std::shared_ptr<SDL_Texture> texture,
@@ -98,5 +98,5 @@ public:
 		SDL_Point* rotationOrigin = NULL,
 		SDL_RendererFlip flip = SDL_FLIP_NONE,
 		Uint8 alpha = 255,
-		SDL_Color colorMod = CommonColors::WHITE);
+		SDL_Color colorMod = DeadFrame2D::Constants::CommonColors::WHITE);
 };

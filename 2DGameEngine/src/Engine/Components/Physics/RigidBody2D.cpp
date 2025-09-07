@@ -9,6 +9,9 @@
 #include <box2d/b2_body.h>
 
 
+using namespace DeadFrame2D::Constants;
+
+
 RigidBody2D::RigidBody2D(const BodyDefinition2D& bodyDefinition)
 	: transform(nullptr),
 	body(nullptr),

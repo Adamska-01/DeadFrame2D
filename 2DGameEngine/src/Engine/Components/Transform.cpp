@@ -3,6 +3,9 @@
 #include "Engine/Entity/GameObject.h"
 
 
+using namespace DeadFrame2D::Constants;
+
+
 Transform::Transform(Vector2F position, Vector2F scale, float angle)
 	: localPosition(position), localScale(scale), localRotation(angle)
 {

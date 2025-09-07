@@ -2,7 +2,7 @@
 #include <SDL_pixels.h>
 
 
-namespace CommonColors
+namespace DeadFrame2D::Constants::CommonColors
 {
 	constexpr SDL_Color WHITE = { 255, 255, 255, 255 };
 	

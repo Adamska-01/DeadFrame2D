@@ -141,7 +141,7 @@ inline constexpr T Vector2<T>::Magnitude() const
 template<typename T>
 inline constexpr T Vector2<T>::AngleBetween(const Vector2<T> other) const
 {
-	auto angle = atan2(y - other.y, x - other.x) * (MathConstants::PI / 180);
+	auto angle = atan2(y - other.y, x - other.x) * (DeadFrame2D::Constants::MathConstants::PI / 180);
 
 	return angle >= 0 ? angle : 360 + angle;
 }
@@ -173,7 +173,7 @@ inline constexpr Vector2<T> Vector2<T>::Max(const Vector2<T>& other) const
 template<typename T>
 inline constexpr Vector2<T> Vector2<T>::Rotated(float angleInDegrees) const
 {
-	float radians = angleInDegrees * MathConstants::PI / 180.0f;
+	float radians = angleInDegrees * DeadFrame2D::Constants::MathConstants::PI / 180.0f;
 	float cosA = std::cos(radians);
 	float sinA = std::sin(radians);
 

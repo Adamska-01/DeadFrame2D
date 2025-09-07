@@ -3,6 +3,9 @@
 #include "Core/Math/Vector2.h"
 
 
+using namespace DeadFrame2D::Constants;
+
+
 Circle::Circle()
 	: position(Vector2F::Zero), radius(1.0f)
 {

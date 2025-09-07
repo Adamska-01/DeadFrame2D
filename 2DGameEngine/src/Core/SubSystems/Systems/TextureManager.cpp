@@ -6,6 +6,9 @@
 #include <memory>
 
 
+using namespace DeadFrame2D::Constants;
+
+
 std::unordered_map<std::string, std::weak_ptr<SDL_Texture>> TextureManager::textureCache = {};
 
 Camera* TextureManager::currentCamera = nullptr;

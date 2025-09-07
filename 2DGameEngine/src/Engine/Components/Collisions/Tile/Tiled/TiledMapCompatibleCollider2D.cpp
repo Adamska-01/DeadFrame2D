@@ -8,6 +8,9 @@
 #include "Utilities/Helpers/Physics/PhysicsShapeCreators.h"
 
 
+using namespace DeadFrame2D::Constants;
+
+
 TiledMapCompatibleCollider2D::TiledMapCompatibleCollider2D(const PhysicsMaterial& physicsMaterial)
 	: TileCollider2D(physicsMaterial)
 {
@@ -67,11 +70,11 @@ void TiledMapCompatibleCollider2D::RebuildFixture()
 					Vector2F((j * tileSize + tileSize * 0.5f), (i * tileSize + tileSize * 0.5f)),
 					angle);
 
-				physicsMaterial.density = layer.GetFloatProperty(Constants::TiledPropertyNames::DENSITY, 1.0f);
-				physicsMaterial.friction = layer.GetFloatProperty(Constants::TiledPropertyNames::FRICTION, 0.3f);
-				physicsMaterial.isSensor = layer.GetBoolProperty(Constants::TiledPropertyNames::IS_SENSOR, false);
-				physicsMaterial.restitution = layer.GetFloatProperty(Constants::TiledPropertyNames::RESTITUTION, 0.0f);
-				physicsMaterial.restitutionThreshold = layer.GetFloatProperty(Constants::TiledPropertyNames::RESTITUTION_THRESHOLD, 1.0f);
+				physicsMaterial.density = layer.GetFloatProperty(TiledPropertyNames::DENSITY, 1.0f);
+				physicsMaterial.friction = layer.GetFloatProperty(TiledPropertyNames::FRICTION, 0.3f);
+				physicsMaterial.isSensor = layer.GetBoolProperty(TiledPropertyNames::IS_SENSOR, false);
+				physicsMaterial.restitution = layer.GetFloatProperty(TiledPropertyNames::RESTITUTION, 0.0f);
+				physicsMaterial.restitutionThreshold = layer.GetFloatProperty(TiledPropertyNames::RESTITUTION_THRESHOLD, 1.0f);
 
 				auto def = PhysicsConversion::ToB2FixtureDef(physicsMaterial, reinterpret_cast<uintptr_t>(this));
 

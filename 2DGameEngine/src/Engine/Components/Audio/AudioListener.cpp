@@ -8,6 +8,9 @@
 #include "Utilities/Helpers/Physics/PhysicsShapeCreators.h"
 
 
+using namespace DeadFrame2D::Constants;
+
+
 AudioListener::AudioListener()
 	: transform(nullptr),
 	collisionBody(nullptr),

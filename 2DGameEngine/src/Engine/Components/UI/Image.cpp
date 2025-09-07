@@ -4,6 +4,9 @@
 #include "Engine/Components/UI/Image.h"
 
 
+using namespace DeadFrame2D::Constants;
+
+
 Image::Image()
 	: color(CommonColors::WHITE)
 {

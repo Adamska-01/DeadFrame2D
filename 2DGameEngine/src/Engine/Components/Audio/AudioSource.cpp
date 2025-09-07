@@ -10,6 +10,9 @@
 #include <box2d/b2_body.h>
 
 
+using namespace DeadFrame2D::Constants;
+
+
 AudioSource::AudioSource()
 	: transform(nullptr),
 	audioListenerInContact(nullptr),
