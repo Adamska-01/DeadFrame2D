@@ -1,7 +1,7 @@
 #include "Core/SubSystems/Systems/Input/Devices/ControllerInputDevice.h"
 #include "Core/SubSystems/Systems/Input/InputControls.h"
 #include "Engine/EngineEvents/EventDispatcher.h"
-#include "Engine/EngineEvents/Events/Input/ControllerDisconnectedEvent.h"
+#include "Engine/EngineEvents/Events/SubSystems/Input/ControllerDisconnectedEvent.h"
 #include <iostream>
 #include <stdexcept>
 #include <string>
