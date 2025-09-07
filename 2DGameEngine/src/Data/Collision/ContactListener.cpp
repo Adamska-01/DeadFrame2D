@@ -1,9 +1,9 @@
-#include "Components/Audio/AudioListener.h"
-#include "Components/Audio/AudioSource.h"
-#include "Components/Collisions/Collider2D.h"
 #include "Data/Collision/CollisionInfo.h"
 #include "Data/Collision/ContactListener.h"
-#include "GameObject.h"
+#include "Engine/Components/Audio/AudioListener.h"
+#include "Engine/Components/Audio/AudioSource.h"
+#include "Engine/Components/Collisions/Collider2D.h"
+#include "Engine/Entity/GameObject.h"
 
 
 std::pair<ContactEventProvider*, ContactEventProvider*> ContactListener::GetUserDataFromContact(b2Contact* contact)

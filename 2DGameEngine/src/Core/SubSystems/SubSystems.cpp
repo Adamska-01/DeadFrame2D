@@ -1,0 +1,78 @@
+#include "Core/SubSystems/SubSystems.h"
+#include "Core/SubSystems/Systems/AudioManager.h"
+#include "Core/SubSystems/Systems/CoroutineScheduler.h"
+#include "Core/SubSystems/Systems/Input/Input.h"
+#include "Core/SubSystems/Systems/PhysicsEngine2D.h"
+#include "Core/SubSystems/Systems/Renderer.h"
+#include "Core/SubSystems/Systems/TextureManager.h"
+#include "Core/SubSystems/Systems/UIManager.h"
+#include "Core/SubSystems/Systems/Window.h"
+#include <Constants/PhysicsConstants.h>
+
+
+SubSystems::SubSystems()
+{
+	subSystems.fill(nullptr);
+}
+
+SubSystems::~SubSystems()
+{
+	for (const auto& subSystem : subSystems)
+	{
+		delete subSystem;
+	}
+}
+
+void SubSystems::InitializeSubSystems(EngineConfig config)
+{
+	auto window = new Window(config.window);
+
+	subSystems[0] = window;
+
+	subSystems[1] = new Renderer(window->GetWindow(), config.rendering);
+
+	subSystems[2] = new Input();
+
+	subSystems[3] = new TextureManager();
+
+	subSystems[4] = new UIManager();
+
+	subSystems[5] = new AudioManager();
+
+	subSystems[6] = new PhysicsEngine2D(Vector2F(PhysicsConstants::GRAVITY_X, PhysicsConstants::GRAVITY_Y));
+
+	subSystems[7] = new CoroutineScheduler();
+}
+
+void SubSystems::Update(float deltaTime)
+{
+	for (const auto& subSystem : subSystems)
+	{
+		subSystem->Update(deltaTime);
+	}
+}
+
+// TODO: Create the interface with BeginFrame and EndFrame
+void SubSystems::BeginFrame()
+{
+	for (const auto& subSystem : subSystems)
+	{
+		subSystem->BeginFrame();
+	}
+}
+
+void SubSystems::EndUpdate()
+{
+	for (const auto& subSystem : subSystems)
+	{
+		subSystem->EndUpdate();
+	}
+}
+
+void SubSystems::EndDraw()
+{
+	for (const auto& subSystem : subSystems)
+	{
+		subSystem->EndDraw();
+	}
+}

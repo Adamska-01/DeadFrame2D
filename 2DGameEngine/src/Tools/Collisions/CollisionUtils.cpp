@@ -1,5 +1,5 @@
-#include "Components/Generic/Circle.h"
-#include "Tools/Collisions/CollisionUtils.h"
+#include "Core/Math/Circle.h"
+#include "Utilities/Collisions/CollisionUtils.h"
 #include <algorithm>
 #include <SDL.h>
 

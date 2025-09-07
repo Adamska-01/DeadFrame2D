@@ -1,0 +1,102 @@
+#pragma once
+#include "Constants/CommonColors.h"
+#include "Core/Math/Circle.h"
+#include "Core/SubSystems/Abstractions/ISubSystem.h"
+#include <memory>
+#include <SDL_image.h>
+#include <string>
+#include <unordered_map>
+
+
+class Camera;
+
+
+class TextureManager : public ISubSystem
+{
+	friend class SubSystems;
+	friend class Engine;
+
+
+private:
+	static std::unordered_map<std::string, std::weak_ptr<SDL_Texture>> textureCache;
+
+	static Camera* currentCamera;
+
+
+	TextureManager();
+
+	virtual ~TextureManager() override;
+
+	TextureManager(const TextureManager&) = delete;
+
+	TextureManager(TextureManager&&) = delete;
+
+
+	TextureManager& operator=(const TextureManager&) = delete;
+
+	TextureManager& operator=(TextureManager&&) = delete;
+
+
+	virtual void Update(float deltaTime) override;
+
+	virtual void BeginFrame() override;
+
+	virtual void EndUpdate() override;
+
+	virtual void EndDraw() override;
+
+
+	static void DrawLine(const Vector2F& p1, const Vector2F& p2, SDL_Color color = CommonColors::WHITE, Camera* camera = nullptr);
+
+	static void DrawRect(SDL_Rect rect, float angleDegrees, SDL_Color color = CommonColors::WHITE, bool filled = false, Camera* camera = nullptr);
+
+	static void DrawCircle(Circle circle, SDL_Color color = CommonColors::WHITE, bool filled = false, Camera* camera = nullptr);
+
+	static void DrawTexture(
+		std::shared_ptr<SDL_Texture> texture,
+		const SDL_Rect* srcRect = NULL,
+		const SDL_Rect* dstRect = NULL,
+		float angle = 0.0f,
+		SDL_Point* rotationOrigin = NULL,
+		SDL_RendererFlip flip = SDL_FLIP_NONE,
+		Uint8 alpha = 255,
+		SDL_Color colorMod = CommonColors::WHITE,
+		Camera* camera = nullptr);
+
+
+public:
+	static std::shared_ptr<SDL_Texture> LoadTexture(std::string_view filename);
+
+
+	static void DrawLineWorldSpace(const Vector2F& p1, const Vector2F& p2, SDL_Color color = CommonColors::WHITE);
+
+	static void DrawLineScreenSpace(const Vector2F& p1, const Vector2F& p2, SDL_Color color = CommonColors::WHITE);
+
+	static void DrawRectWorldSpace(SDL_Rect rect, float angleDegrees, SDL_Color color = CommonColors::WHITE, bool filled = false);
+
+	static void DrawRectScreenSpace(SDL_Rect rect, float angleDegrees, SDL_Color color = CommonColors::WHITE, bool filled = false);
+	
+	static void DrawCircleWorldSpace(Circle circle, SDL_Color color = CommonColors::WHITE, bool filled = false);
+
+	static void DrawCircleScreenSpace(Circle circle, SDL_Color color = CommonColors::WHITE, bool filled = false);
+	
+	static void DrawTextureWorldSpace(
+		std::shared_ptr<SDL_Texture> texture,
+		const SDL_Rect* srcRect = NULL, 
+		const SDL_Rect* dstRect = NULL, 
+		float angle = 0.0f, 
+		SDL_Point* rotationOrigin = NULL,
+		SDL_RendererFlip flip = SDL_FLIP_NONE, 
+		Uint8 alpha = 255, 
+		SDL_Color colorMod = CommonColors::WHITE);
+
+	static void DrawTextureScreenSpace(
+		std::shared_ptr<SDL_Texture> texture,
+		const SDL_Rect* srcRect = NULL,
+		const SDL_Rect* dstRect = NULL,
+		float angle = 0.0f,
+		SDL_Point* rotationOrigin = NULL,
+		SDL_RendererFlip flip = SDL_FLIP_NONE,
+		Uint8 alpha = 255,
+		SDL_Color colorMod = CommonColors::WHITE);
+};
