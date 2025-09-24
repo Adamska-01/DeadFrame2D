@@ -5,14 +5,17 @@
 #include <nlohmann/json.hpp>
 
 
-struct EngineConfig
+namespace Shared::Models
 {
-	WindowConfig window;
+	struct EngineConfig
+	{
+		WindowConfig window;
 
-	RendererConfig rendering;
+		RendererConfig rendering;
 
-	SplashScreenConfig splashScreen;
+		SplashScreenConfig splashScreen;
 
 
-	NLOHMANN_DEFINE_TYPE_INTRUSIVE(EngineConfig, window, rendering, splashScreen)
-};
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(EngineConfig, window, rendering, splashScreen)
+	};
+}

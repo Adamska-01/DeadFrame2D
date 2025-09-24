@@ -3,16 +3,19 @@
 #include <string>
 
 
-struct WindowConfig
+namespace Shared::Models
 {
-	std::string title = "DeadFrame2D";
+	struct WindowConfig
+	{
+		std::string title = "DeadFrame2D";
 
-	int width = 1920;
+		int width = 1920;
 
-	int height = 1080;
+		int height = 1080;
 
-	bool fullscreen = false;
+		bool fullscreen = false;
 	
 
-	NLOHMANN_DEFINE_TYPE_INTRUSIVE(WindowConfig, title, width, height, fullscreen)
-};
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(WindowConfig, title, width, height, fullscreen)
+	};
+}

@@ -2,16 +2,19 @@
 #include <string>
 
 
-struct ResourceMount
+namespace Shared::Tools
 {
-	std::string alias;
-
-	std::filesystem::path path;
-
-
-	ResourceMount(const std::string& alias, const std::filesystem::path& path)
-		: alias(alias), path(path)
+	struct ResourceMount
 	{
-		PathMountResolver::Mount(*this);
-	}
-};
+		std::string alias;
+
+		std::filesystem::path path;
+
+
+		ResourceMount(const std::string& alias, const std::filesystem::path& path)
+			: alias(alias), path(path)
+		{
+			PathMountResolver::Mount(*this);
+		}
+	};
+}

@@ -4,12 +4,15 @@
 #include <nlohmann/json.hpp>
 
 
-struct NamedBitflag
+namespace Shared::Models
 {
-	std::string name;
+	struct NamedBitflag
+	{
+		std::string name;
 
-	uint16_t value;
+		uint16_t value;
 
 
-	NLOHMANN_DEFINE_TYPE_INTRUSIVE(NamedBitflag, name, value)
-};
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(NamedBitflag, name, value)
+	};
+}

@@ -1,7 +1,8 @@
 #pragma once
 
 
-namespace PhysicsConstants
+// TODO: Put these in a config file (json)
+namespace Shared::Constants::Physics
 {
 	constexpr float GRAVITY_X = 0.0f;
 

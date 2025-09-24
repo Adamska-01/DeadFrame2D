@@ -3,14 +3,17 @@
 #include <string>
 
 
-struct SplashScreenConfig
+namespace Shared::Models
 {
-	float fadeInDurationSeconds = 1.0f;
+	struct SplashScreenConfig
+	{
+		float fadeInDurationSeconds = 1.0f;
 
-	float holdVisibleDurationSeconds = 1.0f;
-	
-	float fadeOutDurationSeconds = 1.0f;
+		float holdVisibleDurationSeconds = 1.0f;
+
+		float fadeOutDurationSeconds = 1.0f;
 
 
-	NLOHMANN_DEFINE_TYPE_INTRUSIVE(SplashScreenConfig, fadeInDurationSeconds, holdVisibleDurationSeconds, fadeOutDurationSeconds)
-};
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(SplashScreenConfig, fadeInDurationSeconds, holdVisibleDurationSeconds, fadeOutDurationSeconds)
+	};
+}

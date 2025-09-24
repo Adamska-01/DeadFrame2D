@@ -4,7 +4,7 @@
 #include <string_view>
 
 
-namespace Constants::ResourcePaths
+namespace Shared::Constants::Paths
 {
 	namespace Folders
 	{
@@ -20,29 +20,29 @@ namespace Constants::ResourcePaths
 		inline constexpr std::string_view LOGOS_ALIAS = "logos";
 
 
-		inline static const ResourceMount SHARED_FONTS{std::string(SHARED_FONTS_ALIAS), "Shared/Resources/Fonts/" };
+		inline static const Shared::Tools::ResourceMount SHARED_FONTS{std::string(SHARED_FONTS_ALIAS), "Shared/Resources/Fonts/" };
 
-		inline static const ResourceMount SHARED_INPUT_CONTROLS{ std::string(SHARED_INPUT_CONTROLS_ALIAS), "Shared/Resources/Configurations/" };
+		inline static const Shared::Tools::ResourceMount SHARED_INPUT_CONTROLS{ std::string(SHARED_INPUT_CONTROLS_ALIAS), "Shared/Resources/Configurations/Input/" };
 
-		inline static const ResourceMount SHARED_ENGINE_CONFIG{std::string(SHARED_ENGINE_CONFIG_ALIAS), "Shared/Resources/Configurations/" };
+		inline static const Shared::Tools::ResourceMount SHARED_ENGINE_CONFIG{std::string(SHARED_ENGINE_CONFIG_ALIAS), "Shared/Resources/Configurations/System/" };
 
-		inline static const ResourceMount SHARED_PHYSICS_CONFIGS{std::string(SHARED_PHYSICS_CONFIGS_ALIAS), "Shared/Resources/Configurations/Physics/" };
+		inline static const Shared::Tools::ResourceMount SHARED_PHYSICS_CONFIGS{std::string(SHARED_PHYSICS_CONFIGS_ALIAS), "Shared/Resources/Configurations/Physics/" };
 
-		inline static const ResourceMount LOGOS{std::string(LOGOS_ALIAS), "Shared/Resources/Logos/" };
+		inline static const Shared::Tools::ResourceMount LOGOS{std::string(LOGOS_ALIAS), "Shared/Resources/Logos/" };
 	}
 
 	namespace Files
 	{
-		static const ResolvedPath CONSOLAS_FONT{ std::string(Folders::SHARED_FONTS_ALIAS), "consola.ttf" };
+		static const Shared::Tools::ResolvedPath CONSOLAS_FONT{ std::string(Folders::SHARED_FONTS_ALIAS), "consola.ttf" };
 
-		static const ResolvedPath INPUT_CONTROLS{ std::string(Folders::SHARED_INPUT_CONTROLS_ALIAS), "InputControls.json" };
+		static const Shared::Tools::ResolvedPath INPUT_CONTROLS{ std::string(Folders::SHARED_INPUT_CONTROLS_ALIAS), "InputControls.json" };
 
-		static const ResolvedPath ENGINE_CONFIGURATION{ std::string(Folders::SHARED_ENGINE_CONFIG_ALIAS), "Manifest.json" };
+		static const Shared::Tools::ResolvedPath ENGINE_CONFIGURATION{ std::string(Folders::SHARED_ENGINE_CONFIG_ALIAS), "Manifest.json" };
 
-		static const ResolvedPath COLLISION_MASKS{ std::string(Folders::SHARED_PHYSICS_CONFIGS_ALIAS), "CollisionMasks.json" };
+		static const Shared::Tools::ResolvedPath COLLISION_MASKS{ std::string(Folders::SHARED_PHYSICS_CONFIGS_ALIAS), "CollisionMasks.json" };
 
-		static const ResolvedPath WINDOW_ICON{ std::string(Folders::LOGOS_ALIAS), "Window_Icon.png" };
+		static const Shared::Tools::ResolvedPath WINDOW_ICON{ std::string(Folders::LOGOS_ALIAS), "Window_Icon.png" };
 
-		static const ResolvedPath SPLASH_SCREEN{ std::string(Folders::LOGOS_ALIAS), "Splash_Screen.png" };
+		static const Shared::Tools::ResolvedPath SPLASH_SCREEN{ std::string(Folders::LOGOS_ALIAS), "Splash_Screen.png" };
 	}
 }

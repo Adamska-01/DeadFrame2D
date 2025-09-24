@@ -2,14 +2,17 @@
 #include <nlohmann/json.hpp>
 
 
-struct RendererConfig
+namespace Shared::Models
 {
-	int width = 1920;
+	struct RendererConfig
+	{
+		int width = 1920;
 
-	int height = 1080;
+		int height = 1080;
 
-	int targetFramerate = 60;
+		int targetFramerate = 60;
 
 
-	NLOHMANN_DEFINE_TYPE_INTRUSIVE(RendererConfig, width, height, targetFramerate)
-};
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(RendererConfig, width, height, targetFramerate)
+	};
+}

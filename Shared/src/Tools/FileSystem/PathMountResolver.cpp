@@ -3,40 +3,43 @@
 #include "Tools/FileSystem/ResourceMount.h"
 
 
-void PathMountResolver::Mount(const ResourceMount& resourceMount)
+namespace Shared::Tools
 {
-	mounts[resourceMount.alias] = resourceMount.path;
-}
-
-std::filesystem::path PathMountResolver::Resolve(const ResolvedPath& resolvedPath)
-{
-	const auto& alias = resolvedPath.alias;
-	const auto& fileName = resolvedPath.fileName;
-
-	auto it = mounts.find(alias);
-
-	if (it == mounts.end())
+	void PathMountResolver::Mount(const ResourceMount& resourceMount)
 	{
-		throw std::runtime_error("Unknown mount alias: " + alias);
+		mounts[resourceMount.alias] = resourceMount.path;
 	}
 
-	// Try with prefix first
-	auto resolvedPathWithPrefix = prefix / it->second / fileName;
+	std::filesystem::path PathMountResolver::Resolve(const ResolvedPath& resolvedPath)
+	{
+		const auto& alias = resolvedPath.alias;
+		const auto& fileName = resolvedPath.fileName;
+
+		auto it = mounts.find(alias);
+
+		if (it == mounts.end())
+		{
+			throw std::runtime_error("Unknown mount alias: " + alias);
+		}
+
+		// Try with prefix first
+		auto resolvedPathWithPrefix = prefix / it->second / fileName;
 	
-	if (std::filesystem::exists(resolvedPathWithPrefix))
-		return resolvedPathWithPrefix;
+		if (std::filesystem::exists(resolvedPathWithPrefix))
+			return resolvedPathWithPrefix;
 
-	// Try without prefix
-	auto resolvedPathWithoutPrefix = it->second / fileName;
+		// Try without prefix
+		auto resolvedPathWithoutPrefix = it->second / fileName;
 	
-	if (std::filesystem::exists(resolvedPathWithoutPrefix))
-		return resolvedPathWithoutPrefix;
+		if (std::filesystem::exists(resolvedPathWithoutPrefix))
+			return resolvedPathWithoutPrefix;
 
-	// Neither path exists
-	throw std::runtime_error("File not found with or without prefix: " + resolvedPathWithPrefix.string() + " / " + resolvedPathWithoutPrefix.string());
-}
+		// Neither path exists
+		throw std::runtime_error("File not found with or without prefix: " + resolvedPathWithPrefix.string() + " / " + resolvedPathWithoutPrefix.string());
+	}
 
-void PathMountResolver::SetMountPrefix(std::string mountPrefix)
-{
-	prefix = std::filesystem::path(mountPrefix);
+	void PathMountResolver::SetMountPrefix(std::string mountPrefix)
+	{
+		prefix = std::filesystem::path(mountPrefix);
+	}
 }

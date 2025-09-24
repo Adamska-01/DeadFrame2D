@@ -3,44 +3,47 @@
 #include <string>
 
 
-struct ResolvedPath
+namespace Shared::Tools
 {
-private:
-	mutable std::string cached = "";
-
-
-	inline void StoreCache() const
+	struct ResolvedPath
 	{
-		if (!cached.empty())
-			return;
-
-		cached = PathMountResolver::Resolve(*this).string();
-	}
+	private:
+		mutable std::string cached = "";
 
 
-public:
-	std::string alias;
+		inline void StoreCache() const
+		{
+			if (!cached.empty())
+				return;
 
-	std::string fileName;
-
-
-	ResolvedPath(const std::string& alias, const std::string& fileName)
-		: alias(alias), fileName(fileName)
-	{
-	}
+			cached = PathMountResolver::Resolve(*this).string();
+		}
 
 
-	inline operator std::string() const
-	{
-		StoreCache();
+	public:
+		std::string alias;
 
-		return cached;
-	}
+		std::string fileName;
 
-	operator std::string_view() const
-	{
-		StoreCache();
 
-		return cached;
-	}
-};
+		ResolvedPath(const std::string& alias, const std::string& fileName)
+			: alias(alias), fileName(fileName)
+		{
+		}
+
+
+		inline operator std::string() const
+		{
+			StoreCache();
+
+			return cached;
+		}
+
+		operator std::string_view() const
+		{
+			StoreCache();
+
+			return cached;
+		}
+	};
+}
