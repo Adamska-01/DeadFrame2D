@@ -4,25 +4,28 @@
 #include <SDL.h>
 
 
-struct MessageBoxConfig 
+namespace DeadFrame2D::Data
 {
-	std::string title = "Default Title";
+	struct MessageBoxConfig 
+	{
+		std::string title = "Default Title";
 	
-	std::string message = "Default Message";
+		std::string message = "Default Message";
 	
-	SDL_MessageBoxFlags type = SDL_MESSAGEBOX_INFORMATION;
+		SDL_MessageBoxFlags type = SDL_MESSAGEBOX_INFORMATION;
 	
-	std::vector<SDL_MessageBoxButtonData> buttons;
+		std::vector<SDL_MessageBoxButtonData> buttons;
 
 
-	MessageBoxConfig(
-		const std::string& title, 
-		const std::string& message, 
-		SDL_MessageBoxFlags boxType, 
-		const std::vector<SDL_MessageBoxButtonData>& buttons);
+		MessageBoxConfig(
+			const std::string& title, 
+			const std::string& message, 
+			SDL_MessageBoxFlags boxType, 
+			const std::vector<SDL_MessageBoxButtonData>& buttons);
 
 
-	void AddButton(const SDL_MessageBoxButtonData& button);
+		void AddButton(const SDL_MessageBoxButtonData& button);
 
-	bool IsValid() const;
-};
+		bool IsValid() const;
+	};
+}

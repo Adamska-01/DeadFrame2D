@@ -1,17 +1,23 @@
 #pragma once
 
 
-struct MessageBoxConfig;
-
-
-// TODO: Rename this to "MessageBoxService"
-class MessageHandler
+namespace DeadFrame2D::Data
 {
-public:
-	MessageHandler() = default;
-
-	~MessageHandler() = default;
+	struct MessageBoxConfig;
+}
 
 
-	int ShowMessageBox(const MessageBoxConfig& messageBoxConfig);
-};
+namespace DeadFrame2D::Core
+{
+	// TODO: Rename this to "MessageBoxService"
+	class MessageHandler
+	{
+	public:
+		MessageHandler() = default;
+
+		~MessageHandler() = default;
+
+
+		int ShowMessageBox(const DeadFrame2D::Data::MessageBoxConfig& messageBoxConfig);
+	};
+}

@@ -8,114 +8,122 @@
 #include "Utilities/Helpers/Physics/PhysicsShapeCreators.h"
 
 
-using namespace DeadFrame2D::Constants;
-
-
-AudioListener::AudioListener()
-	: transform(nullptr),
-	collisionBody(nullptr),
-	collisionFixture(nullptr),
-	lastTransformPosition(Vector2F::Zero),
-	lastTransformRotation(0.0f)
+namespace DeadFrame2D::Engine
 {
-}
+	using namespace Shared::Constants;
 
-AudioListener::~AudioListener()
-{
-	if (collisionBody == nullptr)
-		return;
+	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Data;
+	using namespace DeadFrame2D::Utilities;
+	using namespace DeadFrame2D::Constants;
 
-	auto fixture = collisionBody->GetFixtureList();
 
-	while (fixture != nullptr)
+	AudioListener::AudioListener()
+		: transform(nullptr),
+		collisionBody(nullptr),
+		collisionFixture(nullptr),
+		lastTransformPosition(Vector2F::Zero),
+		lastTransformRotation(0.0f)
 	{
-		auto next = fixture->GetNext();
-
-		collisionBody->DestroyFixture(fixture);
-
-		fixture = next;
 	}
-}
 
-void AudioListener::RebuildFixture()
-{
-	if (collisionBody == nullptr)
+	AudioListener::~AudioListener()
 	{
-		auto bodyDef = BodyDefinition2D
+		if (collisionBody == nullptr)
+			return;
+
+		auto fixture = collisionBody->GetFixtureList();
+
+		while (fixture != nullptr)
 		{
-			.type = BodyType2D::Dynamic,
-			.gravityScale = 0.0f
+			auto next = fixture->GetNext();
+
+			collisionBody->DestroyFixture(fixture);
+
+			fixture = next;
+		}
+	}
+
+	void AudioListener::RebuildFixture()
+	{
+		if (collisionBody == nullptr)
+		{
+			auto bodyDef = BodyDefinition2D
+			{
+				.type = BodyType2D::Dynamic,
+				.gravityScale = 0.0f
+			};
+
+			auto bodyDefBox2d = ToB2BodyDef(bodyDef);
+
+			collisionBody = PhysicsEngine2D::CreateBody(&bodyDefBox2d);
+		}
+
+		if (collisionFixture != nullptr)
+		{
+			collisionBody->DestroyFixture(collisionFixture);
+
+			collisionFixture = nullptr;
+		}
+
+		auto physicsMat = PhysicsMaterial
+		{
+			// Tiny circle (box2d doesn't support dots)
+			.shape = CreateCircleShape(50.0001f),
+			.isSensor = true,
+			.filter = FilterData
+			{
+				.categoryBits = PhysicsEngine2D::GetCollisionMasks().GetMaskFlagByName("AUDIO"),
+				.maskBits = PhysicsEngine2D::GetCollisionMasks().GetMaskFlagByName("AUDIO")
+			}
 		};
 
-		auto bodyDefBox2d = PhysicsConversion::ToB2BodyDef(bodyDef);
+		auto fixtureDef = ToB2FixtureDef(physicsMat, reinterpret_cast<uintptr_t>(this));
 
-		collisionBody = PhysicsEngine2D::CreateBody(&bodyDefBox2d);
+		collisionFixture = collisionBody->CreateFixture(&fixtureDef);
+
+		lastTransformPosition = transform->GetWorldPosition();
+		lastTransformRotation = transform->GetWorldRotation();
+
+		collisionBody->SetTransform(b2Vec2(lastTransformPosition.x * Physics::PIXEL_TO_METER, lastTransformPosition.y * Physics::PIXEL_TO_METER), lastTransformRotation * (MathConstants::PI / 180.0f));
+
+		isDirty = false;
 	}
 
-	if (collisionFixture != nullptr)
+	void AudioListener::Init()
 	{
-		collisionBody->DestroyFixture(collisionFixture);
+		transform = OwningObject.lock()->GetTransform();
 
-		collisionFixture = nullptr;
+		isDirty = true;
 	}
 
-	auto physicsMat = PhysicsMaterial
+	void AudioListener::Start()
 	{
-		// Tiny circle (box2d doesn't support dots)
-		.shape = PhysicsShapeCreators::CreateCircleShape(50.0001f),
-		.isSensor = true,
-		.filter = FilterData
+	}
+
+	void AudioListener::Update(float deltaTime)
+	{
+		if (isDirty)
 		{
-			.categoryBits = PhysicsEngine2D::GetCollisionMasks().GetMaskFlagByName("AUDIO"),
-			.maskBits = PhysicsEngine2D::GetCollisionMasks().GetMaskFlagByName("AUDIO")
+			RebuildFixture();
 		}
-	};
 
-	auto fixtureDef = PhysicsConversion::ToB2FixtureDef(physicsMat, reinterpret_cast<uintptr_t>(this));
+		auto currentTransformPosition = transform->GetWorldPosition();
+		auto currentTransformRotation = transform->GetWorldRotation();
 
-	collisionFixture = collisionBody->CreateFixture(&fixtureDef);
+		if (currentTransformPosition == lastTransformPosition && currentTransformRotation == currentTransformRotation)
+			return;
 
-	lastTransformPosition = transform->GetWorldPosition();
-	lastTransformRotation = transform->GetWorldRotation();
+		currentTransformPosition *= Physics::PIXEL_TO_METER;
 
-	collisionBody->SetTransform(b2Vec2(lastTransformPosition.x * PhysicsConstants::PIXEL_TO_METER, lastTransformPosition.y * PhysicsConstants::PIXEL_TO_METER), lastTransformRotation * (MathConstants::PI / 180.0f));
-
-	isDirty = false;
-}
-
-void AudioListener::Init()
-{
-	transform = OwningObject.lock()->GetTransform();
-
-	isDirty = true;
-}
-
-void AudioListener::Start()
-{
-}
-
-void AudioListener::Update(float deltaTime)
-{
-	if (isDirty)
-	{
-		RebuildFixture();
+		collisionBody->SetTransform(b2Vec2(currentTransformPosition.x, currentTransformPosition.y), currentTransformRotation * (MathConstants::PI / 180.0f));
+		collisionBody->SetAwake(true);
 	}
 
-	auto currentTransformPosition = transform->GetWorldPosition();
-	auto currentTransformRotation = transform->GetWorldRotation();
+	void AudioListener::Draw()
+	{
 
-	if (currentTransformPosition == lastTransformPosition && currentTransformRotation == currentTransformRotation)
-		return;
-
-	currentTransformPosition *= PhysicsConstants::PIXEL_TO_METER;
-
-	collisionBody->SetTransform(b2Vec2(currentTransformPosition.x, currentTransformPosition.y), currentTransformRotation * (MathConstants::PI / 180.0f));
-	collisionBody->SetAwake(true);
-}
-
-void AudioListener::Draw()
-{
-
-	lastTransformPosition = transform->GetWorldPosition();
-	lastTransformRotation = transform->GetWorldRotation();
+		lastTransformPosition = transform->GetWorldPosition();
+		lastTransformRotation = transform->GetWorldRotation();
+	}
 }

@@ -2,21 +2,24 @@
 #include <iostream>
 
 
-MessageBoxConfig::MessageBoxConfig(
-	const std::string& t,
-	const std::string& m,
-	SDL_MessageBoxFlags ty,
-	const std::vector<SDL_MessageBoxButtonData>& b) 
-	: title(t), message(m), type(ty), buttons(b) 
+namespace DeadFrame2D::Data
 {
-}
+	MessageBoxConfig::MessageBoxConfig(
+		const std::string& t,
+		const std::string& m,
+		SDL_MessageBoxFlags ty,
+		const std::vector<SDL_MessageBoxButtonData>& b) 
+		: title(t), message(m), type(ty), buttons(b) 
+	{
+	}
 
-void MessageBoxConfig::AddButton(const SDL_MessageBoxButtonData& button) 
-{
-	buttons.push_back(button);
-}
+	void MessageBoxConfig::AddButton(const SDL_MessageBoxButtonData& button) 
+	{
+		buttons.push_back(button);
+	}
 
-bool MessageBoxConfig::IsValid() const 
-{
-	return !title.empty() && !message.empty() && !buttons.empty();
+	bool MessageBoxConfig::IsValid() const 
+	{
+		return !title.empty() && !message.empty() && !buttons.empty();
+	}
 }

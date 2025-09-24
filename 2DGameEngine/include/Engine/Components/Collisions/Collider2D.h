@@ -8,63 +8,68 @@
 
 
 class b2Fixture;
-class Transform;
-class RigidBody2D;
 
 
-class Collider2D : public ContactEventProvider
+namespace DeadFrame2D::Engine
 {
-	friend class ContactListener;
+	class Transform;
+	class RigidBody2D;
 
 
-private:
-	void GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
-
-	void GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
-
-	Task Disable();
+	class Collider2D : public ContactEventProvider
+	{
+		friend class ContactListener;
 
 
-protected:
-	b2Fixture* fixture;
+	private:
+		void GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
 
-	Transform* transform;
+		void GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
 
-	RigidBody2D* rigidBody;
-
-	PhysicsMaterial physicsMaterial;
+		DeadFrame2D::Core::Task Disable();
 
 
-	Collider2D(const PhysicsMaterial& physicsMaterial);
+	protected:
+		b2Fixture* fixture;
 
-	virtual ~Collider2D() override;
+		Transform* transform;
 
+		RigidBody2D* rigidBody;
 
-	virtual void RebuildFixture();
-
-
-	void SearchRigidBody();
-
-
-	virtual void OnGameObjectActiveStateChangedHandler(GameObject* obj, bool isActive) override;
+		DeadFrame2D::Data::PhysicsMaterial physicsMaterial;
 
 
-public:
-	virtual void Init();
+		Collider2D(const DeadFrame2D::Data::PhysicsMaterial& physicsMaterial);
 
-	virtual void Start();
-
-	virtual void Update(float dt);
-
-	virtual void Draw();
+		virtual ~Collider2D() override;
 
 
-	bool IsTrigger() const;
-
-	void SetIsTrigger(bool value);
+		virtual void RebuildFixture();
 
 
-	Transform* GetTranform() const;
+		void SearchRigidBody();
 
-	PhysicsMaterial GetPhysicsMaterial();
-};
+
+		virtual void OnGameObjectActiveStateChangedHandler(GameObject* obj, bool isActive) override;
+
+
+	public:
+		virtual void Init();
+
+		virtual void Start();
+
+		virtual void Update(float dt);
+
+		virtual void Draw();
+
+
+		bool IsTrigger() const;
+
+		void SetIsTrigger(bool value);
+
+
+		Transform* GetTranform() const;
+
+		const DeadFrame2D::Data::PhysicsMaterial& GetPhysicsMaterial();
+	};
+}

@@ -4,53 +4,59 @@
 #include "Engine/Entity/GameObject.h"
 
 
-Sprite::Sprite(std::string_view texturePath)
+namespace DeadFrame2D::Engine
 {
-	transform = nullptr;
-	spriteSize = Vector2I::One;
+	using namespace DeadFrame2D::Core;
 
-	LoadSprite(texturePath);
-}
 
-void Sprite::Init()
-{
-	transform = OwningObject.lock()->GetComponent<Transform>();
-}
-
-void Sprite::Start()
-{
-
-}
-
-void Sprite::Update(float deltaTime)
-{
-}
-
-void Sprite::Draw()
-{
-	auto worldPosition = transform->GetWorldPosition();
-	auto worldScale = transform->GetWorldScale();
-	auto worldRotation = transform->GetWorldRotation();
-
-	auto scaledDest = SDL_Rect
+	Sprite::Sprite(std::string_view texturePath)
 	{
-		static_cast<int>(worldPosition.x - (spriteSize.x * worldScale.x) / 2),
-		static_cast<int>(worldPosition.y - (spriteSize.y * worldScale.y) / 2),
-		static_cast<int>(spriteSize.x * worldScale.x),
-		static_cast<int>(spriteSize.y * worldScale.y)
-	};
+		transform = nullptr;
+		spriteSize = Vector2I::One;
 
-	TextureManager::DrawTextureWorldSpace(spriteTexture, NULL, &scaledDest, worldRotation);
-}
+		LoadSprite(texturePath);
+	}
 
-void Sprite::LoadSprite(std::string_view texturePath)
-{
-	spriteTexture = TextureManager::LoadTexture(texturePath);
+	void Sprite::Init()
+	{
+		transform = OwningObject.lock()->GetComponent<Transform>();
+	}
 
-	SDL_QueryTexture(spriteTexture.get(), NULL, NULL, &spriteSize.x, &spriteSize.y);
-}
+	void Sprite::Start()
+	{
 
-std::shared_ptr<SDL_Texture> Sprite::GetTexture()
-{
-	return spriteTexture;
+	}
+
+	void Sprite::Update(float deltaTime)
+	{
+	}
+
+	void Sprite::Draw()
+	{
+		auto worldPosition = transform->GetWorldPosition();
+		auto worldScale = transform->GetWorldScale();
+		auto worldRotation = transform->GetWorldRotation();
+
+		auto scaledDest = SDL_Rect
+		{
+			static_cast<int>(worldPosition.x - (spriteSize.x * worldScale.x) / 2),
+			static_cast<int>(worldPosition.y - (spriteSize.y * worldScale.y) / 2),
+			static_cast<int>(spriteSize.x * worldScale.x),
+			static_cast<int>(spriteSize.y * worldScale.y)
+		};
+
+		TextureManager::DrawTextureWorldSpace(spriteTexture, NULL, &scaledDest, worldRotation);
+	}
+
+	void Sprite::LoadSprite(std::string_view texturePath)
+	{
+		spriteTexture = TextureManager::LoadTexture(texturePath);
+
+		SDL_QueryTexture(spriteTexture.get(), NULL, NULL, &spriteSize.x, &spriteSize.y);
+	}
+
+	std::shared_ptr<SDL_Texture> Sprite::GetTexture()
+	{
+		return spriteTexture;
+	}
 }

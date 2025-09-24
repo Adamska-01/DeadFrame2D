@@ -4,17 +4,20 @@
 #include "Models/TileEditors/Tiled/TiledTileSet.h"
 
 
-struct TiledMap
+namespace DeadFrame2D::Models
 {
-	int width;
+	struct TiledMap
+	{
+		int width;
 
-	int height;
+		int height;
 
-	int tileSize;
+		int tileSize;
 
-	std::vector<TiledTileSet> tileSets;
+		std::vector<TiledTileSet> tileSets;
 
-	std::vector<TiledLayer> layers;
+		std::vector<TiledLayer> layers;
 
-	std::vector<TiledObjectGroup> objectGroups;
-};
+		std::vector<TiledObjectGroup> objectGroups;
+	};
+}

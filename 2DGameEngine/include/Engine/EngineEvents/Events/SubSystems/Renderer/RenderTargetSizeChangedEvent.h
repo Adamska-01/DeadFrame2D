@@ -3,11 +3,14 @@
 #include "Core/Math/Vector2.h"
 
 
-class RenderTargetSizeChangedEvent : public DispatchableEvent
+namespace DeadFrame2D::Engine
 {
-public:
-	Vector2I renderTargetSize;
+	class RenderTargetSizeChangedEvent : public DispatchableEvent
+	{
+	public:
+		DeadFrame2D::Core::Vector2I renderTargetSize;
 
 
-	RenderTargetSizeChangedEvent(Vector2I renderTargetSize);
-};
+		RenderTargetSizeChangedEvent(DeadFrame2D::Core::Vector2I renderTargetSize);
+	};
+}

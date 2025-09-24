@@ -3,17 +3,20 @@
 #include "Data/Blueprints/UI/ButtonBlueprintModel.h"
 
 
-class ButtonBlueprint : public GameObject
+namespace DeadFrame2D::Engine
 {
-private:
-	ButtonBlueprintModel buttonBlueprintConfiguration;
+	class ButtonBlueprint : public GameObject
+	{
+	private:
+		DeadFrame2D::Data::ButtonBlueprintModel buttonBlueprintConfiguration;
 
 
-public:
-	ButtonBlueprint(const ButtonBlueprintModel& buttonBlueprintConfiguration);
+	public:
+		ButtonBlueprint(const DeadFrame2D::Data::ButtonBlueprintModel& buttonBlueprintConfiguration);
 
-	virtual ~ButtonBlueprint() override = default;
+		virtual ~ButtonBlueprint() override = default;
 
 
-	virtual void ConstructGameObject() override;
-};
+		virtual void ConstructGameObject() override;
+	};
+}

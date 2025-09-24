@@ -1,12 +1,15 @@
 #include "Engine/Components/UI/Abstractions/IInteractableUI.h"
 
 
-bool IInteractableUI::IsPressed() const
+namespace DeadFrame2D::Engine
 {
-	return isPressed;
-}
+	bool IInteractableUI::IsPressed() const
+	{
+		return isPressed;
+	}
 
-bool IInteractableUI::IsHovered() const
-{
-	return isHovered;
+	bool IInteractableUI::IsHovered() const
+	{
+		return isHovered;
+	}
 }

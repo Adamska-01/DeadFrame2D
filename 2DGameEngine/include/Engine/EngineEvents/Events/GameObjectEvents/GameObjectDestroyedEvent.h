@@ -4,11 +4,14 @@
 #include <memory>
 
 
-class GameObjectDestroyedEvent : public DispatchableEvent
+namespace DeadFrame2D::Engine
 {
-public:
-	std::weak_ptr<GameObject> gameObjectDestroyed;
+	class GameObjectDestroyedEvent : public DispatchableEvent
+	{
+	public:
+		std::weak_ptr<GameObject> gameObjectDestroyed;
 
 
-	GameObjectDestroyedEvent(std::weak_ptr<GameObject> gameObjectDestroyed);
-};
+		GameObjectDestroyedEvent(std::weak_ptr<GameObject> gameObjectDestroyed);
+	};
+}

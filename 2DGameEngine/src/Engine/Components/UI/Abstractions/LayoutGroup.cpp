@@ -7,91 +7,98 @@
 #include "Utilities/Helpers/Events/EventHelpers.h"
 
 
-LayoutGroup::LayoutGroup(float layoutSpacing, LayoutPadding layoutPadding)
-	: layoutSpacing(layoutSpacing), layoutPadding(layoutPadding)
+namespace DeadFrame2D::Engine
 {
-	auto identifier = reinterpret_cast<uintptr_t>(this);
+	using namespace DeadFrame2D::Data;
+	using namespace DeadFrame2D::Utilities;
+
+
+	LayoutGroup::LayoutGroup(float layoutSpacing, LayoutPadding layoutPadding)
+		: layoutSpacing(layoutSpacing), layoutPadding(layoutPadding)
+	{
+		auto identifier = reinterpret_cast<uintptr_t>(this);
 	
-	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &LayoutGroup::GameObjectCreatedHandler), identifier);
-	EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &LayoutGroup::GameObjectDestroyedHandler), identifier);
-}
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), BindFunction(this, &LayoutGroup::GameObjectCreatedHandler), identifier);
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), BindFunction(this, &LayoutGroup::GameObjectDestroyedHandler), identifier);
+	}
 
-LayoutGroup::~LayoutGroup()
-{
-	auto identifier = reinterpret_cast<uintptr_t>(this);
+	LayoutGroup::~LayoutGroup()
+	{
+		auto identifier = reinterpret_cast<uintptr_t>(this);
 
-	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), identifier);
-	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), identifier);
-}
+		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), identifier);
+		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), identifier);
+	}
 
-void LayoutGroup::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
-{
-	auto gameObjEvent = DispatchableEvent::SafeCast<GameObjectCreatedEvent>(dispatchableEvent);
+	void LayoutGroup::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
+	{
+		auto gameObjEvent = DispatchableEvent::SafeCast<GameObjectCreatedEvent>(dispatchableEvent);
 
-	if (gameObjEvent == nullptr || gameObjEvent->gameObjectCreated == nullptr)
-		return;
+		if (gameObjEvent == nullptr || gameObjEvent->gameObjectCreated == nullptr)
+			return;
 	
-	auto& target = gameObjEvent->gameObjectCreated; 
+		auto& target = gameObjEvent->gameObjectCreated; 
 
-	if (!target->IsChildOf(OwningObject))
-		return;
+		if (!target->IsChildOf(OwningObject))
+			return;
 
-	DeregisterAllHandlers(target);
-	RegisterAllHandlers(target);
+		DeregisterAllHandlers(target);
+		RegisterAllHandlers(target);
 
-	MarkDirty();
-}
+		MarkDirty();
+	}
 
-void LayoutGroup::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
-{
-	auto gameObjEvent = DispatchableEvent::SafeCast<GameObjectDestroyedEvent>(dispatchableEvent);
+	void LayoutGroup::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
+	{
+		auto gameObjEvent = DispatchableEvent::SafeCast<GameObjectDestroyedEvent>(dispatchableEvent);
 
-	if (!gameObjEvent || gameObjEvent->gameObjectDestroyed.lock() == nullptr)
-		return;
+		if (!gameObjEvent || gameObjEvent->gameObjectDestroyed.lock() == nullptr)
+			return;
 
-	auto target = gameObjEvent->gameObjectDestroyed;
+		auto target = gameObjEvent->gameObjectDestroyed;
 
-	if (!target.lock()->IsChildOf(OwningObject))
-		return;
+		if (!target.lock()->IsChildOf(OwningObject))
+			return;
 
-	DeregisterAllHandlers(target);
+		DeregisterAllHandlers(target);
 
-	MarkDirty();
-}
+		MarkDirty();
+	}
 
-void LayoutGroup::OnGameObjectActiveStateChangedHandler(GameObject* child, bool activeState)
-{
-	MarkDirty();
-}
+	void LayoutGroup::OnGameObjectActiveStateChangedHandler(GameObject* child, bool activeState)
+	{
+		MarkDirty();
+	}
 
-void LayoutGroup::Init()
-{
-}
+	void LayoutGroup::Init()
+	{
+	}
 
-void LayoutGroup::Start()
-{
-	UpdateLayout();
-}
-
-void LayoutGroup::Update(float deltaTime)
-{
-	if (isDirty)
+	void LayoutGroup::Start()
 	{
 		UpdateLayout();
 	}
-}
 
-void LayoutGroup::Draw()
-{
-}
-
-void LayoutGroup::UpdateLayout()
-{
-	for (const auto& ui : OwningObject.lock()->GetComponentsInChildren<UIComponent>())
+	void LayoutGroup::Update(float deltaTime)
 	{
-		DeregisterAllHandlers(ui->GetGameObject());
-		RegisterAllHandlers(ui->GetGameObject());
+		if (isDirty)
+		{
+			UpdateLayout();
+		}
 	}
 
-	isDirty = false;
+	void LayoutGroup::Draw()
+	{
+	}
+
+	void LayoutGroup::UpdateLayout()
+	{
+		for (const auto& ui : OwningObject.lock()->GetComponentsInChildren<UIComponent>())
+		{
+			DeregisterAllHandlers(ui->GetGameObject());
+			RegisterAllHandlers(ui->GetGameObject());
+		}
+
+		isDirty = false;
+	}
 }

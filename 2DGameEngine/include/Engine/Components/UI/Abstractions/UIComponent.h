@@ -4,38 +4,41 @@
 #include <Data/UI/UIAnchor.h>
 
 
-class Transform;
-
-
-/**
- * @brief Represents a generic UI Component.
- */
-class UIComponent : public GameComponent
+namespace DeadFrame2D::Engine
 {
-protected:
-	UIAnchor anchor;
-
-	Vector2F widgetSize;
-
-	Transform* transform;
+	class Transform;
 
 
-public:
-	UIComponent();
+	/**
+	 * @brief Represents a generic UI Component.
+	 */
+	class UIComponent : public GameComponent
+	{
+	protected:
+		DeadFrame2D::Data::UIAnchor anchor;
 
-	virtual ~UIComponent() override = default;
+		DeadFrame2D::Core::Vector2F widgetSize;
+
+		Transform* transform;
 
 
-	virtual void Init() override;
-	
-	virtual void Update(float deltaTime) override = 0;
-	
-	virtual void Draw() override = 0;
+	public:
+		UIComponent();
+
+		virtual ~UIComponent() override = default;
 
 
-	void SetAnchor(UIAnchor newAnchor);
+		virtual void Init() override;
 
-	void SetWidgetSize(Vector2F newWidgetSize);
+		virtual void Update(float deltaTime) override = 0;
 
-	Vector2F GetWidgetSize() const;
-};
+		virtual void Draw() override = 0;
+
+
+		void SetAnchor(DeadFrame2D::Data::UIAnchor newAnchor);
+
+		void SetWidgetSize(DeadFrame2D::Core::Vector2F newWidgetSize);
+
+		DeadFrame2D::Core::Vector2F GetWidgetSize() const;
+	};
+}

@@ -8,95 +8,101 @@
 #include <unordered_map>
 
 
-class Camera;
-
-
-class TextureManager : public ISubSystem
+namespace DeadFrame2D::Engine
 {
-	friend class SubSystems;
-	friend class Engine;
+	class Camera;
+}
 
 
-private:
-	static std::unordered_map<std::string, std::weak_ptr<SDL_Texture>> textureCache;
-
-	static Camera* currentCamera;
-
-
-	TextureManager();
-
-	virtual ~TextureManager() override;
-
-	TextureManager(const TextureManager&) = delete;
-
-	TextureManager(TextureManager&&) = delete;
+namespace DeadFrame2D::Core
+{
+	class TextureManager : public ISubSystem
+	{
+		friend class SubSystems;
+		friend class Engine;
 
 
-	TextureManager& operator=(const TextureManager&) = delete;
+	private:
+		static std::unordered_map<std::string, std::weak_ptr<SDL_Texture>> textureCache;
 
-	TextureManager& operator=(TextureManager&&) = delete;
-
-
-	virtual void Update(float deltaTime) override;
-
-	virtual void BeginFrame() override;
-
-	virtual void EndUpdate() override;
-
-	virtual void EndDraw() override;
+		static DeadFrame2D::Engine::Camera* currentCamera;
 
 
-	static void DrawLine(const Vector2F& p1, const Vector2F& p2, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, Camera* camera = nullptr);
+		TextureManager();
 
-	static void DrawRect(SDL_Rect rect, float angleDegrees, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false, Camera* camera = nullptr);
+		virtual ~TextureManager() override;
 
-	static void DrawCircle(Circle circle, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false, Camera* camera = nullptr);
+		TextureManager(const TextureManager&) = delete;
 
-	static void DrawTexture(
-		std::shared_ptr<SDL_Texture> texture,
-		const SDL_Rect* srcRect = NULL,
-		const SDL_Rect* dstRect = NULL,
-		float angle = 0.0f,
-		SDL_Point* rotationOrigin = NULL,
-		SDL_RendererFlip flip = SDL_FLIP_NONE,
-		Uint8 alpha = 255,
-		SDL_Color colorMod = DeadFrame2D::Constants::CommonColors::WHITE,
-		Camera* camera = nullptr);
+		TextureManager(TextureManager&&) = delete;
 
 
-public:
-	static std::shared_ptr<SDL_Texture> LoadTexture(std::string_view filename);
+		TextureManager& operator=(const TextureManager&) = delete;
+
+		TextureManager& operator=(TextureManager&&) = delete;
 
 
-	static void DrawLineWorldSpace(const Vector2F& p1, const Vector2F& p2, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE);
+		virtual void Update(float deltaTime) override;
 
-	static void DrawLineScreenSpace(const Vector2F& p1, const Vector2F& p2, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE);
+		virtual void BeginFrame() override;
 
-	static void DrawRectWorldSpace(SDL_Rect rect, float angleDegrees, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false);
+		virtual void EndUpdate() override;
 
-	static void DrawRectScreenSpace(SDL_Rect rect, float angleDegrees, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false);
+		virtual void EndDraw() override;
+
+
+		static void DrawLine(const Vector2F& p1, const Vector2F& p2, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, DeadFrame2D::Engine::Camera* camera = nullptr);
+
+		static void DrawRect(SDL_Rect rect, float angleDegrees, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false, DeadFrame2D::Engine::Camera* camera = nullptr);
+
+		static void DrawCircle(Circle circle, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false, DeadFrame2D::Engine::Camera* camera = nullptr);
+
+		static void DrawTexture(
+			std::shared_ptr<SDL_Texture> texture,
+			const SDL_Rect* srcRect = NULL,
+			const SDL_Rect* dstRect = NULL,
+			float angle = 0.0f,
+			SDL_Point* rotationOrigin = NULL,
+			SDL_RendererFlip flip = SDL_FLIP_NONE,
+			Uint8 alpha = 255,
+			SDL_Color colorMod = DeadFrame2D::Constants::CommonColors::WHITE,
+			DeadFrame2D::Engine::Camera* camera = nullptr);
+
+
+	public:
+		static std::shared_ptr<SDL_Texture> LoadTexture(std::string_view filename);
+
+
+		static void DrawLineWorldSpace(const Vector2F& p1, const Vector2F& p2, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE);
+
+		static void DrawLineScreenSpace(const Vector2F& p1, const Vector2F& p2, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE);
+
+		static void DrawRectWorldSpace(SDL_Rect rect, float angleDegrees, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false);
+
+		static void DrawRectScreenSpace(SDL_Rect rect, float angleDegrees, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false);
 	
-	static void DrawCircleWorldSpace(Circle circle, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false);
+		static void DrawCircleWorldSpace(Circle circle, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false);
 
-	static void DrawCircleScreenSpace(Circle circle, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false);
+		static void DrawCircleScreenSpace(Circle circle, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false);
 	
-	static void DrawTextureWorldSpace(
-		std::shared_ptr<SDL_Texture> texture,
-		const SDL_Rect* srcRect = NULL, 
-		const SDL_Rect* dstRect = NULL, 
-		float angle = 0.0f, 
-		SDL_Point* rotationOrigin = NULL,
-		SDL_RendererFlip flip = SDL_FLIP_NONE, 
-		Uint8 alpha = 255, 
-		SDL_Color colorMod = DeadFrame2D::Constants::CommonColors::WHITE);
+		static void DrawTextureWorldSpace(
+			std::shared_ptr<SDL_Texture> texture,
+			const SDL_Rect* srcRect = NULL, 
+			const SDL_Rect* dstRect = NULL, 
+			float angle = 0.0f, 
+			SDL_Point* rotationOrigin = NULL,
+			SDL_RendererFlip flip = SDL_FLIP_NONE, 
+			Uint8 alpha = 255, 
+			SDL_Color colorMod = DeadFrame2D::Constants::CommonColors::WHITE);
 
-	static void DrawTextureScreenSpace(
-		std::shared_ptr<SDL_Texture> texture,
-		const SDL_Rect* srcRect = NULL,
-		const SDL_Rect* dstRect = NULL,
-		float angle = 0.0f,
-		SDL_Point* rotationOrigin = NULL,
-		SDL_RendererFlip flip = SDL_FLIP_NONE,
-		Uint8 alpha = 255,
-		SDL_Color colorMod = DeadFrame2D::Constants::CommonColors::WHITE);
-};
+		static void DrawTextureScreenSpace(
+			std::shared_ptr<SDL_Texture> texture,
+			const SDL_Rect* srcRect = NULL,
+			const SDL_Rect* dstRect = NULL,
+			float angle = 0.0f,
+			SDL_Point* rotationOrigin = NULL,
+			SDL_RendererFlip flip = SDL_FLIP_NONE,
+			Uint8 alpha = 255,
+			SDL_Color colorMod = DeadFrame2D::Constants::CommonColors::WHITE);
+	};
+}

@@ -4,31 +4,39 @@
 #include "Utilities/Debugging/Guards.h"
 
 
-UIComponent::UIComponent()
-	: anchor(UIAnchor::CENTER),
-	widgetSize(Vector2F::One),
-	transform(nullptr)
+namespace DeadFrame2D::Engine
 {
-}
+	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Data;
+	using namespace DeadFrame2D::Utilities;
 
-void UIComponent::Init()
-{
-	transform = OwningObject.lock()->GetComponent<Transform>();
 
-	Tools::Helpers::GuardAgainstNull(transform, "Failed to get Transform from OwningObject");
-}
+	UIComponent::UIComponent()
+		: anchor(UIAnchor::CENTER),
+		widgetSize(Vector2F::One),
+		transform(nullptr)
+	{
+	}
 
-void UIComponent::SetAnchor(UIAnchor newAnchor)
-{
-	anchor = newAnchor;
-}
+	void UIComponent::Init()
+	{
+		transform = OwningObject.lock()->GetComponent<Transform>();
 
-void UIComponent::SetWidgetSize(Vector2F newWidgetSize)
-{
-	widgetSize = newWidgetSize;
-}
+		GuardAgainstNull(transform, "Failed to get Transform from OwningObject");
+	}
 
-Vector2F UIComponent::GetWidgetSize() const
-{
-	return widgetSize * transform->GetWorldScale();
+	void UIComponent::SetAnchor(UIAnchor newAnchor)
+	{
+		anchor = newAnchor;
+	}
+
+	void UIComponent::SetWidgetSize(Vector2F newWidgetSize)
+	{
+		widgetSize = newWidgetSize;
+	}
+
+	Vector2F UIComponent::GetWidgetSize() const
+	{
+		return widgetSize * transform->GetWorldScale();
+	}
 }

@@ -9,66 +9,71 @@
 struct b2FixtureDef;
 class b2Fixture;
 class b2Body;
-class Transform;
 
 
-class RigidBody2D : public GameComponent
+namespace DeadFrame2D::Engine
 {
-private:
-	Transform* transform;
-
-	b2Body* body;
-
-	mutable Vector2F velocity;
-	
-	mutable Vector2F acceleration;
-
-	MultiCastVoid pendingActions;
-
-	Vector2F lastTransformPosition;
-
-	float lastTransformRotation;
-
-	
-public:
-	RigidBody2D(const BodyDefinition2D& bodyDefinition);
-
-	RigidBody2D(RigidBody2D&& other) = default;
-	
-	virtual ~RigidBody2D() override;
+	class Transform;
 
 
-	void Init() override;
+	class RigidBody2D : public GameComponent
+	{
+	private:
+		Transform* transform;
 
-	void Start() override;
-	
-	void Update(float deltaTime) override;
+		b2Body* body;
 
-	void Draw() override;
+		mutable DeadFrame2D::Core::Vector2F velocity;
+
+		mutable DeadFrame2D::Core::Vector2F acceleration;
+
+		DeadFrame2D::Utilities::MultiCastVoid pendingActions;
+
+		DeadFrame2D::Core::Vector2F lastTransformPosition;
+
+		float lastTransformRotation;
 
 
-	b2Fixture* CreateFixture(const b2FixtureDef* fixtureDef);
+	public:
+		RigidBody2D(const DeadFrame2D::Data::BodyDefinition2D& bodyDefinition);
 
-	void ChangeBodyType(BodyType2D newBodyType);
+		RigidBody2D(RigidBody2D&& other) = default;
 
-	void DestroyFixture(b2Fixture* fixtureDef);
+		virtual ~RigidBody2D() override;
 
 
-	Vector2F GetVelocity() const;
+		void Init() override;
 
-	void SetVelocity(const Vector2F& velocity);
+		void Start() override;
 
-	void SetVelocityX(float velX);
-	
-	void SetVelocityY(float velY);
+		void Update(float deltaTime) override;
 
-	void AddImpulse(const Vector2F& impulse);
+		void Draw() override;
 
-	void AddImpulseX(float impulseX);
-	
-	void AddImpulseY(float impulseY);
 
-	void AddForce(const Vector2F& force);
+		b2Fixture* CreateFixture(const b2FixtureDef* fixtureDef);
 
-	void SetGravityScale(float newGravityScale);
-};
+		void ChangeBodyType(DeadFrame2D::Data::BodyType2D newBodyType);
+
+		void DestroyFixture(b2Fixture* fixtureDef);
+
+
+		DeadFrame2D::Core::Vector2F GetVelocity() const;
+
+		void SetVelocity(const DeadFrame2D::Core::Vector2F& velocity);
+
+		void SetVelocityX(float velX);
+
+		void SetVelocityY(float velY);
+
+		void AddImpulse(const DeadFrame2D::Core::Vector2F& impulse);
+
+		void AddImpulseX(float impulseX);
+
+		void AddImpulseY(float impulseY);
+
+		void AddForce(const DeadFrame2D::Core::Vector2F& force);
+
+		void SetGravityScale(float newGravityScale);
+	};
+}

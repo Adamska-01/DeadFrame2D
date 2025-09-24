@@ -6,87 +6,92 @@
 #include <string_view>
 
 
-class Transform;
-class AudioListener;
 class b2Body;
 class b2Fixture;
 class b2CircleShape;
 
 
-class AudioSource : public ContactEventProvider
+namespace DeadFrame2D::Engine
 {
-	friend class ContactListener;
+	class Transform;
+	class AudioListener;
 
 
-protected:
-	Transform* transform;
+	class AudioSource : public ContactEventProvider
+	{
+		friend class ContactListener;
 
-	AudioListener* audioListenerInContact;
 
-	std::shared_ptr<Mix_Chunk> sfxClip;
+	protected:
+		Transform* transform;
 
-	std::shared_ptr<Mix_Music> musicTrack;
+		AudioListener* audioListenerInContact;
 
-	// Using Box2D to detect audio source collisions with audio listeners
-	b2Body* collisionBody;
+		std::shared_ptr<Mix_Chunk> sfxClip;
+
+		std::shared_ptr<Mix_Music> musicTrack;
+
+		// Using Box2D to detect audio source collisions with audio listeners
+		b2Body* collisionBody;
 	
-	b2Fixture* collisionFixture;
+		b2Fixture* collisionFixture;
 
-	bool isMusic;
+		bool isMusic;
 
-	float minReachingDistance;
+		float minReachingDistance;
 
-	float maxReachingDistance;
+		float maxReachingDistance;
 
-	float volume;
+		float volume;
 
-	int loops; // Number of loops (-1 for infinite)
+		int loops; // Number of loops (-1 for infinite)
 
-	int playingChannel;
+		int playingChannel;
 
-	Vector2F lastTransformPosition;
+		DeadFrame2D::Core::Vector2F lastTransformPosition;
 
-	float lastTransformRotation;
-
-
-	void OnAudioSourceEnterHandler(const CollisionInfo& collisionInfo);
-
-	void OnAudioSourceExitHandler(const CollisionInfo& collisionInfo);
-
-	void RebuildFixture();
+		float lastTransformRotation;
 
 
-public:
-	AudioSource();
+		void OnAudioSourceEnterHandler(const DeadFrame2D::Data::CollisionInfo& collisionInfo);
 
-	AudioSource(const std::string& audioSource, bool isMusic = false, float volume = 1.0f);
+		void OnAudioSourceExitHandler(const DeadFrame2D::Data::CollisionInfo& collisionInfo);
 
-	virtual ~AudioSource() override;
-
-
-	virtual void Init() override;
-
-	virtual void Start() override;
-
-	virtual void Update(float deltaTime) override;
-
-	virtual void Draw() override;
+		void RebuildFixture();
 
 
-	void LoadAudio(const std::string_view& audioSource, bool isMusic = false);
+	public:
+		AudioSource();
 
-	void Play(bool loop = false);
+		AudioSource(const std::string& audioSource, bool isMusic = false, float volume = 1.0f);
 
-	void Pause();
-
-	void Stop();
+		virtual ~AudioSource() override;
 
 
-	void SetVolume(float vol);
+		virtual void Init() override;
 
-	void SetMaxDistance(float newMaxDistance);
+		virtual void Start() override;
 
-	void SetMinDistance(float newMinDistance);
+		virtual void Update(float deltaTime) override;
 
-	int GetVolume() const;
-};
+		virtual void Draw() override;
+
+
+		void LoadAudio(const std::string_view& audioSource, bool isMusic = false);
+
+		void Play(bool loop = false);
+
+		void Pause();
+
+		void Stop();
+
+
+		void SetVolume(float vol);
+
+		void SetMaxDistance(float newMaxDistance);
+
+		void SetMinDistance(float newMinDistance);
+
+		int GetVolume() const;
+	};
+}

@@ -4,9 +4,12 @@
 #include <vector>
 
 
-struct TiledObjectGroup
+namespace DeadFrame2D::Models
 {
-	std::string name;
-	
-	std::vector<Vector2F> points;
-};
+	struct TiledObjectGroup
+	{
+		std::string name;
+
+		std::vector<DeadFrame2D::Core::Vector2F> points;
+	};
+}

@@ -9,86 +9,98 @@
 #include <Constants/ResourcePaths.h>
 
 
-PhysicsEngine2D* PhysicsEngine2D::instance;
-
-
-PhysicsEngine2D::PhysicsEngine2D(const Vector2F& gravity)
+namespace DeadFrame2D::Core
 {
-	assert(instance == nullptr && "PhysicsEngine2D was already initialized!");
+	using namespace Shared::Constants;
+	using namespace Shared::Models;
 
-	instance = this;
-
-	contactListener = std::make_unique<ContactListener>();
-
-	debugDrawer = std::unique_ptr<b2Draw>(ColliderDrawerFactory().CreateProduct());
-
-
-	world = std::make_unique<b2World>(b2Vec2(gravity.x, gravity.y));
-
-	world->SetContactListener(contactListener.get());
-
-	world->SetDebugDraw(debugDrawer.get());
+	using namespace DeadFrame2D::Data;
+	using namespace DeadFrame2D::Utilities;
+	using namespace DeadFrame2D::Factories;
 
 
-	collisionMasks = JsonSerializer::DeserializeFromFile<CollisionMasks>(Constants::ResourcePaths::Files::COLLISION_MASKS);
+	PhysicsEngine2D* PhysicsEngine2D::instance;
 
 
-	std::cout << "[Info] SDL_image successfully initialized." << std::endl;
-}
+	PhysicsEngine2D::PhysicsEngine2D(const Vector2F& gravity)
+	{
+		assert(instance == nullptr && "PhysicsEngine2D was already initialized!");
 
-PhysicsEngine2D::~PhysicsEngine2D()
-{
-	world.reset();
+		instance = this;
 
-	instance = nullptr;
+		contactListener = std::make_unique<ContactListener>();
 
-	std::cout << "[Info] PhysicsEngine2D subsystem successfully quit." << std::endl;
-}
+		debugDrawer = std::unique_ptr<b2Draw>(ColliderDrawerFactory().CreateProduct());
 
-void PhysicsEngine2D::Update(float deltaTime)
-{
 
-}
+		world = std::make_unique<b2World>(b2Vec2(gravity.x, gravity.y));
 
-void PhysicsEngine2D::BeginFrame()
-{
-}
+		world->SetContactListener(contactListener.get());
 
-void PhysicsEngine2D::EndUpdate()
-{
-	world->Step(FrameTimer::DeltaTime(), PhysicsConstants::VELOCITY_ITERATIONS, PhysicsConstants::POSITION_ITERATIONS);
-}
+		world->SetDebugDraw(debugDrawer.get());
 
-void PhysicsEngine2D::EndDraw()
-{
-	world->DebugDraw();
-}
 
-Vector2F PhysicsEngine2D::GetGravity()
-{
-	auto b2Gravity = instance->world->GetGravity();
+		collisionMasks = DeserializeFromFile<CollisionMasks>(Paths::Files::COLLISION_MASKS);
 
-	return Vector2F(b2Gravity.x, b2Gravity.y);
-}
 
-void PhysicsEngine2D::SetGravity(const Vector2F& newGravity)
-{
-	auto b2Gravity = b2Vec2(newGravity.x, newGravity.y);
+		std::cout << "[Info] SDL_image successfully initialized." << std::endl;
+	}
 
-	instance->world->SetGravity(b2Gravity);
-}
+	PhysicsEngine2D::~PhysicsEngine2D()
+	{
+		world.reset();
 
-b2Body* PhysicsEngine2D::CreateBody(const b2BodyDef* bodyDef)
-{
-	return instance->world->CreateBody(bodyDef);
-}
+		instance = nullptr;
 
-void PhysicsEngine2D::DestroyBody(b2Body* bodyToDestroy)
-{
-	return instance->world->DestroyBody(bodyToDestroy);
-}
+		std::cout << "[Info] PhysicsEngine2D subsystem successfully quit." << std::endl;
+	}
 
-const CollisionMasks& PhysicsEngine2D::GetCollisionMasks()
-{
-	return instance->collisionMasks;
+	void PhysicsEngine2D::Update(float deltaTime)
+	{
+
+	}
+
+	void PhysicsEngine2D::BeginFrame()
+	{
+
+	}
+
+	void PhysicsEngine2D::EndUpdate()
+	{
+		world->Step(FrameTimer::DeltaTime(), Physics::VELOCITY_ITERATIONS, Physics::POSITION_ITERATIONS);
+	}
+
+	void PhysicsEngine2D::EndDraw()
+	{
+		world->DebugDraw();
+	}
+
+	Vector2F PhysicsEngine2D::GetGravity()
+	{
+		auto b2Gravity = instance->world->GetGravity();
+
+		return Vector2F(b2Gravity.x, b2Gravity.y);
+	}
+
+	void PhysicsEngine2D::SetGravity(const Vector2F& newGravity)
+	{
+		auto b2Gravity = b2Vec2(newGravity.x, newGravity.y);
+
+		instance->world->SetGravity(b2Gravity);
+	}
+
+	b2Body* PhysicsEngine2D::CreateBody(const b2BodyDef* bodyDef)
+	{
+		return instance->world->CreateBody(bodyDef);
+	}
+
+	void PhysicsEngine2D::DestroyBody(b2Body* bodyToDestroy)
+	{
+		return instance->world->DestroyBody(bodyToDestroy);
+	}
+
+	const CollisionMasks& PhysicsEngine2D::GetCollisionMasks()
+	{
+		return instance->collisionMasks;
+	}
 }

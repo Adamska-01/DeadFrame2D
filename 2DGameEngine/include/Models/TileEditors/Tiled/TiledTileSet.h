@@ -4,31 +4,33 @@
 #include <string>
 
 
-
-struct TiledTileSet
+namespace DeadFrame2D::Models
 {
-	std::shared_ptr<SDL_Texture> tileSetTexture;
+	struct TiledTileSet
+	{
+		std::shared_ptr<SDL_Texture> tileSetTexture;
 
-	std::string source;
+		std::string source;
 
-	int firstID;
+		int firstID;
 
-	int lastID;
+		int lastID;
 
-	int rowCount;
+		int rowCount;
 
-	int columnCount;
+		int columnCount;
 
-	int tileCount;
+		int tileCount;
 
-	int tileSize;
-
-
-	TiledTileSet(int firstID, int lastID, int rowCount, int columnCount, int tileCount, int tileSize, const std::string& source);
-
-
-	bool IsValid() const;
+		int tileSize;
 
 
-	friend std::ostream& operator<<(std::ostream& os, const TiledTileSet& tileSet);
-};
+		TiledTileSet(int firstID, int lastID, int rowCount, int columnCount, int tileCount, int tileSize, const std::string& source);
+
+
+		bool IsValid() const;
+
+
+		friend std::ostream& operator<<(std::ostream& os, const TiledTileSet& tileSet);
+	};
+}

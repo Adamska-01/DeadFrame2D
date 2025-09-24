@@ -4,21 +4,28 @@
 #include "Engine/Components/UI/TextMesh.h"
 
 
-ButtonBlueprint::ButtonBlueprint(const ButtonBlueprintModel& buttonBlueprintConfiguration)
-	: buttonBlueprintConfiguration(buttonBlueprintConfiguration)
+namespace DeadFrame2D::Engine
 {
+	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Data;
+
+
+	ButtonBlueprint::ButtonBlueprint(const ButtonBlueprintModel& buttonBlueprintConfiguration)
+		: buttonBlueprintConfiguration(buttonBlueprintConfiguration)
+	{
 	
-}
+	}
 
-void ButtonBlueprint::ConstructGameObject()
-{
-	AddComponent<Button>(buttonBlueprintConfiguration.buttonComponentModel);
+	void ButtonBlueprint::ConstructGameObject()
+	{
+		AddComponent<Button>(buttonBlueprintConfiguration.buttonComponentModel);
 
-	auto textMeshObject = GameObject::Instantiate<GameObject>();
+		auto textMeshObject = GameObject::Instantiate<GameObject>();
 
-	auto comp = textMeshObject.lock()->AddComponent<TextMesh>(buttonBlueprintConfiguration.textMeshComponentModel);
+		auto comp = textMeshObject.lock()->AddComponent<TextMesh>(buttonBlueprintConfiguration.textMeshComponentModel);
 
-	AddChildGameObject(textMeshObject);
+		AddChildGameObject(textMeshObject);
 
-	textMeshObject.lock()->GetComponent<Transform>()->SetLocalPosition(Vector2F::Zero);
+		textMeshObject.lock()->GetComponent<Transform>()->SetLocalPosition(Vector2F::Zero);
+	}
 }

@@ -3,24 +3,27 @@
 #include <coroutine>
 
 
-class WaitForSeconds : public ICoroutineAwaitable
+namespace DeadFrame2D::Core
 {
-private:
-	float timeRemaining;
+	class WaitForSeconds : public ICoroutineAwaitable
+	{
+	private:
+		float timeRemaining;
 
-	std::coroutine_handle<> continuation;
-
-
-public:
-	explicit WaitForSeconds(float seconds);
+		std::coroutine_handle<> continuation;
 
 
-	bool await_ready() const noexcept override;
-
-	void await_suspend(std::coroutine_handle<> h) override;
-
-	void await_resume() const noexcept override;
+	public:
+		explicit WaitForSeconds(float seconds);
 
 
-	bool Tick(float deltaTime) override;
-};
+		bool await_ready() const noexcept override;
+
+		void await_suspend(std::coroutine_handle<> h) override;
+
+		void await_resume() const noexcept override;
+
+
+		bool Tick(float deltaTime) override;
+	};
+}

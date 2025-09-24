@@ -10,40 +10,43 @@
 struct SDL_Texture;
 
 
-class UIManager : public ISubSystem
+namespace DeadFrame2D::Core
 {
-	friend class SubSystems;
+	class UIManager : public ISubSystem
+	{
+		friend class SubSystems;
 
 
-private:
-	UIManager();
+	private:
+		UIManager();
 
-	virtual ~UIManager() override;
+		virtual ~UIManager() override;
 
-	UIManager(const UIManager&) = delete;
+		UIManager(const UIManager&) = delete;
 	
-	UIManager(UIManager&&) = delete;
+		UIManager(UIManager&&) = delete;
 	
 
-	UIManager& operator=(const UIManager&) = delete;
+		UIManager& operator=(const UIManager&) = delete;
 
-	UIManager& operator=(UIManager&&) = delete;
-
-
-	static std::unordered_map<std::pair<std::string, int>, std::shared_ptr<TTF_Font>, PairHash> fontCache;
+		UIManager& operator=(UIManager&&) = delete;
 
 
-	virtual void Update(float deltaTime) override;
-
-	virtual void BeginFrame() override;
-
-	virtual void EndUpdate() override;
-
-	virtual void EndDraw() override;
+		static std::unordered_map<std::pair<std::string, int>, std::shared_ptr<TTF_Font>, DeadFrame2D::Utilities::PairHash> fontCache;
 
 
-public:
-	static std::shared_ptr<TTF_Font> LoadFont(std::string_view textSource, int fontsize);
+		virtual void Update(float deltaTime) override;
 
-	static std::shared_ptr<SDL_Texture> LoadText(std::shared_ptr<TTF_Font> font, std::string text, SDL_Color color, bool centerText = false);
-};
+		virtual void BeginFrame() override;
+
+		virtual void EndUpdate() override;
+
+		virtual void EndDraw() override;
+
+
+	public:
+		static std::shared_ptr<TTF_Font> LoadFont(std::string_view textSource, int fontsize);
+
+		static std::shared_ptr<SDL_Texture> LoadText(std::shared_ptr<TTF_Font> font, std::string text, SDL_Color color, bool centerText = false);
+	};
+}

@@ -10,69 +10,76 @@
 #include <Constants/PhysicsConstants.h>
 
 
-SubSystems::SubSystems()
+namespace DeadFrame2D::Core
 {
-	subSystems.fill(nullptr);
-}
+	using namespace Shared::Constants;
+	using namespace Shared::Models;
 
-SubSystems::~SubSystems()
-{
-	for (const auto& subSystem : subSystems)
+
+	SubSystems::SubSystems()
 	{
-		delete subSystem;
+		subSystems.fill(nullptr);
 	}
-}
 
-void SubSystems::InitializeSubSystems(EngineConfig config)
-{
-	auto window = new Window(config.window);
-
-	subSystems[0] = window;
-
-	subSystems[1] = new Renderer(window->GetWindow(), config.rendering);
-
-	subSystems[2] = new Input();
-
-	subSystems[3] = new TextureManager();
-
-	subSystems[4] = new UIManager();
-
-	subSystems[5] = new AudioManager();
-
-	subSystems[6] = new PhysicsEngine2D(Vector2F(PhysicsConstants::GRAVITY_X, PhysicsConstants::GRAVITY_Y));
-
-	subSystems[7] = new CoroutineScheduler();
-}
-
-void SubSystems::Update(float deltaTime)
-{
-	for (const auto& subSystem : subSystems)
+	SubSystems::~SubSystems()
 	{
-		subSystem->Update(deltaTime);
+		for (const auto& subSystem : subSystems)
+		{
+			delete subSystem;
+		}
 	}
-}
 
-// TODO: Create the interface with BeginFrame and EndFrame
-void SubSystems::BeginFrame()
-{
-	for (const auto& subSystem : subSystems)
+	void SubSystems::InitializeSubSystems(EngineConfig config)
 	{
-		subSystem->BeginFrame();
+		auto window = new Window(config.window);
+
+		subSystems[0] = window;
+
+		subSystems[1] = new Renderer(window->GetWindow(), config.rendering);
+
+		subSystems[2] = new Input();
+
+		subSystems[3] = new TextureManager();
+
+		subSystems[4] = new UIManager();
+
+		subSystems[5] = new AudioManager();
+
+		subSystems[6] = new PhysicsEngine2D(Vector2F(Physics::GRAVITY_X, Physics::GRAVITY_Y));
+
+		subSystems[7] = new CoroutineScheduler();
 	}
-}
 
-void SubSystems::EndUpdate()
-{
-	for (const auto& subSystem : subSystems)
+	void SubSystems::Update(float deltaTime)
 	{
-		subSystem->EndUpdate();
+		for (const auto& subSystem : subSystems)
+		{
+			subSystem->Update(deltaTime);
+		}
 	}
-}
 
-void SubSystems::EndDraw()
-{
-	for (const auto& subSystem : subSystems)
+	// TODO: Create the interface with BeginFrame and EndFrame
+	void SubSystems::BeginFrame()
 	{
-		subSystem->EndDraw();
+		for (const auto& subSystem : subSystems)
+		{
+			subSystem->BeginFrame();
+		}
+	}
+
+	void SubSystems::EndUpdate()
+	{
+		for (const auto& subSystem : subSystems)
+		{
+			subSystem->EndUpdate();
+		}
+	}
+
+	void SubSystems::EndDraw()
+	{
+		for (const auto& subSystem : subSystems)
+		{
+			subSystem->EndDraw();
+		}
 	}
 }

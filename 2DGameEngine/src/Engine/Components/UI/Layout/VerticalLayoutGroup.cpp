@@ -4,61 +4,68 @@
 #include "Engine/Entity/GameObject.h"
 
 
-VerticalLayoutGroup::VerticalLayoutGroup(float layoutSpacing, LayoutPadding layoutPadding)
-	: LayoutGroup(layoutSpacing, layoutPadding)
+namespace DeadFrame2D::Engine
 {
-}
+	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Data;
 
-void VerticalLayoutGroup::UpdateLayout()
-{
-	LayoutGroup::UpdateLayout();
 
-	std::vector<UIComponent*> interactables;
-
-	for (const auto& ui : OwningObject.lock()->GetComponentsInChildren<UIComponent>())
+	VerticalLayoutGroup::VerticalLayoutGroup(float layoutSpacing, LayoutPadding layoutPadding)
+		: LayoutGroup(layoutSpacing, layoutPadding)
 	{
-		if (ui == nullptr || !ui->GetGameObject().lock()->IsActive())
-			continue;
-
-		interactables.push_back(ui);
 	}
 
-	auto groupSize = interactables.size();
+	void VerticalLayoutGroup::UpdateLayout()
+	{
+		LayoutGroup::UpdateLayout();
+
+		std::vector<UIComponent*> interactables;
+
+		for (const auto& ui : OwningObject.lock()->GetComponentsInChildren<UIComponent>())
+		{
+			if (ui == nullptr || !ui->GetGameObject().lock()->IsActive())
+				continue;
+
+			interactables.push_back(ui);
+		}
+
+		auto groupSize = interactables.size();
 	
-	if (groupSize == 0)
-		return;
+		if (groupSize == 0)
+			return;
 
-	// Precompute total layout height
-	auto totalHeight = 0.0f;
-	for (const auto& interactable : interactables)
-	{
-		totalHeight += interactable->GetWidgetSize().y;
-	}
+		// Precompute total layout height
+		auto totalHeight = 0.0f;
+		for (const auto& interactable : interactables)
+		{
+			totalHeight += interactable->GetWidgetSize().y;
+		}
 	
-	totalHeight += layoutSpacing * (groupSize - 1);
+		totalHeight += layoutSpacing * (groupSize - 1);
 
-	// Start at top (centered layout origin minus half height)
-	auto currentPosition = Vector2F
-	{
-		0.0f,
-		-totalHeight / 2.0f
-	};
+		// Start at top (centered layout origin minus half height)
+		auto currentPosition = Vector2F
+		{
+			0.0f,
+			-totalHeight / 2.0f
+		};
 
-	for (auto& interactable : interactables)
-	{
-		auto size = interactable->GetWidgetSize();
+		for (auto& interactable : interactables)
+		{
+			auto size = interactable->GetWidgetSize();
 
-		auto transform = interactable->GetGameObject().lock()->GetComponent<Transform>();
+			auto transform = interactable->GetGameObject().lock()->GetComponent<Transform>();
 		
-		if (transform == nullptr)
-			continue;
+			if (transform == nullptr)
+				continue;
 
-		// Set local position to center the widget at current position + half its height
-		transform->SetLocalPosition(currentPosition + Vector2F(0.0f, size.y / 2.0f));
+			// Set local position to center the widget at current position + half its height
+			transform->SetLocalPosition(currentPosition + Vector2F(0.0f, size.y / 2.0f));
 
-		// Move down by full height + spacing
-		currentPosition.y += size.y + layoutSpacing;
+			// Move down by full height + spacing
+			currentPosition.y += size.y + layoutSpacing;
+		}
+
+		isDirty = false;
 	}
-
-	isDirty = false;
 }

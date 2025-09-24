@@ -8,51 +8,54 @@
 #include <vector>
 
 
-class Input : public IEventProcessor, public ISubSystem
+namespace DeadFrame2D::Core
 {
-	friend class SubSystems;
+	class Input : public IEventProcessor, public ISubSystem
+	{
+		friend class SubSystems;
 
 
-private:
-	Input();
+	private:
+		Input();
 
-	virtual ~Input() override;
+		virtual ~Input() override;
 
-	Input(Input&&) = delete;
-
-
-	Input& operator=(const Input&) = delete;
-
-	Input& operator=(Input&&) = delete;
+		Input(Input&&) = delete;
 
 
-	static std::unique_ptr<InputDevice> keyboardDevice;
-	
-	static std::unique_ptr<InputDevice> mouseDevice;
+		Input& operator=(const Input&) = delete;
 
-	static std::vector<std::unique_ptr<InputDevice>> controllerDevices;
+		Input& operator=(Input&&) = delete;
 
 
-	void DisconnectControllerHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
+		static std::unique_ptr<InputDevice> keyboardDevice;
+
+		static std::unique_ptr<InputDevice> mouseDevice;
+
+		static std::vector<std::unique_ptr<InputDevice>> controllerDevices;
 
 
-	virtual void Update(float deltaTime) override;
-
-	virtual void BeginFrame() override;
-
-	virtual void EndUpdate() override;
-
-	virtual void EndDraw() override;
+		void DisconnectControllerHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
 
 
-public:
-	std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
+		virtual void Update(float deltaTime) override;
+
+		virtual void BeginFrame() override;
+
+		virtual void EndUpdate() override;
+
+		virtual void EndDraw() override;
 
 
-	static bool IsButtonPressed(PlayerInputSlot playerSlot, const char* actionName);
+	public:
+		std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
 
-	static bool IsButtonHeld(PlayerInputSlot playerSlot, const char* actionName);
 
-	// TODO: Implement input axis
-	static float GetAxisValue(PlayerInputSlot playerSlot, const char* actionName);
-};
+		static bool IsButtonPressed(DeadFrame2D::Data::PlayerInputSlot playerSlot, const char* actionName);
+
+		static bool IsButtonHeld(DeadFrame2D::Data::PlayerInputSlot playerSlot, const char* actionName);
+
+		// TODO: Implement input axis
+		static float GetAxisValue(DeadFrame2D::Data::PlayerInputSlot playerSlot, const char* actionName);
+	};
+}

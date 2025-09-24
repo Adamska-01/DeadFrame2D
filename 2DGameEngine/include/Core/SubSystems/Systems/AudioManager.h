@@ -7,80 +7,83 @@
 #include <unordered_map>
 
 
-class AudioManager : public ISubSystem
+namespace DeadFrame2D::Core
 {
-	friend class SubSystems;
+	class AudioManager : public ISubSystem
+	{
+		friend class SubSystems;
 
 
-private:
-	static std::unordered_map<std::string, std::weak_ptr<Mix_Music>> musicCache;
+	private:
+		static std::unordered_map<std::string, std::weak_ptr<Mix_Music>> musicCache;
 
-	static std::unordered_map<std::string, std::weak_ptr<Mix_Chunk>> sfxCache;
+		static std::unordered_map<std::string, std::weak_ptr<Mix_Chunk>> sfxCache;
 
-	static std::mutex audioMutex;
+		static std::mutex audioMutex;
 
-	static float musicVolume;
+		static float musicVolume;
 
-	static float sfxVolume;
+		static float sfxVolume;
 
-	static float masterVolume;
-
-
-	AudioManager();
-
-	virtual ~AudioManager() override;
-
-	AudioManager(const AudioManager&) = delete;
-
-	AudioManager(AudioManager&&) = delete;
+		static float masterVolume;
 
 
-	AudioManager& operator=(const AudioManager&) = delete;
+		AudioManager();
 
-	AudioManager& operator=(AudioManager&&) = delete;
+		virtual ~AudioManager() override;
 
+		AudioManager(const AudioManager&) = delete;
 
-	virtual void Update(float deltaTime) override;
-
-	virtual void BeginFrame() override;
-
-	virtual void EndUpdate() override;
-
-	virtual void EndDraw() override;
+		AudioManager(AudioManager&&) = delete;
 
 
-public:
-	static std::shared_ptr<Mix_Music> LoadMusic(const std::string_view& filepath);
+		AudioManager& operator=(const AudioManager&) = delete;
 
-	static std::shared_ptr<Mix_Chunk> LoadSFX(const std::string_view& filepath);
+		AudioManager& operator=(AudioManager&&) = delete;
 
-	static bool PlayMusicTrack(const std::shared_ptr<Mix_Music>& music, int loopCount = 0);
 
-	static int PlaySFX(const std::shared_ptr<Mix_Chunk>& sfx, int loopCount = 0);
+		virtual void Update(float deltaTime) override;
 
-	static void FadeInMusicTrack(const std::shared_ptr<Mix_Music>& music, int loopCount, int fadeTimeMs);
+		virtual void BeginFrame() override;
 
-	static void StopMusic();
+		virtual void EndUpdate() override;
 
-	static void StopSFX(int sfxChannel);
+		virtual void EndDraw() override;
 
-	static void PauseMusic();
 
-	static void PauseSFX(int sfxChannel);
+	public:
+		static std::shared_ptr<Mix_Music> LoadMusic(const std::string_view& filepath);
 
-	static void ResumeMusic();
+		static std::shared_ptr<Mix_Chunk> LoadSFX(const std::string_view& filepath);
 
-	static void SetMusicVolume(float volume /*[0-1]*/);
+		static bool PlayMusicTrack(const std::shared_ptr<Mix_Music>& music, int loopCount = 0);
 
-	static void SetGlobalSFXVolume(float volume /*[0-1]*/); 
+		static int PlaySFX(const std::shared_ptr<Mix_Chunk>& sfx, int loopCount = 0);
 
-	static void SetSFXVolume(float volume /*[0-1]*/, int sfxChannel = -1);
+		static void FadeInMusicTrack(const std::shared_ptr<Mix_Music>& music, int loopCount, int fadeTimeMs);
 
-	static void SetMasterVolume(float volume);
+		static void StopMusic();
 
-	static float GetMasterVolume();
+		static void StopSFX(int sfxChannel);
 
-	static float GetMusicGlobalVolume();
+		static void PauseMusic();
 
-	static float GetGlobalSFXVolume();
-};
+		static void PauseSFX(int sfxChannel);
+
+		static void ResumeMusic();
+
+		static void SetMusicVolume(float volume /*[0-1]*/);
+
+		static void SetGlobalSFXVolume(float volume /*[0-1]*/); 
+
+		static void SetSFXVolume(float volume /*[0-1]*/, int sfxChannel = -1);
+
+		static void SetMasterVolume(float volume);
+
+		static float GetMasterVolume();
+
+		static float GetMusicGlobalVolume();
+
+		static float GetGlobalSFXVolume();
+	};
+}

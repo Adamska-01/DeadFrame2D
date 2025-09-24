@@ -8,118 +8,125 @@
 #include "Utilities/Helpers/Physics/PhysicsShapeCreators.h"
 
 
-using namespace DeadFrame2D::Constants;
-
-
-TiledMapCompatibleCollider2D::TiledMapCompatibleCollider2D(const PhysicsMaterial& physicsMaterial)
-	: TileCollider2D(physicsMaterial)
+namespace DeadFrame2D::Engine
 {
-	fixtures.clear();
-	collisionLayers.clear();
+	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Data;
+	using namespace DeadFrame2D::Models;
+	using namespace DeadFrame2D::Utilities;
+	using namespace DeadFrame2D::Constants;
 
-	tileSize = 0;
-	tileMapDimension = Vector2I::Zero;
-}
 
-TiledMapCompatibleCollider2D::~TiledMapCompatibleCollider2D()
-{
-	DeleteFixtures();
-}
-
-void TiledMapCompatibleCollider2D::DeleteFixtures()
-{
-	if (fixtures.size() <= 0 || rigidBody == nullptr)
-		return;
-
-	for (auto fix : fixtures)
+	TiledMapCompatibleCollider2D::TiledMapCompatibleCollider2D(const PhysicsMaterial& physicsMaterial)
+		: TileCollider2D(physicsMaterial)
 	{
-		if (fix == nullptr)
-			continue;
+		fixtures.clear();
+		collisionLayers.clear();
 
-		rigidBody->DestroyFixture(fix);
+		tileSize = 0;
+		tileMapDimension = Vector2I::Zero;
 	}
-}
 
-void TiledMapCompatibleCollider2D::RebuildFixture()
-{
-	DeleteFixtures();
-
-	SearchRigidBody();
-
-	if (rigidBody == nullptr)
-		return;
-
-	fixtures.clear();
-
-	auto angle = transform->GetWorldRotation() * (MathConstants::PI / 180.0f);
-
-	for (const auto& layer : collisionLayers)
+	TiledMapCompatibleCollider2D::~TiledMapCompatibleCollider2D()
 	{
-		for (auto i = 0; i < tileMapDimension.y; ++i)
+		DeleteFixtures();
+	}
+
+	void TiledMapCompatibleCollider2D::DeleteFixtures()
+	{
+		if (fixtures.size() <= 0 || rigidBody == nullptr)
+			return;
+
+		for (auto fix : fixtures)
 		{
-			for (auto j = 0; j < tileMapDimension.x; ++j)
-			{
-				auto tileID = layer.Data[i][j];
+			if (fix == nullptr)
+				continue;
 
-				if (tileID == 0)
-					continue;
-				
-				this->physicsMaterial.shape = PhysicsShapeCreators::CreateBoxShape(
-					tileSize * 0.5f,
-					tileSize * 0.5f,
-					Vector2F((j * tileSize + tileSize * 0.5f), (i * tileSize + tileSize * 0.5f)),
-					angle);
-
-				physicsMaterial.density = layer.GetFloatProperty(TiledPropertyNames::DENSITY, 1.0f);
-				physicsMaterial.friction = layer.GetFloatProperty(TiledPropertyNames::FRICTION, 0.3f);
-				physicsMaterial.isSensor = layer.GetBoolProperty(TiledPropertyNames::IS_SENSOR, false);
-				physicsMaterial.restitution = layer.GetFloatProperty(TiledPropertyNames::RESTITUTION, 0.0f);
-				physicsMaterial.restitutionThreshold = layer.GetFloatProperty(TiledPropertyNames::RESTITUTION_THRESHOLD, 1.0f);
-
-				auto def = PhysicsConversion::ToB2FixtureDef(physicsMaterial, reinterpret_cast<uintptr_t>(this));
-
-				fixtures.push_back(rigidBody->CreateFixture(&def));
-
-				// Clean up before creating another shape
-				delete this->physicsMaterial.shape;
-				this->physicsMaterial.shape = nullptr;
-			}
+			rigidBody->DestroyFixture(fix);
 		}
 	}
 
-	isDirty = false;
-}
+	void TiledMapCompatibleCollider2D::RebuildFixture()
+	{
+		DeleteFixtures();
 
-void TiledMapCompatibleCollider2D::Init()
-{
-	TileCollider2D::Init();
+		SearchRigidBody();
 
-	tileMapRenderer = OwningObject.lock()->GetComponent<TiledMapCompatibleRenderer>();
+		if (rigidBody == nullptr)
+			return;
 
-	Tools::Helpers::GuardAgainstNull(tileMapRenderer, "Failed to get TiledMapCompatibleRenderer from OwningObject");
+		fixtures.clear();
 
-	const auto& tileMap = tileMapRenderer->GetTileMap();
+		auto angle = transform->GetWorldRotation() * (MathConstants::PI / 180.0f);
 
-	tileSize = tileMap->tileSize;
+		for (const auto& layer : collisionLayers)
+		{
+			for (auto i = 0; i < tileMapDimension.y; ++i)
+			{
+				for (auto j = 0; j < tileMapDimension.x; ++j)
+				{
+					auto tileID = layer.Data[i][j];
 
-	tileMapDimension = Vector2I(tileMap->width, tileMap->height);
+					if (tileID == 0)
+						continue;
+				
+					this->physicsMaterial.shape = CreateBoxShape(
+						tileSize * 0.5f,
+						tileSize * 0.5f,
+						Vector2F((j * tileSize + tileSize * 0.5f), (i * tileSize + tileSize * 0.5f)),
+						angle);
 
-	collisionLayers = tileMap->layers;
+					physicsMaterial.density = layer.GetFloatProperty(TiledPropertyNames::DENSITY, 1.0f);
+					physicsMaterial.friction = layer.GetFloatProperty(TiledPropertyNames::FRICTION, 0.3f);
+					physicsMaterial.isSensor = layer.GetBoolProperty(TiledPropertyNames::IS_SENSOR, false);
+					physicsMaterial.restitution = layer.GetFloatProperty(TiledPropertyNames::RESTITUTION, 0.0f);
+					physicsMaterial.restitutionThreshold = layer.GetFloatProperty(TiledPropertyNames::RESTITUTION_THRESHOLD, 1.0f);
 
-	MarkDirty();
-}
+					auto def = ToB2FixtureDef(physicsMaterial, reinterpret_cast<uintptr_t>(this));
 
-const std::vector<TiledLayer>& TiledMapCompatibleCollider2D::GetCollisionLayers() const
-{
-	return collisionLayers;
-}
+					fixtures.push_back(rigidBody->CreateFixture(&def));
 
-const Vector2I& TiledMapCompatibleCollider2D::GetTileMapDimensions() const
-{
-	return tileMapDimension;
-}
+					// Clean up before creating another shape
+					delete this->physicsMaterial.shape;
+					this->physicsMaterial.shape = nullptr;
+				}
+			}
+		}
 
-int TiledMapCompatibleCollider2D::GetTileSize() const
-{
-	return tileSize;
+		isDirty = false;
+	}
+
+	void TiledMapCompatibleCollider2D::Init()
+	{
+		TileCollider2D::Init();
+
+		tileMapRenderer = OwningObject.lock()->GetComponent<TiledMapCompatibleRenderer>();
+
+		GuardAgainstNull(tileMapRenderer, "Failed to get TiledMapCompatibleRenderer from OwningObject");
+
+		const auto& tileMap = tileMapRenderer->GetTileMap();
+
+		tileSize = tileMap->tileSize;
+
+		tileMapDimension = Vector2I(tileMap->width, tileMap->height);
+
+		collisionLayers = tileMap->layers;
+
+		MarkDirty();
+	}
+
+	const std::vector<TiledLayer>& TiledMapCompatibleCollider2D::GetCollisionLayers() const
+	{
+		return collisionLayers;
+	}
+
+	const Vector2I& TiledMapCompatibleCollider2D::GetTileMapDimensions() const
+	{
+		return tileMapDimension;
+	}
+
+	int TiledMapCompatibleCollider2D::GetTileSize() const
+	{
+		return tileSize;
+	}
 }

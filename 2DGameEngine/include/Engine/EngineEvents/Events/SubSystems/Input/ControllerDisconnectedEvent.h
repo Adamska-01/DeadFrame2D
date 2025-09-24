@@ -3,11 +3,14 @@
 #include "Engine/EngineEvents/DispatchableEvent.h"
 
 
-class ControllerDisconnectedEvent : public DispatchableEvent
+namespace DeadFrame2D::Engine
 {
-public:
-	const InputDevice* controllerDevice;
+	class ControllerDisconnectedEvent : public DispatchableEvent
+	{
+	public:
+		const DeadFrame2D::Core::InputDevice* controllerDevice;
 
 
-	ControllerDisconnectedEvent(const InputDevice* controllerDevice);
-};
+		ControllerDisconnectedEvent(const DeadFrame2D::Core::InputDevice* controllerDevice);
+	};
+}

@@ -5,38 +5,43 @@
 #include <string>
 
 
-class Transform;
 struct SDL_Texture;
 
 
-class Sprite : public GameComponent
+namespace DeadFrame2D::Engine
 {
-protected:
-	std::shared_ptr<SDL_Texture> spriteTexture;
-
-	Transform* transform;
-
-	Vector2I spriteSize;
+	class Transform;
 
 
-public:
-	Sprite(std::string_view texturePath);
+	class Sprite : public GameComponent
+	{
+	protected:
+		std::shared_ptr<SDL_Texture> spriteTexture;
+
+		Transform* transform;
+
+		DeadFrame2D::Core::Vector2I spriteSize;
+
+
+	public:
+		Sprite(std::string_view texturePath);
 	
-	Sprite(Sprite&& other) = default;
+		Sprite(Sprite&& other) = default;
 
-	virtual ~Sprite() override = default;
-
-
-	virtual void Init() override;
-
-	virtual void Start() override;
-
-	virtual void Update(float deltaTime) override;
-
-	virtual void Draw() override;
+		virtual ~Sprite() override = default;
 
 
-	void LoadSprite(std::string_view texturePath);
+		virtual void Init() override;
+
+		virtual void Start() override;
+
+		virtual void Update(float deltaTime) override;
+
+		virtual void Draw() override;
+
+
+		void LoadSprite(std::string_view texturePath);
 	
-	std::shared_ptr<SDL_Texture> GetTexture();
-};
+		std::shared_ptr<SDL_Texture> GetTexture();
+	};
+}

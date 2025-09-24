@@ -1,20 +1,23 @@
 #pragma once
 
 
-class ISubSystem
+namespace DeadFrame2D::Core
 {
-	friend class SubSystems;
-
-	
-protected:
-	virtual ~ISubSystem() = default;
+	class ISubSystem
+	{
+		friend class SubSystems;
 
 
-	virtual void Update(float deltaTime) = 0;
+	protected:
+		virtual ~ISubSystem() = default;
 
-	virtual void BeginFrame() = 0;
 
-	virtual void EndUpdate() = 0;
+		virtual void Update(float deltaTime) = 0;
 
-	virtual void EndDraw() = 0;
-};
+		virtual void BeginFrame() = 0;
+
+		virtual void EndUpdate() = 0;
+
+		virtual void EndDraw() = 0;
+	};
+}

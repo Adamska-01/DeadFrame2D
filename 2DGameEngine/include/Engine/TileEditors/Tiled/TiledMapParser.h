@@ -30,22 +30,24 @@ Example XML map structure:
 </map>
 */
 
-
-class TiledMapParser : public XML_Parser<std::shared_ptr<TiledMap>>
+namespace DeadFrame2D::Engine
 {
-private:
-	TiledTileSet ParseTileSet(tinyxml2::XMLElement* xmlTileset);
+	class TiledMapParser : public DeadFrame2D::Utilities::XML_Parser<std::shared_ptr<DeadFrame2D::Models::TiledMap>>
+	{
+	private:
+		DeadFrame2D::Models::TiledTileSet ParseTileSet(tinyxml2::XMLElement* xmlTileset);
 
-	TiledLayer ParseLayers(tinyxml2::XMLElement* xmlLayer, int rowcount, int colcount);
+		DeadFrame2D::Models::TiledLayer ParseLayers(tinyxml2::XMLElement* xmlLayer, int rowcount, int colcount);
 
-	TiledObjectGroup ParseObjectGroup(tinyxml2::XMLElement* xmlObjectGroup);
+		DeadFrame2D::Models::TiledObjectGroup ParseObjectGroup(tinyxml2::XMLElement* xmlObjectGroup);
 
 
-public:
-	TiledMapParser() = default;
+	public:
+		TiledMapParser() = default;
 	
-	~TiledMapParser() = default;
+		~TiledMapParser() = default;
 
 
-	virtual std::shared_ptr<TiledMap> Parse(std::string_view source) override;
-};
+		virtual std::shared_ptr<DeadFrame2D::Models::TiledMap> Parse(std::string_view source) override;
+	};
+}

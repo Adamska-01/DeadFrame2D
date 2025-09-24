@@ -5,8 +5,11 @@
 class b2Draw;
 
 
-class ColliderDrawerFactory : public IFactory<b2Draw*>
+namespace DeadFrame2D::Factories
 {
-public:
-	b2Draw* CreateProduct() override;
-};
+	class ColliderDrawerFactory : public IFactory<b2Draw*>
+	{
+	public:
+		b2Draw* CreateProduct() override;
+	};
+}

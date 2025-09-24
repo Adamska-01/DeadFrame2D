@@ -4,41 +4,43 @@
 #include "Engine/Components/TileMap/Tiled/TiledMapCompatibleRenderer.h"
 
 
-class RigidBody2D;
 class b2Fixture;
 
 
-class TiledMapCompatibleCollider2D : public TileCollider2D<TiledMapCompatibleRenderer>
+namespace DeadFrame2D::Engine
 {
-private:
-	void DeleteFixtures();
+	class TiledMapCompatibleCollider2D : public TileCollider2D<TiledMapCompatibleRenderer>
+	{
+	private:
+		void DeleteFixtures();
 
 
-protected:
-	std::vector<TiledLayer> collisionLayers;
+	protected:
+		std::vector<DeadFrame2D::Models::TiledLayer> collisionLayers;
 
-	std::vector<b2Fixture*> fixtures;
+		std::vector<b2Fixture*> fixtures;
 
-	Vector2I tileMapDimension;
+		DeadFrame2D::Core::Vector2I tileMapDimension;
 
-	int tileSize;
-
-
-	virtual void RebuildFixture() override;
+		int tileSize;
 
 
-public:
-	TiledMapCompatibleCollider2D(const PhysicsMaterial& physicsMaterial = PhysicsMaterial());
-
-	virtual ~TiledMapCompatibleCollider2D() override;
+		virtual void RebuildFixture() override;
 
 
-	virtual void Init() override;
+	public:
+		TiledMapCompatibleCollider2D(const DeadFrame2D::Data::PhysicsMaterial& physicsMaterial = DeadFrame2D::Data::PhysicsMaterial());
+
+		virtual ~TiledMapCompatibleCollider2D() override;
 
 
-	const std::vector<TiledLayer>& GetCollisionLayers() const;
+		virtual void Init() override;
+
+
+		const std::vector<DeadFrame2D::Models::TiledLayer>& GetCollisionLayers() const;
 	
-	const Vector2I& GetTileMapDimensions() const;
+		const DeadFrame2D::Core::Vector2I& GetTileMapDimensions() const;
 
-	int GetTileSize() const;
-};
+		int GetTileSize() const;
+	};
+}

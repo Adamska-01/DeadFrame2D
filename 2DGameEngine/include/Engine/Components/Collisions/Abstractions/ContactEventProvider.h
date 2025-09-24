@@ -5,30 +5,33 @@
 #include <functional>
 
 
-class ContactEventProvider : public GameComponent
+namespace DeadFrame2D::Engine
 {
-protected:
-	MulticastDelegate<const CollisionInfo&> onContactEnter;
+	class ContactEventProvider : public GameComponent
+	{
+	protected:
+		DeadFrame2D::Utilities::MulticastDelegate<const DeadFrame2D::Data::CollisionInfo&> onContactEnter;
 
-	MulticastDelegate<const CollisionInfo&> onContactExit;
-
-
-public:
-	ContactEventProvider();
-
-	virtual ~ContactEventProvider() override;
+		DeadFrame2D::Utilities::MulticastDelegate<const DeadFrame2D::Data::CollisionInfo&> onContactExit;
 
 
-	virtual void RegisterContactEnterHandler(const std::function<void(const CollisionInfo&)>& handler, std::uintptr_t identifier);
+	public:
+		ContactEventProvider();
 
-	virtual void RegisterContactExitHandler(const std::function<void(const CollisionInfo&)>& handler, std::uintptr_t identifier);
-
-	virtual void DeregisterContactEnterHandler(std::uintptr_t identifier);
-
-	virtual void DeregisterContactExitHandler(std::uintptr_t identifier);
+		virtual ~ContactEventProvider() override;
 
 
-	virtual void InvokeCollisionEnter(const CollisionInfo& info);
+		virtual void RegisterContactEnterHandler(const std::function<void(const DeadFrame2D::Data::CollisionInfo&)>& handler, std::uintptr_t identifier);
 
-	virtual void InvokeCollisionExit(const CollisionInfo& info);
-};
+		virtual void RegisterContactExitHandler(const std::function<void(const DeadFrame2D::Data::CollisionInfo&)>& handler, std::uintptr_t identifier);
+
+		virtual void DeregisterContactEnterHandler(std::uintptr_t identifier);
+
+		virtual void DeregisterContactExitHandler(std::uintptr_t identifier);
+
+
+		virtual void InvokeCollisionEnter(const DeadFrame2D::Data::CollisionInfo& info);
+
+		virtual void InvokeCollisionExit(const DeadFrame2D::Data::CollisionInfo& info);
+	};
+}

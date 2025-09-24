@@ -7,53 +7,56 @@
 #include <vector>
 
 
-class Window : public IEventProcessor, public ISubSystem
+namespace DeadFrame2D::Core
 {
-	friend class SubSystems;
+	class Window : public IEventProcessor, public ISubSystem
+	{
+		friend class SubSystems;
 
 
-private:
-	Window(WindowConfig windowConfig);
+	private:
+		Window(Shared::Models::WindowConfig windowConfig);
 
-	virtual ~Window() override;
+		virtual ~Window() override;
 
-	Window(const Window&) = delete;
+		Window(const Window&) = delete;
 
-	Window(Window&&) = delete;
-
-
-	Window& operator=(const Window&) = delete;
-
-	Window& operator=(Window&&) = delete;
+		Window(Window&&) = delete;
 
 
-	static SDL_Window* window;
+		Window& operator=(const Window&) = delete;
+
+		Window& operator=(Window&&) = delete;
 
 
-	virtual void Update(float deltaTime) override;
-
-	virtual void BeginFrame() override;
-
-	virtual void EndUpdate() override;
-
-	virtual void EndDraw() override;
+		static SDL_Window* window;
 
 
-public:
-	std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
+		virtual void Update(float deltaTime) override;
+
+		virtual void BeginFrame() override;
+
+		virtual void EndUpdate() override;
+
+		virtual void EndDraw() override;
 
 
-	static SDL_Window* GetWindow();
+	public:
+		std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
 
-	static Vector2I GetResolution();
 
-	static std::vector<SDL_DisplayMode> GetSupportedResolutions();
+		static SDL_Window* GetWindow();
 
-	static void SetWindowTitle(const std::string& title);
+		static Vector2I GetResolution();
 
-	static void SetWindowIcon(std::string_view iconSource);
+		static std::vector<SDL_DisplayMode> GetSupportedResolutions();
 
-	static void SetWindowMode(WindowMode mode);
+		static void SetWindowTitle(const std::string& title);
 
-	static bool SetResolution(Vector2I resolution);
-};
+		static void SetWindowIcon(std::string_view iconSource);
+
+		static void SetWindowMode(DeadFrame2D::Data::WindowMode mode);
+
+		static bool SetResolution(Vector2I resolution);
+	};
+}

@@ -5,42 +5,45 @@
 #include <vector>
 
 
-class ICoroutineAwaitable;
-struct Task;
-
-
-class CoroutineScheduler : public ISubSystem
+namespace DeadFrame2D::Core
 {
-	friend class SubSystems;
+	class ICoroutineAwaitable;
+	struct Task;
 
 
-private:
-	static CoroutineScheduler* instance;
+	class CoroutineScheduler : public ISubSystem
+	{
+		friend class SubSystems;
 
 
-	std::vector<Task*> tasks;
+	private:
+		static CoroutineScheduler* instance;
 
 
-	CoroutineScheduler();
-
-	virtual ~CoroutineScheduler() override;
-
-	CoroutineScheduler(const CoroutineScheduler&) = delete;
-
-	CoroutineScheduler& operator=(const CoroutineScheduler&) = delete;
+		std::vector<Task*> tasks;
 
 
-	virtual void Update(float deltaTime) override;
+		CoroutineScheduler();
 
-	virtual void BeginFrame() override;
+		virtual ~CoroutineScheduler() override;
 
-	virtual void EndUpdate() override;
+		CoroutineScheduler(const CoroutineScheduler&) = delete;
 
-	virtual void EndDraw() override;
+		CoroutineScheduler& operator=(const CoroutineScheduler&) = delete;
 
 
-public:
-	static Task& StartCoroutine(Task&& task);
+		virtual void Update(float deltaTime) override;
 
-	static void Reset();
-};
+		virtual void BeginFrame() override;
+
+		virtual void EndUpdate() override;
+
+		virtual void EndDraw() override;
+
+
+	public:
+		static Task& StartCoroutine(Task&& task);
+
+		static void Reset();
+	};
+}

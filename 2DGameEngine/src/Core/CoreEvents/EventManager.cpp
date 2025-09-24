@@ -3,49 +3,52 @@
 #include <SDL.h>
 
 
-std::vector<IEventProcessor*> EventManager::eventProcessors = {};
-
-
-EventManager::EventManager()
+namespace DeadFrame2D::Core
 {
-	sdlEvent = SDL_Event();
-}
+	std::vector<IEventProcessor*> EventManager::eventProcessors = {};
 
-std::optional<int> EventManager::ProcessEvents()
-{
-	while (SDL_PollEvent(&sdlEvent))
+
+	EventManager::EventManager()
 	{
-		for (const auto& processor : eventProcessors)
-		{
-			if (const auto ecode = processor->ProcessEvents(sdlEvent))
-				return ecode;
-		}
+		sdlEvent = SDL_Event();
 	}
 
-	return std::nullopt;
-}
-
-void EventManager::AddEventProcessor(IEventProcessor* eventProcessor)
-{
-	eventProcessors.push_back(eventProcessor);
-}
-
-void EventManager::RemoveEventProcessor(IEventProcessor* eventProcessor)
-{
-	auto it = std::remove(
-		eventProcessors.begin(), 
-		eventProcessors.end(), 
-		eventProcessor);
-
-	eventProcessors.erase(it, eventProcessors.end());
-}
-
-void EventManager::SendSystemEvent(SDL_EventType eventType)
-{
-	auto toSend = SDL_Event
+	std::optional<int> EventManager::ProcessEvents()
 	{
-		.type = (uint32_t)eventType
-	};
+		while (SDL_PollEvent(&sdlEvent))
+		{
+			for (const auto& processor : eventProcessors)
+			{
+				if (const auto ecode = processor->ProcessEvents(sdlEvent))
+					return ecode;
+			}
+		}
 
-	SDL_PushEvent(&toSend);
+		return std::nullopt;
+	}
+
+	void EventManager::AddEventProcessor(IEventProcessor* eventProcessor)
+	{
+		eventProcessors.push_back(eventProcessor);
+	}
+
+	void EventManager::RemoveEventProcessor(IEventProcessor* eventProcessor)
+	{
+		auto it = std::remove(
+			eventProcessors.begin(), 
+			eventProcessors.end(), 
+			eventProcessor);
+
+		eventProcessors.erase(it, eventProcessors.end());
+	}
+
+	void EventManager::SendSystemEvent(SDL_EventType eventType)
+	{
+		auto toSend = SDL_Event
+		{
+			.type = (uint32_t)eventType
+		};
+
+		SDL_PushEvent(&toSend);
+	}
 }

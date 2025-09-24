@@ -2,14 +2,17 @@
 #include <utility>
 
 
-struct PairHash
+namespace DeadFrame2D::Utilities
 {
-	template <typename T1, typename T2>
-	std::size_t operator ( ) (const std::pair<T1, T2>& p) const
+	struct PairHash
 	{
-		auto h1 = std::hash<T1>{}(p.first);
-		auto h2 = std::hash<T2>{}(p.second);
+		template <typename T1, typename T2>
+		std::size_t operator ( ) (const std::pair<T1, T2>& p) const
+		{
+			auto h1 = std::hash<T1>{}(p.first);
+			auto h2 = std::hash<T2>{}(p.second);
 
-		return h1 ^ (h2 << 1);
-	}
-};
+			return h1 ^ (h2 << 1);
+		}
+	};
+}

@@ -1,7 +1,10 @@
 #include "Engine/EngineEvents/Events/GameObjectEvents/ChildGameObjectAddedEvent.h"
 
 
-ChildGameObjectAddedEvent::ChildGameObjectAddedEvent(std::weak_ptr<GameObject> childGameObject)
-	: childGameObject(childGameObject)
+namespace DeadFrame2D::Engine
 {
+	ChildGameObjectAddedEvent::ChildGameObjectAddedEvent(std::weak_ptr<GameObject> childGameObject)
+		: childGameObject(childGameObject)
+	{
+	}
 }

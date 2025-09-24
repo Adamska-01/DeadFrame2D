@@ -2,33 +2,33 @@
 #include "Core/Math/Vector2.h"
 
 
-struct Circle;
 struct SDL_Rect;
 
+namespace DeadFrame2D::Core
+{ 
+	struct Circle;
+}
 
-// TODO: Delete 'GetExpandedTarget' and repplace the class with a namespace called "CollisionUtils" or something, since it has no state.
-// TODO: replace all the "const T*" with "const T&"
-class CollisionUtils
+
+namespace DeadFrame2D::Utilities::Collision
 {
-private:
-	SDL_Rect GetExpandedTarget(const SDL_Rect* colliderRect, const SDL_Rect* tileRect);
+	// TODO: Delete 'GetExpandedTarget' and repplace the class with a namespace called "CollisionUtils" or something, since it has no state.
+	// TODO: replace all the "const T*" with "const T&"
+	bool PointVsBox(const DeadFrame2D::Core::Vector2F& point, const SDL_Rect* box);
 
+	bool PointVsCircle(const DeadFrame2D::Core::Vector2F& point, const DeadFrame2D::Core::Circle* circle);
 
-public:
-	CollisionUtils() = default;
+	bool RectVsRect(const SDL_Rect* boxA, const SDL_Rect* boxB);
 
-	~CollisionUtils() = default;
+	bool CircleVsRect(const DeadFrame2D::Core::Circle* circle, const SDL_Rect* rect);
 
+	bool SegmentVsRect(const DeadFrame2D::Core::Vector2F& p0, const DeadFrame2D::Core::Vector2F& p1, const SDL_Rect* rect);
 
-	static bool PointVsBox(const Vector2F& point, const SDL_Rect* box);
-
-	static bool PointVsCircle(const Vector2F& point, const Circle* circle);
-
-	static bool RectVsRect(const SDL_Rect* boxA, const SDL_Rect* boxB);
-
-	static bool CircleVsRect(const Circle* circle, const SDL_Rect* rect);
-
-	static bool SegmentVsRect(const Vector2F& p0, const Vector2F& p1, const SDL_Rect* rect);
-
-	static bool RayVsRect(const Vector2F& ray_origin, const Vector2F& ray_dir, const SDL_Rect* target, Vector2F& contact_point, Vector2F& contact_normal, float& t_hit_near);
-};
+	bool RayVsRect(
+		const DeadFrame2D::Core::Vector2F& ray_origin,
+		const DeadFrame2D::Core::Vector2F& ray_dir,
+		const SDL_Rect* target,
+		DeadFrame2D::Core::Vector2F& contact_point,
+		DeadFrame2D::Core::Vector2F& contact_normal,
+		float& t_hit_near);
+}

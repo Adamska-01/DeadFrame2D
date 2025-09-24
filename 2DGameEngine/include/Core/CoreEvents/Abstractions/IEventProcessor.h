@@ -3,13 +3,16 @@
 #include <SDL.h>
 
 
-class IEventProcessor
+namespace DeadFrame2D::Core
 {
-public:
-	IEventProcessor();
+	class IEventProcessor
+	{
+	public:
+		IEventProcessor();
 
-	~IEventProcessor();
+		~IEventProcessor();
 
 
-	virtual std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) = 0;
-};
+		virtual std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) = 0;
+	};
+}

@@ -7,97 +7,105 @@
 #include "Utilities/Helpers/Events/EventHelpers.h"
 
 
-ImageScroller::ImageScroller(std::string_view textureSource, ScrollDirection scrollDirection, float scrollSpeed)
-	: Sprite(textureSource), scrollDirection(scrollDirection), scrollSpeed(scrollSpeed)
+namespace DeadFrame2D::Engine
 {
-	renderTargetSize = Renderer::GetResolutionTarget();
+	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Data;
+	using namespace DeadFrame2D::Utilities;
 
-	scrollOffset = 0;
 
-	EventDispatcher::RegisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), EventHelpers::BindFunction(this, &ImageScroller::RenderTargetSizeChangedHandler), reinterpret_cast<std::uintptr_t>(this));
-}
-
-ImageScroller::~ImageScroller()
-{
-	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), reinterpret_cast<std::uintptr_t>(this));
-}
-
-void ImageScroller::RenderTargetSizeChangedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
-{
-	auto renderTargetChangeEvent = DispatchableEvent::SafeCast<RenderTargetSizeChangedEvent>(dispatchableEvent);
-
-	if (renderTargetChangeEvent == nullptr)
-		return;
-
-	renderTargetSize.x = renderTargetChangeEvent->renderTargetSize.x;
-	renderTargetSize.y = renderTargetChangeEvent->renderTargetSize.y;
-}
-
-void ImageScroller::Update(float deltaTime)
-{
-	scrollOffset += scrollSpeed * deltaTime;
-
-	auto scale = transform->GetWorldScale();
-	auto scaledTileWidth = static_cast<int>(spriteSize.x * scale.x);
-	auto scaledTileHeight = static_cast<int>(spriteSize.y * scale.y);
-
-	scrollOffset += scrollSpeed * deltaTime;
-
-	if (scrollDirection == ScrollDirection::HORIZONTAL)
+	ImageScroller::ImageScroller(std::string_view textureSource, ScrollDirection scrollDirection, float scrollSpeed)
+		: Sprite(textureSource), scrollDirection(scrollDirection), scrollSpeed(scrollSpeed)
 	{
-		if (scrollOffset >= scaledTileWidth)
-		{
-			scrollOffset -= scaledTileWidth;
-		}
-		else if (scrollOffset < 0)
-		{
-			scrollOffset += scaledTileWidth;
-		}
+		renderTargetSize = Renderer::GetResolutionTarget();
+
+		scrollOffset = 0;
+
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), BindFunction(this, &ImageScroller::RenderTargetSizeChangedHandler), reinterpret_cast<std::uintptr_t>(this));
 	}
-	else
+
+	ImageScroller::~ImageScroller()
 	{
-		if (scrollOffset >= scaledTileHeight)
-		{
-			scrollOffset -= scaledTileHeight;
-		}
-		else if (scrollOffset < 0)
-		{
-			scrollOffset += scaledTileHeight;
-		}
+		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), reinterpret_cast<std::uintptr_t>(this));
 	}
-}
 
-void ImageScroller::Draw()
-{
-	if (spriteTexture == nullptr)
-		return;
-
-	auto position = transform->GetWorldPosition();
-	auto scale = transform->GetWorldScale();
-
-	// Calculate scaled size
-	auto scaledTileWidth = static_cast<int>(spriteSize.x * scale.x);
-	auto scaledTileHeight = static_cast<int>(spriteSize.y * scale.y);
-
-	// +2 to handle partial tiles at edges
-	auto tilesX = (renderTargetSize.x / scaledTileWidth) + 2;
-	auto tilesY = (renderTargetSize.y / scaledTileHeight) + 2;
-
-	auto isHorizontal = scrollDirection == ScrollDirection::HORIZONTAL;
-
-	for (auto y = 0; y < (isHorizontal ? 1 : tilesY); ++y)
+	void ImageScroller::RenderTargetSizeChangedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
 	{
-		for (auto x = 0; x < (isHorizontal ? tilesX : 1); ++x)
+		auto renderTargetChangeEvent = DispatchableEvent::SafeCast<RenderTargetSizeChangedEvent>(dispatchableEvent);
+
+		if (renderTargetChangeEvent == nullptr)
+			return;
+
+		renderTargetSize.x = renderTargetChangeEvent->renderTargetSize.x;
+		renderTargetSize.y = renderTargetChangeEvent->renderTargetSize.y;
+	}
+
+	void ImageScroller::Update(float deltaTime)
+	{
+		scrollOffset += scrollSpeed * deltaTime;
+
+		auto scale = transform->GetWorldScale();
+		auto scaledTileWidth = static_cast<int>(spriteSize.x * scale.x);
+		auto scaledTileHeight = static_cast<int>(spriteSize.y * scale.y);
+
+		scrollOffset += scrollSpeed * deltaTime;
+
+		if (scrollDirection == ScrollDirection::HORIZONTAL)
 		{
-			auto destRect = SDL_Rect
+			if (scrollOffset >= scaledTileWidth)
 			{
-				.x = x * scaledTileWidth - (isHorizontal ? static_cast<int>(scrollOffset) : 0) + static_cast<int>(position.x),
-				.y = y * scaledTileHeight - (isHorizontal ? 0 : static_cast<int>(scrollOffset)) + static_cast<int>(position.y),
-				.w = scaledTileWidth,
-				.h = scaledTileHeight
-			};
+				scrollOffset -= scaledTileWidth;
+			}
+			else if (scrollOffset < 0)
+			{
+				scrollOffset += scaledTileWidth;
+			}
+		}
+		else
+		{
+			if (scrollOffset >= scaledTileHeight)
+			{
+				scrollOffset -= scaledTileHeight;
+			}
+			else if (scrollOffset < 0)
+			{
+				scrollOffset += scaledTileHeight;
+			}
+		}
+	}
 
-			TextureManager::DrawTextureWorldSpace(spriteTexture, NULL, &destRect, transform->GetWorldRotation());
+	void ImageScroller::Draw()
+	{
+		if (spriteTexture == nullptr)
+			return;
+
+		auto position = transform->GetWorldPosition();
+		auto scale = transform->GetWorldScale();
+
+		// Calculate scaled size
+		auto scaledTileWidth = static_cast<int>(spriteSize.x * scale.x);
+		auto scaledTileHeight = static_cast<int>(spriteSize.y * scale.y);
+
+		// +2 to handle partial tiles at edges
+		auto tilesX = (renderTargetSize.x / scaledTileWidth) + 2;
+		auto tilesY = (renderTargetSize.y / scaledTileHeight) + 2;
+
+		auto isHorizontal = scrollDirection == ScrollDirection::HORIZONTAL;
+
+		for (auto y = 0; y < (isHorizontal ? 1 : tilesY); ++y)
+		{
+			for (auto x = 0; x < (isHorizontal ? tilesX : 1); ++x)
+			{
+				auto destRect = SDL_Rect
+				{
+					.x = x * scaledTileWidth - (isHorizontal ? static_cast<int>(scrollOffset) : 0) + static_cast<int>(position.x),
+					.y = y * scaledTileHeight - (isHorizontal ? 0 : static_cast<int>(scrollOffset)) + static_cast<int>(position.y),
+					.w = scaledTileWidth,
+					.h = scaledTileHeight
+				};
+
+				TextureManager::DrawTextureWorldSpace(spriteTexture, NULL, &destRect, transform->GetWorldRotation());
+			}
 		}
 	}
 }

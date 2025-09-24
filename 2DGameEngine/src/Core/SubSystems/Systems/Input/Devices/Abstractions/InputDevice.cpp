@@ -1,45 +1,51 @@
 #include "Core/SubSystems/Systems/Input/Devices/Abstractions/InputDevice.h"
 
 
-InputDevice::InputDevice()
-	: assignedPlayer(PlayerInputSlot::NONE)
+namespace DeadFrame2D::Core
 {
-	currentInputStates.clear();
-	lastInputStates.clear();
-}
+	using namespace DeadFrame2D::Data;
 
-void InputDevice::BeginInputFrame()
-{
-	lastInputStates = currentInputStates;
-}
 
-PlayerInputSlot InputDevice::GetAssignedPlayer() const
-{
-	return assignedPlayer;
-}
+	InputDevice::InputDevice()
+		: assignedPlayer(PlayerInputSlot::NONE)
+	{
+		currentInputStates.clear();
+		lastInputStates.clear();
+	}
 
-void InputDevice::AssignedPlayer(PlayerInputSlot assignedPlayer)
-{
-	this->assignedPlayer = assignedPlayer;
-}
+	void InputDevice::BeginInputFrame()
+	{
+		lastInputStates = currentInputStates;
+	}
 
-bool InputDevice::IsKeyPressed(Uint8 inputKey) const
-{
-	auto currentIt = currentInputStates.find(inputKey);
-	auto lastIt = lastInputStates.find(inputKey);
+	PlayerInputSlot InputDevice::GetAssignedPlayer() const
+	{
+		return assignedPlayer;
+	}
 
-	if (currentIt != currentInputStates.end() && lastIt != lastInputStates.end())
-		return currentIt->second && !lastIt->second;
+	void InputDevice::AssignedPlayer(PlayerInputSlot assignedPlayer)
+	{
+		this->assignedPlayer = assignedPlayer;
+	}
 
-	return false;
-}
+	bool InputDevice::IsKeyPressed(Uint8 inputKey) const
+	{
+		auto currentIt = currentInputStates.find(inputKey);
+		auto lastIt = lastInputStates.find(inputKey);
 
-bool InputDevice::IsKeyHeld(Uint8 inputKey) const
-{
-	auto currentIt = currentInputStates.find(inputKey);
+		if (currentIt != currentInputStates.end() && lastIt != lastInputStates.end())
+			return currentIt->second && !lastIt->second;
 
-	if (currentIt != currentInputStates.end())
-		return currentIt->second;
+		return false;
+	}
 
-	return false;
+	bool InputDevice::IsKeyHeld(Uint8 inputKey) const
+	{
+		auto currentIt = currentInputStates.find(inputKey);
+
+		if (currentIt != currentInputStates.end())
+			return currentIt->second;
+
+		return false;
+	}
 }

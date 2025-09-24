@@ -1,37 +1,40 @@
 #include "Engine/Components/UI/Canvas.h"
 
 
-Canvas::Canvas()
-	: sortOrder(0)
+namespace DeadFrame2D::Engine
 {
-}
+	Canvas::Canvas()
+		: sortOrder(0)
+	{
+	}
 
-void Canvas::Init()
-{
+	void Canvas::Init()
+	{
 
-}
+	}
 
-void Canvas::Start()
-{
+	void Canvas::Start()
+	{
 
-}
+	}
 
-void Canvas::Update(float deltaTime)
-{
+	void Canvas::Update(float deltaTime)
+	{
 
-}
+	}
 
-void Canvas::Draw()
-{
+	void Canvas::Draw()
+	{
 
-}
+	}
 
-int Canvas::SetSortOrder() const
-{
-	return sortOrder;
-}
+	int Canvas::SetSortOrder() const
+	{
+		return sortOrder;
+	}
 
-void Canvas::SetSortOrder(int value)
-{
-	sortOrder = value;
+	void Canvas::SetSortOrder(int value)
+	{
+		sortOrder = value;
+	}
 }

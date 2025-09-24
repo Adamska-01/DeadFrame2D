@@ -3,26 +3,32 @@
 #include "Engine/Components/Transform.h"
 
 
-AudioClipBlueprint::AudioClipBlueprint(const std::string_view& audioSourcePath, Vector2F position, float volume, bool isMusic, bool loop)
-	: audioSourcePath(audioSourcePath),
-	position(position),
-	volume(volume),
-	isMusic(isMusic),
-	loop(loop)
+namespace DeadFrame2D::Engine
 {
-	transform->SetWorldPosition(position);
-}
+	using namespace DeadFrame2D::Core;
 
-void AudioClipBlueprint::ConstructGameObject()
-{
-	audioSource = AddComponent<AudioSource>();
 
-	audioSource->LoadAudio(audioSourcePath, isMusic);
-	audioSource->SetVolume(volume);
-	audioSource->Play(loop);
-}
+	AudioClipBlueprint::AudioClipBlueprint(const std::string_view& audioSourcePath, Vector2F position, float volume, bool isMusic, bool loop)
+		: audioSourcePath(audioSourcePath),
+		position(position),
+		volume(volume),
+		isMusic(isMusic),
+		loop(loop)
+	{
+		transform->SetWorldPosition(position);
+	}
 
-AudioSource* AudioClipBlueprint::GetAudioSource()
-{
-	return audioSource;
+	void AudioClipBlueprint::ConstructGameObject()
+	{
+		audioSource = AddComponent<AudioSource>();
+
+		audioSource->LoadAudio(audioSourcePath, isMusic);
+		audioSource->SetVolume(volume);
+		audioSource->Play(loop);
+	}
+
+	AudioSource* AudioClipBlueprint::GetAudioSource()
+	{
+		return audioSource;
+	}
 }

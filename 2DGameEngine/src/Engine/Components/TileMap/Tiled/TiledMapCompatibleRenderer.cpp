@@ -3,69 +3,87 @@
 #include "Engine/Components/TileMap/Tiled/TiledMapCompatibleRenderer.h"
 
 
-TiledMapCompatibleRenderer::TiledMapCompatibleRenderer(std::shared_ptr<TiledMap> tileMap, bool extendMapToRenderTarget)
+namespace DeadFrame2D::Engine
 {
-	this->tileMap = tileMap;
+	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Models;
 
-	if (!extendMapToRenderTarget)
-		return;
 
-	Renderer::SetResolutionTarget({ tileMap->width * tileMap->tileSize + 32, tileMap->height * tileMap->tileSize });
-}
-
-void TiledMapCompatibleRenderer::Init()
-{
-	for (auto i = 0; i < tileMap->tileSets.size(); i++)
+	TiledMapCompatibleRenderer::TiledMapCompatibleRenderer(std::shared_ptr<TiledMap> tileMap, bool extendMapToRenderTarget)
 	{
-		for (auto id = tileMap->tileSets[i].firstID; id <= tileMap->tileSets[i].lastID; id++)
+		this->tileMap = tileMap;
+
+		if (!extendMapToRenderTarget)
+			return;
+
+		Renderer::SetResolutionTarget({ tileMap->width * tileMap->tileSize + 32, tileMap->height * tileMap->tileSize });
+	}
+
+	void TiledMapCompatibleRenderer::Init()
+	{
+		for (auto i = 0; i < tileMap->tileSets.size(); i++)
 		{
-			tileIDToTileSet[id] = i;
+			for (auto id = tileMap->tileSets[i].firstID; id <= tileMap->tileSets[i].lastID; id++)
+			{
+				tileIDToTileSet[id] = i;
+			}
 		}
 	}
-}
 
-void TiledMapCompatibleRenderer::Start()
-{
-
-}
-
-void TiledMapCompatibleRenderer::Update(float dt)
-{
-}
-
-void TiledMapCompatibleRenderer::Draw()
-{
-	const auto& tileSets = tileMap->tileSets;
-	
-	for (const auto& layer : tileMap->layers)
+	void TiledMapCompatibleRenderer::Start()
 	{
-		for (auto i = 0; i < tileMap->height; ++i)
+
+	}
+
+	void TiledMapCompatibleRenderer::Update(float dt)
+	{
+	}
+
+	void TiledMapCompatibleRenderer::Draw()
+	{
+		const auto& tileSets = tileMap->tileSets;
+	
+		for (const auto& layer : tileMap->layers)
 		{
-			for (auto j = 0; j < tileMap->width; ++j)
+			for (auto i = 0; i < tileMap->height; ++i)
 			{
-				auto tileID = layer.Data[i][j];
+				for (auto j = 0; j < tileMap->width; ++j)
+				{
+					auto tileID = layer.Data[i][j];
 
-				// Skip empty tiles
-				if (tileID == 0) 
-					continue; 
+					// Skip empty tiles
+					if (tileID == 0) 
+						continue; 
 
-				// Get tileSetIndex directly from the precomputed map
-				auto tileSetIndex = tileIDToTileSet[tileID];
+					// Get tileSetIndex directly from the precomputed map
+					auto tileSetIndex = tileIDToTileSet[tileID];
 
-				// Get the corresponding TileSet
-				const auto& tileSet = tileSets[tileSetIndex];
-				auto tileSetSize = tileSet.tileSize;
-				auto tileSetColumnCount = tileSet.columnCount;
+					// Get the corresponding TileSet
+					const auto& tileSet = tileSets[tileSetIndex];
+					auto tileSetSize = tileSet.tileSize;
+					auto tileSetColumnCount = tileSet.columnCount;
 
-				// Calculate tileRow and tileCol
-				auto tileRow = (tileID - tileSet.firstID) / tileSetColumnCount;
-				auto tileCol = (tileID - tileSet.firstID) % tileSetColumnCount;
+					// Calculate tileRow and tileCol
+					auto tileRow = (tileID - tileSet.firstID) / tileSetColumnCount;
+					auto tileCol = (tileID - tileSet.firstID) % tileSetColumnCount;
 
-				// Source and destination rects
-				SDL_Rect src{ tileCol * tileSetSize, tileRow * tileSetSize, tileSetSize, tileSetSize };
-				SDL_Rect dest{ j * tileSetSize, i * tileSetSize, tileSetSize, tileSetSize };
+					auto src = SDL_Rect
+					{ 
+						.x = tileCol * tileSetSize,
+						.y = tileRow * tileSetSize,
+						.w = tileSetSize,
+						.h = tileSetSize
+					};
+					auto dest = SDL_Rect
+					{ 
+						.x = j * tileSetSize, 
+						.y = i * tileSetSize, 
+						.w = tileSetSize, 
+						.h = tileSetSize 
+					};
 
-				TextureManager::DrawTextureWorldSpace(tileSet.tileSetTexture, &src, &dest);
+					TextureManager::DrawTextureWorldSpace(tileSet.tileSetTexture, &src, &dest);
+				}
 			}
 		}
 	}

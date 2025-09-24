@@ -5,51 +5,54 @@
 #include <SDL_rect.h>
 
 
-class Camera;
-class Transform;
-
-
-class CameraFollow : public GameComponent
+namespace DeadFrame2D::Engine
 {
-private:
-	Camera* camera = nullptr;
-
-	Transform* transform = nullptr;
-
-	std::weak_ptr<GameObject> target;
-
-	SDL_FRect worldBounds;
-
-	Vector2F offset;
-
-	Vector2I resolutionTarget;
-
-	float followSpeed;
+	class Camera;
+	class Transform;
 
 
-	void RenderTargetSizeChangedEventHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
+	class CameraFollow : public GameComponent
+	{
+	private:
+		Camera* camera = nullptr;
+
+		Transform* transform = nullptr;
+
+		std::weak_ptr<GameObject> target;
+
+		SDL_FRect worldBounds;
+
+		DeadFrame2D::Core::Vector2F offset;
+
+		DeadFrame2D::Core::Vector2I resolutionTarget;
+
+		float followSpeed;
 
 
-public:
-	CameraFollow(Camera* camera, std::weak_ptr<GameObject> target);
+		void RenderTargetSizeChangedEventHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
+
+
+	public:
+		CameraFollow(Camera* camera, std::weak_ptr<GameObject> target);
 	
-	virtual ~CameraFollow() override;
+		virtual ~CameraFollow() override;
 
 
-	virtual void Init() override;
+		virtual void Init() override;
 
-	virtual void Start() override;
+		virtual void Start() override;
 
-	virtual void Update(float deltaTime) override;
+		virtual void Update(float deltaTime) override;
 
-	virtual void Draw() override;
+		virtual void Draw() override;
 
 
-	void SetTarget(std::weak_ptr<GameObject> newTarget);
+		void SetTarget(std::weak_ptr<GameObject> newTarget);
 
-	void SetBounds(const SDL_FRect& bounds);
+		void SetBounds(const SDL_FRect& bounds);
 
-	void SetOffset(Vector2F newOffset);
+		void SetOffset(DeadFrame2D::Core::Vector2F newOffset);
 
-	void SetFollowSpeed(float speed);
-};
+		void SetFollowSpeed(float speed);
+	};
+}

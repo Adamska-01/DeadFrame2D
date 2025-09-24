@@ -9,118 +9,125 @@
 #include <limits>
 
 
-CameraFollow::CameraFollow(Camera* camera, std::weak_ptr<GameObject> target)
-	: camera(camera),
-	target(target),
-	offset(Vector2F::Zero),
-	followSpeed(10.0f)
+namespace DeadFrame2D::Engine
 {
-	worldBounds = SDL_FRect
-	{ 
-		-std::numeric_limits<float>::infinity(),
-		-std::numeric_limits<float>::infinity(),
-		std::numeric_limits<float>::infinity(),
-		std::numeric_limits<float>::infinity()
-	};
+	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Utilities;
 
-	resolutionTarget = Renderer::GetResolutionTarget();
 
-	EventDispatcher::RegisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), EventHelpers::BindFunction(this, &CameraFollow::RenderTargetSizeChangedEventHandler), reinterpret_cast<uintptr_t>(this));
-}
-
-CameraFollow::~CameraFollow()
-{
-	EventDispatcher::DeregisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), reinterpret_cast<uintptr_t>(this));
-}
-
-void CameraFollow::RenderTargetSizeChangedEventHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
-{
-	auto renderTargetSizeChangeEvent = DispatchableEvent::SafeCast<RenderTargetSizeChangedEvent>(dispatchableEvent);
-
-	if (renderTargetSizeChangeEvent == nullptr)
-		return;
-
-	resolutionTarget = renderTargetSizeChangeEvent->renderTargetSize;
-}
-
-void CameraFollow::Init()
-{
-}
-
-void CameraFollow::Start()
-{
-
-}
-
-void CameraFollow::Update(float deltaTime)
-{
-	if (target.expired() || !camera)
-		return;
-
-	auto targetLocked = target.lock();
-	auto cameraGO = camera->GetGameObject().lock();
-
-	if (!targetLocked || !cameraGO)
-		return;
-
-	auto cameraTransform = cameraGO->GetTransform();
-	auto targetTransform = targetLocked->GetTransform();
-
-	const auto targetPos = targetTransform->GetWorldPosition();
-	const auto zoom = std::max(camera->GetZoom(), 0.01f);
-	const auto res = Renderer::GetResolutionTarget();
-
-	const auto viewSize = Vector2F
+	CameraFollow::CameraFollow(Camera* camera, std::weak_ptr<GameObject> target)
+		: camera(camera),
+		target(target),
+		offset(Vector2F::Zero),
+		followSpeed(10.0f)
 	{
-		static_cast<float>(res.x) / zoom,
-		static_cast<float>(res.y) / zoom
-	};
+		worldBounds = SDL_FRect
+		{ 
+			-std::numeric_limits<float>::infinity(),
+			-std::numeric_limits<float>::infinity(),
+			std::numeric_limits<float>::infinity(),
+			std::numeric_limits<float>::infinity()
+		};
 
-	const auto halfView = viewSize * 0.5f;
-	auto desiredCenter = targetPos + offset;
+		resolutionTarget = Renderer::GetResolutionTarget();
 
-	// Clamp inside world bounds
-	const auto xMin = worldBounds.x + halfView.x;
-	const auto xMax = worldBounds.x + worldBounds.w - halfView.x;
-	const auto yMin = worldBounds.y + halfView.y;
-	const auto yMax = worldBounds.y + worldBounds.h - halfView.y;
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), BindFunction(this, &CameraFollow::RenderTargetSizeChangedEventHandler), reinterpret_cast<uintptr_t>(this));
+	}
 
-	desiredCenter.x = (worldBounds.w < viewSize.x)
-		? (worldBounds.x + worldBounds.w * 0.5f)
-		: std::clamp(desiredCenter.x, xMin, xMax);
+	CameraFollow::~CameraFollow()
+	{
+		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), reinterpret_cast<uintptr_t>(this));
+	}
 
-	desiredCenter.y = (worldBounds.h < viewSize.y)
-		? (worldBounds.y + worldBounds.h * 0.5f)
-		: std::clamp(desiredCenter.y, yMin, yMax);
+	void CameraFollow::RenderTargetSizeChangedEventHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
+	{
+		auto renderTargetSizeChangeEvent = DispatchableEvent::SafeCast<RenderTargetSizeChangedEvent>(dispatchableEvent);
 
-	const auto currentPos = cameraTransform->GetWorldPosition();
-	const auto t = std::clamp(followSpeed * deltaTime, 0.0f, 1.0f);
-	const auto newPos = Vector2F::Lerp(currentPos, desiredCenter, t);
+		if (renderTargetSizeChangeEvent == nullptr)
+			return;
 
-	cameraTransform->SetWorldPosition(newPos);
-}
+		resolutionTarget = renderTargetSizeChangeEvent->renderTargetSize;
+	}
 
-void CameraFollow::Draw()
-{
+	void CameraFollow::Init()
+	{
+	}
 
-}
+	void CameraFollow::Start()
+	{
 
-void CameraFollow::SetTarget(std::weak_ptr<GameObject> newTarget)
-{
-	target = newTarget;
-}
+	}
 
-void CameraFollow::SetBounds(const SDL_FRect& bounds)
-{
-	worldBounds = bounds;
-}
+	void CameraFollow::Update(float deltaTime)
+	{
+		if (target.expired() || !camera)
+			return;
 
-void CameraFollow::SetOffset(Vector2F newOffset)
-{
-	offset = newOffset;
-}
+		auto targetLocked = target.lock();
+		auto cameraGO = camera->GetGameObject().lock();
 
-void CameraFollow::SetFollowSpeed(float speed)
-{
-	followSpeed = speed;
+		if (!targetLocked || !cameraGO)
+			return;
+
+		auto cameraTransform = cameraGO->GetTransform();
+		auto targetTransform = targetLocked->GetTransform();
+
+		const auto targetPos = targetTransform->GetWorldPosition();
+		const auto zoom = std::max(camera->GetZoom(), 0.01f);
+		const auto res = Renderer::GetResolutionTarget();
+
+		const auto viewSize = Vector2F
+		{
+			static_cast<float>(res.x) / zoom,
+			static_cast<float>(res.y) / zoom
+		};
+
+		const auto halfView = viewSize * 0.5f;
+		auto desiredCenter = targetPos + offset;
+
+		// Clamp inside world bounds
+		const auto xMin = worldBounds.x + halfView.x;
+		const auto xMax = worldBounds.x + worldBounds.w - halfView.x;
+		const auto yMin = worldBounds.y + halfView.y;
+		const auto yMax = worldBounds.y + worldBounds.h - halfView.y;
+
+		desiredCenter.x = (worldBounds.w < viewSize.x)
+			? (worldBounds.x + worldBounds.w * 0.5f)
+			: std::clamp(desiredCenter.x, xMin, xMax);
+
+		desiredCenter.y = (worldBounds.h < viewSize.y)
+			? (worldBounds.y + worldBounds.h * 0.5f)
+			: std::clamp(desiredCenter.y, yMin, yMax);
+
+		const auto currentPos = cameraTransform->GetWorldPosition();
+		const auto t = std::clamp(followSpeed * deltaTime, 0.0f, 1.0f);
+		const auto newPos = Vector2F::Lerp(currentPos, desiredCenter, t);
+
+		cameraTransform->SetWorldPosition(newPos);
+	}
+
+	void CameraFollow::Draw()
+	{
+
+	}
+
+	void CameraFollow::SetTarget(std::weak_ptr<GameObject> newTarget)
+	{
+		target = newTarget;
+	}
+
+	void CameraFollow::SetBounds(const SDL_FRect& bounds)
+	{
+		worldBounds = bounds;
+	}
+
+	void CameraFollow::SetOffset(Vector2F newOffset)
+	{
+		offset = newOffset;
+	}
+
+	void CameraFollow::SetFollowSpeed(float speed)
+	{
+		followSpeed = speed;
+	}
 }

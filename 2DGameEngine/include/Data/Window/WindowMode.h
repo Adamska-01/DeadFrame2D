@@ -1,13 +1,16 @@
 #pragma once
 
 
-enum class WindowMode
+namespace DeadFrame2D::Data
 {
-	WINDOWED,
+	enum class WindowMode
+	{
+		WINDOWED,
 
-	BORDERLESS,
+		BORDERLESS,
 
-	WINDOW_FULLSCREEN,
-	
-	FULLSCREEN
-};
+		WINDOW_FULLSCREEN,
+
+		FULLSCREEN
+	};
+}

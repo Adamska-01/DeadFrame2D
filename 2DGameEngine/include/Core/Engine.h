@@ -7,29 +7,33 @@
 #include <Models/Engine/EngineConfig.h>
 
 
-class Engine
+namespace DeadFrame2D::Core
 {
-private:
-	std::optional<int> RenderSplashScreen();
+	// TODO: Change the name of the class so it is different from the DeadFrame2D::Engine namespace
+	class Engine
+	{
+	private:
+		std::optional<int> RenderSplashScreen();
 
 
-protected:
-	std::unique_ptr<SubSystems> engineSubSystems;
+	protected:
+		std::unique_ptr<SubSystems> engineSubSystems;
 
-	std::unique_ptr<SceneManager> sceneManager;
+		std::unique_ptr<DeadFrame2D::Engine::SceneManager> sceneManager;
 
-	EventManager eventManager;
+		EventManager eventManager;
 
-	FrameTimer frameTimer;
+		FrameTimer frameTimer;
 
-	EngineConfig engineConfig;
+		Shared::Models::EngineConfig engineConfig;
 
 
-public:
-	Engine();
+	public:
+		Engine();
 	
-	virtual ~Engine() = default;
+		virtual ~Engine() = default;
 
 
-	std::optional<int> Run();
-};
+		std::optional<int> Run();
+	};
+}

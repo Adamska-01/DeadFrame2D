@@ -5,28 +5,31 @@
 #include <string_view>
 
 
-class Image : public UIComponent
+namespace DeadFrame2D::Engine
 {
-private:
-	std::shared_ptr<SDL_Texture> sourceImage;
+	class Image : public UIComponent
+	{
+	private:
+		std::shared_ptr<SDL_Texture> sourceImage;
 
-	SDL_Color color;
-
-
-public:
-	Image();
-
-	virtual ~Image() override = default;
+		SDL_Color color;
 
 
-	virtual void Start() override;
+	public:
+		Image();
 
-	virtual void Update(float deltaTime) override;
-
-	virtual void Draw() override;
+		virtual ~Image() override = default;
 
 
-	void LoadSprite(std::string_view texturePath);
+		virtual void Start() override;
 
-	void SetColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
-};
+		virtual void Update(float deltaTime) override;
+
+		virtual void Draw() override;
+
+
+		void LoadSprite(std::string_view texturePath);
+
+		void SetColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+	};
+}

@@ -3,20 +3,26 @@
 #include "Engine/Components/Collisions/Collider2D.h"
 
 
-class CircleCollider2D : public Collider2D
+namespace DeadFrame2D::Engine
 {
-private:
-	b2CircleShape* shape;
+	class CircleCollider2D : public Collider2D
+	{
+	private:
+		b2CircleShape* shape;
 
 
-	void DeleteShape();
+		void DeleteShape();
 
 
-public:
-	CircleCollider2D(float radius, Vector2F offsetFromCenter = Vector2F::Zero, const PhysicsMaterial& physicsMaterial = PhysicsMaterial());
+	public:
+		CircleCollider2D(
+			float radius, 
+			DeadFrame2D::Core::Vector2F offsetFromCenter = DeadFrame2D::Core::Vector2F::Zero, 
+			const DeadFrame2D::Data::PhysicsMaterial& physicsMaterial = DeadFrame2D::Data::PhysicsMaterial());
 
-	virtual ~CircleCollider2D() override;
+		virtual ~CircleCollider2D() override;
 
-	
-	void SetNewCircleShape(float radius, Vector2F offsetFromCenter);
-};
+
+		void SetNewCircleShape(float radius, DeadFrame2D::Core::Vector2F offsetFromCenter);
+	};
+}

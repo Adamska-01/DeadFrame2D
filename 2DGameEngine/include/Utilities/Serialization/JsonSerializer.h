@@ -6,8 +6,10 @@
 #include <iostream>
 
 
-namespace JsonSerializer 
+namespace DeadFrame2D::Utilities
 {
+	// TODO: put this in a static class
+
 	template <typename T>
 	nlohmann::json Serialize(const T& obj) 
 	{
@@ -73,4 +75,4 @@ namespace JsonSerializer
 
 	template <typename T>
 	inline constexpr bool IsObjectSerializable = IsSerializable<T>::value;
-} 
+}

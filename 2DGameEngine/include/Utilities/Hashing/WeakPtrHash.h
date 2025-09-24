@@ -2,13 +2,16 @@
 #include <memory>
 
 
-template<typename T>
-struct WeakPtrHash 
+namespace DeadFrame2D::Utilities
 {
-	size_t operator()(const std::weak_ptr<T>& wp) const 
+	template<typename T>
+	struct WeakPtrHash 
 	{
-		auto sp = wp.lock();
-	
-		return std::hash<T*>()(sp.get());
-	}
-};
+		size_t operator()(const std::weak_ptr<T>& wp) const 
+		{
+			auto sp = wp.lock();
+
+			return std::hash<T*>()(sp.get());
+		}
+	};
+}

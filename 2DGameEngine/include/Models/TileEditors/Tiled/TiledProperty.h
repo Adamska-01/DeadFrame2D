@@ -3,11 +3,14 @@
 #include <variant>
 
 
-struct TiledProperty
+namespace DeadFrame2D::Models
 {
-	std::string Name;
+	struct TiledProperty
+	{
+		std::string Name;
 
-	std::string Type;
+		std::string Type;
 
-	std::variant<bool, float, int, std::string> Value;
-};
+		std::variant<bool, float, int, std::string> Value;
+	};
+}

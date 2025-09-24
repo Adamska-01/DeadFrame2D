@@ -4,36 +4,39 @@
 #include <string_view>
 
 
-class AudioSource;
-
-
-class AudioClipBlueprint : public GameObject
+namespace DeadFrame2D::Engine
 {
-private:
-	AudioSource* audioSource;
-
-	std::string_view audioSourcePath;
-
-	Vector2F position;
-
-	float volume;
-
-	bool isMusic;
-
-	bool loop;
+	class AudioSource;
 
 
-public:
-	AudioClipBlueprint(
-		const std::string_view& audioSourcePath,
-		Vector2F position = Vector2F::Zero,
-		float volume = 1.0f,
-		bool isMusic = false,
-		bool loop = false);
+	class AudioClipBlueprint : public GameObject
+	{
+	private:
+		AudioSource* audioSource;
+
+		std::string_view audioSourcePath;
+
+		DeadFrame2D::Core::Vector2F position;
+
+		float volume;
+
+		bool isMusic;
+
+		bool loop;
 
 
-	virtual void ConstructGameObject() override;
+	public:
+		AudioClipBlueprint(
+			const std::string_view& audioSourcePath,
+			DeadFrame2D::Core::Vector2F position = DeadFrame2D::Core::Vector2F::Zero,
+			float volume = 1.0f,
+			bool isMusic = false,
+			bool loop = false);
 
 
-	AudioSource* GetAudioSource();
-};
+		virtual void ConstructGameObject() override;
+
+
+		AudioSource* GetAudioSource();
+	};
+}

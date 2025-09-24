@@ -2,12 +2,15 @@
 #include "Core/CoreEvents/Abstractions/IEventProcessor.h"
 
 
-IEventProcessor::IEventProcessor()
+namespace DeadFrame2D::Core
 {
-	EventManager::AddEventProcessor(this);
-}
+	IEventProcessor::IEventProcessor()
+	{
+		EventManager::AddEventProcessor(this);
+	}
 
-IEventProcessor::~IEventProcessor()
-{
-	EventManager::RemoveEventProcessor(this);
+	IEventProcessor::~IEventProcessor()
+	{
+		EventManager::RemoveEventProcessor(this);
+	}
 }

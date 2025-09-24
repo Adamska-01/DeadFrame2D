@@ -2,11 +2,14 @@
 #include "Core/SubSystems/Systems/Input/Devices/Abstractions/InputDevice.h"
 
 
-class KeyboardInputDevice : public InputDevice
+namespace DeadFrame2D::Core
 {
-public:
-	KeyboardInputDevice();
+	class KeyboardInputDevice : public InputDevice
+	{
+	public:
+		KeyboardInputDevice();
 
 
-	virtual void ProcessEvent(const SDL_Event& controllerEvent) override;
-};
+		virtual void ProcessEvent(const SDL_Event& controllerEvent) override;
+	};
+}

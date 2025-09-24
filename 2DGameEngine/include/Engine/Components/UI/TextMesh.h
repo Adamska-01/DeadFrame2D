@@ -9,56 +9,65 @@
 struct SDL_Texture;
 struct SDL_Color;
 struct SDL_Rect;
-struct TextMeshComponentModel;
-class Transform;
 
-
-class TextMesh : public UIComponent
+namespace DeadFrame2D::Data
 {
-private:
-	Transform* transform;
-
-	Vector2F initialObjectScale;
-
-	std::shared_ptr<SDL_Texture> textTexture;
-
-	std::shared_ptr<TTF_Font> font;
-
-	std::string text;
-
-	SDL_Color color;
-
-	bool centered;
-
-	unsigned int fontSize;
+	struct TextMeshComponentModel;
+}
 
 
-public:
-	TextMesh(const TextMeshComponentModel& textMeshConfiguration);
-
-	virtual ~TextMesh() override = default;
-
-
-	virtual void Init() override;
-
-	virtual void Start() override;
-
-	virtual void Update(float deltaTime) override;
-
-	virtual void Draw() override;
+namespace DeadFrame2D::Engine
+{
+	class Transform;
 
 
-	void SetFontSize(unsigned int newFontSize);
+	class TextMesh : public UIComponent
+	{
+	private:
+		Transform* transform;
 
-	void SetTextColor(SDL_Color newColor);
+		DeadFrame2D::Core::Vector2F initialObjectScale;
 
-	void SetFontStyle(FontStyle newFontStyle);
+		std::shared_ptr<SDL_Texture> textTexture;
 
-	void SetText(std::string newText);
+		std::shared_ptr<TTF_Font> font;
 
-	void SetIsCentered(bool isCentered);
+		std::string text;
 
-	std::string GetText();
+		SDL_Color color;
 
-	SDL_Rect GetTextDestRect();
-};
+		bool centered;
+
+		unsigned int fontSize;
+
+
+	public:
+		TextMesh(const DeadFrame2D::Data::TextMeshComponentModel& textMeshConfiguration);
+
+		virtual ~TextMesh() override = default;
+
+
+		virtual void Init() override;
+
+		virtual void Start() override;
+
+		virtual void Update(float deltaTime) override;
+
+		virtual void Draw() override;
+
+
+		void SetFontSize(unsigned int newFontSize);
+
+		void SetTextColor(SDL_Color newColor);
+
+		void SetFontStyle(DeadFrame2D::Data::FontStyle newFontStyle);
+
+		void SetText(std::string newText);
+
+		void SetIsCentered(bool isCentered);
+
+		std::string GetText();
+
+		SDL_Rect GetTextDestRect();
+	};
+}

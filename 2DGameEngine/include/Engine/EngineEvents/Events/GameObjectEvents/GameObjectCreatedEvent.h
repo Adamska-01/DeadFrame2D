@@ -3,14 +3,17 @@
 #include <memory>
 
 
-class GameObject;
-
-
-class GameObjectCreatedEvent : public DispatchableEvent
+namespace DeadFrame2D::Engine
 {
-public:
-	std::shared_ptr<GameObject> gameObjectCreated;
+	class GameObject;
 
 
-	GameObjectCreatedEvent(std::shared_ptr<GameObject> gameObjectDestroyed);
-};
+	class GameObjectCreatedEvent : public DispatchableEvent
+	{
+	public:
+		std::shared_ptr<GameObject> gameObjectCreated;
+
+
+		GameObjectCreatedEvent(std::shared_ptr<GameObject> gameObjectDestroyed);
+	};
+}

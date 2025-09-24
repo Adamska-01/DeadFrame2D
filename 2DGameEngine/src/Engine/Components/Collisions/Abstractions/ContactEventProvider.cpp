@@ -1,44 +1,50 @@
 #include "Engine/Components/Collisions/Abstractions/ContactEventProvider.h"
 
 
-ContactEventProvider::ContactEventProvider()
+namespace DeadFrame2D::Engine
 {
-	onContactEnter.Clear();
-	onContactExit.Clear();
-}
+	using namespace DeadFrame2D::Data;
 
-ContactEventProvider::~ContactEventProvider()
-{
-	onContactEnter.Clear();
-	onContactExit.Clear();
-}
 
-void ContactEventProvider::RegisterContactEnterHandler(const std::function<void(const CollisionInfo&)>& handler, std::uintptr_t identifier)
-{
-	onContactEnter.RegisterCallback(handler, identifier);
-}
+	ContactEventProvider::ContactEventProvider()
+	{
+		onContactEnter.Clear();
+		onContactExit.Clear();
+	}
 
-void ContactEventProvider::RegisterContactExitHandler(const std::function<void(const CollisionInfo&)>& handler, std::uintptr_t identifier)
-{
-	onContactExit.RegisterCallback(handler, identifier);
-}
+	ContactEventProvider::~ContactEventProvider()
+	{
+		onContactEnter.Clear();
+		onContactExit.Clear();
+	}
 
-void ContactEventProvider::DeregisterContactEnterHandler(std::uintptr_t identifier)
-{
-	onContactEnter.DeregisterCallback(identifier);
-}
+	void ContactEventProvider::RegisterContactEnterHandler(const std::function<void(const CollisionInfo&)>& handler, std::uintptr_t identifier)
+	{
+		onContactEnter.RegisterCallback(handler, identifier);
+	}
 
-void ContactEventProvider::DeregisterContactExitHandler(std::uintptr_t identifier)
-{
-	onContactExit.DeregisterCallback(identifier);
-}
+	void ContactEventProvider::RegisterContactExitHandler(const std::function<void(const CollisionInfo&)>& handler, std::uintptr_t identifier)
+	{
+		onContactExit.RegisterCallback(handler, identifier);
+	}
 
-void ContactEventProvider::InvokeCollisionEnter(const CollisionInfo& info)
-{
-	onContactEnter(info);
-}
+	void ContactEventProvider::DeregisterContactEnterHandler(std::uintptr_t identifier)
+	{
+		onContactEnter.DeregisterCallback(identifier);
+	}
 
-void ContactEventProvider::InvokeCollisionExit(const CollisionInfo& info)
-{
-	onContactExit(info);
+	void ContactEventProvider::DeregisterContactExitHandler(std::uintptr_t identifier)
+	{
+		onContactExit.DeregisterCallback(identifier);
+	}
+
+	void ContactEventProvider::InvokeCollisionEnter(const CollisionInfo& info)
+	{
+		onContactEnter(info);
+	}
+
+	void ContactEventProvider::InvokeCollisionExit(const CollisionInfo& info)
+	{
+		onContactExit(info);
+	}
 }

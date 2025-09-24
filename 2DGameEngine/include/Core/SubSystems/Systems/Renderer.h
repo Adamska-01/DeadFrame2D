@@ -6,55 +6,54 @@
 #include <SDL.h>
 
 
-struct SDL_Window;
-struct SDL_Renderer;
-
-
-class Renderer : public ISubSystem
+namespace DeadFrame2D::Core
 {
-	friend class SubSystems;
+	class Renderer : public ISubSystem
+	{
+		friend class SubSystems;
 
 
-private:
-	static SDL_Renderer* renderer;
+	private:
+		static SDL_Renderer* renderer;
 
 
-	Renderer(SDL_Window* window, RendererConfig config);
+		Renderer(SDL_Window* window, Shared::Models::RendererConfig config);
 
-	virtual ~Renderer() override;
+		virtual ~Renderer() override;
 
-	Renderer(const Renderer&) = delete;
+		Renderer(const Renderer&) = delete;
 
-	Renderer(Renderer&&) = delete;
+		Renderer(Renderer&&) = delete;
 
-	Renderer& operator=(const Renderer&) = delete;
+		Renderer& operator=(const Renderer&) = delete;
 
-	Renderer& operator=(Renderer&&) = delete;
-
-
-	virtual void Update(float deltaTime) override;
-
-	virtual void BeginFrame() override;
-
-	virtual void EndUpdate() override;
-
-	virtual void EndDraw() override;
+		Renderer& operator=(Renderer&&) = delete;
 
 
-public:
-	static void ClearBuffer();
+		virtual void Update(float deltaTime) override;
 
-	static void PresentBuffer();
+		virtual void BeginFrame() override;
 
-	static SDL_Renderer* GetRenderer();
+		virtual void EndUpdate() override;
 
-	static SDL_Color GetDisplayColor();
+		virtual void EndDraw() override;
 
-	static Vector2I GetResolutionTarget();
 
-	static void SetViewport(const SDL_Rect& viewPort);
+	public:
+		static void ClearBuffer();
 
-	static void SetDisplayColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+		static void PresentBuffer();
 
-	static void SetResolutionTarget(Vector2I targetResolution);
-};
+		static SDL_Renderer* GetRenderer();
+
+		static SDL_Color GetDisplayColor();
+
+		static Vector2I GetResolutionTarget();
+
+		static void SetViewport(const SDL_Rect& viewPort);
+
+		static void SetDisplayColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+
+		static void SetResolutionTarget(Vector2I targetResolution);
+	};
+}

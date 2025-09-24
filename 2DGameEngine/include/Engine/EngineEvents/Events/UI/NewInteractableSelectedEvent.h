@@ -3,11 +3,14 @@
 #include "Engine/EngineEvents//DispatchableEvent.h"
 
 
-class NewInteractableSelectedEvent : public DispatchableEvent
+namespace DeadFrame2D::Engine
 {
-public:
-	IInteractableUI* newSelectedInteractable;
+	class NewInteractableSelectedEvent : public DispatchableEvent
+	{
+	public:
+		IInteractableUI* newSelectedInteractable;
 
 
-	NewInteractableSelectedEvent(IInteractableUI* newSelectedInteractable);
-};
+		NewInteractableSelectedEvent(IInteractableUI* newSelectedInteractable);
+	};
+}

@@ -3,11 +3,14 @@
 #include "Factories/Products/Debugging/ColliderDrawer.h"
 
 
-b2Draw* ColliderDrawerFactory::CreateProduct()
+namespace DeadFrame2D::Factories
 {
-#if DEBUG
-	return new ColliderDrawer(Renderer::GetRenderer());
-#else
-	return nullptr;
-#endif
+	b2Draw* ColliderDrawerFactory::CreateProduct()
+	{
+	#if DEBUG
+		return new ColliderDrawer(DeadFrame2D::Core::Renderer::GetRenderer());
+	#else
+		return nullptr;
+	#endif
+	}
 }

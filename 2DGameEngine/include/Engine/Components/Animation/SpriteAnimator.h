@@ -6,48 +6,51 @@
 #include <unordered_map>
 
 
-class Transform;
-class Sprite;
-
-
-class SpriteAnimator : public GameComponent
+namespace DeadFrame2D::Engine
 {
-protected:
-	Transform* transform;
-
-	Sprite* sprite;
-
-	std::unordered_map<std::string, SpriteAnimationProperties> animations;
-
-	std::string currentAnimationID;
-
-	SpriteAnimationState animState;
+	class Transform;
+	class Sprite;
 
 
-public:
-	SpriteAnimator();
+	class SpriteAnimator : public GameComponent
+	{
+	protected:
+		Transform* transform;
+
+		Sprite* sprite;
+
+		std::unordered_map<std::string, DeadFrame2D::Data::SpriteAnimationProperties> animations;
+
+		std::string currentAnimationID;
+
+		DeadFrame2D::Data::SpriteAnimationState animState;
+
+
+	public:
+		SpriteAnimator();
 
 	
-	virtual void Init() override;
+		virtual void Init() override;
 
-	virtual void Start() override;
+		virtual void Start() override;
 	
-	virtual void Update(float dt) override;
+		virtual void Update(float dt) override;
 	
-	virtual void Draw() override;
+		virtual void Draw() override;
 
 
-	void AddAnimation(const SpriteAnimationProperties& properties);
+		void AddAnimation(const DeadFrame2D::Data::SpriteAnimationProperties& properties);
 
-	void PlayAnimation(const std::string& name, bool restartIfPlaying = false);
+		void PlayAnimation(const std::string& name, bool restartIfPlaying = false);
 	
-	bool IsPlaying(const std::string& name) const;
+		bool IsPlaying(const std::string& name) const;
 
-	void SetFlipState(SDL_RendererFlip flipState);
+		void SetFlipState(SDL_RendererFlip flipState);
 
-	float GetAnimationProgressRatio() const;
+		float GetAnimationProgressRatio() const;
 
-	const SpriteAnimationProperties* GetCurrentAnimationProperties() const;
+		const DeadFrame2D::Data::SpriteAnimationProperties* GetCurrentAnimationProperties() const;
 
-	SDL_Rect GetFrameRect() const;
-};
+		SDL_Rect GetFrameRect() const;
+	};
+}

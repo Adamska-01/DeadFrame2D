@@ -4,72 +4,76 @@
 #include "Engine/Components/UI/Image.h"
 
 
-using namespace DeadFrame2D::Constants;
-
-
-Image::Image()
-	: color(CommonColors::WHITE)
+namespace DeadFrame2D::Engine
 {
-}
+	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Constants;
 
-void Image::Start()
-{
 
-}
-
-void Image::Update(float deltaTime)
-{
-
-}
-
-void Image::Draw()
-{
-	auto currentPosition = transform->GetWorldPosition();
-	auto worldRotation = transform->GetWorldRotation();
-	auto scaledSize = GetWidgetSize();
-	auto anchorVector = GetAnchorFromPreset(anchor);
-
-	auto destRect = SDL_Rect
+	Image::Image()
+		: color(Constants::CommonColors::WHITE)
 	{
-		static_cast<int>(currentPosition.x - ((scaledSize.x) * anchorVector.x)),
-		static_cast<int>(currentPosition.y - ((scaledSize.y) * anchorVector.y)),
-		static_cast<int>(scaledSize.x),
-		static_cast<int>(scaledSize.y)
-	};
-
-	if (sourceImage != nullptr)
-	{
-		TextureManager::DrawTextureScreenSpace(
-			sourceImage,
-			NULL,
-			&destRect,
-			worldRotation,
-			NULL,
-			SDL_RendererFlip::SDL_FLIP_NONE, 
-			255,
-			color);
 	}
-	else
+
+	void Image::Start()
 	{
-		TextureManager::DrawRectScreenSpace(destRect, worldRotation, color, true);
+
 	}
-}
 
-void Image::LoadSprite(std::string_view texturePath)
-{
-	sourceImage = TextureManager::LoadTexture(texturePath);
+	void Image::Update(float deltaTime)
+	{
 
-	auto width = 0, height = 0;
-	SDL_QueryTexture(sourceImage.get(), NULL, NULL, &width, &height);
+	}
 
-	widgetSize.x = static_cast<float>(width);
-	widgetSize.y = static_cast<float>(height);
-}
+	void Image::Draw()
+	{
+		auto currentPosition = transform->GetWorldPosition();
+		auto worldRotation = transform->GetWorldRotation();
+		auto scaledSize = GetWidgetSize();
+		auto anchorVector = GetAnchorFromPreset(anchor);
 
-void Image::SetColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
-{
-	color.r = r;
-	color.g = g;
-	color.b = b;
-	color.a = a;
+		auto destRect = SDL_Rect
+		{
+			static_cast<int>(currentPosition.x - ((scaledSize.x) * anchorVector.x)),
+			static_cast<int>(currentPosition.y - ((scaledSize.y) * anchorVector.y)),
+			static_cast<int>(scaledSize.x),
+			static_cast<int>(scaledSize.y)
+		};
+
+		if (sourceImage != nullptr)
+		{
+			TextureManager::DrawTextureScreenSpace(
+				sourceImage,
+				NULL,
+				&destRect,
+				worldRotation,
+				NULL,
+				SDL_RendererFlip::SDL_FLIP_NONE, 
+				255,
+				color);
+		}
+		else
+		{
+			TextureManager::DrawRectScreenSpace(destRect, worldRotation, color, true);
+		}
+	}
+
+	void Image::LoadSprite(std::string_view texturePath)
+	{
+		sourceImage = TextureManager::LoadTexture(texturePath);
+
+		auto width = 0, height = 0;
+		SDL_QueryTexture(sourceImage.get(), NULL, NULL, &width, &height);
+
+		widgetSize.x = static_cast<float>(width);
+		widgetSize.y = static_cast<float>(height);
+	}
+
+	void Image::SetColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+	{
+		color.r = r;
+		color.g = g;
+		color.b = b;
+		color.a = a;
+	}
 }

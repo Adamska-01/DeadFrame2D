@@ -4,41 +4,44 @@
 #include <memory>
 
 
-class DispatchableEvent;
-class UIComponent;
-
-
-class LayoutGroup : public GameComponent
+namespace DeadFrame2D::Engine
 {
-private:
-	void GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
-
-	void GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
+	class DispatchableEvent;
+	class UIComponent;
 
 
-protected:
-	float layoutSpacing;
+	class LayoutGroup : public GameComponent
+	{
+	private:
+		void GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
 
-	LayoutPadding layoutPadding;
+		void GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
+
+
+	protected:
+		float layoutSpacing;
+
+		DeadFrame2D::Data::LayoutPadding layoutPadding;
 
 	
-	virtual void OnGameObjectActiveStateChangedHandler(GameObject* child, bool activeState) override;
+		virtual void OnGameObjectActiveStateChangedHandler(GameObject* child, bool activeState) override;
 
 
-public:
-	LayoutGroup(float layoutSpacing, LayoutPadding layoutPadding);
+	public:
+		LayoutGroup(float layoutSpacing, DeadFrame2D::Data::LayoutPadding layoutPadding);
 
-	virtual ~LayoutGroup() override;
-
-
-	virtual void Init() override;
-
-	virtual void Start() override;
-
-	virtual void Update(float deltaTime) override;
-
-	virtual void Draw() override;
+		virtual ~LayoutGroup() override;
 
 
-	virtual void UpdateLayout();
-};
+		virtual void Init() override;
+
+		virtual void Start() override;
+
+		virtual void Update(float deltaTime) override;
+
+		virtual void Draw() override;
+
+
+		virtual void UpdateLayout();
+	};
+}

@@ -7,64 +7,72 @@
 #include <string>
 
 
-ControllerInputDevice::ControllerInputDevice(int deviceID)
+namespace DeadFrame2D::Core
 {
-	if (!SDL_IsGameController(deviceID))
-		throw std::invalid_argument("The device (ID: " + std::to_string(deviceID) + ") is not a valid game controller.");
+	using namespace Shared::Models;
 
-	this->deviceID = deviceID;
+	using namespace DeadFrame2D::Engine;
 
-	gameControllerDevice = SDL_GameControllerOpen(deviceID);
-	
-	if (gameControllerDevice == nullptr)
-		throw std::runtime_error("Failed to open game controller: " + std::string(SDL_GetError()));
 
-	std::cout << "Connected Game Controller " << deviceID << ": " << SDL_JoystickNameForIndex(deviceID) << std::endl;
-
-	for (const auto& [actionName, actionMappings] : InputControls::GetAllActions())
+	ControllerInputDevice::ControllerInputDevice(int deviceID)
 	{
-		for (const auto& mapping : actionMappings)
-		{
-			if (mapping.inputDeviceType != InputDeviceType::CONTROLLER)
-				continue;
+		if (!SDL_IsGameController(deviceID))
+			throw std::invalid_argument("The device (ID: " + std::to_string(deviceID) + ") is not a valid game controller.");
 
-			// Initialize the key state to false (not pressed)
-			currentInputStates.insert({ mapping.inputKey, false });
+		this->deviceID = deviceID;
+
+		gameControllerDevice = SDL_GameControllerOpen(deviceID);
+	
+		if (gameControllerDevice == nullptr)
+			throw std::runtime_error("Failed to open game controller: " + std::string(SDL_GetError()));
+
+		std::cout << "Connected Game Controller " << deviceID << ": " << SDL_JoystickNameForIndex(deviceID) << std::endl;
+
+		for (const auto& [actionName, actionMappings] : InputControls::GetAllActions())
+		{
+			for (const auto& mapping : actionMappings)
+			{
+				if (mapping.inputDeviceType != InputDeviceType::CONTROLLER)
+					continue;
+
+				// Initialize the key state to false (not pressed)
+				currentInputStates.insert({ mapping.inputKey, false });
+			}
 		}
 	}
-}
 
-ControllerInputDevice::~ControllerInputDevice()
-{
-	SDL_GameControllerClose(gameControllerDevice);
-
-	gameControllerDevice = nullptr;
-}
-
-void ControllerInputDevice::ProcessEvent(const SDL_Event& controllerEvent)
-{
-	if (deviceID != controllerEvent.cdevice.which)
-		return;
-
-	switch (controllerEvent.type)
+	ControllerInputDevice::~ControllerInputDevice()
 	{
-	case SDL_EventType::SDL_CONTROLLERBUTTONDOWN:
-		currentInputStates[controllerEvent.cbutton.button] = true;
-		break;
+		SDL_GameControllerClose(gameControllerDevice);
 
-	case SDL_EventType::SDL_CONTROLLERBUTTONUP:
-		currentInputStates[controllerEvent.cbutton.button] = false;
-		break;
+		gameControllerDevice = nullptr;
+	}
 
-		// TODO: Add axis support
-	case SDL_EventType::SDL_CONTROLLERAXISMOTION:
-		break;
+	void ControllerInputDevice::ProcessEvent(const SDL_Event& controllerEvent)
+	{
+		if (deviceID != controllerEvent.cdevice.which)
+			return;
 
-	case SDL_EventType::SDL_CONTROLLERDEVICEREMOVED:
-		EventDispatcher::SendEvent(std::make_shared<ControllerDisconnectedEvent>(this));
-		break;
+		switch (controllerEvent.type)
+		{
+		case SDL_EventType::SDL_CONTROLLERBUTTONDOWN:
+			currentInputStates[controllerEvent.cbutton.button] = true;
+			break;
 
-	default:
-		break;
+		case SDL_EventType::SDL_CONTROLLERBUTTONUP:
+			currentInputStates[controllerEvent.cbutton.button] = false;
+			break;
+
+			// TODO: Add axis support
+		case SDL_EventType::SDL_CONTROLLERAXISMOTION:
+			break;
+
+		case SDL_EventType::SDL_CONTROLLERDEVICEREMOVED:
+			EventDispatcher::SendEvent(std::make_shared<ControllerDisconnectedEvent>(this));
+			break;
+
+		default:
+			break;
+		}
 	}
 }

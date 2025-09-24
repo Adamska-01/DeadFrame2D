@@ -3,27 +3,30 @@
 #include <Models/Engine/EngineConfig.h>
 
 
-// TODO: Rename this to 'SubSystemManager'
-class SubSystems
+namespace DeadFrame2D::Core
 {
-private:
-	std::array<ISubSystem*, 8> subSystems;
+	// TODO: Rename this to 'SubSystemManager'
+	class SubSystems
+	{
+	private:
+		std::array<ISubSystem*, 8> subSystems;
 
 
-public:
-	SubSystems();
+	public:
+		SubSystems();
 
-	~SubSystems();
-
-
-	void InitializeSubSystems(EngineConfig config);
+		~SubSystems();
 
 
-	void Update(float deltaTime);
+		void InitializeSubSystems(Shared::Models::EngineConfig config);
 
-	void BeginFrame();
 
-	void EndUpdate();
+		void Update(float deltaTime);
 
-	void EndDraw();
-};
+		void BeginFrame();
+
+		void EndUpdate();
+
+		void EndDraw();
+	};
+}

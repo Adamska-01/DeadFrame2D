@@ -2,26 +2,32 @@
 #include "Data/Window/MessageBoxConfig.h"
 
 
-int MessageHandler::ShowMessageBox(const MessageBoxConfig& config)
+namespace DeadFrame2D::Core
 {
-	auto& buttons = config.buttons;
+	using namespace DeadFrame2D::Data;
 
-	SDL_MessageBoxData messageBoxData = {
-		config.type,
-		nullptr,
-		config.title.c_str(),
-		config.message.c_str(),
-		static_cast<int>(buttons.size()),
-		buttons.empty() ? nullptr : buttons.data(),
-		nullptr 
-	};
 
-	auto buttonId = -1;
-	
-	if (SDL_ShowMessageBox(&messageBoxData, &buttonId) < 0) 
+	int MessageHandler::ShowMessageBox(const MessageBoxConfig& config)
 	{
-		SDL_Log("Error displaying message box: %s", SDL_GetError());
-	}
+		auto& buttons = config.buttons;
 
-	return buttonId;
+		SDL_MessageBoxData messageBoxData = {
+			config.type,
+			nullptr,
+			config.title.c_str(),
+			config.message.c_str(),
+			static_cast<int>(buttons.size()),
+			buttons.empty() ? nullptr : buttons.data(),
+			nullptr 
+		};
+
+		auto buttonId = -1;
+	
+		if (SDL_ShowMessageBox(&messageBoxData, &buttonId) < 0) 
+		{
+			SDL_Log("Error displaying message box: %s", SDL_GetError());
+		}
+
+		return buttonId;
+	}
 }

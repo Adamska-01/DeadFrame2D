@@ -6,24 +6,26 @@
 #include <cassert>
 
 
-namespace PhysicsConversion
+namespace DeadFrame2D::Utilities
 {
+	// TODO: Put these functions in a static class
+
 	/**
 	 * @brief Converts a custom BodyType2D to Box2D's b2BodyType.
 	 * @param type The custom BodyType2D value.
 	 * @return Corresponding b2BodyType.
 	 */
-	inline b2BodyType ToB2BodyType(BodyType2D type)
+	inline b2BodyType ToB2BodyType(DeadFrame2D::Data::BodyType2D type)
 	{
 		switch (type)
 		{
-		case BodyType2D::Static:
+		case DeadFrame2D::Data::BodyType2D::Static:
 			return b2_staticBody;
 
-		case BodyType2D::Kinematic:
+		case DeadFrame2D::Data::BodyType2D::Kinematic:
 			return b2_kinematicBody;
 
-		case BodyType2D::Dynamic:
+		case DeadFrame2D::Data::BodyType2D::Dynamic:
 			return b2_dynamicBody;
 
 		default:
@@ -34,7 +36,7 @@ namespace PhysicsConversion
 	/**
 	 * @brief Converts BodyDefinition2D wrapper into a b2BodyDef instance for use with Box2D.
 	 */
-	inline b2BodyDef ToB2BodyDef(const BodyDefinition2D& bodyDef)
+	inline b2BodyDef ToB2BodyDef(const DeadFrame2D::Data::BodyDefinition2D& bodyDef)
 	{
 		b2BodyDef b2Def;
 
@@ -58,7 +60,7 @@ namespace PhysicsConversion
 	/**
 	 * @brief Converts PhysicsMaterial wrapper into a b2FixtureDef instance for use with Box2D.
 	 */
-	inline b2FixtureDef ToB2FixtureDef(const PhysicsMaterial& physicsMaterial, uintptr_t userDataPtr)
+	inline b2FixtureDef ToB2FixtureDef(const DeadFrame2D::Data::PhysicsMaterial& physicsMaterial, uintptr_t userDataPtr)
 	{
 		b2FixtureDef b2FDef;
 
@@ -72,7 +74,7 @@ namespace PhysicsConversion
 		b2FDef.filter.groupIndex = physicsMaterial.filter.groupIndex;
 		b2FDef.filter.maskBits = physicsMaterial.filter.maskBits;
 		b2FDef.userData.pointer = userDataPtr;
-		
+
 		assert(b2FDef.shape != nullptr && "Shape must not be null");
 
 		return b2FDef;

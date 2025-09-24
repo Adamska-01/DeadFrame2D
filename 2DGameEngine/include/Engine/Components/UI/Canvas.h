@@ -2,27 +2,30 @@
 #include "Engine/Components/UI/Abstractions/UIComponent.h"
 
 
-class Canvas : public UIComponent
+namespace DeadFrame2D::Engine
 {
-private:
-	// Impossible to implement for now...
-	int sortOrder;
+	class Canvas : public UIComponent
+	{
+	private:
+		// Impossible to implement for now...
+		int sortOrder;
 
 
-public:
-	Canvas();
+	public:
+		Canvas();
 
 
-	virtual void Init() override;
+		virtual void Init() override;
 
-	virtual void Start() override;
+		virtual void Start() override;
 
-	virtual void Update(float deltaTime) override;
+		virtual void Update(float deltaTime) override;
 
-	virtual void Draw() override;
+		virtual void Draw() override;
 
 
-	int SetSortOrder() const;
+		int SetSortOrder() const;
 
-	void SetSortOrder(int value);
-};
+		void SetSortOrder(int value);
+	};
+}

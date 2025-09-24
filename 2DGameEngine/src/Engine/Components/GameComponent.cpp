@@ -2,28 +2,31 @@
 #include "Engine/Entity/GameObject.h"
 
 
-GameComponent::GameComponent()
+namespace DeadFrame2D::Engine
 {
-	isActive = true;
-	isDirty = false;
-}
+	GameComponent::GameComponent()
+	{
+		isActive = true;
+		isDirty = false;
+	}
 
-void GameComponent::MarkDirty()
-{
-	isDirty = true;
-}
+	void GameComponent::MarkDirty()
+	{
+		isDirty = true;
+	}
 
-std::weak_ptr<GameObject> GameComponent::GetGameObject() const
-{
-	return OwningObject;
-}
+	std::weak_ptr<GameObject> GameComponent::GetGameObject() const
+	{
+		return OwningObject;
+	}
 
-bool GameComponent::IsActive() const
-{
-	return isActive;
-}
+	bool GameComponent::IsActive() const
+	{
+		return isActive;
+	}
 
-void GameComponent::SetActive(bool value)
-{
-	isActive = value;
+	void GameComponent::SetActive(bool value)
+	{
+		isActive = value;
+	}
 }

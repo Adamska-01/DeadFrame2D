@@ -1,35 +1,34 @@
 #pragma once
 #include "Core/Coroutines/WaitForSeconds.h"
 #include "Core/Coroutines/WaitOneFrame.h"
-#include "Core/SubSystems/Systems/CoroutineScheduler.h"
 
 
-namespace Tools::Helpers::Coroutines
+namespace DeadFrame2D::Utilities
 {
-	inline WaitOneFrame& WaitFrame()
+	inline DeadFrame2D::Core::WaitOneFrame& WaitFrame()
 	{
-		if (!Task::currentTask)
+		if (!DeadFrame2D::Core::Task::currentTask)
 		{
 			throw std::runtime_error("WaitFrame must be called inside a running Task.");
 		}
 
-		auto* awaitable = new WaitOneFrame();
+		auto* awaitable = new DeadFrame2D::Core::WaitOneFrame();
 
-		Task::currentTask->AddAwaitable(awaitable);
+		DeadFrame2D::Core::Task::currentTask->AddAwaitable(awaitable);
 
 		return *awaitable;
 	}
 
-	inline WaitForSeconds& WaitSeconds(float seconds)
+	inline DeadFrame2D::Core::WaitForSeconds& WaitSeconds(float seconds)
 	{
-		if (!Task::currentTask)
+		if (!DeadFrame2D::Core::Task::currentTask)
 		{
 			throw std::runtime_error("WaitSeconds must be called inside a running Task.");
 		}
 
-		auto* awaitable = new WaitForSeconds(seconds);
+		auto* awaitable = new DeadFrame2D::Core::WaitForSeconds(seconds);
 
-		Task::currentTask->AddAwaitable(awaitable);
+		DeadFrame2D::Core::Task::currentTask->AddAwaitable(awaitable);
 
 		return *awaitable;
 	}

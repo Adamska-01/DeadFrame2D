@@ -12,50 +12,53 @@ class b2ContactListener;
 class b2Draw;
 
 
-class PhysicsEngine2D : public ISubSystem
+namespace DeadFrame2D::Core
 {
-	friend class SubSystems;
+	class PhysicsEngine2D : public ISubSystem
+	{
+		friend class SubSystems;
 
 
-private:
-	static PhysicsEngine2D* instance;
+	private:
+		static PhysicsEngine2D* instance;
 
 
-	std::unique_ptr<b2World> world;
+		std::unique_ptr<b2World> world;
 
-	std::unique_ptr<b2ContactListener> contactListener;
+		std::unique_ptr<b2ContactListener> contactListener;
 
-	std::unique_ptr<b2Draw> debugDrawer;
+		std::unique_ptr<b2Draw> debugDrawer;
 
-	CollisionMasks collisionMasks;
-
-
-	PhysicsEngine2D(const Vector2F& gravity);
-
-	virtual ~PhysicsEngine2D() override;
-
-	PhysicsEngine2D(const PhysicsEngine2D&) = delete;
-
-	PhysicsEngine2D(PhysicsEngine2D&&) = delete;
+		Shared::Models::CollisionMasks collisionMasks;
 
 
-	virtual void Update(float deltaTime) override;
+		PhysicsEngine2D(const Vector2F& gravity);
 
-	virtual void BeginFrame() override;
+		virtual ~PhysicsEngine2D() override;
 
-	virtual void EndUpdate() override;
+		PhysicsEngine2D(const PhysicsEngine2D&) = delete;
 
-	virtual void EndDraw() override;
+		PhysicsEngine2D(PhysicsEngine2D&&) = delete;
 
 
-public:
-	static Vector2F GetGravity();
+		virtual void Update(float deltaTime) override;
 
-	static void SetGravity(const Vector2F& newGravity);
+		virtual void BeginFrame() override;
 
-	static b2Body* CreateBody(const b2BodyDef* bodyDef);
+		virtual void EndUpdate() override;
 
-	static void DestroyBody(b2Body* bodyToDestroy);
+		virtual void EndDraw() override;
 
-	static const CollisionMasks& GetCollisionMasks();
-};
+
+	public:
+		static Vector2F GetGravity();
+
+		static void SetGravity(const Vector2F& newGravity);
+
+		static b2Body* CreateBody(const b2BodyDef* bodyDef);
+
+		static void DestroyBody(b2Body* bodyToDestroy);
+
+		static const Shared::Models::CollisionMasks& GetCollisionMasks();
+	};
+}

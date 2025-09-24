@@ -6,23 +6,26 @@
 #include <unordered_map>
 
 
-using EventHandler = MulticastDelegate<std::shared_ptr<DispatchableEvent>>;
-
-
-class EventDispatcher
+namespace DeadFrame2D::Engine
 {
-private:
-	static std::unordered_map<std::type_index, EventHandler> eventHandlers;
+	using EventHandler = DeadFrame2D::Utilities::MulticastDelegate<std::shared_ptr<DispatchableEvent>>;
 
 
-	// Prevent instantiation
-	EventDispatcher() = delete;
+	class EventDispatcher
+	{
+	private:
+		static std::unordered_map<std::type_index, EventHandler> eventHandlers;
 
 
-public:
-	static void RegisterEventHandler(const std::type_index& eventType, const std::function<void(std::shared_ptr<DispatchableEvent>)>& handler, std::uintptr_t identifier);
+		// Prevent instantiation
+		EventDispatcher() = delete;
 
-	static void DeregisterEventHandler(const std::type_index& eventType, std::uintptr_t identifier);
-	
-	static void SendEvent(std::shared_ptr<DispatchableEvent> event);
-};
+
+	public:
+		static void RegisterEventHandler(const std::type_index& eventType, const std::function<void(std::shared_ptr<DispatchableEvent>)>& handler, std::uintptr_t identifier);
+
+		static void DeregisterEventHandler(const std::type_index& eventType, std::uintptr_t identifier);
+
+		static void SendEvent(std::shared_ptr<DispatchableEvent> event);
+	};
+}

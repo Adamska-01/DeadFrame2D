@@ -4,67 +4,73 @@
 #include "Engine/SceneSystem/SceneManager.h"
 
 
-std::unique_ptr<Scene> SceneManager::currentScene;
-std::function<std::unique_ptr<Scene>()> SceneManager::newSceneFactory;
-
-
-SceneManager::SceneManager()
+namespace DeadFrame2D::Engine
 {
-	currentScene = nullptr;
-	newSceneFactory = nullptr;
-}
+	using namespace DeadFrame2D::Core;
 
-SceneManager::~SceneManager()
-{
-	currentScene.reset();
-}
 
-void SceneManager::UpdateScene(float deltaTime) const
-{
-	if (currentScene == nullptr)
-		return;
+	std::unique_ptr<Scene> SceneManager::currentScene;
+	std::function<std::unique_ptr<Scene>()> SceneManager::newSceneFactory;
 
-	currentScene->Update(deltaTime);
-}
 
-void SceneManager::LateUpdateScene(float deltaTime) const
-{
-	if (currentScene == nullptr)
-		return;
-
-	currentScene->LateUpdate(deltaTime);
-}
-
-void SceneManager::DrawScene() const
-{
-	if (currentScene == nullptr)
-		return;
-
-	currentScene->Draw();
-}
-
-bool SceneManager::LoadNewSceneIfAvailable()
-{
-	if (newSceneFactory == nullptr)
-		return false;
-
-	CoroutineScheduler::Reset();
-	FrameTimer::SetTimeScale(1.0f);
-
-	if (currentScene != nullptr)
+	SceneManager::SceneManager()
 	{
-		currentScene->Exit();
+		currentScene = nullptr;
+		newSceneFactory = nullptr;
+	}
 
+	SceneManager::~SceneManager()
+	{
 		currentScene.reset();
 	}
 
-	currentScene = newSceneFactory();
+	void SceneManager::UpdateScene(float deltaTime) const
+	{
+		if (currentScene == nullptr)
+			return;
 
-	currentScene->Enter();
+		currentScene->Update(deltaTime);
+	}
 
-	currentScene->Init();
+	void SceneManager::LateUpdateScene(float deltaTime) const
+	{
+		if (currentScene == nullptr)
+			return;
 
-	newSceneFactory = nullptr;
+		currentScene->LateUpdate(deltaTime);
+	}
 
-	return true;
+	void SceneManager::DrawScene() const
+	{
+		if (currentScene == nullptr)
+			return;
+
+		currentScene->Draw();
+	}
+
+	bool SceneManager::LoadNewSceneIfAvailable()
+	{
+		if (newSceneFactory == nullptr)
+			return false;
+
+		CoroutineScheduler::Reset();
+		FrameTimer::SetTimeScale(1.0f);
+
+		if (currentScene != nullptr)
+		{
+			currentScene->Exit();
+
+			currentScene.reset();
+		}
+
+		currentScene = newSceneFactory();
+
+		currentScene->Enter();
+
+		currentScene->Init();
+
+		newSceneFactory = nullptr;
+
+		return true;
+	}
 }

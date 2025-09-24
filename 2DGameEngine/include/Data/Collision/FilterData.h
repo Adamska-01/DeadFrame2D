@@ -3,11 +3,14 @@
 #include <cstdint>
 
 
-struct FilterData
+namespace DeadFrame2D::Data
 {
-	uint16_t categoryBits = PhysicsEngine2D::GetCollisionMasks().GetMaskFlagByName("DEFAULT");
+	struct FilterData
+	{
+		uint16_t categoryBits = DeadFrame2D::Core::PhysicsEngine2D::GetCollisionMasks().GetMaskFlagByName("DEFAULT");
 
-	uint16_t maskBits = PhysicsEngine2D::GetCollisionMasks().GetMaskFlagByName("ALL");
+		uint16_t maskBits = DeadFrame2D::Core::PhysicsEngine2D::GetCollisionMasks().GetMaskFlagByName("ALL");
 
-	int16_t groupIndex = 0;
-};
+		int16_t groupIndex = 0;
+	};
+}

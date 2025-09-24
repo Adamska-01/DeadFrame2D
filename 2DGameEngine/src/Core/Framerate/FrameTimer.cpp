@@ -3,98 +3,101 @@
 #include <thread>
 
 
-using namespace std::chrono;
-
-
-float FrameTimer::deltaTime = 0;
-
-float FrameTimer::timeScale = 1.0f;
-
-int FrameTimer::currentFPS = 0;
-
-
-FrameTimer::FrameTimer()
-	: countedFrames(0),
-	counterDelay(0),
-	isFpsLocked(true)
+namespace DeadFrame2D::Core
 {
-	start = system_clock::now();
-	end = system_clock::now();
+	using namespace std::chrono;
 
-	SetTargetFramerate(60);
-}
 
-void FrameTimer::CalculateFPS()
-{
-	countedFrames++;
-	counterDelay += workTime.count();
+	float FrameTimer::deltaTime = 0;
 
-	if (counterDelay >= 1000.0f)
+	float FrameTimer::timeScale = 1.0f;
+
+	int FrameTimer::currentFPS = 0;
+
+
+	FrameTimer::FrameTimer()
+		: countedFrames(0),
+		counterDelay(0),
+		isFpsLocked(true)
 	{
-		deltaTime = (1.0f / countedFrames);
-		currentFPS = countedFrames - 1;
+		start = system_clock::now();
+		end = system_clock::now();
 
-		counterDelay = 0;
-		countedFrames = 0;
+		SetTargetFramerate(60);
 	}
-}
 
-void FrameTimer::StartClock()
-{
-	start = system_clock::now();
-}
+	void FrameTimer::CalculateFPS()
+	{
+		countedFrames++;
+		counterDelay += workTime.count();
 
-void FrameTimer::EndClock()
-{
-	end = system_clock::now();
-	workTime = end - start;
-}
+		if (counterDelay >= 1000.0f)
+		{
+			deltaTime = (1.0f / countedFrames);
+			currentFPS = countedFrames - 1;
 
-void FrameTimer::DelayByFrameTime()
-{
-	CalculateFPS();
+			counterDelay = 0;
+			countedFrames = 0;
+		}
+	}
 
-	if (!isFpsLocked || workTime.count() >= frameTime)
-		return;
+	void FrameTimer::StartClock()
+	{
+		start = system_clock::now();
+	}
 
-	// Lock framerate to target
-	duration<float, std::milli> delta_ms(frameTime - workTime.count());
+	void FrameTimer::EndClock()
+	{
+		end = system_clock::now();
+		workTime = end - start;
+	}
 
-	auto delta_ms_duration = duration_cast<std::chrono::milliseconds>(delta_ms);
+	void FrameTimer::DelayByFrameTime()
+	{
+		CalculateFPS();
 
-	counterDelay += delta_ms_duration.count(); // For FPS calculation
+		if (!isFpsLocked || workTime.count() >= frameTime)
+			return;
 
-	std::this_thread::sleep_for(std::chrono::milliseconds(delta_ms_duration.count()));
-}
+		// Lock framerate to target
+		duration<float, std::milli> delta_ms(frameTime - workTime.count());
 
-void FrameTimer::SetTargetFramerate(unsigned int fps)
-{
-	frameTime = 1000.0f / fps;
+		auto delta_ms_duration = duration_cast<std::chrono::milliseconds>(delta_ms);
 
-	isFpsLocked = true;
-}
+		counterDelay += delta_ms_duration.count(); // For FPS calculation
 
-void FrameTimer::UnlockFramerate()
-{
-	isFpsLocked = false;
-}
+		std::this_thread::sleep_for(std::chrono::milliseconds(delta_ms_duration.count()));
+	}
 
-float FrameTimer::DeltaTime()
-{
-	return deltaTime * timeScale;
-}
+	void FrameTimer::SetTargetFramerate(unsigned int fps)
+	{
+		frameTime = 1000.0f / fps;
 
-int FrameTimer::Framerate()
-{
-	return currentFPS;
-}
+		isFpsLocked = true;
+	}
 
-void FrameTimer::SetTimeScale(float scale)
-{
-	timeScale = std::max(0.0f, scale);
-}
+	void FrameTimer::UnlockFramerate()
+	{
+		isFpsLocked = false;
+	}
 
-float FrameTimer::GetTimeScale()
-{
-	return timeScale;
+	float FrameTimer::DeltaTime()
+	{
+		return deltaTime * timeScale;
+	}
+
+	int FrameTimer::Framerate()
+	{
+		return currentFPS;
+	}
+
+	void FrameTimer::SetTimeScale(float scale)
+	{
+		timeScale = std::max(0.0f, scale);
+	}
+
+	float FrameTimer::GetTimeScale()
+	{
+		return timeScale;
+	}
 }

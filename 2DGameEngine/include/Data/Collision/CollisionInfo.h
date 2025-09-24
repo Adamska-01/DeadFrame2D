@@ -3,17 +3,22 @@
 #include <memory>
 
 
-class GameObject;
-class Collider2D;
-
-
-struct CollisionInfo
+namespace DeadFrame2D::Engine
 {
-	Vector2F contactPoint = Vector2F::Zero;
+	class GameObject;
+}
 
-	Vector2F normal = Vector2F::Zero;
 
-	std::weak_ptr<GameObject> thisGameObject;
+namespace DeadFrame2D::Data
+{
+	struct CollisionInfo
+	{
+		DeadFrame2D::Core::Vector2F contactPoint = DeadFrame2D::Core::Vector2F::Zero;
 
-	std::weak_ptr<GameObject> otherGameObject;
-};
+		DeadFrame2D::Core::Vector2F normal = DeadFrame2D::Core::Vector2F::Zero;
+
+		std::weak_ptr<DeadFrame2D::Engine::GameObject> thisGameObject;
+
+		std::weak_ptr<DeadFrame2D::Engine::GameObject> otherGameObject;
+	};
+}

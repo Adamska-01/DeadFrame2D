@@ -5,80 +5,88 @@
 #include <functional>
 
 
-class Transform;
-struct ButtonComponentModel;
-
-
-class Button : public IInteractableUI, public IEventProcessor
+namespace DeadFrame2D::Data
 {
-private:
-	MultiCastVoid onPressedCallback;
-
-	MultiCastVoid onEnterCallback;
-
-	std::shared_ptr<SDL_Texture> currentButtonImage;
-
-	std::shared_ptr<SDL_Texture> buttonIdleImage;
-
-	std::shared_ptr<SDL_Texture> buttonHoveredImage;
-
-	std::shared_ptr<SDL_Texture> buttonPressedImage;
-
-	SDL_Color idleFillColor;
-
-	SDL_Color hoveredFillColor;
-
-	SDL_Color pressedFillColor;
+	struct ButtonComponentModel;
+}
 
 
-public:
-	Button(const ButtonComponentModel& buttonConfiguration);
-
-	virtual ~Button() override = default;
-
-
-	virtual std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
+namespace DeadFrame2D::Engine
+{
+	class Transform;
 
 
-	virtual void Init() override;
+	class Button : public IInteractableUI, public DeadFrame2D::Core::IEventProcessor
+	{
+	private:
+		DeadFrame2D::Utilities::MultiCastVoid onPressedCallback;
 
-	virtual void Start() override;
+		DeadFrame2D::Utilities::MultiCastVoid onEnterCallback;
 
-	virtual void Update(float deltaTime) override;
+		std::shared_ptr<SDL_Texture> currentButtonImage;
 
-	virtual void Draw() override;
+		std::shared_ptr<SDL_Texture> buttonIdleImage;
+
+		std::shared_ptr<SDL_Texture> buttonHoveredImage;
+
+		std::shared_ptr<SDL_Texture> buttonPressedImage;
+
+		SDL_Color idleFillColor;
+
+		SDL_Color hoveredFillColor;
+
+		SDL_Color pressedFillColor;
 
 
-	virtual void OnPointerEnter() override;
+	public:
+		Button(const DeadFrame2D::Data::ButtonComponentModel& buttonConfiguration);
 
-	virtual void OnPointerExit() override;
+		virtual ~Button() override = default;
 
-	virtual void OnPointerDown() override;
+
+		virtual std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
+
+
+		virtual void Init() override;
+
+		virtual void Start() override;
+
+		virtual void Update(float deltaTime) override;
+
+		virtual void Draw() override;
+
+
+		virtual void OnPointerEnter() override;
+
+		virtual void OnPointerExit() override;
+
+		virtual void OnPointerDown() override;
 	
-	virtual void OnPointerUp() override;
+		virtual void OnPointerUp() override;
 
 
-	void AddPressedCallback(std::function<void()> onPressedHandler, std::uintptr_t identifier);
+		void AddPressedCallback(std::function<void()> onPressedHandler, std::uintptr_t identifier);
 
-	void AddEnterCallback(std::function<void()> onEnterCallback, std::uintptr_t identifier);
+		void AddEnterCallback(std::function<void()> onEnterCallback, std::uintptr_t identifier);
 	
-	SDL_Rect GetBoundingBox() const;
+		SDL_Rect GetBoundingBox() const;
 
-	SDL_Color GetIdleFillColor() const;
+		SDL_Color GetIdleFillColor() const;
 
-	SDL_Color GetHoveredFillColor() const;
+		SDL_Color GetHoveredFillColor() const;
 
-	SDL_Color GetPressedFillColor() const;
+		SDL_Color GetPressedFillColor() const;
 
-	void SetIdleFillColor(const SDL_Color& color);
+		void SetIdleFillColor(const SDL_Color& color);
 	
-	void SetHoveredFillColor(const SDL_Color& color);
+		void SetHoveredFillColor(const SDL_Color& color);
 	
-	void SetPressedFillColor(const SDL_Color& color);
+		void SetPressedFillColor(const SDL_Color& color);
 
-	void SetIdleButtonImageSource(std::string_view idleButtonSource);
+		void SetIdleButtonImageSource(std::string_view idleButtonSource);
 
-	void SetHoveredButtonImageSource(std::string_view hoveredButtonSource);
+		void SetHoveredButtonImageSource(std::string_view hoveredButtonSource);
 	
-	void SetPressedButtonImageSource(std::string_view pressedButtonSource);
-};
+		void SetPressedButtonImageSource(std::string_view pressedButtonSource);
+	};
+}

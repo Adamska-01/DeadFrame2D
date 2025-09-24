@@ -4,31 +4,34 @@
 #include <unordered_map>
 
 
-class InputDevice
+namespace DeadFrame2D::Core
 {
-protected:
-	PlayerInputSlot assignedPlayer;
+	class InputDevice
+	{
+	protected:
+		DeadFrame2D::Data::PlayerInputSlot assignedPlayer;
 
-	std::unordered_map<Uint8, bool> currentInputStates;
+		std::unordered_map<Uint8, bool> currentInputStates;
 
-	std::unordered_map<Uint8, bool> lastInputStates;
-
-
-	InputDevice();
-
-
-public:
-	// TODO: Why not using IEventProcessor?
-	virtual void ProcessEvent(const SDL_Event& controllerEvent) = 0;
+		std::unordered_map<Uint8, bool> lastInputStates;
 
 
-	void BeginInputFrame();
+		InputDevice();
 
-	PlayerInputSlot GetAssignedPlayer() const;
-	
-	void AssignedPlayer(PlayerInputSlot assignedPlayer);
 
-	bool IsKeyPressed(Uint8 inputKey) const;
+	public:
+		// TODO: Why not using IEventProcessor?
+		virtual void ProcessEvent(const SDL_Event& controllerEvent) = 0;
 
-	bool IsKeyHeld(Uint8 inputKey) const;
-};
+
+		void BeginInputFrame();
+
+		DeadFrame2D::Data::PlayerInputSlot GetAssignedPlayer() const;
+
+		void AssignedPlayer(DeadFrame2D::Data::PlayerInputSlot assignedPlayer);
+
+		bool IsKeyPressed(Uint8 inputKey) const;
+
+		bool IsKeyHeld(Uint8 inputKey) const;
+	};
+}

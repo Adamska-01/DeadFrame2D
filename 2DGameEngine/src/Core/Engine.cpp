@@ -6,126 +6,136 @@
 #include <Constants/ResourcePaths.h>
 
 
-Engine::Engine()
+namespace DeadFrame2D::Core
 {
-	engineConfig = JsonSerializer::DeserializeFromFile<EngineConfig>(Constants::ResourcePaths::Files::ENGINE_CONFIGURATION);
+	using namespace Shared::Constants;
+	using namespace Shared::Models;
 
-	engineSubSystems = std::make_unique<SubSystems>();
-	engineSubSystems->InitializeSubSystems(engineConfig);
+	using namespace DeadFrame2D::Engine;
+	using namespace DeadFrame2D::Utilities;
 
-	sceneManager = std::make_unique<SceneManager>();
 
-	frameTimer.SetTargetFramerate(engineConfig.rendering.targetFramerate);
-}
-
-std::optional<int> Engine::RenderSplashScreen()
-{
-	auto splashTexture = TextureManager::LoadTexture(Constants::ResourcePaths::Files::SPLASH_SCREEN);
-	auto renderer = Renderer::GetRenderer();
-	auto renderTargetSize = Renderer::GetResolutionTarget();
-
-	auto width = 0, height = 0;
-	SDL_QueryTexture(splashTexture.get(), nullptr, nullptr, &width, &height);
-
-	auto destRect = SDL_Rect
+	Engine::Engine()
 	{
-		static_cast<int>(renderTargetSize.x * 0.5f - width * 0.2f),
-		static_cast<int>(renderTargetSize.y * 0.5f - height * 0.2f),
-		static_cast<int>(width * 0.4f),
-		static_cast<int>(height * 0.4f)
-	};
+		engineConfig = DeserializeFromFile<EngineConfig>(Paths::Files::ENGINE_CONFIGURATION);
 
-	constexpr uint8_t MaxAlpha = 255;
-	auto fadeInDuration = engineConfig.splashScreen.fadeInDurationSeconds;
-	auto holdDuration = engineConfig.splashScreen.holdVisibleDurationSeconds;
-	auto fadeOutDuration = engineConfig.splashScreen.fadeOutDurationSeconds;
-	auto totalDuration = fadeInDuration + holdDuration + fadeOutDuration;
+		engineSubSystems = std::make_unique<SubSystems>();
+		engineSubSystems->InitializeSubSystems(engineConfig);
 
-	auto elapsedTime = 0.0f;
-	while (elapsedTime < totalDuration)
-	{
-		frameTimer.StartClock();
+		sceneManager = std::make_unique<SceneManager>();
 
-		if (const auto ecode = eventManager.ProcessEvents())
-			return *ecode;
-
-		auto deltaTime = frameTimer.DeltaTime();
-
-		elapsedTime += deltaTime;
-
-		auto alpha = MaxAlpha;
-
-		if (elapsedTime < fadeInDuration)
-		{
-			auto t = elapsedTime / fadeInDuration;
-			alpha *= t;
-		}
-		else if (elapsedTime > totalDuration - fadeOutDuration)
-		{
-			auto t = 1.0f - ((elapsedTime - (totalDuration - fadeOutDuration)) / fadeOutDuration);
-			alpha *= t;
-		}
-
-		Renderer::ClearBuffer();
-		TextureManager::DrawTexture(splashTexture, nullptr, &destRect, 0.0f, nullptr, SDL_RendererFlip::SDL_FLIP_NONE, alpha);
-		Renderer::PresentBuffer();
-
-		frameTimer.EndClock();
-		frameTimer.DelayByFrameTime();
+		frameTimer.SetTargetFramerate(engineConfig.rendering.targetFramerate);
 	}
 
-	return std::nullopt;
-}
-
-std::optional<int> Engine::Run()
-{
-	if (const auto splashCode = RenderSplashScreen())
-		return *splashCode;
-
-	while (true)
+	std::optional<int> Engine::RenderSplashScreen()
 	{
-		frameTimer.StartClock();
+		auto splashTexture = TextureManager::LoadTexture(Paths::Files::SPLASH_SCREEN);
+		auto renderer = Renderer::GetRenderer();
+		auto renderTargetSize = Renderer::GetResolutionTarget();
 
-		auto deltaTime = frameTimer.DeltaTime();
+		auto width = 0, height = 0;
+		SDL_QueryTexture(splashTexture.get(), nullptr, nullptr, &width, &height);
 
-		engineSubSystems->BeginFrame();
-
-		// Looks for messages and return optional if QUIT
-		if (const auto ecode = eventManager.ProcessEvents())
-			return *ecode;
-
-		engineSubSystems->Update(deltaTime);
-
-		sceneManager->UpdateScene(deltaTime);
-
-		engineSubSystems->EndUpdate();
-
-		sceneManager->LateUpdateScene(deltaTime);
-
-		Renderer::ClearBuffer();
-
-		for (const auto& camera : Camera::cameras)
+		auto destRect = SDL_Rect
 		{
-			if (!camera->IsActive())
-				continue;
+			static_cast<int>(renderTargetSize.x * 0.5f - width * 0.2f),
+			static_cast<int>(renderTargetSize.y * 0.5f - height * 0.2f),
+			static_cast<int>(width * 0.4f),
+			static_cast<int>(height * 0.4f)
+		};
 
-			TextureManager::currentCamera = camera;
+		constexpr uint8_t MaxAlpha = 255;
+		auto fadeInDuration = engineConfig.splashScreen.fadeInDurationSeconds;
+		auto holdDuration = engineConfig.splashScreen.holdVisibleDurationSeconds;
+		auto fadeOutDuration = engineConfig.splashScreen.fadeOutDurationSeconds;
+		auto totalDuration = fadeInDuration + holdDuration + fadeOutDuration;
 
-			Renderer::SetViewport(camera->GetViewBox());
+		auto elapsedTime = 0.0f;
+		while (elapsedTime < totalDuration)
+		{
+			frameTimer.StartClock();
 
-			sceneManager->DrawScene();
+			if (const auto ecode = eventManager.ProcessEvents())
+				return *ecode;
 
-			engineSubSystems->EndDraw();
+			auto deltaTime = frameTimer.DeltaTime();
 
-			TextureManager::currentCamera = nullptr;
+			elapsedTime += deltaTime;
+
+			auto alpha = MaxAlpha;
+
+			if (elapsedTime < fadeInDuration)
+			{
+				auto t = elapsedTime / fadeInDuration;
+				alpha *= t;
+			}
+			else if (elapsedTime > totalDuration - fadeOutDuration)
+			{
+				auto t = 1.0f - ((elapsedTime - (totalDuration - fadeOutDuration)) / fadeOutDuration);
+				alpha *= t;
+			}
+
+			Renderer::ClearBuffer();
+			TextureManager::DrawTexture(splashTexture, nullptr, &destRect, 0.0f, nullptr, SDL_RendererFlip::SDL_FLIP_NONE, alpha);
+			Renderer::PresentBuffer();
+
+			frameTimer.EndClock();
+			frameTimer.DelayByFrameTime();
 		}
 
-		Renderer::PresentBuffer();
+		return std::nullopt;
+	}
 
-		sceneManager->LoadNewSceneIfAvailable();
+	std::optional<int> Engine::Run()
+	{
+		if (const auto splashCode = RenderSplashScreen())
+			return *splashCode;
 
-		//FPS and delay
-		frameTimer.EndClock();
-		frameTimer.DelayByFrameTime();
+		while (true)
+		{
+			frameTimer.StartClock();
+
+			auto deltaTime = frameTimer.DeltaTime();
+
+			engineSubSystems->BeginFrame();
+
+			// Looks for messages and return optional if QUIT
+			if (const auto ecode = eventManager.ProcessEvents())
+				return *ecode;
+
+			engineSubSystems->Update(deltaTime);
+
+			sceneManager->UpdateScene(deltaTime);
+
+			engineSubSystems->EndUpdate();
+
+			sceneManager->LateUpdateScene(deltaTime);
+
+			Renderer::ClearBuffer();
+
+			for (const auto& camera : Camera::cameras)
+			{
+				if (!camera->IsActive())
+					continue;
+
+				TextureManager::currentCamera = camera;
+
+				Renderer::SetViewport(camera->GetViewBox());
+
+				sceneManager->DrawScene();
+
+				engineSubSystems->EndDraw();
+
+				TextureManager::currentCamera = nullptr;
+			}
+
+			Renderer::PresentBuffer();
+
+			sceneManager->LoadNewSceneIfAvailable();
+
+			//FPS and delay
+			frameTimer.EndClock();
+			frameTimer.DelayByFrameTime();
+		}
 	}
 }

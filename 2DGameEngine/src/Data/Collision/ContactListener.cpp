@@ -6,74 +6,82 @@
 #include "Engine/Entity/GameObject.h"
 
 
-std::pair<ContactEventProvider*, ContactEventProvider*> ContactListener::GetUserDataFromContact(b2Contact* contact)
+namespace DeadFrame2D::Data
 {
-	auto* fixtureA = contact->GetFixtureA();
-	auto* fixtureB = contact->GetFixtureB();
+	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Engine;
 
-	auto* objA = reinterpret_cast<ContactEventProvider*>(fixtureA->GetUserData().pointer);
-	auto* objB = reinterpret_cast<ContactEventProvider*>(fixtureB->GetUserData().pointer);
 
-	return { objA, objB };
-}
-
-void ContactListener::BeginContact(b2Contact* contact)
-{
-	auto [colA, colB] = GetUserDataFromContact(contact);
-
-	if (colA == nullptr || colB == nullptr)
-		return;
-
-	// Get world manifold for contact points and normal
-	b2WorldManifold worldManifold;
-	contact->GetWorldManifold(&worldManifold);
-
-	auto contactPoint = Vector2F(worldManifold.points[0].x, worldManifold.points[0].y);
-	auto normal = Vector2F(worldManifold.normal.x, worldManifold.normal.y);
-
-	auto infoA = CollisionInfo
+	std::pair<ContactEventProvider*, ContactEventProvider*> ContactListener::GetUserDataFromContact(b2Contact* contact)
 	{
-		.contactPoint = contactPoint,
-		.normal = normal,
-		.thisGameObject = colA->GetGameObject(),
-		.otherGameObject = colB->GetGameObject(),
-	};
+		auto* fixtureA = contact->GetFixtureA();
+		auto* fixtureB = contact->GetFixtureB();
 
-	auto infoB = CollisionInfo
+		auto* objA = reinterpret_cast<ContactEventProvider*>(fixtureA->GetUserData().pointer);
+		auto* objB = reinterpret_cast<ContactEventProvider*>(fixtureB->GetUserData().pointer);
+
+		return { objA, objB };
+	}
+
+
+	void ContactListener::BeginContact(b2Contact* contact)
 	{
-		.contactPoint = contactPoint,
-		.normal = normal * -1,
-		.thisGameObject = colB->GetGameObject(),
-		.otherGameObject = colA->GetGameObject()
-	};
+		auto [colA, colB] = GetUserDataFromContact(contact);
 
-	colA->InvokeCollisionEnter(infoA);
-	colB->InvokeCollisionEnter(infoB);
-}
+		if (colA == nullptr || colB == nullptr)
+			return;
 
-void ContactListener::EndContact(b2Contact* contact)
-{
-	auto [colA, colB] = GetUserDataFromContact(contact);
+		// Get world manifold for contact points and normal
+		b2WorldManifold worldManifold;
+		contact->GetWorldManifold(&worldManifold);
 
-	if (!colA || !colB)
-		return;
+		auto contactPoint = Vector2F(worldManifold.points[0].x, worldManifold.points[0].y);
+		auto normal = Vector2F(worldManifold.normal.x, worldManifold.normal.y);
 
-	CollisionInfo infoA
+		auto infoA = CollisionInfo
+		{
+			.contactPoint = contactPoint,
+			.normal = normal,
+			.thisGameObject = colA->GetGameObject(),
+			.otherGameObject = colB->GetGameObject(),
+		};
+
+		auto infoB = CollisionInfo
+		{
+			.contactPoint = contactPoint,
+			.normal = normal * -1,
+			.thisGameObject = colB->GetGameObject(),
+			.otherGameObject = colA->GetGameObject()
+		};
+
+		colA->InvokeCollisionEnter(infoA);
+		colB->InvokeCollisionEnter(infoB);
+	}
+
+	void ContactListener::EndContact(b2Contact* contact)
 	{
-		.contactPoint = Vector2F(),
-		.normal = Vector2F(),
-		.thisGameObject = colA->GetGameObject(),
-		.otherGameObject = colB->GetGameObject(),
-	};
+		auto [colA, colB] = GetUserDataFromContact(contact);
 
-	CollisionInfo infoB
-	{
-		.contactPoint = Vector2F(),
-		.normal = Vector2F(),
-		.thisGameObject = colB->GetGameObject(),
-		.otherGameObject = colA->GetGameObject()
-	};
+		if (!colA || !colB)
+			return;
 
-	colA->InvokeCollisionExit(infoA);
-	colB->InvokeCollisionExit(infoB);
+		CollisionInfo infoA
+		{
+			.contactPoint = Vector2F(),
+			.normal = Vector2F(),
+			.thisGameObject = colA->GetGameObject(),
+			.otherGameObject = colB->GetGameObject(),
+		};
+
+		CollisionInfo infoB
+		{
+			.contactPoint = Vector2F(),
+			.normal = Vector2F(),
+			.thisGameObject = colB->GetGameObject(),
+			.otherGameObject = colA->GetGameObject()
+		};
+
+		colA->InvokeCollisionExit(infoA);
+		colB->InvokeCollisionExit(infoB);
+	}
 }

@@ -1,12 +1,15 @@
 #pragma once
 
 
-template<typename T>
-class IFactory
+namespace DeadFrame2D::Factories
 {
-public:
-	virtual ~IFactory() = default;
-	
-	
-	virtual T CreateProduct() = 0;
-};
+	template<typename T>
+	class IFactory
+	{
+	public:
+		virtual ~IFactory() = default;
+
+
+		virtual T CreateProduct() = 0;
+	};
+}

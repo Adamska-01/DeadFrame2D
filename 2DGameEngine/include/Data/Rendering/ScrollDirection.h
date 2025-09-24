@@ -1,9 +1,12 @@
 #pragma once
 
 
-enum class ScrollDirection
+namespace DeadFrame2D::Data
 {
-	HORIZONTAL,
+	enum class ScrollDirection
+	{
+		HORIZONTAL,
 
-	VERTICAL
-};
+		VERTICAL
+	};
+}

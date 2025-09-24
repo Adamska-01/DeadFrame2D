@@ -2,43 +2,48 @@
 #include "Engine/Components/Collisions/Abstractions/ContactEventProvider.h"
 
 
-class Transform;
 class b2Body;
 class b2Fixture;
 
 
-class AudioListener : public ContactEventProvider
+namespace DeadFrame2D::Engine
 {
-	friend class ContactListener;
+	class Transform;
 
 
-protected:
-	Transform* transform = nullptr;
-
-	// Using Box2D to detect audio source collisions with audio listeners
-	b2Body* collisionBody;
-	
-	b2Fixture* collisionFixture;
-
-	Vector2F lastTransformPosition;
-
-	float lastTransformRotation;
+	class AudioListener : public ContactEventProvider
+	{
+		friend class ContactListener;
 
 
-	void RebuildFixture();
+	protected:
+		Transform* transform = nullptr;
+
+		// Using Box2D to detect audio source collisions with audio listeners
+		b2Body* collisionBody;
+
+		b2Fixture* collisionFixture;
+
+		DeadFrame2D::Core::Vector2F lastTransformPosition;
+
+		float lastTransformRotation;
 
 
-public:
-	AudioListener();
-	
-	virtual ~AudioListener() override;
+		void RebuildFixture();
 
 
-	virtual void Init() override;
-	
-	virtual void Start() override;
-	
-	virtual void Update(float deltaTime) override;
+	public:
+		AudioListener();
 
-	virtual void Draw() override;
-};
+		virtual ~AudioListener() override;
+
+
+		virtual void Init() override;
+
+		virtual void Start() override;
+
+		virtual void Update(float deltaTime) override;
+
+		virtual void Draw() override;
+	};
+}

@@ -3,8 +3,9 @@
 #include <string>
 
 
-namespace Tools::Helpers
+namespace DeadFrame2D::Utilities
 {
+	// TODO: put this in a static class
 	template<typename T>
 	T GuardAgainstNull(T ptr, const std::string& message)
 	{

@@ -3,29 +3,31 @@
 #include <vector>
 
 
-
-class EventManager 
+namespace DeadFrame2D::Core
 {
-private:
-	SDL_Event sdlEvent;
+	class EventManager 
+	{
+	private:
+		SDL_Event sdlEvent;
 
 
-	static std::vector<IEventProcessor*> eventProcessors;
+		static std::vector<IEventProcessor*> eventProcessors;
 
 
-public:
-	EventManager();
+	public:
+		EventManager();
 
-	// Deleting the processors is up to the owners 
-	~EventManager() = default;
-
-
-	std::optional<int> ProcessEvents();
+		// Deleting the processors is up to the owners 
+		~EventManager() = default;
 
 
-	static void AddEventProcessor(IEventProcessor* eventProcessor);
+		std::optional<int> ProcessEvents();
 
-	static void RemoveEventProcessor(IEventProcessor* eventProcessor);
 
-	static void SendSystemEvent(SDL_EventType eventType);
-};
+		static void AddEventProcessor(IEventProcessor* eventProcessor);
+
+		static void RemoveEventProcessor(IEventProcessor* eventProcessor);
+
+		static void SendSystemEvent(SDL_EventType eventType);
+	};
+}

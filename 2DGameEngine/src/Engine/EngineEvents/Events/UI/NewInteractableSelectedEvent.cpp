@@ -1,7 +1,10 @@
 #include "Engine/EngineEvents/Events/UI/NewInteractableSelectedEvent.h"
 
 
-NewInteractableSelectedEvent::NewInteractableSelectedEvent(IInteractableUI* newSelectedInteractable)
-	: newSelectedInteractable(newSelectedInteractable)
+namespace DeadFrame2D::Engine
 {
+	NewInteractableSelectedEvent::NewInteractableSelectedEvent(IInteractableUI* newSelectedInteractable)
+		: newSelectedInteractable(newSelectedInteractable)
+	{
+	}
 }

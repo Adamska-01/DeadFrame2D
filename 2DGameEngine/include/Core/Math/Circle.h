@@ -2,19 +2,22 @@
 #include "Core/Math/Vector2.h"
 
 
-struct Circle
+namespace DeadFrame2D::Core
 {
-	Vector2F position;
+	struct Circle
+	{
+		Vector2F position;
 
-	float radius;
+		float radius;
 
 	
-	Circle();
+		Circle();
 
-	Circle(const Vector2F& pos, float r);
+		Circle(const Vector2F& pos, float r);
 
 
-	float Area() const;
+		float Area() const;
 
-	float Circumference() const;
-};
+		float Circumference() const;
+	};
+}

@@ -2,19 +2,22 @@
 #include "Core/SubSystems/Systems/Input/Devices/Abstractions/InputDevice.h"
 
 
-class ControllerInputDevice : public InputDevice
+namespace DeadFrame2D::Core
 {
-protected:
-	int deviceID;
+	class ControllerInputDevice : public InputDevice
+	{
+	protected:
+		int deviceID;
 
-	SDL_GameController* gameControllerDevice;
-
-
-public:
-	ControllerInputDevice(int deviceID);
-	
-	~ControllerInputDevice();
+		SDL_GameController* gameControllerDevice;
 
 
-	virtual void ProcessEvent(const SDL_Event& controllerEvent) override;
-};
+	public:
+		ControllerInputDevice(int deviceID);
+
+		~ControllerInputDevice();
+
+
+		virtual void ProcessEvent(const SDL_Event& controllerEvent) override;
+	};
+}

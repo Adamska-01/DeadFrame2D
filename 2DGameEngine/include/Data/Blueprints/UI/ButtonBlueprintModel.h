@@ -3,9 +3,12 @@
 #include "Data/Components/UI/TextMeshComponentModel.h"
 
 
-struct ButtonBlueprintModel
+namespace DeadFrame2D::Data
 {
-	ButtonComponentModel buttonComponentModel;
+	struct ButtonBlueprintModel
+	{
+		ButtonComponentModel buttonComponentModel;
 
-	TextMeshComponentModel textMeshComponentModel;
-};
+		TextMeshComponentModel textMeshComponentModel;
+	};
+}

@@ -5,31 +5,34 @@
 #include <memory>
 
 
-class DispatchableEvent;
-
-
-class ImageScroller : public Sprite
+namespace DeadFrame2D::Engine
 {
-private:
-	ScrollDirection scrollDirection;
-
-	float scrollSpeed;
-
-	float scrollOffset;
-
-	Vector2I renderTargetSize;
+	class DispatchableEvent;
 
 
-	void RenderTargetSizeChangedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
+	class ImageScroller : public Sprite
+	{
+	private:
+		DeadFrame2D::Data::ScrollDirection scrollDirection;
+
+		float scrollSpeed;
+
+		float scrollOffset;
+
+		DeadFrame2D::Core::Vector2I renderTargetSize;
 
 
-public:
-	ImageScroller(std::string_view textureSource, ScrollDirection scrollDirection, float scrollSpeed);
-
-	virtual ~ImageScroller() override;
+		void RenderTargetSizeChangedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
 
 
-	virtual void Update(float deltaTime) override;
+	public:
+		ImageScroller(std::string_view textureSource, DeadFrame2D::Data::ScrollDirection scrollDirection, float scrollSpeed);
 
-	virtual void Draw() override;
-};
+		virtual ~ImageScroller() override;
+
+
+		virtual void Update(float deltaTime) override;
+
+		virtual void Draw() override;
+	};
+}

@@ -3,11 +3,14 @@
 #include "Engine/Components/UI/Abstractions/LayoutGroup.h"
 
 
-class VerticalLayoutGroup : public LayoutGroup
+namespace DeadFrame2D::Engine
 {
-public:
-	VerticalLayoutGroup(float layoutSpacing, LayoutPadding layoutPadding);
+	class VerticalLayoutGroup : public DeadFrame2D::Engine::LayoutGroup
+	{
+	public:
+		VerticalLayoutGroup(float layoutSpacing, DeadFrame2D::Data::LayoutPadding layoutPadding);
 
 
-	virtual void UpdateLayout() override;
-};
+		virtual void UpdateLayout() override;
+	};
+}
