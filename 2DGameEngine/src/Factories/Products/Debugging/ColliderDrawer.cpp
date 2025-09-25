@@ -1,4 +1,4 @@
-#include "Constants/PhysicsConstants.h"
+#include "Core/SubSystems/Systems/PhysicsEngine2D.h"
 #include "Core/SubSystems/Systems/Renderer.h"
 #include "Core/SubSystems/Systems/TextureManager.h"
 #include "Factories/Products/Debugging/ColliderDrawer.h"
@@ -7,8 +7,6 @@
 
 namespace DeadFrame2D::Factories
 {
-	using namespace Shared::Constants;
-
 	using namespace DeadFrame2D::Core;
 
 
@@ -32,9 +30,11 @@ namespace DeadFrame2D::Factories
 			b2Vec2 p1 = vertices[i];
 			b2Vec2 p2 = vertices[(i + 1) % vertexCount];
 
+			const auto PIXEL_PER_METER = PhysicsEngine2D::GetPhysicsConfig().pixelPerMeter;
+
 			TextureManager::DrawLineWorldSpace(
-				Vector2F(p1.x * Physics::METER_TO_PIXEL, p1.y * Physics::METER_TO_PIXEL),
-				Vector2F(p2.x * Physics::METER_TO_PIXEL, p2.y * Physics::METER_TO_PIXEL),
+				Vector2F(p1.x * PIXEL_PER_METER, p1.y * PIXEL_PER_METER),
+				Vector2F(p2.x * PIXEL_PER_METER, p2.y * PIXEL_PER_METER),
 				sdlColor);
 		}
 	}
@@ -46,10 +46,12 @@ namespace DeadFrame2D::Factories
 
 	void ColliderDrawer::DrawCircle(const b2Vec2& center, float radius, const b2Color& color)
 	{
-		auto pixelRadius = radius * Physics::METER_TO_PIXEL;
+		const auto PIXEL_PER_METER = PhysicsEngine2D::GetPhysicsConfig().pixelPerMeter;
+
+		auto pixelRadius = radius * PIXEL_PER_METER;
 		auto pixelCenter = Vector2F(
-			center.x * Physics::METER_TO_PIXEL, 
-			center.y * Physics::METER_TO_PIXEL);
+			center.x * PIXEL_PER_METER,
+			center.y * PIXEL_PER_METER);
 
 		TextureManager::DrawCircleWorldSpace(
 			Circle(pixelCenter, pixelRadius),
@@ -64,11 +66,13 @@ namespace DeadFrame2D::Factories
 
 	void ColliderDrawer::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
 	{
+		const auto PIXEL_PER_METER = PhysicsEngine2D::GetPhysicsConfig().pixelPerMeter;
+		
 		auto sdlColor = SDL_Color(uint8_t(color.r * 255), uint8_t(color.g * 255), uint8_t(color.b * 255), uint8_t(color.a * 255));
 
 		TextureManager::DrawLineWorldSpace(
-			Vector2F(p1.x * Physics::METER_TO_PIXEL, p1.y * Physics::METER_TO_PIXEL),
-			Vector2F(p2.x * Physics::METER_TO_PIXEL, p2.y * Physics::METER_TO_PIXEL),
+			Vector2F(p1.x * PIXEL_PER_METER, p1.y * PIXEL_PER_METER),
+			Vector2F(p2.x * PIXEL_PER_METER, p2.y * PIXEL_PER_METER),
 			sdlColor);
 	}
 

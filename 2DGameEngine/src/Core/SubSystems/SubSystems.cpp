@@ -7,7 +7,6 @@
 #include "Core/SubSystems/Systems/TextureManager.h"
 #include "Core/SubSystems/Systems/UIManager.h"
 #include "Core/SubSystems/Systems/Window.h"
-#include <Constants/PhysicsConstants.h>
 
 
 namespace DeadFrame2D::Core
@@ -29,7 +28,7 @@ namespace DeadFrame2D::Core
 		}
 	}
 
-	void SubSystems::InitializeSubSystems(EngineConfig config)
+	void SubSystems::InitializeSubSystems(SystemConfig config)
 	{
 		auto window = new Window(config.window);
 
@@ -43,9 +42,9 @@ namespace DeadFrame2D::Core
 
 		subSystems[4] = new UIManager();
 
-		subSystems[5] = new AudioManager();
+		subSystems[5] = new AudioManager(config.audio);
 
-		subSystems[6] = new PhysicsEngine2D(Vector2F(Physics::GRAVITY_X, Physics::GRAVITY_Y));
+		subSystems[6] = new PhysicsEngine2D(config.physics);
 
 		subSystems[7] = new CoroutineScheduler();
 	}

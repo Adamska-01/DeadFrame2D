@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
 #include <memory>
+#include <Models/Audio/AudioConfig.h>
 #include <mutex>
 #include <SDL_mixer.h>
 #include <string_view>
@@ -15,20 +16,19 @@ namespace DeadFrame2D::Core
 
 
 	private:
-		static std::unordered_map<std::string, std::weak_ptr<Mix_Music>> musicCache;
-
-		static std::unordered_map<std::string, std::weak_ptr<Mix_Chunk>> sfxCache;
-
-		static std::mutex audioMutex;
-
-		static float musicVolume;
-
-		static float sfxVolume;
-
-		static float masterVolume;
+		static AudioManager* instance;
 
 
-		AudioManager();
+		Shared::Models::AudioConfig audioConfig;
+
+		std::unordered_map<std::string, std::weak_ptr<Mix_Music>> musicCache;
+
+		std::unordered_map<std::string, std::weak_ptr<Mix_Chunk>> sfxCache;
+
+		std::mutex audioMutex;
+
+
+		AudioManager(const Shared::Models::AudioConfig& audioConfig);
 
 		virtual ~AudioManager() override;
 

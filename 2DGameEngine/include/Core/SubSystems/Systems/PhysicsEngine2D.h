@@ -1,7 +1,8 @@
 #pragma once
 #include "Core/Math/Vector2.h"
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
-#include "Models/Physics/CollisionMasks.h"
+#include "Models/Physics/Masks/CollisionMasks.h"
+#include "Models/Physics/PhysicsConfig.h"
 #include <memory>
 
 
@@ -29,10 +30,12 @@ namespace DeadFrame2D::Core
 
 		std::unique_ptr<b2Draw> debugDrawer;
 
+		Shared::Models::PhysicsConfig physicsConfig;
+
 		Shared::Models::CollisionMasks collisionMasks;
 
 
-		PhysicsEngine2D(const Vector2F& gravity);
+		PhysicsEngine2D(const Shared::Models::PhysicsConfig& physicsConfig);
 
 		virtual ~PhysicsEngine2D() override;
 
@@ -58,6 +61,8 @@ namespace DeadFrame2D::Core
 		static b2Body* CreateBody(const b2BodyDef* bodyDef);
 
 		static void DestroyBody(b2Body* bodyToDestroy);
+
+		static const Shared::Models::PhysicsConfig& GetPhysicsConfig();
 
 		static const Shared::Models::CollisionMasks& GetCollisionMasks();
 	};

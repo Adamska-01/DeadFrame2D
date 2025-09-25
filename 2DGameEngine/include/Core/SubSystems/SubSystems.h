@@ -1,6 +1,6 @@
 #pragma once
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
-#include <Models/Engine/EngineConfig.h>
+#include <Models/SystemConfig.h>
 
 
 namespace DeadFrame2D::Core
@@ -18,7 +18,7 @@ namespace DeadFrame2D::Core
 		~SubSystems();
 
 
-		void InitializeSubSystems(Shared::Models::EngineConfig config);
+		void InitializeSubSystems(Shared::Models::SystemConfig config);
 
 
 		void Update(float deltaTime);

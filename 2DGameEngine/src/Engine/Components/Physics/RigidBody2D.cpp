@@ -1,4 +1,3 @@
-#include "Constants/PhysicsConstants.h"
 #include "Core/SubSystems/Systems/PhysicsEngine2D.h"
 #include "Data/Physics/BodyDefinition2D.h"
 #include "Engine/Components/Physics/RigidBody2D.h"
@@ -11,8 +10,6 @@
 
 namespace DeadFrame2D::Engine
 {
-	using namespace Shared::Constants;
-
 	using namespace DeadFrame2D::Core;
 	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Utilities;
@@ -62,7 +59,9 @@ namespace DeadFrame2D::Engine
 		lastTransformPosition = transform->GetWorldPosition();
 		lastTransformRotation = transform->GetWorldRotation();
 
-		body->SetTransform(b2Vec2(lastTransformPosition.x * Physics::PIXEL_TO_METER, lastTransformPosition.y * Physics::PIXEL_TO_METER), lastTransformRotation * (MathConstants::PI / 180.0f));
+		auto METER_PER_PIXEL = PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
+
+		body->SetTransform(b2Vec2(lastTransformPosition.x * METER_PER_PIXEL, lastTransformPosition.y * METER_PER_PIXEL), lastTransformRotation * (MathConstants::PI / 180.0f));
 	}
 
 	void RigidBody2D::Start()
@@ -81,12 +80,15 @@ namespace DeadFrame2D::Engine
 			pendingActions.Clear();
 		}
 
+		auto PIXEL_PER_METER = PhysicsEngine2D::GetPhysicsConfig().pixelPerMeter;
+		auto METER_PER_PIXEL = PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
+
 		auto currentTransformPosition = transform->GetWorldPosition();
 		auto currentTransformRotation = transform->GetWorldRotation();
 
 		if (currentTransformPosition != lastTransformPosition)
 		{
-			currentTransformPosition = currentTransformPosition * Physics::PIXEL_TO_METER;
+			currentTransformPosition = currentTransformPosition * METER_PER_PIXEL;
 			body->SetTransform(b2Vec2(currentTransformPosition.x, currentTransformPosition.y), body->GetAngle());
 		}
 		if (currentTransformRotation != lastTransformRotation)
@@ -97,8 +99,8 @@ namespace DeadFrame2D::Engine
 		auto pos = body->GetPosition();
 		auto angle = body->GetAngle();
 
-		pos.x *= Physics::METER_TO_PIXEL;
-		pos.y *= Physics::METER_TO_PIXEL;
+		pos.x *= PIXEL_PER_METER;
+		pos.y *= PIXEL_PER_METER;
 
 		// Sync transform to physics body
 		transform->SetWorldPosition(Vector2F(pos.x, pos.y));

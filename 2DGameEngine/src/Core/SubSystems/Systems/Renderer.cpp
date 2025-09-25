@@ -16,7 +16,7 @@ namespace DeadFrame2D::Core
 	SDL_Renderer* Renderer::renderer = nullptr;
 
 
-	Renderer::Renderer(SDL_Window* window, RendererConfig config)
+	Renderer::Renderer(SDL_Window* window, const RendererConfig& config)
 	{
 	#if _DEBUG
 		DBG_ASSERT_MSG(window, "Window initialisation failed: %s\n", SDL_GetError());

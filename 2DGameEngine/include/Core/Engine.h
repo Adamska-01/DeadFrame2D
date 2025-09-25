@@ -4,7 +4,6 @@
 #include "Engine/SceneSystem/SceneManager.h"
 #include "Framerate/FrameTimer.h"
 #include "SubSystems/SubSystems.h"
-#include <Models/Engine/EngineConfig.h>
 
 
 namespace DeadFrame2D::Core
@@ -24,8 +23,6 @@ namespace DeadFrame2D::Core
 		EventManager eventManager;
 
 		FrameTimer frameTimer;
-
-		Shared::Models::EngineConfig engineConfig;
 
 
 	public:

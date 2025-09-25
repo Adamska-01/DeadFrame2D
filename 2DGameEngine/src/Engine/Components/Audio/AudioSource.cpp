@@ -12,8 +12,6 @@
 
 namespace DeadFrame2D::Engine
 {
-	using namespace Shared::Constants;
-
 	using namespace DeadFrame2D::Core;
 	using namespace DeadFrame2D::Constants;
 	using namespace DeadFrame2D::Data;
@@ -138,7 +136,9 @@ namespace DeadFrame2D::Engine
 		lastTransformPosition = transform->GetWorldPosition();
 		lastTransformRotation = transform->GetWorldRotation();
 
-		collisionBody->SetTransform(b2Vec2(lastTransformPosition.x * Physics::PIXEL_TO_METER, lastTransformPosition.y * Physics::PIXEL_TO_METER), lastTransformRotation * (MathConstants::PI / 180.0f));
+		const auto METER_PER_PIXEL = DeadFrame2D::Core::PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
+
+		collisionBody->SetTransform(b2Vec2(lastTransformPosition.x * METER_PER_PIXEL, lastTransformPosition.y * METER_PER_PIXEL), lastTransformRotation * (MathConstants::PI / 180.0f));
 
 		isDirty = false;
 	}
@@ -168,7 +168,7 @@ namespace DeadFrame2D::Engine
 
 		if (currentTransformPosition != lastTransformPosition || currentTransformRotation != currentTransformRotation)
 		{
-			currentTransformPosition *= Physics::PIXEL_TO_METER;
+			currentTransformPosition *= DeadFrame2D::Core::PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
 
 			collisionBody->SetTransform(b2Vec2(currentTransformPosition.x, currentTransformPosition.y), currentTransformRotation * (MathConstants::PI / 180.0f));
 			collisionBody->SetAwake(true);

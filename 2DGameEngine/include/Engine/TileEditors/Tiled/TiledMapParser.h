@@ -1,6 +1,6 @@
 #pragma once
 #include "Models/TileEditors/Tiled/TiledMap.h"
-#include "Utilities/Serialization/XML_Parser.h"
+#include "Tools/Serialization/XML_Parser.h"
 #include <memory>
 #include <tinyxml2.h>
 
@@ -32,7 +32,7 @@ Example XML map structure:
 
 namespace DeadFrame2D::Engine
 {
-	class TiledMapParser : public DeadFrame2D::Utilities::XML_Parser<std::shared_ptr<DeadFrame2D::Models::TiledMap>>
+	class TiledMapParser : public Shared::Tools::XML_Parser<std::shared_ptr<DeadFrame2D::Models::TiledMap>>
 	{
 	private:
 		DeadFrame2D::Models::TiledTileSet ParseTileSet(tinyxml2::XMLElement* xmlTileset);

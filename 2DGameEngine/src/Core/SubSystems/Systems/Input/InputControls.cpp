@@ -1,13 +1,12 @@
 #include "Core/SubSystems/Systems/Input/InputControls.h"
-#include "Utilities/Serialization/JsonSerializer.h"
 #include <iostream>
+#include <Tools/Serialization/JsonSerializer.h>
 
 
 namespace DeadFrame2D::Core
 {
 	using namespace Shared::Models;
-
-	using namespace DeadFrame2D::Utilities;
+	using namespace Shared::Tools;
 
 
 	std::unordered_map<std::string, std::vector<InputBinding>> InputControls::inputActions;

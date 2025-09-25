@@ -1,7 +1,6 @@
 #pragma once
-#include "Constants/PhysicsConstants.h"
 #include "Core/Math/Vector2.h"
-#include <box2d/box2d.h>
+#include "Core/SubSystems/Systems/PhysicsEngine2D.h"
 
 
 namespace DeadFrame2D::Utilities
@@ -25,14 +24,14 @@ namespace DeadFrame2D::Utilities
 	{
 		auto boxShape = new b2PolygonShape();
 
-		const auto PIXEL_TO_METER = Shared::Constants::Physics::PIXEL_TO_METER;
+		const auto METER_PER_PIXEL = DeadFrame2D::Core::PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
 
 		boxShape->SetAsBox(
-			halfWidth * PIXEL_TO_METER,
-			halfHeight * PIXEL_TO_METER,
+			halfWidth * METER_PER_PIXEL,
+			halfHeight * METER_PER_PIXEL,
 			b2Vec2(
-				center.x * PIXEL_TO_METER,
-				center.y * PIXEL_TO_METER),
+				center.x * METER_PER_PIXEL,
+				center.y * METER_PER_PIXEL),
 			angle);
 		
 		return boxShape;
@@ -49,12 +48,12 @@ namespace DeadFrame2D::Utilities
 	{
 		auto circleShape = new b2CircleShape();
 
-		const auto PIXEL_TO_METER = Shared::Constants::Physics::PIXEL_TO_METER;
+		const auto METER_PER_PIXEL = DeadFrame2D::Core::PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
 
-		circleShape->m_radius = radius * PIXEL_TO_METER;
+		circleShape->m_radius = radius * METER_PER_PIXEL;
 		circleShape->m_p = b2Vec2(
-			center.x * PIXEL_TO_METER,
-			center.y * PIXEL_TO_METER);
+			center.x * METER_PER_PIXEL,
+			center.y * METER_PER_PIXEL);
 		
 		return circleShape;
 	}

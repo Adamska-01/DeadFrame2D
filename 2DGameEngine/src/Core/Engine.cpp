@@ -2,8 +2,9 @@
 #include "Core/SubSystems/Systems/Renderer.h"
 #include "Core/SubSystems/Systems/TextureManager.h"
 #include "Engine/Components/Rendering/Camera.h"
-#include "Utilities/Serialization/JsonSerializer.h"
 #include <Constants/ResourcePaths.h>
+#include <Models/Other/SplashScreenConfig.h>
+#include <Models/SystemConfig.h>
 
 
 namespace DeadFrame2D::Core
@@ -17,14 +18,14 @@ namespace DeadFrame2D::Core
 
 	Engine::Engine()
 	{
-		engineConfig = DeserializeFromFile<EngineConfig>(Paths::Files::ENGINE_CONFIGURATION);
+		auto systemConfig = SystemConfig::LoadFromFiles();
 
 		engineSubSystems = std::make_unique<SubSystems>();
-		engineSubSystems->InitializeSubSystems(engineConfig);
+		engineSubSystems->InitializeSubSystems(systemConfig);
 
 		sceneManager = std::make_unique<SceneManager>();
 
-		frameTimer.SetTargetFramerate(engineConfig.rendering.targetFramerate);
+		frameTimer.SetTargetFramerate(systemConfig.rendering.targetFramerate);
 	}
 
 	std::optional<int> Engine::RenderSplashScreen()
@@ -44,10 +45,12 @@ namespace DeadFrame2D::Core
 			static_cast<int>(height * 0.4f)
 		};
 
+		auto splashScreenConfig = Shared::Tools::DeserializeFromFile<SplashScreenConfig>(Paths::Files::SPLASH_SCREEN_CONFIGURATION);
+
 		constexpr uint8_t MaxAlpha = 255;
-		auto fadeInDuration = engineConfig.splashScreen.fadeInDurationSeconds;
-		auto holdDuration = engineConfig.splashScreen.holdVisibleDurationSeconds;
-		auto fadeOutDuration = engineConfig.splashScreen.fadeOutDurationSeconds;
+		auto fadeInDuration = splashScreenConfig.fadeInDurationSeconds;
+		auto holdDuration = splashScreenConfig.holdVisibleDurationSeconds;
+		auto fadeOutDuration = splashScreenConfig.fadeOutDurationSeconds;
 		auto totalDuration = fadeInDuration + holdDuration + fadeOutDuration;
 
 		auto elapsedTime = 0.0f;

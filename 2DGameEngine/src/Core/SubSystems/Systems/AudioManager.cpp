@@ -1,29 +1,25 @@
 #include "Core/SubSystems/Systems/AudioManager.h"
 #include <algorithm>
-#include <Constants/AudioConstants.h>
+#include <cassert>
 #include <iostream>
 
 
 namespace DeadFrame2D::Core
 {
-	using namespace Shared::Constants;
+	using namespace Shared::Models;
+
+	
+	AudioManager* AudioManager::instance;
 
 
-	std::unordered_map<std::string, std::weak_ptr<Mix_Music>> AudioManager::musicCache;
-
-	std::unordered_map<std::string, std::weak_ptr<Mix_Chunk>> AudioManager::sfxCache;
-
-	std::mutex AudioManager::audioMutex;
-
-	float AudioManager::musicVolume = 1.0f;
-
-	float AudioManager::sfxVolume = 1.0f;
-
-	float AudioManager::masterVolume = 1.0f;
-
-
-	AudioManager::AudioManager()
+	AudioManager::AudioManager(const AudioConfig& audioConfig)
+		: audioConfig(audioConfig)
 	{
+		assert(instance == nullptr && "AudioManager was already initialized!");
+
+		musicCache.clear();
+		sfxCache.clear();
+
 		if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
 		{
 			std::cerr << "SDL_Mixer could not initialize! SDL_mixer Error: " << Mix_GetError() << std::endl;
@@ -31,7 +27,7 @@ namespace DeadFrame2D::Core
 			return;
 		}
 
-		Mix_AllocateChannels(Audio::MAX_SFX_CHANNEL_ALLOCATION);
+		Mix_AllocateChannels(audioConfig.maxSFXChannelAllocation);
 
 		std::cout << "[Info] SDL_Mixer successfully initialized." << std::endl;
 	}
@@ -70,11 +66,11 @@ namespace DeadFrame2D::Core
 	{
 		auto filePathString = std::string(filepath);
 
-		std::lock_guard<std::mutex> lock(audioMutex);
+		std::lock_guard<std::mutex> lock(instance->audioMutex);
 
-		auto it = musicCache.find(filePathString);
+		auto it = instance->musicCache.find(filePathString);
 
-		if (it != musicCache.end())
+		if (it != instance->musicCache.end())
 		{
 			if (auto cached = it->second.lock())
 				return cached;
@@ -91,7 +87,7 @@ namespace DeadFrame2D::Core
 
 		auto shared = std::shared_ptr<Mix_Music>(raw, Mix_FreeMusic);
 
-		musicCache[filePathString] = shared;
+		instance->musicCache[filePathString] = shared;
 	
 		return shared;
 	}
@@ -100,11 +96,11 @@ namespace DeadFrame2D::Core
 	{
 		auto filePathString = std::string(filepath);
 	
-		std::lock_guard<std::mutex> lock(audioMutex);
+		std::lock_guard<std::mutex> lock(instance->audioMutex);
 
-		auto it = sfxCache.find(filePathString);
+		auto it = instance->sfxCache.find(filePathString);
 
-		if (it != sfxCache.end())
+		if (it != instance->sfxCache.end())
 		{
 			if (auto cached = it->second.lock())
 				return cached;
@@ -121,9 +117,9 @@ namespace DeadFrame2D::Core
 
 		auto shared = std::shared_ptr<Mix_Chunk>(raw, Mix_FreeChunk);
 	
-		Mix_VolumeChunk(raw, sfxVolume);
+		Mix_VolumeChunk(raw, instance->audioConfig.sfxVolume);
 
-		sfxCache[filePathString] = shared;
+		instance->sfxCache[filePathString] = shared;
 
 		return shared;
 	}
@@ -132,6 +128,9 @@ namespace DeadFrame2D::Core
 	{
 		if (music == nullptr)
 			return false;
+
+		auto musicVolume = instance->audioConfig.musicVolume;
+		auto masterVolume = instance->audioConfig.masterVolume;
 
 		Mix_VolumeMusic(static_cast<int>((musicVolume * masterVolume) * MIX_MAX_VOLUME));
 	
@@ -154,6 +153,9 @@ namespace DeadFrame2D::Core
 		
 			return -1;
 		}
+
+		auto sfxVolume = instance->audioConfig.sfxVolume;
+		auto masterVolume = instance->audioConfig.masterVolume;
 	
 		Mix_Volume(channel, static_cast<int>((sfxVolume * masterVolume) * MIX_MAX_VOLUME));
 
@@ -169,6 +171,9 @@ namespace DeadFrame2D::Core
 		{
 			Mix_FadeOutMusic(fadeTimeMs);
 		}
+
+		auto musicVolume = instance->audioConfig.musicVolume;
+		auto masterVolume = instance->audioConfig.masterVolume;
 
 		Mix_VolumeMusic((musicVolume * masterVolume) / MIX_MAX_VOLUME);
 		Mix_FadeInMusic(music.get(), loopCount, fadeTimeMs);
@@ -201,21 +206,25 @@ namespace DeadFrame2D::Core
 
 	void AudioManager::SetMusicVolume(float volume)
 	{
-		musicVolume = std::clamp(volume, 0.0f, 1.0f);
+		auto newMusicVolume = instance->audioConfig.musicVolume = std::clamp(volume, 0.0f, 1.0f);
+		auto masterVolume = instance->audioConfig.masterVolume;
 
-		Mix_VolumeMusic(static_cast<int>((musicVolume * masterVolume) * MIX_MAX_VOLUME));
+		Mix_VolumeMusic(static_cast<int>((newMusicVolume * masterVolume) * MIX_MAX_VOLUME));
 	}
 
 	void AudioManager::SetGlobalSFXVolume(float volume)
 	{
-		sfxVolume = std::clamp(volume, 0.0f, 1.0f);
+		auto newSfxVolume = instance->audioConfig.sfxVolume = std::clamp(volume, 0.0f, 1.0f);
 
-		SetSFXVolume(sfxVolume);
+		SetSFXVolume(newSfxVolume);
 	}
 
 	void AudioManager::SetSFXVolume(float volume, int sfxChannel)
 	{
 		volume = std::clamp(volume, 0.0f, 1.0f);
+
+		auto sfxVolume = instance->audioConfig.sfxVolume;
+		auto masterVolume = instance->audioConfig.masterVolume;
 
 		// If sfxChannel == -1, it will set the volume of all channels
 		Mix_Volume(sfxChannel, static_cast<int>((volume * sfxVolume * masterVolume) * MIX_MAX_VOLUME));
@@ -223,24 +232,25 @@ namespace DeadFrame2D::Core
 
 	void AudioManager::SetMasterVolume(float volume)
 	{
-		masterVolume = std::clamp(volume, 0.0f, 1.0f);
+		auto newMasterVolume = instance->audioConfig.masterVolume = std::clamp(volume, 0.0f, 1.0f);
+		auto sfxVolume = instance->audioConfig.sfxVolume;
 
-		SetMusicVolume(musicVolume);
+		SetMusicVolume(newMasterVolume);
 		SetSFXVolume(sfxVolume);
 	}
 
 	float AudioManager::GetMasterVolume()
 	{
-		return masterVolume;
+		return instance->audioConfig.masterVolume;
 	}
 
 	float AudioManager::GetMusicGlobalVolume()
 	{
-		return musicVolume;
+		return instance->audioConfig.musicVolume;
 	}
 
 	float AudioManager::GetGlobalSFXVolume()
 	{
-		return sfxVolume;
+		return instance->audioConfig.sfxVolume;
 	}
 }

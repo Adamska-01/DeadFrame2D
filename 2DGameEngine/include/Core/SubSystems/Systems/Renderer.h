@@ -2,7 +2,7 @@
 #include "Core/Math/Vector2.h"
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
 #include <cstdint>
-#include <Models/Engine/RendererConfig.h>
+#include <Models/Rendering/RendererConfig.h>
 #include <SDL.h>
 
 
@@ -17,7 +17,7 @@ namespace DeadFrame2D::Core
 		static SDL_Renderer* renderer;
 
 
-		Renderer(SDL_Window* window, Shared::Models::RendererConfig config);
+		Renderer(SDL_Window* window, const Shared::Models::RendererConfig& config);
 
 		virtual ~Renderer() override;
 

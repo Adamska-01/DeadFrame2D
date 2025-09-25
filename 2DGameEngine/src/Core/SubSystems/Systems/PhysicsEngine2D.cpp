@@ -2,27 +2,27 @@
 #include "Core/SubSystems/Systems/PhysicsEngine2D.h"
 #include "Data/Collision/ContactListener.h"
 #include "Factories/Concretions/Debugging/ColliderDrawerFactory.h"
-#include "Utilities/Serialization/JsonSerializer.h"
 #include <box2d/box2d.h>
 #include <cassert>
-#include <Constants/PhysicsConstants.h>
 #include <Constants/ResourcePaths.h>
+#include <Tools/Serialization/JsonSerializer.h>
 
 
 namespace DeadFrame2D::Core
 {
 	using namespace Shared::Constants;
 	using namespace Shared::Models;
+	using namespace Shared::Tools;
 
 	using namespace DeadFrame2D::Data;
-	using namespace DeadFrame2D::Utilities;
 	using namespace DeadFrame2D::Factories;
 
 
 	PhysicsEngine2D* PhysicsEngine2D::instance;
 
 
-	PhysicsEngine2D::PhysicsEngine2D(const Vector2F& gravity)
+	PhysicsEngine2D::PhysicsEngine2D(const PhysicsConfig& physicsConfig)
+		: physicsConfig(physicsConfig)
 	{
 		assert(instance == nullptr && "PhysicsEngine2D was already initialized!");
 
@@ -33,7 +33,7 @@ namespace DeadFrame2D::Core
 		debugDrawer = std::unique_ptr<b2Draw>(ColliderDrawerFactory().CreateProduct());
 
 
-		world = std::make_unique<b2World>(b2Vec2(gravity.x, gravity.y));
+		world = std::make_unique<b2World>(b2Vec2(physicsConfig.gravityX, physicsConfig.gravityY));
 
 		world->SetContactListener(contactListener.get());
 
@@ -67,7 +67,7 @@ namespace DeadFrame2D::Core
 
 	void PhysicsEngine2D::EndUpdate()
 	{
-		world->Step(FrameTimer::DeltaTime(), Physics::VELOCITY_ITERATIONS, Physics::POSITION_ITERATIONS);
+		world->Step(FrameTimer::DeltaTime(), physicsConfig.velocityIterations, physicsConfig.positionIterations);
 	}
 
 	void PhysicsEngine2D::EndDraw()
@@ -77,16 +77,15 @@ namespace DeadFrame2D::Core
 
 	Vector2F PhysicsEngine2D::GetGravity()
 	{
-		auto b2Gravity = instance->world->GetGravity();
-
-		return Vector2F(b2Gravity.x, b2Gravity.y);
+		return Vector2F(instance->physicsConfig.gravityX, instance->physicsConfig.gravityY);
 	}
 
 	void PhysicsEngine2D::SetGravity(const Vector2F& newGravity)
 	{
-		auto b2Gravity = b2Vec2(newGravity.x, newGravity.y);
+		instance->physicsConfig.gravityX = newGravity.x;
+		instance->physicsConfig.gravityY = newGravity.y;
 
-		instance->world->SetGravity(b2Gravity);
+		instance->world->SetGravity(b2Vec2(newGravity.x, newGravity.y));
 	}
 
 	b2Body* PhysicsEngine2D::CreateBody(const b2BodyDef* bodyDef)
@@ -97,6 +96,11 @@ namespace DeadFrame2D::Core
 	void PhysicsEngine2D::DestroyBody(b2Body* bodyToDestroy)
 	{
 		return instance->world->DestroyBody(bodyToDestroy);
+	}
+
+	const Shared::Models::PhysicsConfig& PhysicsEngine2D::GetPhysicsConfig()
+	{
+		return instance->physicsConfig;
 	}
 
 	const CollisionMasks& PhysicsEngine2D::GetCollisionMasks()

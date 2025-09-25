@@ -3,7 +3,7 @@
 #include "Core/Math/Vector2.h"
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
 #include "Data/Window/WindowMode.h"
-#include <Models/Engine/WindowConfig.h>
+#include <Models/Window/WindowConfig.h>
 #include <vector>
 
 
