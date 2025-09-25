@@ -27,7 +27,7 @@ namespace Shared::Tools
 
 
 		inline static std::filesystem::path prefix = "";
-	
+
 		inline static std::unordered_map<std::string, std::filesystem::path> mounts = {};
 
 

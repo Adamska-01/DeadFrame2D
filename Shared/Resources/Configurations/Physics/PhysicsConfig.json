@@ -1,0 +1,7 @@
+{
+	"gravityX": 0.0,
+	"gravityY": 9.81,
+	"velocityIterations": 8,
+	"positionIterations": 3,
+	"pixelPerMeter": 40.0
+}

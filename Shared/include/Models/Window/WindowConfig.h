@@ -14,7 +14,7 @@ namespace Shared::Models
 		int height = 1080;
 
 		bool fullscreen = false;
-	
+
 
 		NLOHMANN_DEFINE_TYPE_INTRUSIVE(WindowConfig, title, width, height, fullscreen)
 	};
