@@ -1,7 +1,7 @@
 project "Shared"
 	kind "StaticLib"
 	language "C++" -- Doesn't really matter
-	cppdialect "C++17"
+	cppdialect "C++20"
 	staticruntime "on"
 	
 	targetdir ("./Binaries/" .. OutputDir)
@@ -20,7 +20,9 @@ project "Shared"
 		"../Vendor/nlohmann-3.11.3"
 	}
 	
-	filter {}
+	filter "system:windows"
+		buildoptions { "/permissive-" }
+
 	filter "configurations:Debug"
 		defines { "DEBUG" }
 		runtime "Debug"
