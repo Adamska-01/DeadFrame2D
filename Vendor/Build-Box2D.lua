@@ -1,12 +1,13 @@
 project "Box2D"
 	kind "StaticLib"
+	location "./Box2D"
 	language "C++"
-	cppdialect "C++17"
+	cppdialect "C++20"
 	staticruntime "on"
 	defines { "_Static_assert=static_assert" }
 
-	targetdir ("./Box2D/Binaries/" .. OutputDir)
-	objdir ("./Box2D/Binaries/Intermediates/" .. OutputDir)
+	targetdir ("./Binaries/Box2D/" .. OutputDir)
+	objdir ("./Binaries/Box2D/Intermediates/" .. OutputDir)
 
 	files {
 		"Box2D/src/**.cpp",
