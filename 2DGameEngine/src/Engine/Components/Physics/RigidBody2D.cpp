@@ -61,7 +61,9 @@ namespace DeadFrame2D::Engine
 
 		auto METER_PER_PIXEL = PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
 
-		body->SetTransform(b2Vec2(lastTransformPosition.x * METER_PER_PIXEL, lastTransformPosition.y * METER_PER_PIXEL), lastTransformRotation * (MathConstants::PI / 180.0f));
+		auto angleRad = lastTransformRotation * (MathConstants::PI_f / 180.0f);
+
+		body->SetTransform(b2Vec2(lastTransformPosition.x * METER_PER_PIXEL, lastTransformPosition.y * METER_PER_PIXEL), angleRad);
 	}
 
 	void RigidBody2D::Start()
@@ -93,18 +95,20 @@ namespace DeadFrame2D::Engine
 		}
 		if (currentTransformRotation != lastTransformRotation)
 		{
-			body->SetTransform(body->GetPosition(), currentTransformRotation * (MathConstants::PI / 180.0f));
+			auto angleRad = currentTransformRotation * (MathConstants::PI_f / 180.0f);
+
+			body->SetTransform(body->GetPosition(), angleRad);
 		}
 
 		auto pos = body->GetPosition();
-		auto angle = body->GetAngle();
+		auto angle = body->GetAngle() * (180.0f / MathConstants::PI_f);
 
 		pos.x *= PIXEL_PER_METER;
 		pos.y *= PIXEL_PER_METER;
 
 		// Sync transform to physics body
 		transform->SetWorldPosition(Vector2F(pos.x, pos.y));
-		transform->SetLocalRotation(angle * (180.0f / MathConstants::PI));
+		transform->SetLocalRotation(angle);
 
 		lastTransformPosition = transform->GetWorldPosition();
 		lastTransformRotation = transform->GetWorldRotation();

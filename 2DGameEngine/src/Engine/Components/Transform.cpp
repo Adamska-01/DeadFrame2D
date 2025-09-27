@@ -123,7 +123,7 @@ namespace DeadFrame2D::Engine
 
 	void Transform::RotateByRadians(float radian)
 	{
-		localRotation += radian * (180.0f / MathConstants::PI);
+		localRotation += radian * (180.0f / MathConstants::PI_f);
 
 		MarkDirty();
 	}
@@ -201,9 +201,9 @@ namespace DeadFrame2D::Engine
 
 	Vector2F Transform::GetForward() const
 	{
-		auto radians = GetWorldRotation() * (MathConstants::PI / 180.0f);
+		auto radians = GetWorldRotation() * (MathConstants::PI_f / 180.0f);
 
-		return Vector2F(std::cos(radians), std::sin(radians));
+		return Vector2F(cosf(radians), sinf(radians));
 	}
 
 	void Transform::SetLocalPosition(const Vector2F& pos)

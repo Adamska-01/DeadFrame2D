@@ -140,9 +140,9 @@ namespace DeadFrame2D::Core
 		auto cx = rect.x + rect.w * 0.5f;
 		auto cy = rect.y + rect.h * 0.5f;
 
-		auto angleRad = angleDegrees * (MathConstants::PI / 180.0f);
-		auto cosA = std::cos(angleRad);
-		auto sinA = std::sin(angleRad);
+		auto angleRad = angleDegrees * static_cast<float>(MathConstants::PI / 180.0);
+		auto cosA = cosf(angleRad);
+		auto sinA = sinf(angleRad);
 
 		SDL_FPoint corners[4] = 
 		{
@@ -238,7 +238,7 @@ namespace DeadFrame2D::Core
 			return;
 
 		auto screenCenter = circle.position;
-		auto radius = static_cast<int>(circle.radius);
+		auto radius = circle.radius;
 	
 		if (camera != nullptr)
 		{
@@ -264,12 +264,12 @@ namespace DeadFrame2D::Core
 			// Vertices
 			for (auto i = 0; i <= segments; ++i)
 			{
-				float angle = 2.0f * MathConstants::PI * i / segments;
+				auto angle = (2.0f * MathConstants::PI_f * i) / segments;
 				vertices[i + 1] = 
 				{
-					{ screenCenter.x + cosf(angle) * radius, screenCenter.y + sinf(angle) * radius },
-					color,
-					{ (cosf(angle) + 1) * 0.5f, (sinf(angle) + 1) * 0.5f }
+					.position = { screenCenter.x + cosf(angle) * radius, screenCenter.y + sinf(angle) * radius },
+					.color = color,
+					.tex_coord = { (cosf(angle) + 1.0f) * 0.5f, (sinf(angle) + 1.0f) * 0.5f }
 				};
 			}
 
@@ -293,7 +293,7 @@ namespace DeadFrame2D::Core
 		
 			for (auto i = 0; i <= segments; ++i)
 			{
-				float angle = 2.0f * MathConstants::PI * i / segments;
+				auto angle = (2.0f * MathConstants::PI_f * i) / segments;
 			
 				points[i].x = static_cast<int>(screenCenter.x + cosf(angle) * radius);
 				points[i].y = static_cast<int>(screenCenter.y + sinf(angle) * radius);

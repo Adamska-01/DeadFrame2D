@@ -122,8 +122,8 @@ namespace DeadFrame2D::Utilities::Collision
 		auto invdir = Vector2F(1.0f / ray_dir.x, 1.0f / ray_dir.y);
 
 		// Calculate intersections with rectangle bounding axes
-		auto t_near = (Vector2F(target->x, target->y) - ray_origin) * invdir;
-		auto t_far = (Vector2F(target->x, target->y) + Vector2F(target->w, target->h) - ray_origin) * invdir;
+		auto t_near = (Vector2F(static_cast<float>(target->x), static_cast<float>(target->y)) - ray_origin) * invdir;
+		auto t_far = (Vector2F(static_cast<float>(target->x + target->w), static_cast<float>(target->y + target->h)) - ray_origin) * invdir;
 
 		if (std::isnan(t_far.y) || std::isnan(t_far.x) || std::isnan(t_near.y) || std::isnan(t_near.x))
 			return false;
@@ -158,11 +158,11 @@ namespace DeadFrame2D::Utilities::Collision
 
 		if (t_near.x > t_near.y)
 		{
-			contact_normal = invdir.x < 0 ? Vector2F(1, 0) : Vector2F(-1, 0);
+			contact_normal = invdir.x < 0 ? Vector2F::Right : Vector2F::Left;
 		}
 		else if (t_near.x < t_near.y)
 		{
-			contact_normal = invdir.y < 0 ? Vector2F(0,  1) : Vector2F(0, -1);
+			contact_normal = invdir.y < 0 ? Vector2F::Down : Vector2F::Up;
 		}
 
 		// Note if t_near == t_far, collision is principly in a diagonal

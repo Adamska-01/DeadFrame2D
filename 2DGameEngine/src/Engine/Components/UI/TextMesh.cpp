@@ -81,8 +81,8 @@ namespace DeadFrame2D::Engine
 		auto width = 0, height = 0;
 		SDL_QueryTexture(textTexture.get(), NULL, NULL, &width, &height);
 
-		widgetSize.x = static_cast<int>(width);
-		widgetSize.y = static_cast<int>(height);
+		widgetSize.x = static_cast<float>(width);
+		widgetSize.y = static_cast<float>(height);
 	}
 
 	void TextMesh::SetIsCentered(bool isCentered)

@@ -70,12 +70,12 @@ namespace DeadFrame2D::Core
 			if (elapsedTime < fadeInDuration)
 			{
 				auto t = elapsedTime / fadeInDuration;
-				alpha *= t;
+				alpha = static_cast<uint8_t>(alpha * t);
 			}
 			else if (elapsedTime > totalDuration - fadeOutDuration)
 			{
 				auto t = 1.0f - ((elapsedTime - (totalDuration - fadeOutDuration)) / fadeOutDuration);
-				alpha *= t;
+				alpha = static_cast<uint8_t>(alpha * t);
 			}
 
 			Renderer::ClearBuffer();

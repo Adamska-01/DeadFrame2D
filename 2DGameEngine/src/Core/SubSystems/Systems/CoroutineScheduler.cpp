@@ -4,6 +4,7 @@
 #include "Utilities/Debugging/Guards.h"
 #include <algorithm>
 #include <cassert>
+#include <iostream>
 #include <stdexcept>
 
 
@@ -26,7 +27,9 @@ namespace DeadFrame2D::Core
 	{
 		if (instance != this)
 		{
-			throw std::runtime_error("CoroutineScheduler::current does not match this instance.");
+			std::cerr << "[Error] CoroutineScheduler::~CoroutineScheduler(): instance mismatch.\n";
+
+			assert(false && "CoroutineScheduler::instance does not match this instance.");
 		}
 
 		Reset();

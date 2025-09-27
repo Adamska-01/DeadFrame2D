@@ -57,7 +57,7 @@ namespace DeadFrame2D::Engine
 
 		fixtures.clear();
 
-		auto angle = transform->GetWorldRotation() * (MathConstants::PI / 180.0f);
+		auto angle = transform->GetWorldRotation() * (MathConstants::PI_f / 180.0f);
 
 		for (const auto& layer : collisionLayers)
 		{
