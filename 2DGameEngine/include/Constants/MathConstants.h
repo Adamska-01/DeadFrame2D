@@ -1,7 +1,10 @@
 #pragma once
+#include <numbers>
 
 
 namespace DeadFrame2D::Constants::MathConstants
 {
-	constexpr double PI = 3.14159265358979323846;
+	constexpr double PI = std::numbers::pi;
+	
+	constexpr float PI_f = std::numbers::pi_v<float>;
 }
