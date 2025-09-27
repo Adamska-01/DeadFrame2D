@@ -12,7 +12,7 @@ namespace DeadFrame2D::Core
 		auto& buttons = config.buttons;
 
 		SDL_MessageBoxData messageBoxData = {
-			config.type,
+			static_cast<Uint32>(config.type),
 			nullptr,
 			config.title.c_str(),
 			config.message.c_str(),
