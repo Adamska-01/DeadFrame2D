@@ -6,7 +6,7 @@ workspace "Project"
 
 	-- Workspace-wide build options for MSVC (Windows-specific)
 	filter "system:windows"
-		buildoptions { "/EHsc", "/Zc:preprocessor", "/Zc:__cplusplus" }
+		buildoptions { "/EHsc", "/Zc:preprocessor", "/Zc:__cplusplus", "/permissive-" }
 
 	-- Output directory structure for builds
 	OutputDir = "%{cfg.system}-%{cfg.architecture}/%{cfg.buildcfg}"
@@ -26,7 +26,7 @@ workspace "Project"
 		}
 	end
 
-	function get_box2d_libdirs(basePath)
+	function get_libdir(basePath)
 		return {
 			basePath .. OutputDir
 		}
@@ -36,3 +36,4 @@ workspace "Project"
 	include "2DGameEngine/Build-2DGameEngine.lua"
 	include "Shared/Build-Shared.lua" 
 	include "Vendor/Build-Box2D.lua"
+	include "Vendor/Build-tinyxml2.lua"
