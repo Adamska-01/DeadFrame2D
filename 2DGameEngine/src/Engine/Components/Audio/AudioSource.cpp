@@ -138,7 +138,9 @@ namespace DeadFrame2D::Engine
 
 		const auto METER_PER_PIXEL = DeadFrame2D::Core::PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
 
-		collisionBody->SetTransform(b2Vec2(lastTransformPosition.x * METER_PER_PIXEL, lastTransformPosition.y * METER_PER_PIXEL), lastTransformRotation * (MathConstants::PI / 180.0f));
+		auto angleRad = lastTransformRotation * (MathConstants::PI_f / 180.0f);
+
+		collisionBody->SetTransform(b2Vec2(lastTransformPosition.x * METER_PER_PIXEL, lastTransformPosition.y * METER_PER_PIXEL), angleRad);
 
 		isDirty = false;
 	}
@@ -170,7 +172,9 @@ namespace DeadFrame2D::Engine
 		{
 			currentTransformPosition *= DeadFrame2D::Core::PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
 
-			collisionBody->SetTransform(b2Vec2(currentTransformPosition.x, currentTransformPosition.y), currentTransformRotation * (MathConstants::PI / 180.0f));
+			auto angleRad = currentTransformRotation * (MathConstants::PI_f / 180.0f);
+
+			collisionBody->SetTransform(b2Vec2(currentTransformPosition.x, currentTransformPosition.y), angleRad);
 			collisionBody->SetAwake(true);
 		}
 
@@ -292,7 +296,7 @@ namespace DeadFrame2D::Engine
 		isDirty = true;
 	}
 
-	int AudioSource::GetVolume() const
+	float AudioSource::GetVolume() const
 	{
 		return volume;
 	}

@@ -92,6 +92,6 @@ namespace DeadFrame2D::Engine
 
 		void SetMinDistance(float newMinDistance);
 
-		int GetVolume() const;
+		float GetVolume() const;
 	};
 }
