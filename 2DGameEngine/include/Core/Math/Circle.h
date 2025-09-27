@@ -16,8 +16,8 @@ namespace DeadFrame2D::Core
 		Circle(const Vector2F& pos, float r);
 
 
-		float Area() const;
+		double Area() const;
 
-		float Circumference() const;
+		double Circumference() const;
 	};
 }

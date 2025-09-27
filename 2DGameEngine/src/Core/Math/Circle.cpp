@@ -18,12 +18,12 @@ namespace DeadFrame2D::Core
 	{
 	}
 
-	float Circle::Area() const 
+	double Circle::Area() const 
 	{
 		return MathConstants::PI * radius * radius;
 	}
 
-	float Circle::Circumference() const 
+	double Circle::Circumference() const
 	{
 		return 2.0f * MathConstants::PI * radius;
 	}
