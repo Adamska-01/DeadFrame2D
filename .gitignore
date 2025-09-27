@@ -11,8 +11,7 @@ Logs/
 *.log
 Makefile
 
-# Exclude
-!Vendor/Binaries
+Vendor/Binaries
 
 # Ignore all Linux lib folders for SDL libs
 Vendor/SDL/**/lib/Linux/
