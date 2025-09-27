@@ -20,9 +20,7 @@ project "Shared"
 		"../Vendor/nlohmann-3.11.3"
 	}
 	
-	filter "system:windows"
-		buildoptions { "/permissive-" }
-
+	filter {}
 	filter "configurations:Debug"
 		defines { "DEBUG" }
 		runtime "Debug"
