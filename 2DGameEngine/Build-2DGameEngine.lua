@@ -8,12 +8,11 @@ project "2DGameEngine"
 	objdir ("./Binaries/Intermediates/" .. OutputDir)
 	debugdir "../" -- Set working directory to the root of the solution
 	
-	dependson { "Box2D" }
+	dependson { "Box2D", "tinyxml2" }
 
 	files { 
 		"include/**.h", 
-		"src/**.cpp",
-		"../Vendor/tinyxml2-10.0.0/**.cpp" 
+		"src/**.cpp"
 	}
 
 	includedirs { 
@@ -30,39 +29,43 @@ project "2DGameEngine"
 
 	-- Linux
 	filter "system:linux"
-		links { "SDL2", "SDL2_image", "SDL2_ttf", "SDL2_mixer", "Box2D" }
+		links { "SDL2", "SDL2_image", "SDL2_ttf", "SDL2_mixer", "Box2D", "tinyxml2" }
 
 	-- Linux x86
 	filter { "system:linux", "platforms:x86" }
 		architecture "x86"
 		libdirs(table.join(
 			get_sdl_libdirs("../Vendor/SDL/", "Linux/", "x86/"),
-			get_box2d_libdirs("../Vendor/Box2D/Binaries/")))
+			get_libdir("../Vendor/Binaries/Box2D/"),
+			get_libdir("../Vendor/Binaries/tinyxml2-10.0.0/")))
 
 	-- Linux x64
 	filter { "system:linux", "platforms:x64" }
 		architecture "x86_64"
 		libdirs(table.join(
 			get_sdl_libdirs("../Vendor/SDL/", "Linux/", "x64/"),
-			get_box2d_libdirs("../Vendor/Box2D/Binaries/")))
+			get_libdir("../Vendor/Binaries/Box2D/"),
+			get_libdir("../Vendor/Binaries/tinyxml2-10.0.0/")))
 
 	-- Windows
 	filter "system:windows"
-		links { "SDL2.lib", "SDL2main.lib", "SDL2_Image.lib", "SDL2_ttf.lib", "SDL2_mixer.lib", "Box2D.lib" }
+		links { "SDL2.lib", "SDL2main.lib", "SDL2_Image.lib", "SDL2_ttf.lib", "SDL2_mixer.lib", "Box2D.lib", "tinyxml2.lib" }
 		
 	-- Windows x86
 	filter { "system:windows", "platforms:x86" }
 		architecture "x86"
 		libdirs(table.join(
 			get_sdl_libdirs("../Vendor/SDL/", "Windows/", "x86/"),
-			get_box2d_libdirs("../Vendor/Box2D/Binaries/")))
+			get_libdir("../Vendor/Binaries/Box2D/"),
+			get_libdir("../Vendor/Binaries/tinyxml2-10.0.0/")))
 
 	-- Windows x64
 	filter { "system:windows", "platforms:x64" }
 		architecture "x64"
 		libdirs(table.join(
 			get_sdl_libdirs("../Vendor/SDL/", "Windows/", "x64/"),
-			get_box2d_libdirs("../Vendor/Box2D/Binaries/")))
+			get_libdir("../Vendor/Binaries/Box2D/"),
+			get_libdir("../Vendor/Binaries/tinyxml2-10.0.0/")))
 
 	filter {}
 	filter "configurations:Debug"
