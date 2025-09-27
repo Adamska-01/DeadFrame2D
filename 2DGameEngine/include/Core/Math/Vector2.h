@@ -143,7 +143,7 @@ namespace DeadFrame2D::Core
 	template<typename T>
 	inline constexpr T Vector2<T>::AngleBetween(const Vector2<T> other) const
 	{
-		auto angle = atan2(y - other.y, x - other.x) * (DeadFrame2D::Constants::MathConstants::PI / 180);
+		auto angle = atan2(y - other.y, x - other.x) * (DeadFrame2D::Constants::MathConstants::PI / 180.0);
 
 		return angle >= 0 ? angle : 360 + angle;
 	}
@@ -175,9 +175,9 @@ namespace DeadFrame2D::Core
 	template<typename T>
 	inline constexpr Vector2<T> Vector2<T>::Rotated(float angleInDegrees) const
 	{
-		float radians = angleInDegrees * DeadFrame2D::Constants::MathConstants::PI / 180.0f;
-		float cosA = std::cos(radians);
-		float sinA = std::sin(radians);
+		auto radians = (angleInDegrees * DeadFrame2D::Constants::MathConstants::PI_f) / 180.0f;
+		auto cosA = cosf(radians);
+		auto sinA = sinf(radians);
 
 		return Vector2<T>(
 			static_cast<T>(x * cosA - y * sinA),
