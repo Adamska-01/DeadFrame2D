@@ -37,7 +37,7 @@ project "2DGameEngine"
 		libdirs(table.join(
 			get_sdl_libdirs("../Vendor/SDL/", "Linux/", "x86/"),
 			get_libdir("../Vendor/Box2D/Binaries/"),
-			get_libdir("../Vendor/Binaries/tinyxml2-10.0.0/")))
+			get_libdir("../Vendor/tinyxml2-10.0.0/Binaries/")))
 
 	-- Linux x64
 	filter { "system:linux", "platforms:x64" }
@@ -45,7 +45,7 @@ project "2DGameEngine"
 		libdirs(table.join(
 			get_sdl_libdirs("../Vendor/SDL/", "Linux/", "x64/"),
 			get_libdir("../Vendor/Box2D/Binaries/"),
-			get_libdir("../Vendor/Binaries/tinyxml2-10.0.0/")))
+			get_libdir("../Vendor/tinyxml2-10.0.0/Binaries/")))
 
 	-- Windows
 	filter "system:windows"
@@ -57,7 +57,7 @@ project "2DGameEngine"
 		libdirs(table.join(
 			get_sdl_libdirs("../Vendor/SDL/", "Windows/", "x86/"),
 			get_libdir("../Vendor/Box2D/Binaries/"),
-			get_libdir("../Vendor/Binaries/tinyxml2-10.0.0/")))
+			get_libdir("../Vendor/tinyxml2-10.0.0/Binaries/")))
 
 	-- Windows x64
 	filter { "system:windows", "platforms:x64" }
@@ -65,7 +65,7 @@ project "2DGameEngine"
 		libdirs(table.join(
 			get_sdl_libdirs("../Vendor/SDL/", "Windows/", "x64/"),
 			get_libdir("../Vendor/Box2D/Binaries/"),
-			get_libdir("../Vendor/Binaries/tinyxml2-10.0.0/")))
+			get_libdir("../Vendor/tinyxml2-10.0.0/Binaries/")))
 
 	filter {}
 	filter "configurations:Debug"
