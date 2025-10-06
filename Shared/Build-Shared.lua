@@ -1,12 +1,14 @@
 project "Shared"
-	kind "StaticLib"
-	language "C++" -- Doesn't really matter
+	kind "SharedLib"
+	language "C++"
 	cppdialect "C++20"
-	staticruntime "on"
+	staticruntime "off"
 	
 	targetdir ("./Binaries/" .. OutputDir)
 	objdir ("./Binaries/Intermediates/" .. OutputDir)
 	debugdir "../"
+
+	defines { "SHARED_DYNAMIC", "SHARED_DYNAMIC_BUILD" }
 
 	files { 
 		"./include/**.h",
