@@ -1,14 +1,16 @@
 project "2DGameEngine"
-	kind "StaticLib"
+	kind "SharedLib"
 	language "C++"
 	cppdialect "C++20"
-	staticruntime "on"
+	staticruntime "off"
 
-	targetdir ("./Binaries/" .. OutputDir)
+	targetdir ("./Binaries/" .. OutputDir) -- .dll
 	objdir ("./Binaries/Intermediates/" .. OutputDir)
 	debugdir "../" -- Set working directory to the root of the solution
 	
-	dependson { "Box2D", "tinyxml2" }
+	defines { "DF2D_DYNAMIC", "DF2D_DYNAMIC_BUILD", "SHARED_DYNAMIC" }
+
+	dependson { "Box2D", "tinyxml2", "Shared" }
 
 	files { 
 		"include/**.h", 
@@ -27,45 +29,45 @@ project "2DGameEngine"
 		"../Vendor/SDL/SDL2_mixer-2.8.0/include" 
 	}
 
-	-- Linux
-	filter "system:linux"
-		links { "SDL2", "SDL2_image", "SDL2_ttf", "SDL2_mixer", "Box2D", "tinyxml2" }
+	links { "SDL2", "SDL2_image", "SDL2_ttf", "SDL2_mixer", "Shared", "Box2D", "tinyxml2" }
 
-	-- Linux x86
-	filter { "system:linux", "platforms:x86" }
+
+	-- Utility to configure platform + arch libdirs in a single call
+	function configure_platform_libs(osName, arch)
+		libdirs(table.join(
+			get_sdl_libdirs("../Vendor/SDL/", osName, arch),
+			get_libdir("../Shared/Binaries/"),
+			get_libdir("../Vendor/Box2D/Binaries/"),
+			get_libdir("../Vendor/tinyxml2-10.0.0/Binaries/")
+		))
+	end
+
+
+	filter "platforms:x86"
 		architecture "x86"
-		libdirs(table.join(
-			get_sdl_libdirs("../Vendor/SDL/", "Linux/", "x86/"),
-			get_libdir("../Vendor/Box2D/Binaries/"),
-			get_libdir("../Vendor/tinyxml2-10.0.0/Binaries/")))
 
-	-- Linux x64
-	filter { "system:linux", "platforms:x64" }
-		architecture "x86_64"
-		libdirs(table.join(
-			get_sdl_libdirs("../Vendor/SDL/", "Linux/", "x64/"),
-			get_libdir("../Vendor/Box2D/Binaries/"),
-			get_libdir("../Vendor/tinyxml2-10.0.0/Binaries/")))
+	filter "platforms:x64"
+		architecture "x64"
+
 
 	-- Windows
 	filter "system:windows"
-		links { "SDL2.lib", "SDL2main.lib", "SDL2_Image.lib", "SDL2_ttf.lib", "SDL2_mixer.lib", "Box2D.lib", "tinyxml2.lib" }
-		
-	-- Windows x86
-	filter { "system:windows", "platforms:x86" }
-		architecture "x86"
-		libdirs(table.join(
-			get_sdl_libdirs("../Vendor/SDL/", "Windows/", "x86/"),
-			get_libdir("../Vendor/Box2D/Binaries/"),
-			get_libdir("../Vendor/tinyxml2-10.0.0/Binaries/")))
+		implibdir ("./Binaries/" .. OutputDir)
 
-	-- Windows x64
+	filter { "system:windows", "platforms:x86" }
+		configure_platform_libs("Windows", "x86")
+	
 	filter { "system:windows", "platforms:x64" }
-		architecture "x64"
-		libdirs(table.join(
-			get_sdl_libdirs("../Vendor/SDL/", "Windows/", "x64/"),
-			get_libdir("../Vendor/Box2D/Binaries/"),
-			get_libdir("../Vendor/tinyxml2-10.0.0/Binaries/")))
+		configure_platform_libs("Windows", "x64")
+
+
+	-- Linux
+	filter { "system:linux", "platforms:x86" }
+		configure_platform_libs("Linux", "x86")
+	
+	filter { "system:linux", "platforms:x64" }
+		configure_platform_libs("Linux", "x64")
+
 
 	filter {}
 	filter "configurations:Debug"
