@@ -11,13 +11,14 @@ workspace "Project"
 	-- Output directory structure for builds
 	OutputDir = "%{cfg.system}-%{cfg.architecture}/%{cfg.buildcfg}"
 
+
 	-- Helpers
 	function get_sdl_libdirs(basePath, platformPath, architecturePath)
 		local sdl_version = "2.30.10"
 		local image_version = "2.8.2"
 		local ttf_version = "2.22.0"
 		local mixer_version = "2.8.0"
-		
+
 		return {
 			basePath .. "SDL2-" .. sdl_version .. "/lib/" .. platformPath .. "/" .. architecturePath,
 			basePath .. "SDL2_image-" .. image_version .. "/lib/" .. platformPath .. "/" .. architecturePath,
@@ -31,6 +32,7 @@ workspace "Project"
 			basePath .. OutputDir
 		}
 	end
+
 	
 	-- Include Core build script
 	include "2DGameEngine/Build-2DGameEngine.lua"
