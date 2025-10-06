@@ -1,4 +1,5 @@
 #pragma once
+#include "Shared_API.h"
 #include <filesystem>
 #include <string>
 #include <unordered_map>
@@ -10,7 +11,7 @@ namespace Shared::Tools
 	struct ResolvedPath;
 
 
-	class PathMountResolver
+	class SHARED_API PathMountResolver
 	{
 	private:
 		PathMountResolver() = delete;
