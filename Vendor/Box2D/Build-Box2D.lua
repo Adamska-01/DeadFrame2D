@@ -2,7 +2,7 @@ project "Box2D"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++20"
-	staticruntime "on"
+	staticruntime "off"
 	defines { "_Static_assert=static_assert" }
 
 	targetdir ("./Binaries/" .. OutputDir)
