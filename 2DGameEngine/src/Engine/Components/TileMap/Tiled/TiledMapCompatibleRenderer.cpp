@@ -21,7 +21,9 @@ namespace DeadFrame2D::Engine
 
 	void TiledMapCompatibleRenderer::Init()
 	{
-		for (size_t i = 0; i < tileMap->tileSets.size(); i++)
+		auto size = static_cast<int>(tileMap->tileSets.size());
+
+		for (auto i = 0; i < size; i++)
 		{
 			for (auto id = tileMap->tileSets[i].firstID; id <= tileMap->tileSets[i].lastID; id++)
 			{
