@@ -11,7 +11,7 @@
 namespace DeadFrame2D::Core
 {
 	struct Circle;
-	class Engine;
+	class DeadFrameRuntime;
 }
 
 
@@ -22,7 +22,7 @@ namespace DeadFrame2D::Engine
 
 	class DF2D_API Camera : public GameComponent
 	{
-		friend class DeadFrame2D::Core::Engine;
+		friend class DeadFrame2D::Core::DeadFrameRuntime;
 
 
 	private:

@@ -7,7 +7,7 @@
 
 namespace DeadFrame2D::Core 
 { 
-	class Engine; 
+	class DeadFrameRuntime; 
 }
 
 
@@ -15,7 +15,7 @@ namespace DeadFrame2D::Engine
 {
 	class DF2D_API SceneManager
 	{
-		friend DeadFrame2D::Core::Engine;
+		friend DeadFrame2D::Core::DeadFrameRuntime;
 
 
 	private:

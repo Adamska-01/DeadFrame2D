@@ -1,4 +1,4 @@
-#include "Core/Engine.h"
+#include "Core/DeadFrameRuntime.h"
 #include "Core/SubSystems/Systems/Renderer.h"
 #include "Core/SubSystems/Systems/TextureManager.h"
 #include "Engine/Components/Rendering/Camera.h"
@@ -16,7 +16,7 @@ namespace DeadFrame2D::Core
 	using namespace DeadFrame2D::Utilities;
 
 
-	Engine::Engine()
+	DeadFrameRuntime::DeadFrameRuntime()
 	{
 		auto systemConfig = SystemConfig::LoadFromFiles();
 
@@ -28,7 +28,7 @@ namespace DeadFrame2D::Core
 		frameTimer.SetTargetFramerate(systemConfig.rendering.targetFramerate);
 	}
 
-	std::optional<int> Engine::RenderSplashScreen()
+	std::optional<int> DeadFrameRuntime::RenderSplashScreen()
 	{
 		auto splashTexture = TextureManager::LoadTexture(Paths::Files::SPLASH_SCREEN);
 		auto renderer = Renderer::GetRenderer();
@@ -89,7 +89,7 @@ namespace DeadFrame2D::Core
 		return std::nullopt;
 	}
 
-	std::optional<int> Engine::Run()
+	std::optional<int> DeadFrameRuntime::Run()
 	{
 		if (const auto splashCode = RenderSplashScreen())
 			return *splashCode;
