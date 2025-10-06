@@ -35,7 +35,7 @@ workspace "Project"
 
 	
 	-- Include Core build script
-	include "2DGameEngine/Build-2DGameEngine.lua"
+	include "DeadFrame2D/Build-DeadFrame2D.lua"
 	include "Shared/Build-Shared.lua" 
 	include "Vendor/Box2D/Build-Box2D.lua"
 	include "Vendor/tinyxml2-10.0.0/Build-tinyxml2.lua"

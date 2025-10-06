@@ -1,4 +1,4 @@
-project "2DGameEngine"
+project "DeadFrame2D"
 	kind "SharedLib"
 	language "C++"
 	cppdialect "C++20"
