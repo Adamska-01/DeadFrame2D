@@ -1,4 +1,5 @@
 #pragma once
+#include "DF2D_API.h"
 #include <memory>
 #include <SDL.h>
 #include <string>
@@ -6,7 +7,7 @@
 
 namespace DeadFrame2D::Models
 {
-	struct TiledTileSet
+	struct DF2D_API TiledTileSet
 	{
 		std::shared_ptr<SDL_Texture> tileSetTexture;
 

@@ -1,9 +1,10 @@
 #pragma once
+#include "DF2D_API.h"
 
 
 namespace DeadFrame2D::Core
 {
-	class ISubSystem
+	class DF2D_API ISubSystem
 	{
 		friend class SubSystems;
 

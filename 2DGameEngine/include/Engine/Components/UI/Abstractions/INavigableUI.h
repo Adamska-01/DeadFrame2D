@@ -1,4 +1,5 @@
 #pragma once
+#include "DF2D_API.h"
 
 
 namespace DeadFrame2D::Engine
@@ -9,7 +10,7 @@ namespace DeadFrame2D::Engine
 	/**
 	 * @brief Interface for UI elements that can be navigated using directional inputs.
 	 */
-	class INavigableUI
+	class DF2D_API INavigableUI
 	{
 	protected:
 		/**

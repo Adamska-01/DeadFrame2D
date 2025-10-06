@@ -1,4 +1,5 @@
 #pragma once
+#include "DF2D_API.h"
 #include "Engine/Entity/GameObjectObserver.h"
 #include <memory>
 
@@ -8,7 +9,7 @@ namespace DeadFrame2D::Engine
 	class GameObject;
 
 
-	class GameComponent : public GameObjectObserver
+	class DF2D_API GameComponent : public GameObjectObserver
 	{
 		friend class ComponentBucket;
 

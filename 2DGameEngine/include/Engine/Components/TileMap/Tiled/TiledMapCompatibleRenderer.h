@@ -1,11 +1,12 @@
 #pragma once
+#include "DF2D_API.h"
 #include "Engine/Components/TileMap/TileMapRenderer.h"
 #include "Models/TileEditors/Tiled/TiledMap.h"
 
 
 namespace DeadFrame2D::Engine
 {
-	class TiledMapCompatibleRenderer : public TileMapRenderer<std::shared_ptr<DeadFrame2D::Models::TiledMap>>
+	class DF2D_API TiledMapCompatibleRenderer : public TileMapRenderer<std::shared_ptr<DeadFrame2D::Models::TiledMap>>
 	{
 	private:
 		std::unordered_map<int, int> tileIDToTileSet;

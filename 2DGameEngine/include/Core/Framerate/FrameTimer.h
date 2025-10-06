@@ -1,10 +1,11 @@
 #pragma once
+#include "DF2D_API.h"
 #include <chrono>
 
 
 namespace DeadFrame2D::Core
 {
-	class FrameTimer
+	class DF2D_API FrameTimer
 	{
 	private:
 		static float deltaTime;

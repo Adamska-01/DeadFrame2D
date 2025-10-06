@@ -2,6 +2,7 @@
 #include "Core/Math/Vector2.h"
 #include "Data/Physics/BodyDefinition2D.h"
 #include "Data/Physics/BodyType2D.h"
+#include "DF2D_API.h"
 #include "Engine/Components/GameComponent.h"
 #include "Utilities/Delegates/MulticastDelegate.h"
 
@@ -16,7 +17,7 @@ namespace DeadFrame2D::Engine
 	class Transform;
 
 
-	class RigidBody2D : public GameComponent
+	class DF2D_API RigidBody2D : public GameComponent
 	{
 	private:
 		Transform* transform;

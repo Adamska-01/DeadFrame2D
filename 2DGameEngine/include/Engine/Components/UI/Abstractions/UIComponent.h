@@ -1,7 +1,8 @@
 #pragma once
-#include "Engine/Components/GameComponent.h"
 #include "Core/Math/Vector2.h"
-#include <Data/UI/UIAnchor.h>
+#include "Data/UI/UIAnchor.h"
+#include "DF2D_API.h"
+#include "Engine/Components/GameComponent.h"
 
 
 namespace DeadFrame2D::Engine
@@ -12,7 +13,7 @@ namespace DeadFrame2D::Engine
 	/**
 	 * @brief Represents a generic UI Component.
 	 */
-	class UIComponent : public GameComponent
+	class DF2D_API UIComponent : public GameComponent
 	{
 	protected:
 		DeadFrame2D::Data::UIAnchor anchor;

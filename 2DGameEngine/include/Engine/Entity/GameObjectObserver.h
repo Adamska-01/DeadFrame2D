@@ -1,4 +1,5 @@
 #pragma once
+#include "DF2D_API.h"
 #include <memory>
 #include <vector>
 
@@ -9,7 +10,7 @@ namespace DeadFrame2D::Engine
 	class GameComponent;
 
 
-	class GameObjectObserver 
+	class DF2D_API GameObjectObserver
 	{
 	private: 
 		std::vector<std::weak_ptr<GameObject>> allRegisteredGameObjects;
@@ -17,7 +18,7 @@ namespace DeadFrame2D::Engine
 
 	protected:
 		GameObjectObserver();
-	
+
 		virtual ~GameObjectObserver();
 
 
@@ -27,7 +28,7 @@ namespace DeadFrame2D::Engine
 
 
 		virtual void OnGameObjectActiveStateChangedHandler(GameObject* obj, bool isActive);
-	
+
 		virtual void OnNewComponentAddedHandler(GameComponent* comp);
 	};
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include "DF2D_API.h"
 #include "Engine/Components/Collisions/Abstractions/ContactEventProvider.h"
 
 
@@ -11,7 +12,7 @@ namespace DeadFrame2D::Engine
 	class Transform;
 
 
-	class AudioListener : public ContactEventProvider
+	class DF2D_API AudioListener : public ContactEventProvider
 	{
 		friend class ContactListener;
 

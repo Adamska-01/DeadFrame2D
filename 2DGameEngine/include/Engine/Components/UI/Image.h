@@ -1,4 +1,5 @@
 #pragma once
+#include "DF2D_API.h"
 #include "Engine/Components/UI/Abstractions/UIComponent.h"
 #include <memory>
 #include <SDL.h>
@@ -7,7 +8,7 @@
 
 namespace DeadFrame2D::Engine
 {
-	class Image : public UIComponent
+	class DF2D_API Image : public UIComponent
 	{
 	private:
 		std::shared_ptr<SDL_Texture> sourceImage;

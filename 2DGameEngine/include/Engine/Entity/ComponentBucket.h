@@ -18,6 +18,14 @@ namespace DeadFrame2D::Engine
 
 		~ComponentBucket();
 
+		ComponentBucket(const ComponentBucket&) = delete;
+
+		ComponentBucket& operator=(const ComponentBucket&) = delete;
+
+		ComponentBucket(ComponentBucket&&) noexcept = default;
+
+		ComponentBucket& operator=(ComponentBucket&&) noexcept = default;
+
 
 		void LinkComponentToOwner(std::weak_ptr<GameObject> owner, GameComponent* toInitialize);
 

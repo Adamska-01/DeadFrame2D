@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/SubSystems/Systems/AudioManager.h"
 #include "Data/Collision/CollisionInfo.h"
+#include "DF2D_API.h"
 #include "Engine/Components/Collisions/Abstractions/ContactEventProvider.h"
 #include <memory>
 #include <string_view>
@@ -17,7 +18,7 @@ namespace DeadFrame2D::Engine
 	class AudioListener;
 
 
-	class AudioSource : public ContactEventProvider
+	class DF2D_API AudioSource : public ContactEventProvider
 	{
 		friend class ContactListener;
 
@@ -33,7 +34,7 @@ namespace DeadFrame2D::Engine
 
 		// Using Box2D to detect audio source collisions with audio listeners
 		b2Body* collisionBody;
-	
+
 		b2Fixture* collisionFixture;
 
 		bool isMusic;

@@ -45,7 +45,7 @@ namespace DeadFrame2D::Core
 		{
 			auto task = *it;
 
-			Task::currentTask = task;
+			Task::SetCurrentTask(task);
 
 			auto isDoneOrCancelled = task->TickAwaitables(deltaTime);
 
@@ -61,7 +61,7 @@ namespace DeadFrame2D::Core
 		}
 
 		// Reset currentTask after ticking all
-		Task::currentTask = nullptr;
+		Task::SetCurrentTask(nullptr);
 	}
 
 	void CoroutineScheduler::BeginFrame()
@@ -86,13 +86,13 @@ namespace DeadFrame2D::Core
 		auto* heapTask = new Task(std::move(task));
 
 		// Set current task so WaitFrame() works during first resume
-		Task::currentTask = heapTask;
+		Task::SetCurrentTask(heapTask);
 
 		// Now manually resume
 		heapTask->promiseHandle.resume();
 
 		// Reset
-		Task::currentTask = nullptr;
+		Task::SetCurrentTask(nullptr);
 
 		instance->tasks.push_back(heapTask);
 

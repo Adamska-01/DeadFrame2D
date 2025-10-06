@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
+#include "DF2D_API.h"
 #include "Utilities/Hashing/PairHash.h"
 #include <memory>
 #include <SDL_ttf.h>
@@ -12,7 +13,7 @@ struct SDL_Texture;
 
 namespace DeadFrame2D::Core
 {
-	class UIManager : public ISubSystem
+	class DF2D_API UIManager : public ISubSystem
 	{
 		friend class SubSystems;
 
@@ -23,9 +24,9 @@ namespace DeadFrame2D::Core
 		virtual ~UIManager() override;
 
 		UIManager(const UIManager&) = delete;
-	
+
 		UIManager(UIManager&&) = delete;
-	
+
 
 		UIManager& operator=(const UIManager&) = delete;
 

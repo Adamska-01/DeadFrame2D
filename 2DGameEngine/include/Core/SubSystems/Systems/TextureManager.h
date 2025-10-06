@@ -2,6 +2,7 @@
 #include "Constants/CommonColors.h"
 #include "Core/Math/Circle.h"
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
+#include "DF2D_API.h"
 #include <memory>
 #include <SDL_image.h>
 #include <string>
@@ -16,7 +17,7 @@ namespace DeadFrame2D::Engine
 
 namespace DeadFrame2D::Core
 {
-	class TextureManager : public ISubSystem
+	class DF2D_API TextureManager : public ISubSystem
 	{
 		friend class SubSystems;
 		friend class Engine;

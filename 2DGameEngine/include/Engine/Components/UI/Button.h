@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/CoreEvents/Abstractions/IEventProcessor.h"
+#include "DF2D_API.h"
 #include "Engine/Components/UI/Abstractions/IInteractableUI.h"
 #include "Utilities/Delegates/MulticastDelegate.h"
 #include <functional>
@@ -16,7 +17,7 @@ namespace DeadFrame2D::Engine
 	class Transform;
 
 
-	class Button : public IInteractableUI, public DeadFrame2D::Core::IEventProcessor
+	class DF2D_API Button : public IInteractableUI, public DeadFrame2D::Core::IEventProcessor
 	{
 	private:
 		DeadFrame2D::Utilities::MultiCastVoid onPressedCallback;
@@ -61,14 +62,14 @@ namespace DeadFrame2D::Engine
 		virtual void OnPointerExit() override;
 
 		virtual void OnPointerDown() override;
-	
+
 		virtual void OnPointerUp() override;
 
 
 		void AddPressedCallback(std::function<void()> onPressedHandler, std::uintptr_t identifier);
 
 		void AddEnterCallback(std::function<void()> onEnterCallback, std::uintptr_t identifier);
-	
+
 		SDL_Rect GetBoundingBox() const;
 
 		SDL_Color GetIdleFillColor() const;
@@ -78,15 +79,15 @@ namespace DeadFrame2D::Engine
 		SDL_Color GetPressedFillColor() const;
 
 		void SetIdleFillColor(const SDL_Color& color);
-	
+
 		void SetHoveredFillColor(const SDL_Color& color);
-	
+
 		void SetPressedFillColor(const SDL_Color& color);
 
 		void SetIdleButtonImageSource(std::string_view idleButtonSource);
 
 		void SetHoveredButtonImageSource(std::string_view hoveredButtonSource);
-	
+
 		void SetPressedButtonImageSource(std::string_view pressedButtonSource);
 	};
 }

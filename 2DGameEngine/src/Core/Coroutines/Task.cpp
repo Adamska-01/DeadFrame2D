@@ -5,12 +5,18 @@
 
 namespace DeadFrame2D::Core
 {
-	thread_local Task* Task::currentTask = nullptr;
+	// Necessary when running multi-threaded coroutines
+	thread_local Task* currentTask = nullptr;
 
 
 	/// =========================================================================================
 	/// ========================================= Task =========================================
 	/// =========================================================================================
+	void Task::SetCurrentTask(Task* task)
+	{
+		currentTask = task;
+	}
+
 	Task::Task(std::coroutine_handle<promise_type> promiseHandle)
 		: promiseHandle(promiseHandle)
 	{
@@ -128,6 +134,11 @@ namespace DeadFrame2D::Core
 		}
 
 		return IsDone() || IsCancelled();
+	}
+
+	Task* Task::GetCurrentTask()
+	{
+		return currentTask;
 	}
 
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Math/Vector2.h"
+#include "DF2D_API.h"
 #include "Engine/Components/Collisions/Tile/TileCollider2D.h"
 #include "Engine/Components/TileMap/Tiled/TiledMapCompatibleRenderer.h"
 
@@ -9,7 +10,7 @@ class b2Fixture;
 
 namespace DeadFrame2D::Engine
 {
-	class TiledMapCompatibleCollider2D : public TileCollider2D<TiledMapCompatibleRenderer>
+	class DF2D_API TiledMapCompatibleCollider2D : public TileCollider2D<TiledMapCompatibleRenderer>
 	{
 	private:
 		void DeleteFixtures();
@@ -38,7 +39,7 @@ namespace DeadFrame2D::Engine
 
 
 		const std::vector<DeadFrame2D::Models::TiledLayer>& GetCollisionLayers() const;
-	
+
 		const DeadFrame2D::Core::Vector2I& GetTileMapDimensions() const;
 
 		int GetTileSize() const;

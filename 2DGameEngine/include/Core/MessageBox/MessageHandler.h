@@ -1,4 +1,5 @@
 #pragma once
+#include "DF2D_API.h"
 
 
 namespace DeadFrame2D::Data
@@ -10,7 +11,7 @@ namespace DeadFrame2D::Data
 namespace DeadFrame2D::Core
 {
 	// TODO: Rename this to "MessageBoxService"
-	class MessageHandler
+	class DF2D_API MessageHandler
 	{
 	public:
 		MessageHandler() = default;

@@ -1,6 +1,7 @@
 #pragma once
 #include "ComponentBucket.h"
 #include "Core/Coroutines/Task.h"
+#include "DF2D_API.h"
 #include "Engine/EngineEvents/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectCreatedEvent.h"
 #include "Engine/Entity/Abstractions/IObject.h"
@@ -13,7 +14,7 @@ namespace DeadFrame2D::Engine
 	class Transform;
 
 
-	class GameObject : public IObject, public GameObjectNotifier
+	class DF2D_API GameObject : public IObject, public GameObjectNotifier
 	{
 	private:
 		bool isInitialized;
@@ -55,9 +56,9 @@ namespace DeadFrame2D::Engine
 		virtual void Start() override;
 
 		virtual void Update(float deltaTime) override;
-	
+
 		virtual void LateUpdate(float deltaTime) override;
-	
+
 		virtual void Draw() override;
 
 
@@ -79,7 +80,7 @@ namespace DeadFrame2D::Engine
 
 		template<typename T>
 		inline std::vector<T*> GetComponentsInParent(bool recursive = false) const;
-	
+
 		template<typename T, typename... TArgs>
 		T* AddComponent(TArgs&& ...args);
 
@@ -99,7 +100,6 @@ namespace DeadFrame2D::Engine
 		Transform* GetTransform() const;
 
 		std::vector<std::weak_ptr<GameObject>> GetChildren() const;
-	
 		bool IsActive() const;
 
 		void SetActive(bool value);

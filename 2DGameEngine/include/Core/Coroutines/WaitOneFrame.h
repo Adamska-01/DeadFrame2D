@@ -1,12 +1,13 @@
 #pragma once
 #include "Core/Coroutines/Abstractions/ICoroutineAwaitable.h"
 #include "Core/Coroutines/Task.h"
+#include "DF2D_API.h"
 #include <coroutine>
 
 
 namespace DeadFrame2D::Core
 {
-	class WaitOneFrame : public ICoroutineAwaitable
+	class DF2D_API WaitOneFrame : public ICoroutineAwaitable
 	{
 	private:
 		std::coroutine_handle<> continuation;

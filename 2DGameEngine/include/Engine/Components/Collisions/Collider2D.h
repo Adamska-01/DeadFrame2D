@@ -2,6 +2,7 @@
 #include "Core/Coroutines/Task.h"
 #include "Data/Collision/CollisionInfo.h"
 #include "Data/Collision/PhysicsMaterial.h"
+#include "DF2D_API.h"
 #include "Engine/Components/Collisions/Abstractions/ContactEventProvider.h"
 #include "Engine/EngineEvents/DispatchableEvent.h"
 #include "Utilities/Delegates/MulticastDelegate.h"
@@ -16,7 +17,7 @@ namespace DeadFrame2D::Engine
 	class RigidBody2D;
 
 
-	class Collider2D : public ContactEventProvider
+	class DF2D_API Collider2D : public ContactEventProvider
 	{
 		friend class ContactListener;
 

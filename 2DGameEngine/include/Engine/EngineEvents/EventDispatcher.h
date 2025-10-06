@@ -1,4 +1,5 @@
 #pragma once
+#include "DF2D_API.h"
 #include "DispatchableEvent.h"
 #include "Utilities/Delegates/MulticastDelegate.h"
 #include <memory>
@@ -11,7 +12,7 @@ namespace DeadFrame2D::Engine
 	using EventHandler = DeadFrame2D::Utilities::MulticastDelegate<std::shared_ptr<DispatchableEvent>>;
 
 
-	class EventDispatcher
+	class DF2D_API EventDispatcher
 	{
 	private:
 		static std::unordered_map<std::type_index, EventHandler> eventHandlers;

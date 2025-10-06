@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Math/Vector2.h"
+#include "DF2D_API.h"
 #include "Engine/Components/GameComponent.h"
 #include "Engine/EngineEvents/DispatchableEvent.h"
 #include <memory>
@@ -19,7 +20,7 @@ namespace DeadFrame2D::Engine
 	class Transform;
 
 
-	class Camera : public GameComponent
+	class DF2D_API Camera : public GameComponent
 	{
 		friend class DeadFrame2D::Core::Engine;
 
@@ -56,9 +57,9 @@ namespace DeadFrame2D::Engine
 
 
 		void SetZoom(float zoom);
-	
+
 		void SetViewport(const SDL_FRect& normalizedViewport);
-	
+
 		float GetZoom() const;
 
 		/** @brief Sets the normalized viewport (0–1 range). */
@@ -86,7 +87,7 @@ namespace DeadFrame2D::Engine
 		 * @return True if any part of the circle is inside the camera's viewport.
 		 */
 		bool IsVisible(const DeadFrame2D::Core::Circle& circle) const;
-	
+
 		/**
 		 * @brief Checks if the given screen-space line segment is visible within this camera's view box.
 		 * @param p1 The first endpoint of the line segment in screen coordinates.

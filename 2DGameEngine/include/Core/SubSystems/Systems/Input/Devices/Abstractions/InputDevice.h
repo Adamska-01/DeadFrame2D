@@ -1,12 +1,13 @@
 #pragma once
 #include "Data/Input/PlayerInputSlot.h"
+#include "DF2D_API.h"
 #include <SDL_events.h>
 #include <unordered_map>
 
 
 namespace DeadFrame2D::Core
 {
-	class InputDevice
+	class DF2D_API InputDevice
 	{
 	protected:
 		DeadFrame2D::Data::PlayerInputSlot assignedPlayer;

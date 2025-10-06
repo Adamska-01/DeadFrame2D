@@ -1,10 +1,11 @@
 #pragma once
+#include "DF2D_API.h"
 
 
 namespace DeadFrame2D::Factories
 {
 	template<typename T>
-	class IFactory
+	class DF2D_API IFactory
 	{
 	public:
 		virtual ~IFactory() = default;

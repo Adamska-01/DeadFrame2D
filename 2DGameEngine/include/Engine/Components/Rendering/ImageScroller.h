@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Math/Vector2.h"
 #include "Data/Rendering/ScrollDirection.h"
+#include "DF2D_API.h"
 #include "Engine/Components/Rendering/Sprite.h"
 #include <memory>
 
@@ -10,7 +11,7 @@ namespace DeadFrame2D::Engine
 	class DispatchableEvent;
 
 
-	class ImageScroller : public Sprite
+	class DF2D_API ImageScroller : public Sprite
 	{
 	private:
 		DeadFrame2D::Data::ScrollDirection scrollDirection;

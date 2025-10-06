@@ -1,10 +1,11 @@
 #pragma once
+#include "DF2D_API.h"
 #include "Engine/Components/UI/Abstractions/UIComponent.h"
 
 
 namespace DeadFrame2D::Engine
 {
-	class Canvas : public UIComponent
+	class DF2D_API Canvas : public UIComponent
 	{
 	private:
 		// Impossible to implement for now...
@@ -24,7 +25,7 @@ namespace DeadFrame2D::Engine
 		virtual void Draw() override;
 
 
-		int SetSortOrder() const;
+		int GetSortOrder() const;
 
 		void SetSortOrder(int value);
 	};

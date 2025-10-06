@@ -1,4 +1,5 @@
 #pragma once
+#include "DF2D_API.h"
 #include "Engine/Components/GameComponent.h"
 #include "Engine/Entity/GameObject.h"
 #include <type_traits>
@@ -7,7 +8,7 @@
 
 namespace DeadFrame2D::Engine
 {
-	class Scene
+	class DF2D_API Scene
 	{
 	private:
 		bool isRunning;
@@ -52,16 +53,16 @@ namespace DeadFrame2D::Engine
 		virtual void Update(float deltaTime);
 
 		virtual void LateUpdate(float deltaTime);
-	
+
 		virtual void Draw();
-	
+
 
 		void Exit();
 
 
 		template <typename T>
 		T* FindObjectOfType();
-	
+
 		template <typename T>
 		std::vector<T*> FindObjectsOfType();
 	};

@@ -1,11 +1,12 @@
 #pragma once
+#include "DF2D_API.h"
 #include "Engine/Components/Collisions/Collider2D.h"
 
 
 namespace DeadFrame2D::Engine
 {
 	template <typename TRenderer>
-	class TileCollider2D : public Collider2D
+	class DF2D_API TileCollider2D : public Collider2D
 	{
 	protected:
 		TRenderer* tileMapRenderer;

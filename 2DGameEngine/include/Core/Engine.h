@@ -1,5 +1,6 @@
 #pragma once
 #include "CoreEvents/EventManager.h"
+#include "DF2D_API.h"
 #include "Engine/EngineEvents/DispatchableEvent.h"
 #include "Engine/SceneSystem/SceneManager.h"
 #include "Framerate/FrameTimer.h"
@@ -9,7 +10,7 @@
 namespace DeadFrame2D::Core
 {
 	// TODO: Change the name of the class so it is different from the DeadFrame2D::Engine namespace
-	class Engine
+	class DF2D_API Engine
 	{
 	private:
 		std::optional<int> RenderSplashScreen();
@@ -27,7 +28,7 @@ namespace DeadFrame2D::Core
 
 	public:
 		Engine();
-	
+
 		virtual ~Engine() = default;
 
 

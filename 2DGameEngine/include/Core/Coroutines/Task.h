@@ -1,4 +1,5 @@
 #pragma once
+#include "DF2D_API.h"
 #include <atomic>
 #include <coroutine>
 #include <exception>
@@ -11,11 +12,14 @@ namespace DeadFrame2D::Core
 	class ICoroutineAwaitable;
 
 
-	struct Task : std::enable_shared_from_this<Task>
+	struct DF2D_API Task : std::enable_shared_from_this<Task>
 	{
-		struct promise_type
+		friend class CoroutineScheduler;
+
+
+		struct DF2D_API  promise_type
 		{
-			struct final_awaiter
+			struct DF2D_API final_awaiter
 			{
 				std::coroutine_handle<> continuation;
 
@@ -23,7 +27,7 @@ namespace DeadFrame2D::Core
 				bool await_ready() const noexcept;
 
 				void await_suspend(std::coroutine_handle<promise_type> promiseHandle) const noexcept;
-			
+
 				void await_resume() const noexcept;
 			};
 
@@ -49,19 +53,20 @@ namespace DeadFrame2D::Core
 		};
 
 
-		// Necessary when running multi-threaded coroutines
-		static thread_local Task* currentTask;
+	private:
+		static void SetCurrentTask(Task* task);
 
 
+	public:
 		std::coroutine_handle<promise_type> promiseHandle;
 
 		std::vector<ICoroutineAwaitable*> awaitables;
 
 
 		explicit Task(std::coroutine_handle<promise_type> promiseHandle);
-	
+
 		Task(Task&& other) noexcept;
-	
+
 		~Task();
 
 		Task& operator=(Task&& other) noexcept;
@@ -83,5 +88,8 @@ namespace DeadFrame2D::Core
 		void AddAwaitable(ICoroutineAwaitable* awaitable);
 
 		bool TickAwaitables(float deltaTime);
+
+
+		static Task* GetCurrentTask();
 	};
 }

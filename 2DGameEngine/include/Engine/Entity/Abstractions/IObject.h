@@ -1,9 +1,10 @@
 #pragma once
+#include "DF2D_API.h"
 
 
 namespace DeadFrame2D::Engine
 {
-	class IObject
+	class DF2D_API IObject
 	{
 	public:
 		virtual ~IObject() = default;

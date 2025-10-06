@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Math/Vector2.h"
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
+#include "DF2D_API.h"
 #include <cstdint>
 #include <Models/Rendering/RendererConfig.h>
 #include <SDL.h>
@@ -8,7 +9,7 @@
 
 namespace DeadFrame2D::Core
 {
-	class Renderer : public ISubSystem
+	class DF2D_API Renderer : public ISubSystem
 	{
 		friend class SubSystems;
 

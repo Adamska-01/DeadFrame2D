@@ -1,4 +1,5 @@
 #pragma once
+#include "DF2D_API.h"
 #include "Core/Math/Vector2.h"
 #include "Engine/Entity/GameObject.h"
 #include <string_view>
@@ -9,7 +10,7 @@ namespace DeadFrame2D::Engine
 	class AudioSource;
 
 
-	class AudioClipBlueprint : public GameObject
+	class DF2D_API AudioClipBlueprint : public GameObject
 	{
 	private:
 		AudioSource* audioSource;

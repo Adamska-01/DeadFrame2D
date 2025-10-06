@@ -1,4 +1,5 @@
 #pragma once
+#include "DF2D_API.h"
 #include "Engine/SceneSystem/Scene.h"
 #include <memory>
 #include <vector>
@@ -12,7 +13,7 @@ namespace DeadFrame2D::Core
 
 namespace DeadFrame2D::Engine
 {
-	class SceneManager
+	class DF2D_API SceneManager
 	{
 		friend DeadFrame2D::Core::Engine;
 
@@ -24,7 +25,7 @@ namespace DeadFrame2D::Engine
 
 
 		void UpdateScene(float deltaTime) const;
-	
+
 		void LateUpdateScene(float deltaTime) const;
 
 		void DrawScene() const;
@@ -43,7 +44,7 @@ namespace DeadFrame2D::Engine
 
 		template <typename T>
 		static T* FindObjectOfType();
-	
+
 		template <typename T>
 		static std::vector<T*> FindObjectsOfType();
 	};

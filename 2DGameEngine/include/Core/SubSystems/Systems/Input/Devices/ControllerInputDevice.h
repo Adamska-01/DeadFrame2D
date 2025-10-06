@@ -1,10 +1,11 @@
 #pragma once
 #include "Core/SubSystems/Systems/Input/Devices/Abstractions/InputDevice.h"
+#include "DF2D_API.h"
 
 
 namespace DeadFrame2D::Core
 {
-	class ControllerInputDevice : public InputDevice
+	class DF2D_API ControllerInputDevice : public InputDevice
 	{
 	protected:
 		int deviceID;

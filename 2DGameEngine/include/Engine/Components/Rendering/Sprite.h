@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Math/Vector2.h"
+#include "DF2D_API.h"
 #include "Engine/Components/GameComponent.h"
 #include <memory>
 #include <string>
@@ -13,7 +14,7 @@ namespace DeadFrame2D::Engine
 	class Transform;
 
 
-	class Sprite : public GameComponent
+	class DF2D_API Sprite : public GameComponent
 	{
 	protected:
 		std::shared_ptr<SDL_Texture> spriteTexture;
@@ -25,7 +26,7 @@ namespace DeadFrame2D::Engine
 
 	public:
 		Sprite(std::string_view texturePath);
-	
+
 		Sprite(Sprite&& other) = default;
 
 		virtual ~Sprite() override = default;
@@ -41,7 +42,7 @@ namespace DeadFrame2D::Engine
 
 
 		void LoadSprite(std::string_view texturePath);
-	
+
 		std::shared_ptr<SDL_Texture> GetTexture();
 	};
 }

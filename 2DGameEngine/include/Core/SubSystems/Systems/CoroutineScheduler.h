@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
+#include "DF2D_API.h"
 #include <coroutine>
 #include <memory>
 #include <vector>
@@ -11,7 +12,7 @@ namespace DeadFrame2D::Core
 	struct Task;
 
 
-	class CoroutineScheduler : public ISubSystem
+	class DF2D_API CoroutineScheduler : public ISubSystem
 	{
 		friend class SubSystems;
 

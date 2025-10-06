@@ -1,11 +1,12 @@
 #pragma once
-#include <memory>
+#include "DF2D_API.h"
 #include <iostream>
+#include <memory>
 
 
 namespace DeadFrame2D::Engine
 {
-	class DispatchableEvent
+	class DF2D_API DispatchableEvent
 	{
 	protected:
 		DispatchableEvent() = default;

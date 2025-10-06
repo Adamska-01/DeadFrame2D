@@ -1,4 +1,5 @@
 #pragma once
+#include "DF2D_API.h"
 #include "Engine/Components/UI/Abstractions/INavigableUI.h"
 #include "Engine/Components/UI/Abstractions/UIComponent.h"
 
@@ -8,7 +9,7 @@ namespace DeadFrame2D::Engine
 	/**
 	 * @brief Represents the interactable status of a UI element.
 	 */
-	class IInteractableUI : public UIComponent, public INavigableUI
+	class DF2D_API IInteractableUI : public UIComponent, public INavigableUI
 	{
 	protected:
 		bool isPressed;
@@ -40,7 +41,7 @@ namespace DeadFrame2D::Engine
 		 */
 		virtual void OnPointerUp() = 0;
 
-	
+
 		/**
 		 * @brief Checks if the UI element is currently pressed.
 		 * @return True if pressed, false otherwise.

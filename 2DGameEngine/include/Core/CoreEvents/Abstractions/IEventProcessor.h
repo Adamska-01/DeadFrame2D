@@ -1,11 +1,12 @@
 #pragma once
+#include "DF2D_API.h"
 #include <optional>
 #include <SDL.h>
 
 
 namespace DeadFrame2D::Core
 {
-	class IEventProcessor
+	class DF2D_API IEventProcessor
 	{
 	public:
 		IEventProcessor();

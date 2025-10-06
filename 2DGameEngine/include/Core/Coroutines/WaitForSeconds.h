@@ -1,11 +1,12 @@
 #pragma once
 #include "Core/Coroutines/Abstractions/ICoroutineAwaitable.h"
+#include "DF2D_API.h"
 #include <coroutine>
 
 
 namespace DeadFrame2D::Core
 {
-	class WaitForSeconds : public ICoroutineAwaitable
+	class DF2D_API WaitForSeconds : public ICoroutineAwaitable
 	{
 	private:
 		float timeRemaining;

@@ -1,11 +1,12 @@
 #pragma once
 #include "Core/CoreEvents/Abstractions/IEventProcessor.h"
+#include "DF2D_API.h"
 #include <vector>
 
 
 namespace DeadFrame2D::Core
 {
-	class EventManager 
+	class DF2D_API EventManager
 	{
 	private:
 		SDL_Event sdlEvent;

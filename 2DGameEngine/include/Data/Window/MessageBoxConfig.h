@@ -1,12 +1,13 @@
 #pragma once
+#include "DF2D_API.h"
+#include <SDL.h>
 #include <string>
 #include <vector>
-#include <SDL.h>
 
 
 namespace DeadFrame2D::Data
 {
-	struct MessageBoxConfig 
+	struct DF2D_API MessageBoxConfig
 	{
 		std::string title = "Default Title";
 	

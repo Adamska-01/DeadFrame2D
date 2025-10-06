@@ -1,5 +1,6 @@
 #pragma once
 #include "Data/UI/LayoutPadding.h"
+#include "DF2D_API.h"
 #include "Engine/Components/GameComponent.h"
 #include <memory>
 
@@ -10,7 +11,7 @@ namespace DeadFrame2D::Engine
 	class UIComponent;
 
 
-	class LayoutGroup : public GameComponent
+	class DF2D_API LayoutGroup : public GameComponent
 	{
 	private:
 		void GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
@@ -23,7 +24,7 @@ namespace DeadFrame2D::Engine
 
 		DeadFrame2D::Data::LayoutPadding layoutPadding;
 
-	
+
 		virtual void OnGameObjectActiveStateChangedHandler(GameObject* child, bool activeState) override;
 
 

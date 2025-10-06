@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Math/Vector2.h"
 #include "Data/UI/FontStyle.h"
+#include "DF2D_API.h"
 #include "Engine/Components/UI/Abstractions/UIComponent.h"
 #include <memory>
 #include <string>
@@ -21,7 +22,7 @@ namespace DeadFrame2D::Engine
 	class Transform;
 
 
-	class TextMesh : public UIComponent
+	class DF2D_API TextMesh : public UIComponent
 	{
 	private:
 		Transform* transform;

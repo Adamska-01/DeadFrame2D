@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Math/Vector2.h"
+#include "DF2D_API.h"
 #include "Engine/Components/GameComponent.h"
 #include "Engine/EngineEvents/DispatchableEvent.h"
 #include <SDL_rect.h>
@@ -11,7 +12,7 @@ namespace DeadFrame2D::Engine
 	class Transform;
 
 
-	class CameraFollow : public GameComponent
+	class DF2D_API CameraFollow : public GameComponent
 	{
 	private:
 		Camera* camera = nullptr;
@@ -34,7 +35,7 @@ namespace DeadFrame2D::Engine
 
 	public:
 		CameraFollow(Camera* camera, std::weak_ptr<GameObject> target);
-	
+
 		virtual ~CameraFollow() override;
 
 

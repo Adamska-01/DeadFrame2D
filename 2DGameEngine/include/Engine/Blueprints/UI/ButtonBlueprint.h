@@ -1,11 +1,12 @@
 #pragma once
-#include "Engine/Entity/GameObject.h"
 #include "Data/Blueprints/UI/ButtonBlueprintModel.h"
+#include "DF2D_API.h"
+#include "Engine/Entity/GameObject.h"
 
 
 namespace DeadFrame2D::Engine
 {
-	class ButtonBlueprint : public GameObject
+	class DF2D_API ButtonBlueprint : public GameObject
 	{
 	private:
 		DeadFrame2D::Data::ButtonBlueprintModel buttonBlueprintConfiguration;

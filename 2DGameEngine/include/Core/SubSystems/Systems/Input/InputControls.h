@@ -1,4 +1,5 @@
 #pragma once
+#include "DF2D_API.h"
 #include <Models/Input/InputBinding.h>
 #include <optional>
 #include <string>
@@ -8,7 +9,7 @@
 
 namespace DeadFrame2D::Core
 {
-	class InputControls
+	class DF2D_API InputControls
 	{
 	private:
 		static std::unordered_map<std::string, std::vector<Shared::Models::InputBinding>> inputActions;

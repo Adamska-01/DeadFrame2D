@@ -3,6 +3,7 @@
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
 #include "Core/SubSystems/Systems/Input/Devices/Abstractions/InputDevice.h"
 #include "Data/Input/PlayerInputSlot.h"
+#include "DF2D_API.h"
 #include "Engine/EngineEvents/DispatchableEvent.h"
 #include <memory>
 #include <vector>
@@ -10,7 +11,7 @@
 
 namespace DeadFrame2D::Core
 {
-	class Input : public IEventProcessor, public ISubSystem
+	class DF2D_API Input : public IEventProcessor, public ISubSystem
 	{
 		friend class SubSystems;
 

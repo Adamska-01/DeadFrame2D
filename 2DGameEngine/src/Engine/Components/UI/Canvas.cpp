@@ -28,7 +28,7 @@ namespace DeadFrame2D::Engine
 
 	}
 
-	int Canvas::SetSortOrder() const
+	int Canvas::GetSortOrder() const
 	{
 		return sortOrder;
 	}

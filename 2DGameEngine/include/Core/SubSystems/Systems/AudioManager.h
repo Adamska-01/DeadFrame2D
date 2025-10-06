@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
+#include "DF2D_API.h"
 #include <memory>
 #include <Models/Audio/AudioConfig.h>
 #include <mutex>
@@ -10,7 +11,7 @@
 
 namespace DeadFrame2D::Core
 {
-	class AudioManager : public ISubSystem
+	class DF2D_API AudioManager : public ISubSystem
 	{
 		friend class SubSystems;
 

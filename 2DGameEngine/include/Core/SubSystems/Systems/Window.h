@@ -3,13 +3,14 @@
 #include "Core/Math/Vector2.h"
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
 #include "Data/Window/WindowMode.h"
+#include "DF2D_API.h"
 #include <Models/Window/WindowConfig.h>
 #include <vector>
 
 
 namespace DeadFrame2D::Core
 {
-	class Window : public IEventProcessor, public ISubSystem
+	class DF2D_API Window : public IEventProcessor, public ISubSystem
 	{
 		friend class SubSystems;
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "Data/Collision/CollisionInfo.h"
+#include "DF2D_API.h"
 #include "Engine/Components/GameComponent.h"
 #include "Utilities/Delegates/MulticastDelegate.h"
 #include <functional>
@@ -7,7 +8,7 @@
 
 namespace DeadFrame2D::Engine
 {
-	class ContactEventProvider : public GameComponent
+	class DF2D_API ContactEventProvider : public GameComponent
 	{
 	protected:
 		DeadFrame2D::Utilities::MulticastDelegate<const DeadFrame2D::Data::CollisionInfo&> onContactEnter;

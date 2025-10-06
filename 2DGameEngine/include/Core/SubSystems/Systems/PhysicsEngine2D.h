@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Math/Vector2.h"
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
+#include "DF2D_API.h"
 #include "Models/Physics/Masks/CollisionMasks.h"
 #include "Models/Physics/PhysicsConfig.h"
 #include <memory>
@@ -15,7 +16,7 @@ class b2Draw;
 
 namespace DeadFrame2D::Core
 {
-	class PhysicsEngine2D : public ISubSystem
+	class DF2D_API PhysicsEngine2D : public ISubSystem
 	{
 		friend class SubSystems;
 

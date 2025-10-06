@@ -1,11 +1,12 @@
 #pragma once
 #include "Core/Math/Vector2.h"
+#include "DF2D_API.h"
 #include "GameComponent.h"
 
 
 namespace DeadFrame2D::Engine
 {
-	class Transform : public GameComponent
+	class DF2D_API Transform : public GameComponent
 	{
 	private:
 		mutable DeadFrame2D::Core::Vector2F position = DeadFrame2D::Core::Vector2F::Zero;
@@ -42,15 +43,15 @@ namespace DeadFrame2D::Engine
 
 
 		void TranslateX(float x);
-	
+
 		void TranslateY(float y);
-	
+
 		void Translate(DeadFrame2D::Core::Vector2F v);
 
 		void ScaleX(float x);
-	
+
 		void ScaleY(float y);
-	
+
 		void Scale(DeadFrame2D::Core::Vector2F v);
 
 		void RotateByRadians(float radian);
@@ -76,9 +77,9 @@ namespace DeadFrame2D::Engine
 		DeadFrame2D::Core::Vector2F GetLocalScale() const;
 
 		DeadFrame2D::Core::Vector2F GetWorldScale() const;
-	
+
 		float GetLocalRotation() const;
-	
+
 		float GetWorldRotation() const;
 
 		DeadFrame2D::Core::Vector2F GetForward() const;
@@ -86,7 +87,7 @@ namespace DeadFrame2D::Engine
 		void SetLocalPosition(const DeadFrame2D::Core::Vector2F& pos);
 
 		void SetWorldPosition(const DeadFrame2D::Core::Vector2F& worldPos);
-	
+
 		void SetLocalScale(const DeadFrame2D::Core::Vector2F& scale);
 
 		void SetWorldScale(const DeadFrame2D::Core::Vector2F& worldScale);
@@ -95,10 +96,10 @@ namespace DeadFrame2D::Engine
 
 		void SetWorldRotation(float worldRotation);
 
-	
-		inline void Log(std::string msg = "") const
+
+		inline void Log(std::string prefixMsg = "") const
 		{
-			std::cout << msg << "(X Y) = (" << localPosition.x << " " << localPosition.y << ")" << std::endl;
+			std::cout << prefixMsg << "(X Y) = (" << localPosition.x << " " << localPosition.y << ")" << std::endl;
 		}
 	};
 }

@@ -1,11 +1,12 @@
 #pragma once
 #include "Data/UI/LayoutPadding.h"
+#include "DF2D_API.h"
 #include "Engine/Components/UI/Abstractions/LayoutGroup.h"
 
 
 namespace DeadFrame2D::Engine
 {
-	class VerticalLayoutGroup : public DeadFrame2D::Engine::LayoutGroup
+	class DF2D_API VerticalLayoutGroup : public DeadFrame2D::Engine::LayoutGroup
 	{
 	public:
 		VerticalLayoutGroup(float layoutSpacing, DeadFrame2D::Data::LayoutPadding layoutPadding);

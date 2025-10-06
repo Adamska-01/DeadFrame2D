@@ -1,12 +1,13 @@
 #pragma once
 #include "Core/Math/Vector2.h"
 #include "Data/Collision/PhysicsMaterial.h"
+#include "DF2D_API.h"
 #include "Engine/Components/Collisions/Collider2D.h"
 
 
 namespace DeadFrame2D::Engine
 {
-	class BoxCollider2D : public Collider2D
+	class DF2D_API BoxCollider2D : public Collider2D
 	{
 	private:
 		b2PolygonShape* shape;

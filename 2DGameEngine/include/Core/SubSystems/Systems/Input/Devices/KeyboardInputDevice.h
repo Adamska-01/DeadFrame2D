@@ -1,10 +1,11 @@
 #pragma once
 #include "Core/SubSystems/Systems/Input/Devices/Abstractions/InputDevice.h"
+#include "DF2D_API.h"
 
 
 namespace DeadFrame2D::Core
 {
-	class KeyboardInputDevice : public InputDevice
+	class DF2D_API KeyboardInputDevice : public InputDevice
 	{
 	public:
 		KeyboardInputDevice();

@@ -1,12 +1,13 @@
 #pragma once
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
+#include "DF2D_API.h"
 #include <Models/SystemConfig.h>
 
 
 namespace DeadFrame2D::Core
 {
 	// TODO: Rename this to 'SubSystemManager'
-	class SubSystems
+	class DF2D_API SubSystems
 	{
 	private:
 		std::array<ISubSystem*, 8> subSystems;
