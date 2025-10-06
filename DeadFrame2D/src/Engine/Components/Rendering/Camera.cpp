@@ -129,20 +129,20 @@ namespace DeadFrame2D::Engine
 	{
 		auto viewBox = GetViewBox();
 
-		return Collision::RectVsRect(&viewBox, &screenRect);
+		return Collision::RectVsRect(viewBox, screenRect);
 	}
 
 	bool Camera::IsVisible(const Circle& circle) const
 	{
 		auto viewBox = GetViewBox();
 
-		return Collision::CircleVsRect(&circle, &viewBox);
+		return Collision::CircleVsRect(circle, viewBox);
 	}
 
 	bool Camera::IsVisible(const Vector2F& p1, const Vector2F& p2) const
 	{
 		auto viewBox = GetViewBox();
 
-		return Collision::SegmentVsRect(p1, p2, &viewBox);
+		return Collision::SegmentVsRect(p1, p2, viewBox);
 	}
 }

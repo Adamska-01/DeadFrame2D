@@ -50,7 +50,7 @@ namespace DeadFrame2D::Engine
 				};
 				auto destRect = GetBoundingBox();
 
-				if (Collision::PointVsBox(mousePos, &destRect))
+				if (Collision::PointVsBox(mousePos, destRect))
 				{
 					OnPointerDown();
 				}
@@ -66,7 +66,7 @@ namespace DeadFrame2D::Engine
 				};
 				auto destRect = GetBoundingBox();
 
-				if (Collision::PointVsBox(mousePos, &destRect))
+				if (Collision::PointVsBox(mousePos, destRect))
 				{
 					OnPointerUp();
 				}
@@ -85,7 +85,7 @@ namespace DeadFrame2D::Engine
 					Vector2F(
 						static_cast<float>(sdlEvent.motion.x),
 						static_cast<float>(sdlEvent.motion.y)),
-					&destRect);
+					destRect);
 
 				if (isColliding && !isHovered)
 				{
