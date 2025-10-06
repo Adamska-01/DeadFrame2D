@@ -3,11 +3,10 @@
 #include <string>
 
 
-namespace DeadFrame2D::Utilities
+namespace DeadFrame2D::Utilities::Guard
 {
-	// TODO: put this in a static class
 	template<typename T>
-	inline T GuardAgainstNull(T ptr, const std::string& message)
+	inline T AgainstNull(T ptr, const std::string& message)
 	{
 		if (ptr == nullptr)
 		{

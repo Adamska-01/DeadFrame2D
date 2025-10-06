@@ -53,7 +53,7 @@ namespace DeadFrame2D::Engine
 	{
 		transform = OwningObject.lock()->GetComponent<Transform>();
 
-		GuardAgainstNull(transform, "Failed to get Transform from OwningObject");
+		Guard::AgainstNull(transform, "Failed to get Transform from OwningObject");
 	}
 
 	void Camera::Start()

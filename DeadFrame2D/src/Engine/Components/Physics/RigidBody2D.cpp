@@ -54,7 +54,7 @@ namespace DeadFrame2D::Engine
 	{
 		transform = OwningObject.lock()->GetTransform();
 	
-		GuardAgainstNull(transform, "Failed to get Transform from OwningObject");
+		Guard::AgainstNull(transform, "Failed to get Transform from OwningObject");
 
 		lastTransformPosition = transform->GetWorldPosition();
 		lastTransformRotation = transform->GetWorldRotation();

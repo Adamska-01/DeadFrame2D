@@ -39,7 +39,7 @@ namespace DeadFrame2D::Core
 
 	void CoroutineScheduler::Update(float deltaTime)
 	{
-		GuardAgainstNull(instance, "CoroutineScheduler::current is null.");
+		Guard::AgainstNull(instance, "CoroutineScheduler::current is null.");
 
 		for (auto it = instance->tasks.begin(); it != instance->tasks.end();)
 		{
@@ -81,7 +81,7 @@ namespace DeadFrame2D::Core
 
 	Task& CoroutineScheduler::StartCoroutine(Task&& task)
 	{
-		GuardAgainstNull(instance, "CoroutineScheduler::current is null.");
+		Guard::AgainstNull(instance, "CoroutineScheduler::current is null.");
 
 		auto* heapTask = new Task(std::move(task));
 
@@ -101,7 +101,7 @@ namespace DeadFrame2D::Core
 
 	void CoroutineScheduler::Reset()
 	{
-		GuardAgainstNull(instance, "CoroutineScheduler::current is null.");
+		Guard::AgainstNull(instance, "CoroutineScheduler::current is null.");
 
 		for (auto* task : instance->tasks)
 		{
