@@ -1,12 +1,11 @@
 #pragma once
-#include "DF2D_API.h"
 #include "Engine/Components/GameComponent.h"
 
 
 namespace DeadFrame2D::Engine
 {
 	template <typename TMap>
-	class DF2D_API TileMapRenderer : public GameComponent
+	class TileMapRenderer : public GameComponent
 	{
 	protected:
 		TMap tileMap;
