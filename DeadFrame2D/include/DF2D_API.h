@@ -3,7 +3,6 @@
 
 #ifdef _MSC_VER
 	#pragma warning(disable : 4251) // STL types in exported classes
-	#pragma warning(disable : 4275) // base class with no dll-interface // TODO: Remove
 #endif
 
 
