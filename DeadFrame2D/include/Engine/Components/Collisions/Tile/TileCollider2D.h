@@ -6,7 +6,7 @@
 namespace DeadFrame2D::Engine
 {
 	template <typename TRenderer>
-	class DF2D_API TileCollider2D : public Collider2D
+	class TileCollider2D : public Collider2D
 	{
 	protected:
 		TRenderer* tileMapRenderer;
