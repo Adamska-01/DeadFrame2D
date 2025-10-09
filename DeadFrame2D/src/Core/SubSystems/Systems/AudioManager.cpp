@@ -17,6 +17,8 @@ namespace DeadFrame2D::Core
 	{
 		assert(instance == nullptr && "AudioManager was already initialized!");
 
+		instance = this;
+
 		musicCache.clear();
 		sfxCache.clear();
 
@@ -34,6 +36,8 @@ namespace DeadFrame2D::Core
 
 	AudioManager::~AudioManager()
 	{
+		instance = nullptr;
+
 		musicCache.clear();
 		sfxCache.clear();
 
