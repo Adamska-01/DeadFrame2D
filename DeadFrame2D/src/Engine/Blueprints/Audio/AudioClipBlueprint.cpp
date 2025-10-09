@@ -9,7 +9,8 @@ namespace DeadFrame2D::Engine
 
 
 	AudioClipBlueprint::AudioClipBlueprint(const std::string_view& audioSourcePath, Vector2F position, float volume, bool isMusic, bool loop)
-		: audioSourcePath(audioSourcePath),
+		: audioSource(nullptr),
+		audioSourcePath(audioSourcePath),
 		position(position),
 		volume(volume),
 		isMusic(isMusic),
