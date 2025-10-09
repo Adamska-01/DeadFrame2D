@@ -102,7 +102,7 @@ namespace DeadFrame2D::Engine
 
 		tileMapRenderer = OwningObject.lock()->GetComponent<TiledMapCompatibleRenderer>();
 
-		Guard::AgainstNull(tileMapRenderer, "Failed to get TiledMapCompatibleRenderer from OwningObject");
+		Guard::AgainstNull(tileMapRenderer, NAME_OF(tileMapRenderer));
 
 		const auto& tileMap = tileMapRenderer->GetTileMap();
 
