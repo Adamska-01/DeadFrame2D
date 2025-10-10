@@ -19,6 +19,7 @@ project "DeadFrame2D"
 
 	includedirs { 
 		"include",
+		"Internal",
 		"../Shared/include", 
 		"../Vendor/nlohmann-3.11.3", 
 		"../Vendor/tinyxml2-10.0.0", 
