@@ -11,6 +11,25 @@ namespace DeadFrame2D::Models
 {
 	struct TiledLayer
 	{
+	private:
+		template<typename T>
+		T GetPropertyValue(std::string_view key, T defaultValue = {}) const
+		{
+			auto it = Properties.find(std::string(key));
+
+			if (it == Properties.end())
+				return defaultValue;
+
+			const auto& prop = it->second;
+
+			if (std::holds_alternative<T>(prop.Value))
+				return std::get<T>(prop.Value);
+
+			return defaultValue;
+		}
+
+
+	public:
 		std::string name;
 
 		std::unordered_map<std::string, TiledProperty> Properties;
@@ -18,36 +37,24 @@ namespace DeadFrame2D::Models
 		std::vector<std::vector<int>> Data;
 
 
-		std::optional<TiledProperty> GetProperty(std::string_view key) const
+		float GetFloatProperty(std::string_view key, float defaultValue = 0.0f) const
 		{
-			auto it = Properties.find(std::string(key));
-
-			if (it != Properties.end()) 
-				return it->second;
-
-			return std::nullopt; 
+			return GetPropertyValue<float>(key, defaultValue);
 		}
 
-		// TODO: Add a default parameter to defaultValue
-		float GetFloatProperty(std::string_view key, float defaultValue) const
+		bool GetBoolProperty(std::string_view key, bool defaultValue = false) const
 		{
-			auto prop = GetProperty(key);
-
-			if (prop && std::holds_alternative<float>(prop->Value))
-				return std::get<float>(prop->Value);
-
-			return defaultValue;
+			return GetPropertyValue<bool>(key, defaultValue);
 		}
 
-		// TODO: Add a default parameter to defaultValue
-		bool GetBoolProperty(std::string_view key, bool defaultValue) const
+		int GetIntProperty(std::string_view key, int defaultValue = -1) const
 		{
-			auto prop = GetProperty(key);
+			return GetPropertyValue<int>(key, defaultValue);
+		}
 
-			if (prop && std::holds_alternative<bool>(prop->Value))
-				return std::get<bool>(prop->Value);
-
-			return defaultValue;
+		std::string GetStringProperty(std::string_view key, std::string defaultValue = "") const
+		{
+			return GetPropertyValue<std::string>(key, defaultValue);
 		}
 	};
 }
