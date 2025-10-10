@@ -42,8 +42,8 @@ namespace DeadFrame2D::Engine
 	
 		auto identifier = reinterpret_cast<uintptr_t>(this);
 
-		ownerPtr->RegisterOnActiveStateChangedHandler(BindFunction(this, &GameObjectObserver::OnGameObjectActiveStateChangedHandler), identifier);
-		ownerPtr->RegisterOnNewComponentAddedHandler(BindFunction(this, &GameObjectObserver::OnNewComponentAddedHandler), identifier);
+		ownerPtr->RegisterOnActiveStateChangedHandler(EventHelpers::BindFunction(this, &GameObjectObserver::OnGameObjectActiveStateChangedHandler), identifier);
+		ownerPtr->RegisterOnNewComponentAddedHandler(EventHelpers::BindFunction(this, &GameObjectObserver::OnNewComponentAddedHandler), identifier);
 	}
 
 	void GameObjectObserver::DeregisterAllHandlers(std::weak_ptr<GameObject> owner)

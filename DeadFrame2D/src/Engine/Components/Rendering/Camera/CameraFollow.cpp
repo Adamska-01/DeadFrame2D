@@ -31,7 +31,7 @@ namespace DeadFrame2D::Engine
 
 		resolutionTarget = Renderer::GetResolutionTarget();
 
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), BindFunction(this, &CameraFollow::RenderTargetSizeChangedEventHandler), reinterpret_cast<uintptr_t>(this));
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), EventHelpers::BindFunction(this, &CameraFollow::RenderTargetSizeChangedEventHandler), reinterpret_cast<uintptr_t>(this));
 	}
 
 	CameraFollow::~CameraFollow()

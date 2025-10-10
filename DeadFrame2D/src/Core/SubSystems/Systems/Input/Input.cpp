@@ -57,7 +57,7 @@ namespace DeadFrame2D::Core
 		keyboardDevice = std::make_unique<KeyboardInputDevice>();
 		mouseDevice = std::make_unique<MouseInputDevice>();
 
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(ControllerDisconnectedEvent)), BindFunction(this, &Input::DisconnectControllerHandler), reinterpret_cast<std::uintptr_t>(this));
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(ControllerDisconnectedEvent)), EventHelpers::BindFunction(this, &Input::DisconnectControllerHandler), reinterpret_cast<std::uintptr_t>(this));
 	}
 
 	Input::~Input()

@@ -21,9 +21,9 @@ namespace DeadFrame2D::Engine
 
 		auto identifier = reinterpret_cast<uintptr_t>(this);
 	
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), BindFunction(this, &Scene::GameObjectCreatedHandler), identifier);
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), BindFunction(this, &Scene::GameObjectDestroyedHandler), identifier);
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(ChildGameObjectAddedEvent)), BindFunction(this, &Scene::ChildGameObjectAddedHandler), identifier);
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &Scene::GameObjectCreatedHandler), identifier);
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &Scene::GameObjectDestroyedHandler), identifier);
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(ChildGameObjectAddedEvent)), EventHelpers::BindFunction(this, &Scene::ChildGameObjectAddedHandler), identifier);
 	}
 
 	Scene::~Scene()

@@ -21,7 +21,7 @@ namespace DeadFrame2D::Engine
 
 		scrollOffset = 0;
 
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), BindFunction(this, &ImageScroller::RenderTargetSizeChangedHandler), reinterpret_cast<std::uintptr_t>(this));
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), EventHelpers::BindFunction(this, &ImageScroller::RenderTargetSizeChangedHandler), reinterpret_cast<std::uintptr_t>(this));
 	}
 
 	ImageScroller::~ImageScroller()

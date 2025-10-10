@@ -32,8 +32,8 @@ namespace DeadFrame2D::Engine
 		lastTransformPosition(Vector2F::Zero),
 		lastTransformRotation(0.0f)
 	{
-		RegisterContactEnterHandler(BindFunction(this, &AudioSource::OnAudioSourceEnterHandler), reinterpret_cast<uintptr_t>(this));
-		RegisterContactExitHandler(BindFunction(this, &AudioSource::OnAudioSourceExitHandler), reinterpret_cast<uintptr_t>(this));
+		RegisterContactEnterHandler(EventHelpers::BindFunction(this, &AudioSource::OnAudioSourceEnterHandler), reinterpret_cast<uintptr_t>(this));
+		RegisterContactExitHandler(EventHelpers::BindFunction(this, &AudioSource::OnAudioSourceExitHandler), reinterpret_cast<uintptr_t>(this));
 	}
 
 	AudioSource::AudioSource(const std::string& audioSource, bool isMusic, float volume)
@@ -44,8 +44,8 @@ namespace DeadFrame2D::Engine
 
 		LoadAudio(audioSource, isMusic);
 
-		RegisterContactEnterHandler(BindFunction(this, &AudioSource::OnAudioSourceEnterHandler), reinterpret_cast<uintptr_t>(this));
-		RegisterContactExitHandler(BindFunction(this, &AudioSource::OnAudioSourceExitHandler), reinterpret_cast<uintptr_t>(this));
+		RegisterContactEnterHandler(EventHelpers::BindFunction(this, &AudioSource::OnAudioSourceEnterHandler), reinterpret_cast<uintptr_t>(this));
+		RegisterContactExitHandler(EventHelpers::BindFunction(this, &AudioSource::OnAudioSourceExitHandler), reinterpret_cast<uintptr_t>(this));
 	}
 
 	AudioSource::~AudioSource()

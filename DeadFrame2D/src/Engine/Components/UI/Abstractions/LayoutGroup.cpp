@@ -18,8 +18,8 @@ namespace DeadFrame2D::Engine
 	{
 		auto identifier = reinterpret_cast<uintptr_t>(this);
 	
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), BindFunction(this, &LayoutGroup::GameObjectCreatedHandler), identifier);
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), BindFunction(this, &LayoutGroup::GameObjectDestroyedHandler), identifier);
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &LayoutGroup::GameObjectCreatedHandler), identifier);
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &LayoutGroup::GameObjectDestroyedHandler), identifier);
 	}
 
 	LayoutGroup::~LayoutGroup()

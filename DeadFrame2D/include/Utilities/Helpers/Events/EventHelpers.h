@@ -2,9 +2,8 @@
 #include <functional>
 
 
-namespace DeadFrame2D::Utilities
+namespace DeadFrame2D::Utilities::EventHelpers
 {
-	// TODO: Put this in a statci class
 	template <typename T, typename R, typename... Args>
 	inline std::function<R(Args...)> BindFunction(T* instance, R(T::* member_function)(Args...))
 	{
