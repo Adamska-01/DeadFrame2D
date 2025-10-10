@@ -5,19 +5,17 @@
 
 namespace DeadFrame2D::Data
 {
-	// TODO: Make this a struct
 	/**
 	 * @brief Wrapper for Box2D body definition with default values matching b2BodyDef.
 	 */
-	class BodyDefinition2D
+	struct BodyDefinition2D
 	{
-	public:
 		DeadFrame2D::Core::Vector2F position = DeadFrame2D::Core::Vector2F(0.0f, 0.0f);
 
 		DeadFrame2D::Core::Vector2F linearVelocity = DeadFrame2D::Core::Vector2F(0.0f, 0.0f);
 
 		BodyType2D type = BodyType2D::Static;
-	
+
 		float angle = 0.0f;
 
 		float angularVelocity = 0.0f;
