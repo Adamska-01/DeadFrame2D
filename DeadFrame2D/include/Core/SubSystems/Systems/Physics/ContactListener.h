@@ -9,9 +9,8 @@ namespace DeadFrame2D::Engine
 }
 
 
-namespace DeadFrame2D::Data
+namespace DeadFrame2D::Core
 {
-	// TODO: This should not be in the Data namespace.
 	/**
 	 * @brief Custom contact listener for Box2D collision events.
 	 *

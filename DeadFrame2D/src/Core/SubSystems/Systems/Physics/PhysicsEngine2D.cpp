@@ -1,6 +1,6 @@
 #include "Core/Framerate/FrameTimer.h"
-#include "Core/SubSystems/Systems/PhysicsEngine2D.h"
-#include "Data/Collision/ContactListener.h"
+#include "Core/SubSystems/Systems/Physics/ContactListener.h"
+#include "Core/SubSystems/Systems/Physics/PhysicsEngine2D.h"
 #include "Factories/Concretions/Debugging/ColliderDrawerFactory.h"
 #include <box2d/box2d.h>
 #include <cassert>
@@ -14,7 +14,6 @@ namespace DeadFrame2D::Core
 	using namespace Shared::Models;
 	using namespace Shared::Tools;
 
-	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Factories;
 
 

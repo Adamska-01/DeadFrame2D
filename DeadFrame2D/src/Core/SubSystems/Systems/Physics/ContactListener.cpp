@@ -1,14 +1,12 @@
+#include "Core/SubSystems/Systems/Physics/ContactListener.h"
 #include "Data/Collision/CollisionInfo.h"
-#include "Data/Collision/ContactListener.h"
-#include "Engine/Components/Audio/AudioListener.h"
-#include "Engine/Components/Audio/AudioSource.h"
 #include "Engine/Components/Collisions/Collider2D.h"
 #include "Engine/Entity/GameObject.h"
 
 
-namespace DeadFrame2D::Data
+namespace DeadFrame2D::Core
 {
-	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Engine;
 
 
