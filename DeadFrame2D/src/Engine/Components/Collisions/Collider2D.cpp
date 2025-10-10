@@ -1,3 +1,4 @@
+#include "Converters/Physics/PhysicsConversions.h"
 #include "Core/SubSystems/Systems/CoroutineScheduler.h"
 #include "Engine/Components/Collisions/Collider2D.h"
 #include "Engine/Components/Physics/RigidBody2D.h"
@@ -6,12 +7,12 @@
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
 #include "Engine/Entity/GameObject.h"
 #include "Utilities/Helpers/Coroutines/CoroutineHelpers.h"
-#include "Utilities/Helpers/Physics/PhysicsConversion.h"
 
 
 namespace DeadFrame2D::Engine
 {
 	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Converters;
 	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Utilities;
 
@@ -95,7 +96,7 @@ namespace DeadFrame2D::Engine
 		if (rigidBody == nullptr)
 			return;
 
-		auto def = ToB2FixtureDef(physicsMaterial, reinterpret_cast<uintptr_t>(this));
+		auto def = Physics::ToB2FixtureDef(physicsMaterial, reinterpret_cast<uintptr_t>(this));
 
 		fixture = rigidBody->CreateFixture(&def);
 

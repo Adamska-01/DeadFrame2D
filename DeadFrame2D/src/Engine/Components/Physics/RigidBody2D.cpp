@@ -1,16 +1,17 @@
+#include "Converters/Physics/PhysicsConversions.h"
 #include "Core/SubSystems/Systems/PhysicsEngine2D.h"
 #include "Data/Physics/BodyDefinition2D.h"
 #include "Engine/Components/Physics/RigidBody2D.h"
 #include "Engine/Components/Transform.h"
 #include "Engine/Entity/GameObject.h"
 #include "Utilities/Debugging/Guards.h"
-#include "Utilities/Helpers/Physics/PhysicsConversion.h"
 #include <box2d/b2_body.h>
 
 
 namespace DeadFrame2D::Engine
 {
 	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Converters;
 	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Utilities;
 	using namespace DeadFrame2D::Constants;
@@ -26,7 +27,7 @@ namespace DeadFrame2D::Engine
 	{
 		pendingActions.Clear();
 
-		auto bodyDef = ToB2BodyDef(bodyDefinition);
+		auto bodyDef = Physics::ToB2BodyDef(bodyDefinition);
 
 		body = PhysicsEngine2D::CreateBody(&bodyDef);
 	}
@@ -128,7 +129,7 @@ namespace DeadFrame2D::Engine
 	{
 		pendingActions.RegisterCallback([this, newBodyType]()
 			{
-				body->SetType(ToB2BodyType(newBodyType));
+				body->SetType(Physics::ToB2BodyType(newBodyType));
 			},
 			reinterpret_cast<uintptr_t>(this));
 	}

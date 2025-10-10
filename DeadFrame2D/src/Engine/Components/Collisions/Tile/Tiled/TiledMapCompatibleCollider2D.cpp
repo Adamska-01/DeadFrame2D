@@ -1,20 +1,20 @@
 #include "Constants/TiledPropertyNames.h"
+#include "Converters/Physics/PhysicsConversions.h"
 #include "Engine/Components/Collisions/Tile/Tiled/TiledMapCompatibleCollider2D.h"
 #include "Engine/Components/Physics/RigidBody2D.h"
 #include "Engine/Components/Transform.h"
 #include "Engine/Entity/GameObject.h"
 #include "Utilities/Debugging/Guards.h"
-#include "Utilities/Helpers/Physics/PhysicsConversion.h"
-#include "Utilities/Helpers/Physics/PhysicsShapeCreators.h"
 
 
 namespace DeadFrame2D::Engine
 {
 	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Constants;
+	using namespace DeadFrame2D::Converters;
 	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Models;
 	using namespace DeadFrame2D::Utilities;
-	using namespace DeadFrame2D::Constants;
 
 
 	TiledMapCompatibleCollider2D::TiledMapCompatibleCollider2D(const PhysicsMaterial& physicsMaterial)
@@ -70,7 +70,7 @@ namespace DeadFrame2D::Engine
 					if (tileID == 0)
 						continue;
 				
-					this->physicsMaterial.shape = CreateBoxShape(
+					this->physicsMaterial.shape = Physics::ToB2BoxShape(
 						tileSize * 0.5f,
 						tileSize * 0.5f,
 						Vector2F((j * tileSize + tileSize * 0.5f), (i * tileSize + tileSize * 0.5f)),
@@ -82,7 +82,7 @@ namespace DeadFrame2D::Engine
 					physicsMaterial.restitution = layer.GetFloatProperty(TiledPropertyNames::RESTITUTION, 0.0f);
 					physicsMaterial.restitutionThreshold = layer.GetFloatProperty(TiledPropertyNames::RESTITUTION_THRESHOLD, 1.0f);
 
-					auto def = ToB2FixtureDef(physicsMaterial, reinterpret_cast<uintptr_t>(this));
+					auto def = Physics::ToB2FixtureDef(physicsMaterial, reinterpret_cast<uintptr_t>(this));
 
 					fixtures.push_back(rigidBody->CreateFixture(&def));
 

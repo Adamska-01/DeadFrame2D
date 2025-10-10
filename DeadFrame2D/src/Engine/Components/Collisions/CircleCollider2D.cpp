@@ -1,10 +1,11 @@
+#include "Converters/Physics/PhysicsConversions.h"
 #include "Engine/Components/Collisions/CircleCollider2D.h"
-#include "Utilities/Helpers/Physics/PhysicsShapeCreators.h"
 
 
 namespace DeadFrame2D::Engine
 {
 	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Converters;
 	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Utilities;
 
@@ -33,7 +34,7 @@ namespace DeadFrame2D::Engine
 	{
 		DeleteShape();
 
-		shape = CreateCircleShape(radius, offsetFromCenter);
+		shape = Physics::ToB2CircleShape(radius, offsetFromCenter);
 
 		this->physicsMaterial.shape = shape;
 

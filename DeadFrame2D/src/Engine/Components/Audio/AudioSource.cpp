@@ -1,11 +1,10 @@
+#include "Converters/Physics/PhysicsConversions.h"
 #include "Core/SubSystems/Systems/PhysicsEngine2D.h"
 #include "Engine/Components/Audio/AudioListener.h"
 #include "Engine/Components/Audio/AudioSource.h"
 #include "Engine/Components/Transform.h"
 #include "Engine/Entity/GameObject.h"
 #include "Utilities/Helpers/Events/EventHelpers.h"
-#include "Utilities/Helpers/Physics/PhysicsConversion.h"
-#include "Utilities/Helpers/Physics/PhysicsShapeCreators.h"
 #include <algorithm>
 #include <box2d/b2_body.h>
 
@@ -13,6 +12,7 @@
 namespace DeadFrame2D::Engine
 {
 	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Converters;
 	using namespace DeadFrame2D::Constants;
 	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Utilities;
@@ -106,7 +106,7 @@ namespace DeadFrame2D::Engine
 				.gravityScale = 0.0f
 			};
 
-			auto bodyDefBox2d = ToB2BodyDef(bodyDef);
+			auto bodyDefBox2d = Physics::ToB2BodyDef(bodyDef);
 
 			collisionBody = PhysicsEngine2D::CreateBody(&bodyDefBox2d);
 		}
@@ -120,7 +120,7 @@ namespace DeadFrame2D::Engine
 
 		auto physicsMat = PhysicsMaterial
 		{
-			.shape = CreateCircleShape(maxReachingDistance),
+			.shape = Physics::ToB2CircleShape(maxReachingDistance),
 			.isSensor = true,
 			.filter = FilterData
 			{
@@ -129,7 +129,7 @@ namespace DeadFrame2D::Engine
 			}
 		};
 
-		auto fixtureDef = ToB2FixtureDef(physicsMat, reinterpret_cast<uintptr_t>(this));
+		auto fixtureDef = Physics::ToB2FixtureDef(physicsMat, reinterpret_cast<uintptr_t>(this));
 
 		collisionFixture = collisionBody->CreateFixture(&fixtureDef);
 
