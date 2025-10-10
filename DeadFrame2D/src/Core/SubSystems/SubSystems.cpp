@@ -57,7 +57,6 @@ namespace DeadFrame2D::Core
 		}
 	}
 
-	// TODO: Create the interface with BeginFrame and EndFrame
 	void SubSystems::BeginFrame()
 	{
 		for (const auto& subSystem : subSystems)
