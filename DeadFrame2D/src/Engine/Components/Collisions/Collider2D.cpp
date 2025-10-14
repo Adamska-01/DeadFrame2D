@@ -28,7 +28,9 @@ namespace DeadFrame2D::Engine
 		if (fixture == nullptr || rigidBody == nullptr)
 			return;
 
-		// THIS CAUSES NULL REF ERRORS! MAKE COMPONENTS SMART POINTERS!!!!!!!!
+		// Set the user data to nullptr in case the destruction triggers an end contact event
+		fixture->GetUserData().pointer = 0;
+
 		rigidBody->DestroyFixture(fixture);
 	}
 

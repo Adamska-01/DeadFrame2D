@@ -41,8 +41,11 @@ namespace DeadFrame2D::Engine
 		{
 			auto next = fixture->GetNext();
 
+			// Set the user data to nullptr in case the destruction triggers an end contact event
+			fixture->GetUserData().pointer = 0;
+
 			body->DestroyFixture(fixture);
-		
+
 			fixture = next;
 		}
 
