@@ -385,6 +385,27 @@ namespace DeadFrame2D::Core
 		SDL_SetTextureColorMod(texturePtr, oldR, oldG, oldB);
 	}
 
+	void TextureManager::DrawPixel(const Vector2F& p, SDL_Color color, Camera* camera)
+	{
+		auto renderer = Renderer::GetRenderer();
+
+		if (renderer == nullptr)
+			return;
+
+		auto finalPos = camera != nullptr ? camera->WorldToScreen(p) : p;
+
+		auto oldRenderColor = Renderer::GetDisplayColor();
+
+		Renderer::SetDisplayColor(color.r, color.g, color.b, color.a);
+
+		SDL_RenderDrawPoint(
+			renderer, 
+			static_cast<int>(finalPos.x),
+			static_cast<int>(finalPos.y));
+
+		Renderer::SetDisplayColor(oldRenderColor.r, oldRenderColor.g, oldRenderColor.b, oldRenderColor.a);
+	}
+
 	void TextureManager::DrawLineWorldSpace(const Vector2F& p1, const Vector2F& p2, SDL_Color color)
 	{
 		DrawLine(p1, p2, color, currentCamera);
@@ -439,5 +460,15 @@ namespace DeadFrame2D::Core
 		SDL_Color colorMod)
 	{
 		DrawTexture(texture, srcRect, dstRect, angle, rotationOrigin, flip, alpha, colorMod);
+	}
+
+	void TextureManager::DrawPixelWorldSpace(const Vector2F& p, SDL_Color color)
+	{
+		DrawPixel(p, color, currentCamera);
+	}
+
+	void TextureManager::DrawPixelScreenSpace(const Vector2F& p, SDL_Color color)
+	{
+		DrawPixel(p, color);
 	}
 }

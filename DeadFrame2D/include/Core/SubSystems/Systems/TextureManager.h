@@ -52,11 +52,24 @@ namespace DeadFrame2D::Core
 		virtual void EndDraw() override;
 
 
-		static void DrawLine(const Vector2F& p1, const Vector2F& p2, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, DeadFrame2D::Engine::Camera* camera = nullptr);
+		static void DrawLine(
+			const Vector2F& p1, 
+			const Vector2F& p2, 
+			SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, 
+			DeadFrame2D::Engine::Camera* camera = nullptr);
 
-		static void DrawRect(SDL_Rect rect, float angleDegrees, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false, DeadFrame2D::Engine::Camera* camera = nullptr);
+		static void DrawRect(
+			SDL_Rect rect, 
+			float angleDegrees, 
+			SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, 
+			bool filled = false, 
+			DeadFrame2D::Engine::Camera* camera = nullptr);
 
-		static void DrawCircle(Circle circle, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false, DeadFrame2D::Engine::Camera* camera = nullptr);
+		static void DrawCircle(
+			Circle circle, 
+			SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, 
+			bool filled = false, 
+			DeadFrame2D::Engine::Camera* camera = nullptr);
 
 		static void DrawTexture(
 			std::shared_ptr<SDL_Texture> texture,
@@ -67,6 +80,11 @@ namespace DeadFrame2D::Core
 			SDL_RendererFlip flip = SDL_FLIP_NONE,
 			Uint8 alpha = 255,
 			SDL_Color colorMod = DeadFrame2D::Constants::CommonColors::WHITE,
+			DeadFrame2D::Engine::Camera* camera = nullptr);
+
+		static void DrawPixel(
+			const Vector2F& p, 
+			SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE,
 			DeadFrame2D::Engine::Camera* camera = nullptr);
 
 
@@ -105,5 +123,9 @@ namespace DeadFrame2D::Core
 			SDL_RendererFlip flip = SDL_FLIP_NONE,
 			Uint8 alpha = 255,
 			SDL_Color colorMod = DeadFrame2D::Constants::CommonColors::WHITE);
+
+		static void DrawPixelWorldSpace(const Vector2F& p, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE);
+
+		static void DrawPixelScreenSpace(const Vector2F& p, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE);
 	};
 }
