@@ -1,11 +1,12 @@
 #pragma once
-#include "ComponentBucket.h"
 #include "Core/Coroutines/Task.h"
 #include "DF2D_API.h"
 #include "Engine/EngineEvents/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectCreatedEvent.h"
 #include "Engine/Entity/Abstractions/IObject.h"
-#include "GameObjectNotifier.h"
+#include "Engine/Entity/ComponentBucket.h"
+#include "Engine/Entity/ComponentHandle.h"
+#include "Engine/Entity/GameObjectNotifier.h"
 #include <memory>
 
 
@@ -36,9 +37,9 @@ namespace DeadFrame2D::Engine
 
 		std::vector<std::weak_ptr<GameObject>> children;
 
-		Transform* transform;
+		ComponentHandle<Transform> transform;
 
-		ComponentBucket componentBucket;
+		std::shared_ptr<ComponentBucket> componentBucket;
 
 
 		GameObject();
@@ -67,22 +68,25 @@ namespace DeadFrame2D::Engine
 
 
 		template <typename T>
-		T* GetComponent() const;
+		ComponentHandle<T> GetComponent() const;
 
 		template <typename T>
-		T* GetComponentInChildren(bool recursive = false) const;
+		ComponentHandle<T> GetComponentInChildren(bool recursive = false) const;
 
 		template <typename T>
-		std::vector<T*> GetComponentsInChildren(bool recursive = false) const;
+		std::vector<ComponentHandle<T>> GetComponentsInChildren(bool recursive = false) const;
 
 		template<typename T>
-		inline T* GetComponentInParent(bool recursive = false) const;
+		ComponentHandle<T> GetComponentInParent(bool recursive = false) const;
 
 		template<typename T>
-		inline std::vector<T*> GetComponentsInParent(bool recursive = false) const;
+		std::vector<ComponentHandle<T>> GetComponentsInParent(bool recursive = false) const;
 
 		template<typename T, typename... TArgs>
-		T* AddComponent(TArgs&& ...args);
+		ComponentHandle<T> AddComponent(TArgs&& ...args);
+
+		template<typename T>
+		void RemoveComponent(const ComponentHandle<T>& handle);
 
 		void AddChildGameObject(std::weak_ptr<GameObject> child);
 
@@ -97,15 +101,18 @@ namespace DeadFrame2D::Engine
 
 		std::weak_ptr<GameObject> GetParent() const;
 
-		Transform* GetTransform() const;
+		ComponentHandle<Transform> GetTransform() const;
 
 		std::vector<std::weak_ptr<GameObject>> GetChildren() const;
 		bool IsActive() const;
 
 		void SetActive(bool value);
 	};
+}
 
 
+namespace DeadFrame2D::Engine
+{
 	template<typename T, typename ...Args>
 	inline std::weak_ptr<T> GameObject::Instantiate(Args && ...args)
 	{
@@ -116,10 +123,10 @@ namespace DeadFrame2D::Engine
 		obj->thisWeak = obj;
 
 		// This is necessary due to smart pointer/C++ limitations
-		for (auto& component : obj->componentBucket.GetComponents())
+		obj->componentBucket->ForEach([&obj](GameComponent& comp) 
 		{
-			obj->componentBucket.LinkComponentToOwner(obj, component.get());
-		}
+			obj->componentBucket->LinkComponentToOwner(obj, &comp);
+		});
 
 		EventDispatcher::SendEvent(std::make_shared<GameObjectCreatedEvent>(obj));
 
@@ -129,13 +136,13 @@ namespace DeadFrame2D::Engine
 	}
 
 	template<typename T>
-	inline T* GameObject::GetComponent() const
+	inline ComponentHandle<T> GameObject::GetComponent() const
 	{
-		return componentBucket.GetComponent<T>();
+		return componentBucket->GetComponent<T>();
 	}
 
 	template<typename T>
-	inline T* GameObject::GetComponentInChildren(bool recursive) const
+	inline ComponentHandle<T> GameObject::GetComponentInChildren(bool recursive) const
 	{
 		for (const auto& weakChild : children)
 		{
@@ -144,23 +151,23 @@ namespace DeadFrame2D::Engine
 			if (child == nullptr || child->isDestroyed)
 				continue;
 
-			if (T* comp = child->GetComponent<T>())
+			if (auto comp = child->GetComponent<T>())
 				return comp;
 
 			if (recursive)
 			{
-				if (T* childComp = child->GetComponentInChildren<T>(true))
+				if (auto childComp = child->GetComponentInChildren<T>(true))
 					return childComp;
 			}
 		}
 
-		return nullptr;
+		return ComponentHandle<T>();
 	}
 
 	template<typename T>
-	inline std::vector<T*> GameObject::GetComponentsInChildren(bool recursive) const
+	inline std::vector<ComponentHandle<T>> GameObject::GetComponentsInChildren(bool recursive) const
 	{
-		std::vector<T*> results;
+		std::vector<ComponentHandle<T>> results;
 
 		for (const auto& weakChild : children)
 		{
@@ -169,7 +176,7 @@ namespace DeadFrame2D::Engine
 			if (child == nullptr || child->isDestroyed)
 				continue;
 
-			if (T* comp = child->GetComponent<T>())
+			if (auto comp = child->GetComponent<T>())
 				results.push_back(comp);
 
 			if (recursive)
@@ -184,13 +191,13 @@ namespace DeadFrame2D::Engine
 	}
 
 	template<typename T>
-	inline T* GameObject::GetComponentInParent(bool recursive) const
+	inline ComponentHandle<T> GameObject::GetComponentInParent(bool recursive) const
 	{
 		auto current = parent.lock();
 
 		while (current != nullptr)
 		{
-			if (T* comp = current->GetComponent<T>())
+			if (auto comp = current->GetComponent<T>())
 				return comp;
 
 			if (!recursive)
@@ -199,18 +206,19 @@ namespace DeadFrame2D::Engine
 			current = current->parent.lock();
 		}
 
-		return nullptr;
+		return ComponentHandle<T>();
 	}
 
 	template<typename T>
-	inline std::vector<T*> GameObject::GetComponentsInParent(bool recursive) const
+	inline std::vector<ComponentHandle<T>> GameObject::GetComponentsInParent(bool recursive) const
 	{
-		std::vector<T*> results;
+		std::vector<ComponentHandle<T>> results;
+
 		auto current = parent.lock();
 
 		while (current != nullptr)
 		{
-			if (T* comp = current->GetComponent<T>())
+			if (auto comp = current->GetComponent<T>())
 				results.push_back(comp);
 
 			if (!recursive)
@@ -222,15 +230,23 @@ namespace DeadFrame2D::Engine
 		return results;
 	}
 
-	template<typename T, typename... TArgs>
-	inline T* GameObject::AddComponent(TArgs&& ...args)
+	template<typename T, typename ...TArgs>
+	inline ComponentHandle<T> GameObject::AddComponent(TArgs && ...args)
 	{
 		static_assert(std::is_base_of_v<GameComponent, T>, "T must derive from GameComponent");
 
-		auto newComponent = componentBucket.AddComponent<T>(thisWeak, isInitialized, std::forward<TArgs>(args)...);
+		auto newComponent = componentBucket->AddComponent<T>(thisWeak, isInitialized, std::forward<TArgs>(args)...);
 
-		OnNewComponentAdded(newComponent);
+		OnNewComponentAdded(ComponentHandle<GameComponent>::From(newComponent));
 
 		return newComponent;
+	}
+
+	template<typename T>
+	inline void GameObject::RemoveComponent(const ComponentHandle<T>& handle)
+	{
+		componentBucket->RemoveComponent<T>(handle);
+
+		// TODO: Add OnComponentRemoved callback
 	}
 }

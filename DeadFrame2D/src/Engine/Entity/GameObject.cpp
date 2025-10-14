@@ -19,6 +19,8 @@ namespace DeadFrame2D::Engine
 	{
 		children.clear();
 
+		componentBucket = std::make_shared<ComponentBucket>();
+
 		transform = AddComponent<Transform>();
 	}
 
@@ -57,31 +59,31 @@ namespace DeadFrame2D::Engine
 		if (isInitialized)
 			return;
 
-		for (const auto& component : componentBucket.GetComponents())
+		componentBucket->ForEach([](GameComponent& comp) 
 		{
-			component->Init();
-		}
+			comp.Init();
+		});
 
 		isInitialized = true;
 	}
 
 	void GameObject::Start()
 	{
-		for (const auto& component : componentBucket.GetComponents())
+		componentBucket->ForEach([](GameComponent& comp)
 		{
-			component->Start();
-		}
+			comp.Start();
+		});
 	}
 
 	void GameObject::Update(float deltaTime)
 	{
-		for (const auto& component : componentBucket.GetComponents())
+		componentBucket->ForEach([deltaTime](GameComponent& comp)
 		{
-			if (!component->IsActive())
-				continue;
+			if (!comp.IsActive())
+				return;
 
-			component->Update(deltaTime);
-		}
+			comp.Update(deltaTime);
+		});
 
 		for (const auto& child : children)
 		{
@@ -96,14 +98,14 @@ namespace DeadFrame2D::Engine
 
 	void GameObject::LateUpdate(float deltaTime)
 	{
-		for (const auto& component : componentBucket.GetComponents())
+		componentBucket->ForEach([deltaTime](GameComponent& comp)
 		{
-			if (!component->IsActive())
-				continue;
+			if (!comp.IsActive())
+				return;
 
-			// TODO: implement late update in GameComponents
-			//component->LateUpdate(deltaTime);
-		}
+			// TODO: implement LateUpdate in GameComponents
+			// comp.LateUpdate(deltaTime);
+		});
 
 		for (const auto& child : children)
 		{
@@ -112,19 +114,19 @@ namespace DeadFrame2D::Engine
 			if (childPtr == nullptr)
 				continue;
 
-			child.lock()->LateUpdate(deltaTime);
+			childPtr->LateUpdate(deltaTime);
 		}
 	}
 
 	void GameObject::Draw()
 	{
-		for (auto& component : componentBucket.GetComponents())
+		componentBucket->ForEach([](GameComponent& comp)
 		{
-			if (!component->IsActive())
-				continue;
+			if (!comp.IsActive())
+				return;
 
-			component->Draw();
-		}
+			comp.Draw();
+		});
 
 		for (const auto& child : children)
 		{
@@ -133,7 +135,7 @@ namespace DeadFrame2D::Engine
 			if (childPtr == nullptr || !childPtr->IsActive())
 				continue;
 
-			child.lock()->Draw();
+			childPtr->Draw();
 		}
 	}
 
@@ -256,7 +258,7 @@ namespace DeadFrame2D::Engine
 		return parent;
 	}
 
-	Transform* GameObject::GetTransform() const
+	ComponentHandle<Transform> GameObject::GetTransform() const
 	{
 		return transform;
 	}
