@@ -8,6 +8,9 @@ namespace DeadFrame2D::Engine
 {
 	class DF2D_API CircleCollider2D : public Collider2D
 	{
+		TYPE_INFO(CircleCollider2D, Collider2D);
+
+
 	private:
 		b2CircleShape* shape;
 

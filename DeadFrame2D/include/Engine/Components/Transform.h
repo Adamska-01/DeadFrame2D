@@ -8,6 +8,9 @@ namespace DeadFrame2D::Engine
 {
 	class DF2D_API Transform : public GameComponent
 	{
+		TYPE_INFO(Transform, GameComponent);
+
+
 	private:
 		mutable DeadFrame2D::Core::Vector2F position = DeadFrame2D::Core::Vector2F::Zero;
 

@@ -16,6 +16,9 @@ namespace DeadFrame2D::Engine
 
 	class DF2D_API Sprite : public GameComponent
 	{
+		TYPE_INFO(Sprite, GameComponent);
+
+
 	protected:
 		std::shared_ptr<SDL_Texture> spriteTexture;
 

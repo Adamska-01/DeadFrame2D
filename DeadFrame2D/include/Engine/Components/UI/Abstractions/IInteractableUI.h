@@ -11,6 +11,9 @@ namespace DeadFrame2D::Engine
 	 */
 	class DF2D_API IInteractableUI : public UIComponent, public INavigableUI
 	{
+		TYPE_INFO(IInteractableUI, UIComponent);
+
+
 	protected:
 		bool isPressed;
 

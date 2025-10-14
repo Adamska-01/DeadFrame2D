@@ -13,6 +13,9 @@ namespace DeadFrame2D::Engine
 
 	class DF2D_API ImageScroller : public Sprite
 	{
+		TYPE_INFO(ImageScroller, Sprite);
+
+
 	private:
 		DeadFrame2D::Data::ScrollDirection scrollDirection;
 

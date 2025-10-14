@@ -29,4 +29,19 @@ namespace DeadFrame2D::Engine
 	{
 		isActive = value;
 	}
+
+	bool GameComponent::IsA(const DeadFrame2D::Core::TypeInfo* type) const
+	{
+		const auto* current = GetTypeInfo();
+
+		while (current)
+		{
+			if (current == type)
+				return true;
+		
+			current = current->parent;
+		}
+		
+		return false;
+	}
 }

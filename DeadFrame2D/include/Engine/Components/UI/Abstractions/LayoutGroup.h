@@ -13,6 +13,9 @@ namespace DeadFrame2D::Engine
 
 	class DF2D_API LayoutGroup : public GameComponent
 	{
+		TYPE_INFO(LayoutGroup, GameComponent);
+
+
 	private:
 		void GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
 

@@ -7,6 +7,10 @@ namespace DeadFrame2D::Engine
 	template <typename TMap>
 	class TileMapRenderer : public GameComponent
 	{
+		// TODO: Check if this works correctly with "IsA"
+		TYPE_INFO(TileMapRenderer<TMap>, GameComponent);
+
+
 	protected:
 		TMap tileMap;
 

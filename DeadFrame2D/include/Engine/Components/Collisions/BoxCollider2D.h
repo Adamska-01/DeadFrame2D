@@ -9,6 +9,9 @@ namespace DeadFrame2D::Engine
 {
 	class DF2D_API BoxCollider2D : public Collider2D
 	{
+		TYPE_INFO(BoxCollider2D, Collider2D);
+	
+	
 	private:
 		b2PolygonShape* shape;
 

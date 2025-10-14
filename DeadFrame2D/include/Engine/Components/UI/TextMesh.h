@@ -24,6 +24,9 @@ namespace DeadFrame2D::Engine
 
 	class DF2D_API TextMesh : public UIComponent
 	{
+		TYPE_INFO(TextMesh, UIComponent);
+
+
 	private:
 		Transform* transform;
 

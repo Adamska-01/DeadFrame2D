@@ -8,6 +8,9 @@ namespace DeadFrame2D::Engine
 {
 	class DF2D_API HorizontalLayoutGroup : public LayoutGroup
 	{
+		TYPE_INFO(HorizontalLayoutGroup, LayoutGroup);
+
+
 	public:
 		HorizontalLayoutGroup(float layoutSpacing, DeadFrame2D::Data::LayoutPadding layoutPadding);
 

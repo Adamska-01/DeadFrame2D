@@ -10,6 +10,9 @@ namespace DeadFrame2D::Engine
 {
 	class DF2D_API ContactEventProvider : public GameComponent
 	{
+		TYPE_INFO(ContactEventProvider, GameComponent);
+
+
 	protected:
 		DeadFrame2D::Utilities::MulticastDelegate<const DeadFrame2D::Data::CollisionInfo&> onContactEnter;
 

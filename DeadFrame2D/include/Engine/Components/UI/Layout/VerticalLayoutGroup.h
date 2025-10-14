@@ -6,8 +6,11 @@
 
 namespace DeadFrame2D::Engine
 {
-	class DF2D_API VerticalLayoutGroup : public DeadFrame2D::Engine::LayoutGroup
+	class DF2D_API VerticalLayoutGroup : public LayoutGroup
 	{
+		TYPE_INFO(VerticalLayoutGroup, LayoutGroup);
+
+
 	public:
 		VerticalLayoutGroup(float layoutSpacing, DeadFrame2D::Data::LayoutPadding layoutPadding);
 

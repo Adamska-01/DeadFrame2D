@@ -14,6 +14,9 @@ namespace DeadFrame2D::Engine
 
 	class DF2D_API CameraFollow : public GameComponent
 	{
+		TYPE_INFO(CameraFollow, GameComponent);
+
+
 	private:
 		Camera* camera = nullptr;
 

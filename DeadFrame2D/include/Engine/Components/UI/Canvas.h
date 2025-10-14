@@ -7,6 +7,9 @@ namespace DeadFrame2D::Engine
 {
 	class DF2D_API Canvas : public UIComponent
 	{
+		TYPE_INFO(Canvas, UIComponent);
+
+
 	private:
 		// Impossible to implement for now...
 		int sortOrder;

@@ -15,6 +15,9 @@ namespace DeadFrame2D::Engine
 	 */
 	class DF2D_API UIComponent : public GameComponent
 	{
+		TYPE_INFO(UIComponent, GameComponent);
+
+
 	protected:
 		DeadFrame2D::Data::UIAnchor anchor;
 

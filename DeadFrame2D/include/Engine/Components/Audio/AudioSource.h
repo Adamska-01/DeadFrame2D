@@ -20,6 +20,9 @@ namespace DeadFrame2D::Engine
 
 	class DF2D_API AudioSource : public ContactEventProvider
 	{
+		TYPE_INFO(AudioSource, ContactEventProvider);
+
+
 		friend class ContactListener;
 
 

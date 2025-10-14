@@ -19,6 +19,9 @@ namespace DeadFrame2D::Engine
 
 	class DF2D_API RigidBody2D : public GameComponent
 	{
+		TYPE_INFO(RigidBody2D, GameComponent);
+
+
 	private:
 		Transform* transform;
 

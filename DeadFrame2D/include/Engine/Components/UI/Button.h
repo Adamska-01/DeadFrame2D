@@ -14,11 +14,11 @@ namespace DeadFrame2D::Data
 
 namespace DeadFrame2D::Engine
 {
-	class Transform;
-
-
 	class DF2D_API Button : public IInteractableUI, public DeadFrame2D::Core::IEventProcessor
 	{
+		TYPE_INFO(Button, IInteractableUI);
+
+
 	private:
 		DeadFrame2D::Utilities::MultiCastVoid onPressedCallback;
 

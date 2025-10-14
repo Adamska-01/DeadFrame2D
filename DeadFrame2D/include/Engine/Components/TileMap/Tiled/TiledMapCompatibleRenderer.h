@@ -8,6 +8,9 @@ namespace DeadFrame2D::Engine
 {
 	class DF2D_API TiledMapCompatibleRenderer : public TileMapRenderer<std::shared_ptr<DeadFrame2D::Models::TiledMap>>
 	{
+		TYPE_INFO(TiledMapCompatibleRenderer, TileMapRenderer<std::shared_ptr<DeadFrame2D::Models::TiledMap>>);
+
+
 	private:
 		std::unordered_map<int, int> tileIDToTileSet;
 

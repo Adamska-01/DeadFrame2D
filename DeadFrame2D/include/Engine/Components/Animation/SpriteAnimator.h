@@ -2,6 +2,7 @@
 #include "Data/Animation/SpriteAnimationProperties.h"
 #include "Data/Animation/SpriteAnimationState.h"
 #include "DF2D_API.h"
+#include "Core/Reflection/TypeInfo.h"
 #include "Engine/Components/GameComponent.h"
 #include <string>
 #include <unordered_map>
@@ -15,6 +16,9 @@ namespace DeadFrame2D::Engine
 
 	class DF2D_API SpriteAnimator : public GameComponent
 	{
+		TYPE_INFO(SpriteAnimator, GameComponent);
+
+
 	protected:
 		Transform* transform;
 

@@ -12,6 +12,9 @@ namespace DeadFrame2D::Engine
 {
 	class DF2D_API TiledMapCompatibleCollider2D : public TileCollider2D<TiledMapCompatibleRenderer>
 	{
+		TYPE_INFO(TiledMapCompatibleCollider2D, TileCollider2D<TiledMapCompatibleRenderer>);
+
+
 	private:
 		void DeleteFixtures();
 

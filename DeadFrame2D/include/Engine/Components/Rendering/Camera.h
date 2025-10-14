@@ -22,6 +22,9 @@ namespace DeadFrame2D::Engine
 
 	class DF2D_API Camera : public GameComponent
 	{
+		TYPE_INFO(Camera, GameComponent);
+
+
 		friend class DeadFrame2D::Core::DeadFrameRuntime;
 
 

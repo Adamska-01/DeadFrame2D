@@ -8,6 +8,9 @@ namespace DeadFrame2D::Engine
 	template <typename TRenderer>
 	class TileCollider2D : public Collider2D
 	{
+		TYPE_INFO(TileCollider2D, Collider2D);
+
+
 	protected:
 		TRenderer* tileMapRenderer;
 

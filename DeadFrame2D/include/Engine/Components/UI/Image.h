@@ -10,6 +10,9 @@ namespace DeadFrame2D::Engine
 {
 	class DF2D_API Image : public UIComponent
 	{
+		TYPE_INFO(Image, UIComponent);
+
+
 	private:
 		std::shared_ptr<SDL_Texture> sourceImage;
 

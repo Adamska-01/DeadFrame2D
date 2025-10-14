@@ -23,11 +23,17 @@ namespace DeadFrame2D::Engine
 
 
 	public:
+		static inline const DeadFrame2D::Core::TypeInfo StaticTypeInfo{ "GameComponent", nullptr};
+
+
 		GameComponent();
 
 		GameComponent(GameComponent&& other) = default;
 
 		virtual ~GameComponent() override = default;
+
+
+		virtual const DeadFrame2D::Core::TypeInfo* GetTypeInfo() const = 0;
 
 
 		virtual void Init() = 0;
@@ -47,5 +53,7 @@ namespace DeadFrame2D::Engine
 		bool IsActive() const;
 
 		void SetActive(bool value);
+
+		bool IsA(const DeadFrame2D::Core::TypeInfo* type) const;
 	};
 }

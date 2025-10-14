@@ -19,6 +19,9 @@ namespace DeadFrame2D::Engine
 
 	class DF2D_API Collider2D : public ContactEventProvider
 	{
+		TYPE_INFO(Collider2D, ContactEventProvider);
+		
+		
 		friend class ContactListener;
 
 
