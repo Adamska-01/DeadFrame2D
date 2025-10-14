@@ -15,7 +15,7 @@ namespace DeadFrame2D::Engine
 	using namespace DeadFrame2D::Utilities;
 
 
-	CameraFollow::CameraFollow(Camera* camera, std::weak_ptr<GameObject> target)
+	CameraFollow::CameraFollow(ComponentHandle<Camera> camera, std::weak_ptr<GameObject> target)
 		: camera(camera),
 		target(target),
 		offset(Vector2F::Zero),

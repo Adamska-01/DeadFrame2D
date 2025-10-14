@@ -1,44 +1,45 @@
+#include "Engine/Components/UI/Abstractions/IInteractableUI.h"
 #include "Engine/Components/UI/Abstractions/INavigableUI.h"
 
 
 namespace DeadFrame2D::Engine
 {
-	IInteractableUI* INavigableUI::GetUpInteractable()
+	ComponentHandle<IInteractableUI> INavigableUI::GetUpInteractable()
 	{
 		return up;
 	}
 
-	IInteractableUI* INavigableUI::GetDownInteractable()
+	ComponentHandle<IInteractableUI> INavigableUI::GetDownInteractable()
 	{
 		return down;
 	}
 
-	IInteractableUI* INavigableUI::GetRightInteractable()
+	ComponentHandle<IInteractableUI> INavigableUI::GetRightInteractable()
 	{
 		return right;
 	}
 
-	IInteractableUI* INavigableUI::GetLeftInteractable()
+	ComponentHandle<IInteractableUI> INavigableUI::GetLeftInteractable()
 	{
 		return left;
 	}
 
-	void INavigableUI::SetNavigableUpElement(IInteractableUI* upElement)
+	void INavigableUI::SetNavigableUpElement(ComponentHandle<IInteractableUI> upElement)
 	{
 		up = upElement;
 	}
 
-	void INavigableUI::SetNavigableDownElement(IInteractableUI* downElement)
+	void INavigableUI::SetNavigableDownElement(ComponentHandle<IInteractableUI> downElement)
 	{
 		down = downElement;
 	}
 
-	void INavigableUI::SetNavigableRightElement(IInteractableUI* rightElement)
+	void INavigableUI::SetNavigableRightElement(ComponentHandle<IInteractableUI> rightElement)
 	{
 		right = rightElement;
 	}
 
-	void INavigableUI::SetNavigableLeftElement(IInteractableUI* leftElement)
+	void INavigableUI::SetNavigableLeftElement(ComponentHandle<IInteractableUI> leftElement)
 	{
 		left = leftElement;
 	}

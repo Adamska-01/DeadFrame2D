@@ -1,6 +1,7 @@
 #pragma once
 #include "DF2D_API.h"
 #include "Engine/Components/Collisions/Abstractions/ContactEventProvider.h"
+#include "Engine/Entity/ComponentHandle.h"
 
 
 class b2Body;
@@ -10,8 +11,8 @@ class b2Fixture;
 namespace DeadFrame2D::Engine
 {
 	class Transform;
-
-
+	
+	
 	class DF2D_API AudioListener : public ContactEventProvider
 	{
 		TYPE_INFO(AudioListener, ContactEventProvider);
@@ -21,9 +22,8 @@ namespace DeadFrame2D::Engine
 
 
 	protected:
-		Transform* transform = nullptr;
+		ComponentHandle<Transform> transform;
 
-		// Using Box2D to detect audio source collisions with audio listeners
 		b2Body* collisionBody;
 
 		b2Fixture* collisionFixture;

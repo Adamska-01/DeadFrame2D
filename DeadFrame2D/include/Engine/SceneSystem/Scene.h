@@ -1,6 +1,7 @@
 #pragma once
 #include "DF2D_API.h"
 #include "Engine/Components/GameComponent.h"
+#include "Engine/Entity/ComponentHandle.h"
 #include "Engine/Entity/GameObject.h"
 #include <type_traits>
 #include <vector>
@@ -61,15 +62,18 @@ namespace DeadFrame2D::Engine
 
 
 		template <typename T>
-		T* FindObjectOfType();
+		ComponentHandle<T> FindObjectOfType();
 
 		template <typename T>
-		std::vector<T*> FindObjectsOfType();
+		std::vector<ComponentHandle<T>> FindObjectsOfType();
 	};
+}
 
 
+namespace DeadFrame2D::Engine
+{
 	template<typename T>
-	inline T* Scene::FindObjectOfType()
+	inline ComponentHandle<T> Scene::FindObjectOfType()
 	{
 		static_assert(std::is_base_of_v<GameComponent, T>, "T must derive from GameComponent");
 
@@ -83,15 +87,15 @@ namespace DeadFrame2D::Engine
 			return component;
 		}
 
-		return nullptr;
+		return ComponentHandle<T>();
 	}
 
 	template <typename T>
-	inline std::vector<T*> Scene::FindObjectsOfType()
+	inline std::vector<ComponentHandle<T>> Scene::FindObjectsOfType()
 	{
 		static_assert(std::is_base_of_v<GameComponent, T>, "T must derive from GameComponent");
 
-		std::vector<T*> results;
+		std::vector<ComponentHandle<T>> results;
 
 		for (const auto& object : gameObjects)
 		{

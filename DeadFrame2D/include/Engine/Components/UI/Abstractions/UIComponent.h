@@ -3,6 +3,7 @@
 #include "Data/UI/UIAnchor.h"
 #include "DF2D_API.h"
 #include "Engine/Components/GameComponent.h"
+#include "Engine/Entity/ComponentHandle.h"
 
 
 namespace DeadFrame2D::Engine
@@ -23,7 +24,7 @@ namespace DeadFrame2D::Engine
 
 		DeadFrame2D::Core::Vector2F widgetSize;
 
-		Transform* transform;
+		ComponentHandle<Transform> transform;
 
 
 	public:

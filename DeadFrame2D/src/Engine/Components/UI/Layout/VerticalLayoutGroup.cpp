@@ -19,7 +19,7 @@ namespace DeadFrame2D::Engine
 	{
 		LayoutGroup::UpdateLayout();
 
-		std::vector<UIComponent*> interactables;
+		std::vector<ComponentHandle<UIComponent>> interactables;
 
 		for (const auto& ui : OwningObject.lock()->GetComponentsInChildren<UIComponent>())
 		{

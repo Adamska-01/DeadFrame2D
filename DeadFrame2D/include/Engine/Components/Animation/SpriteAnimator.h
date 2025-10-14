@@ -4,6 +4,7 @@
 #include "DF2D_API.h"
 #include "Core/Reflection/TypeInfo.h"
 #include "Engine/Components/GameComponent.h"
+#include "Engine/Entity/ComponentHandle.h"
 #include <string>
 #include <unordered_map>
 
@@ -20,9 +21,9 @@ namespace DeadFrame2D::Engine
 
 
 	protected:
-		Transform* transform;
+		ComponentHandle<Transform> transform;
 
-		Sprite* sprite;
+		ComponentHandle<Sprite> sprite;
 
 		std::unordered_map<std::string, DeadFrame2D::Data::SpriteAnimationProperties> animations;
 

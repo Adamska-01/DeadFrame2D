@@ -3,6 +3,7 @@
 #include "Data/UI/FontStyle.h"
 #include "DF2D_API.h"
 #include "Engine/Components/UI/Abstractions/UIComponent.h"
+#include "Engine/Entity/ComponentHandle.h"
 #include <memory>
 #include <string>
 
@@ -28,7 +29,7 @@ namespace DeadFrame2D::Engine
 
 
 	private:
-		Transform* transform;
+		ComponentHandle<Transform> transform;
 
 		DeadFrame2D::Core::Vector2F initialObjectScale;
 

@@ -20,8 +20,7 @@ namespace DeadFrame2D::Engine
 
 
 	Camera::Camera()
-		: transform(nullptr),
-		// Fullscreen (Doesn't work currently)
+		: // Fullscreen (Doesn't work currently)
 		normalizedViewport({ 0.0f, 0.0f, 1.0f, 1.0f }),
 		zoom(1.0f)
 	{
@@ -51,9 +50,7 @@ namespace DeadFrame2D::Engine
 
 	void Camera::Init()
 	{
-		transform = OwningObject.lock()->GetComponent<Transform>();
-
-		Guard::AgainstNull(transform, NAME_OF(transform));
+		transform = Guard::AgainstNull(OwningObject.lock()->GetComponent<Transform>(), NAME_OF(transform));
 	}
 
 	void Camera::Start()

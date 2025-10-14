@@ -19,9 +19,7 @@ namespace DeadFrame2D::Engine
 
 
 	AudioSource::AudioSource()
-		: transform(nullptr),
-		audioListenerInContact(nullptr),
-		collisionBody(nullptr),
+		: collisionBody(nullptr),
 		collisionFixture(nullptr),
 		isMusic(false),
 		minReachingDistance(1),
@@ -132,7 +130,7 @@ namespace DeadFrame2D::Engine
 		auto fixtureDef = Physics::ToB2FixtureDef(physicsMat, reinterpret_cast<uintptr_t>(this));
 
 		collisionFixture = collisionBody->CreateFixture(&fixtureDef);
-
+		
 		lastTransformPosition = transform->GetWorldPosition();
 		lastTransformRotation = transform->GetWorldRotation();
 

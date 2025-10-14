@@ -13,16 +13,14 @@ namespace DeadFrame2D::Engine
 
 	UIComponent::UIComponent()
 		: anchor(UIAnchor::CENTER),
-		widgetSize(Vector2F::One),
-		transform(nullptr)
+		widgetSize(Vector2F::One)
 	{
 	}
 
 	void UIComponent::Init()
 	{
-		transform = OwningObject.lock()->GetComponent<Transform>();
-
-		Guard::AgainstNull(transform, NAME_OF(transform));
+		// TODO: try to assign in this way and rename it "AgainstNullAssignment" (Also create another called AgainstNull that doesn't assign)
+		transform = Guard::AgainstNull(OwningObject.lock()->GetComponent<Transform>(), NAME_OF(transform));
 	}
 
 	void UIComponent::SetAnchor(UIAnchor newAnchor)

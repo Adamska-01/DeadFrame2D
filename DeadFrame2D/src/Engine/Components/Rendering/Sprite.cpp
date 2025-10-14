@@ -11,7 +11,6 @@ namespace DeadFrame2D::Engine
 
 	Sprite::Sprite(std::string_view texturePath)
 	{
-		transform = nullptr;
 		spriteSize = Vector2I::One;
 
 		LoadSprite(texturePath);

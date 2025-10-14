@@ -5,6 +5,7 @@
 #include "DF2D_API.h"
 #include "Engine/Components/Collisions/Abstractions/ContactEventProvider.h"
 #include "Engine/EngineEvents/DispatchableEvent.h"
+#include "Engine/Entity/ComponentHandle.h"
 #include "Utilities/Delegates/MulticastDelegate.h"
 
 
@@ -36,9 +37,9 @@ namespace DeadFrame2D::Engine
 	protected:
 		b2Fixture* fixture;
 
-		Transform* transform;
+		ComponentHandle<Transform> transform;
 
-		RigidBody2D* rigidBody;
+		ComponentHandle<RigidBody2D> rigidBody;
 
 		DeadFrame2D::Data::PhysicsMaterial physicsMaterial;
 
@@ -72,7 +73,7 @@ namespace DeadFrame2D::Engine
 		void SetIsTrigger(bool value);
 
 
-		Transform* GetTranform() const;
+		ComponentHandle<Transform> GetTranform() const;
 
 		const DeadFrame2D::Data::PhysicsMaterial& GetPhysicsMaterial();
 	};

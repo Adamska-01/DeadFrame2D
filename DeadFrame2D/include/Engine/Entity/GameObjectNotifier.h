@@ -9,6 +9,9 @@ namespace DeadFrame2D::Engine
 	class GameObject;
 	class GameComponent;
 
+	template<typename T>
+	class ComponentHandle;
+
 
 	class DF2D_API GameObjectNotifier
 	{
@@ -20,13 +23,13 @@ namespace DeadFrame2D::Engine
 
 		DeadFrame2D::Utilities::MulticastDelegate<GameObject*, bool> OnActiveStateChanged;
 
-		DeadFrame2D::Utilities::MulticastDelegate<GameComponent*> OnNewComponentAdded;
+		DeadFrame2D::Utilities::MulticastDelegate<const ComponentHandle<GameComponent>&> OnNewComponentAdded;
 
 
 	public:
 		void RegisterOnActiveStateChangedHandler(std::function<void(GameObject*, bool)> handler, uintptr_t identifier);
 
-		void RegisterOnNewComponentAddedHandler(std::function<void(GameComponent*)> handler, uintptr_t identifier);
+		void RegisterOnNewComponentAddedHandler(std::function<void(const ComponentHandle<GameComponent>&)> handler, uintptr_t identifier);
 
 
 		void DeregisterOnActiveStateChangedHandler(uintptr_t identifier);

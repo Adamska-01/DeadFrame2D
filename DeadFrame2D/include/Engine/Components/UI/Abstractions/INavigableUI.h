@@ -1,5 +1,6 @@
 #pragma once
 #include "DF2D_API.h"
+#include "Engine/Entity/ComponentHandle.h"
 
 
 namespace DeadFrame2D::Engine
@@ -16,68 +17,68 @@ namespace DeadFrame2D::Engine
 		/**
 		 * @brief Pointer to the interactable UI element that is navigated to when moving up.
 		 */
-		IInteractableUI* up = nullptr;
+		ComponentHandle<IInteractableUI> up;
 
 		/**
 		 * @brief Pointer to the interactable UI element that is navigated to when moving down.
 		 */
-		IInteractableUI* down = nullptr;
+		ComponentHandle<IInteractableUI> down;
 
 		/**
 		 * @brief Pointer to the interactable UI element that is navigated to when moving right.
 		 */
-		IInteractableUI* right = nullptr;
+		ComponentHandle<IInteractableUI> right;
 
 		/**
 		 * @brief Pointer to the interactable UI element that is navigated to when moving left.
 		 */
-		IInteractableUI* left = nullptr;
+		ComponentHandle<IInteractableUI> left;
 
 
 	public:
 		/**
 		 * @brief Gets the UI element upwards.
 		 */
-		IInteractableUI* GetUpInteractable();
+		ComponentHandle<IInteractableUI> GetUpInteractable();
 
 		/**
 		 * @brief Gets the UI element downwards.
 		 */
-		IInteractableUI* GetDownInteractable();
+		ComponentHandle<IInteractableUI> GetDownInteractable();
 
 		/**
 		 * @brief Gets the UI element rightwards.
 		 */
-		IInteractableUI* GetRightInteractable();
+		ComponentHandle<IInteractableUI> GetRightInteractable();
 
 		/**
 		 * @brief Gets the UI element leftwards.
 		 */
-		IInteractableUI* GetLeftInteractable();
+		ComponentHandle<IInteractableUI> GetLeftInteractable();
 
 
 		/**
 		* @brief Assigns the interactable UI element to be navigated to when moving up.
 		* @param upElement Pointer to the interactable UI element to navigate to when moving up.
 		*/
-		void SetNavigableUpElement(IInteractableUI* upElement);
+		void SetNavigableUpElement(ComponentHandle<IInteractableUI> upElement);
 
 		/**
 		 * @brief Assigns the interactable UI element to be navigated to when moving down.
 		 * @param downElement Pointer to the interactable UI element to navigate to when moving down.
 		 */
-		void SetNavigableDownElement(IInteractableUI* downElement);
+		void SetNavigableDownElement(ComponentHandle<IInteractableUI> downElement);
 
 		/**
 		 * @brief Assigns the interactable UI element to be navigated to when moving right.
 		 * @param rightElement Pointer to the interactable UI element to navigate to when moving right.
 		 */
-		void SetNavigableRightElement(IInteractableUI* rightElement);
+		void SetNavigableRightElement(ComponentHandle<IInteractableUI> rightElement);
 
 		/**
 		 * @brief Assigns the interactable UI element to be navigated to when moving left.
 		 * @param leftElement Pointer to the interactable UI element to navigate to when moving left.
 		 */
-		void SetNavigableLeftElement(IInteractableUI* leftElement);
+		void SetNavigableLeftElement(ComponentHandle<IInteractableUI> leftElement);
 	};
 }

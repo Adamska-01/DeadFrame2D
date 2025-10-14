@@ -3,6 +3,7 @@
 #include "DF2D_API.h"
 #include "Engine/Components/GameComponent.h"
 #include "Engine/EngineEvents/DispatchableEvent.h"
+#include "Engine/Entity/ComponentHandle.h"
 #include <SDL_rect.h>
 
 
@@ -18,9 +19,9 @@ namespace DeadFrame2D::Engine
 
 
 	private:
-		Camera* camera = nullptr;
+		ComponentHandle<Camera> camera;
 
-		Transform* transform = nullptr;
+		ComponentHandle<Transform> transform;
 
 		std::weak_ptr<GameObject> target;
 
@@ -37,7 +38,7 @@ namespace DeadFrame2D::Engine
 
 
 	public:
-		CameraFollow(Camera* camera, std::weak_ptr<GameObject> target);
+		CameraFollow(ComponentHandle<Camera> camera, std::weak_ptr<GameObject> target);
 
 		virtual ~CameraFollow() override;
 

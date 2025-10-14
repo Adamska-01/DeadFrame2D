@@ -11,7 +11,7 @@ namespace DeadFrame2D::Engine
 
 
 	Image::Image()
-		: color(Constants::CommonColors::WHITE)
+		: color(CommonColors::WHITE)
 	{
 	}
 

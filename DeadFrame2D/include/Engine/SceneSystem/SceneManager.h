@@ -1,5 +1,6 @@
 #pragma once
 #include "DF2D_API.h"
+#include "Engine/Entity/ComponentHandle.h"
 #include "Engine/SceneSystem/Scene.h"
 #include <memory>
 #include <vector>
@@ -43,10 +44,10 @@ namespace DeadFrame2D::Engine
 		static void LoadScene(Args&&... args);
 
 		template <typename T>
-		static T* FindObjectOfType();
+		static ComponentHandle<T> FindObjectOfType();
 
 		template <typename T>
-		static std::vector<T*> FindObjectsOfType();
+		static std::vector<ComponentHandle<T>> FindObjectsOfType();
 	};
 
 
@@ -66,13 +67,13 @@ namespace DeadFrame2D::Engine
 	}
 
 	template<typename T>
-	inline T* SceneManager::FindObjectOfType()
+	inline ComponentHandle<T> SceneManager::FindObjectOfType()
 	{
 		return currentScene->FindObjectOfType<T>();
 	}
 
 	template<typename T>
-	inline std::vector<T*> SceneManager::FindObjectsOfType()
+	inline std::vector<ComponentHandle<T>> SceneManager::FindObjectsOfType()
 	{
 		return currentScene->FindObjectsOfType<T>();
 	}

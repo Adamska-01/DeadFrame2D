@@ -3,6 +3,7 @@
 #include "Data/Collision/CollisionInfo.h"
 #include "DF2D_API.h"
 #include "Engine/Components/Collisions/Abstractions/ContactEventProvider.h"
+#include "Engine/Entity/ComponentHandle.h"
 #include <memory>
 #include <string_view>
 
@@ -27,9 +28,9 @@ namespace DeadFrame2D::Engine
 
 
 	protected:
-		Transform* transform;
+		ComponentHandle<Transform> transform;
 
-		AudioListener* audioListenerInContact;
+		ComponentHandle<AudioListener> audioListenerInContact;
 
 		std::shared_ptr<Mix_Chunk> sfxClip;
 

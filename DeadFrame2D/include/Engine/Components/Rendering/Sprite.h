@@ -2,6 +2,7 @@
 #include "Core/Math/Vector2.h"
 #include "DF2D_API.h"
 #include "Engine/Components/GameComponent.h"
+#include "Engine/Entity/ComponentHandle.h"
 #include <memory>
 #include <string>
 
@@ -22,7 +23,7 @@ namespace DeadFrame2D::Engine
 	protected:
 		std::shared_ptr<SDL_Texture> spriteTexture;
 
-		Transform* transform;
+		ComponentHandle<Transform> transform;
 
 		DeadFrame2D::Core::Vector2I spriteSize;
 

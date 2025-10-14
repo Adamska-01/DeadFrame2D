@@ -1,6 +1,7 @@
 #pragma once
-#include "DF2D_API.h"
 #include "Core/Math/Vector2.h"
+#include "DF2D_API.h"
+#include "Engine/Entity/ComponentHandle.h"
 #include "Engine/Entity/GameObject.h"
 #include <string_view>
 
@@ -13,7 +14,7 @@ namespace DeadFrame2D::Engine
 	class DF2D_API AudioClipBlueprint : public GameObject
 	{
 	private:
-		AudioSource* audioSource;
+		ComponentHandle<AudioSource> audioSource;
 
 		std::string_view audioSourcePath;
 
@@ -38,6 +39,6 @@ namespace DeadFrame2D::Engine
 		virtual void ConstructGameObject() override;
 
 
-		AudioSource* GetAudioSource();
+		ComponentHandle<AudioSource> GetAudioSource();
 	};
 }

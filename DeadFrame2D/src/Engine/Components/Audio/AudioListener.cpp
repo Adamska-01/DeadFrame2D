@@ -1,5 +1,4 @@
 #include "Converters/Physics/PhysicsConversions.h"
-#include "Core/Framerate/FrameTimer.h"
 #include "Core/SubSystems/Systems/Physics/PhysicsEngine2D.h"
 #include "Data/Collision/PhysicsMaterial.h"
 #include "Engine/Components/Audio/AudioListener.h"
@@ -16,8 +15,7 @@ namespace DeadFrame2D::Engine
 
 
 	AudioListener::AudioListener()
-		: transform(nullptr),
-		collisionBody(nullptr),
+		: collisionBody(nullptr),
 		collisionFixture(nullptr),
 		lastTransformPosition(Vector2F::Zero),
 		lastTransformRotation(0.0f)

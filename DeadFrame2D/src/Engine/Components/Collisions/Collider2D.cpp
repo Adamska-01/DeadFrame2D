@@ -18,9 +18,7 @@ namespace DeadFrame2D::Engine
 
 
 	Collider2D::Collider2D(const PhysicsMaterial& physicsMaterial)
-		: transform(nullptr), 
-		fixture(nullptr), 
-		rigidBody(nullptr), 
+		: fixture(nullptr), 
 		physicsMaterial(physicsMaterial)
 	{
 	}
@@ -166,7 +164,7 @@ namespace DeadFrame2D::Engine
 		MarkDirty();
 	}
 
-	Transform* Collider2D::GetTranform() const
+	ComponentHandle<Transform> Collider2D::GetTranform() const
 	{
 		return transform;
 	}

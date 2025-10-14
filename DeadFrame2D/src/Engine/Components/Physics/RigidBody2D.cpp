@@ -18,9 +18,7 @@ namespace DeadFrame2D::Engine
 
 
 	RigidBody2D::RigidBody2D(const BodyDefinition2D& bodyDefinition)
-		: transform(nullptr),
-		body(nullptr),
-		velocity(Vector2F::Zero),
+		: velocity(Vector2F::Zero),
 		acceleration(Vector2F::Zero),
 		lastTransformPosition(Vector2F::Zero),
 		lastTransformRotation(0.0f)

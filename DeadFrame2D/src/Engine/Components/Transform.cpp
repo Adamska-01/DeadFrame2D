@@ -1,5 +1,6 @@
 #include "Constants/MathConstants.h"
 #include "Engine/Components/Transform.h"
+#include "Engine/Entity/ComponentHandle.h"
 #include "Engine/Entity/GameObject.h"
 
 
@@ -216,7 +217,7 @@ namespace DeadFrame2D::Engine
 	void Transform::SetWorldPosition(const Vector2F& worldPos)
 	{
 		auto parent = OwningObject.lock() ? OwningObject.lock()->GetParent().lock() : nullptr;
-		auto parentTransform = parent != nullptr ? parent->GetComponent<Transform>() : nullptr;
+		auto parentTransform = parent != nullptr ? parent->GetComponent<Transform>() : ComponentHandle<Transform>();
 
 		if (parentTransform == nullptr)
 		{
@@ -254,7 +255,7 @@ namespace DeadFrame2D::Engine
 	void Transform::SetWorldScale(const Vector2F& worldScale)
 	{
 		auto parent = OwningObject.lock() ? OwningObject.lock()->GetParent().lock() : nullptr;
-		auto parentTransform = parent != nullptr ? parent->GetComponent<Transform>() : nullptr;
+		auto parentTransform = parent != nullptr ? parent->GetComponent<Transform>() : ComponentHandle<Transform>();
 
 		if (parentTransform == nullptr)
 		{
@@ -282,7 +283,7 @@ namespace DeadFrame2D::Engine
 	void Transform::SetWorldRotation(float worldRotation)
 	{
 		auto parent = OwningObject.lock() ? OwningObject.lock()->GetParent().lock() : nullptr;
-		auto parentTransform = parent != nullptr ? parent->GetComponent<Transform>() : nullptr;
+		auto parentTransform = parent != nullptr ? parent->GetComponent<Transform>() : ComponentHandle<Transform>();
 
 		localRotation = parentTransform
 			? worldRotation - parentTransform->GetWorldRotation()

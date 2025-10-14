@@ -9,6 +9,9 @@ namespace DeadFrame2D::Engine
 	class GameObject;
 	class GameComponent;
 
+	template<typename T>
+	class ComponentHandle;
+
 
 	class DF2D_API GameObjectObserver
 	{
@@ -29,6 +32,6 @@ namespace DeadFrame2D::Engine
 
 		virtual void OnGameObjectActiveStateChangedHandler(GameObject* obj, bool isActive);
 
-		virtual void OnNewComponentAddedHandler(GameComponent* comp);
+		virtual void OnNewComponentAddedHandler(const ComponentHandle<GameComponent>& comp);
 	};
 }

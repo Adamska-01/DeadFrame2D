@@ -13,9 +13,7 @@ namespace DeadFrame2D::Engine
 
 
 	SpriteAnimator::SpriteAnimator()
-		: transform(nullptr),
-		sprite(nullptr),
-		currentAnimationID(""),
+		: currentAnimationID(""),
 		animState(SpriteAnimationState())
 	{
 		animations.clear();

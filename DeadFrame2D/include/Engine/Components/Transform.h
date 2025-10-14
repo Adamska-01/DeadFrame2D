@@ -1,7 +1,7 @@
 #pragma once
 #include "Core/Math/Vector2.h"
 #include "DF2D_API.h"
-#include "GameComponent.h"
+#include "Engine/Components/GameComponent.h"
 
 
 namespace DeadFrame2D::Engine

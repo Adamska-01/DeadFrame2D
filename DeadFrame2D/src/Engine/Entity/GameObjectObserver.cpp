@@ -1,3 +1,5 @@
+#include "Engine/Components/GameComponent.h"
+#include "Engine/Entity/ComponentHandle.h"
 #include "Engine/Entity/GameObject.h"
 #include "Engine/Entity/GameObjectObserver.h"
 #include "Utilities/Helpers/Events/EventHelpers.h"
@@ -62,7 +64,7 @@ namespace DeadFrame2D::Engine
 	{
 	}
 
-	void GameObjectObserver::OnNewComponentAddedHandler(GameComponent* comp)
+	void GameObjectObserver::OnNewComponentAddedHandler(const ComponentHandle<GameComponent>& comp)
 	{
 	}
 }

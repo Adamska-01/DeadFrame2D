@@ -4,6 +4,7 @@
 #include "Engine/Components/Transform.h"
 #include "Engine/EngineEvents/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/SubSystems/Renderer/RenderTargetSizeChangedEvent.h"
+#include "Engine/Entity/ComponentHandle.h"
 #include "Utilities/Helpers/Events/EventHelpers.h"
 
 

@@ -3,6 +3,7 @@
 #include "DF2D_API.h"
 #include "Engine/Components/GameComponent.h"
 #include "Engine/EngineEvents/DispatchableEvent.h"
+#include "Engine/Entity/ComponentHandle.h"
 #include <memory>
 #include <SDL.h>
 #include <vector>
@@ -32,7 +33,7 @@ namespace DeadFrame2D::Engine
 		static std::vector<Camera*> cameras;
 
 
-		Transform* transform;
+		ComponentHandle<Transform> transform;
 
 		DeadFrame2D::Core::Vector2I resolutionTarget;
 

@@ -12,11 +12,11 @@ namespace DeadFrame2D::Engine
 
 
 	protected:
-		TRenderer* tileMapRenderer;
+		ComponentHandle<TRenderer> tileMapRenderer;
 
 
 		TileCollider2D(const DeadFrame2D::Data::PhysicsMaterial& physicsMaterial = DeadFrame2D::Data::PhysicsMaterial())
-			: Collider2D(physicsMaterial), tileMapRenderer(nullptr)
+			: Collider2D(physicsMaterial)
 		{
 		}
 

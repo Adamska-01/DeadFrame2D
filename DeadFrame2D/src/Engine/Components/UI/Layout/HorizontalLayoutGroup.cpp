@@ -1,6 +1,7 @@
 #include "Engine/Components/Transform.h"
 #include "Engine/Components/UI/Abstractions/UIComponent.h"
 #include "Engine/Components/UI/Layout/HorizontalLayoutGroup.h"
+#include "Engine/Entity/ComponentHandle.h"
 #include "Engine/Entity/GameObject.h"
 
 
@@ -19,7 +20,7 @@ namespace DeadFrame2D::Engine
 	{
 		LayoutGroup::UpdateLayout();
 
-		std::vector<UIComponent*> interactables;
+		std::vector<ComponentHandle<UIComponent>> interactables;
 
 		for (const auto& ui : OwningObject.lock()->GetComponentsInChildren<UIComponent>())
 		{

@@ -4,6 +4,7 @@
 #include "Data/Physics/BodyType2D.h"
 #include "DF2D_API.h"
 #include "Engine/Components/GameComponent.h"
+#include "Engine/Entity/ComponentHandle.h"
 #include "Utilities/Delegates/MulticastDelegate.h"
 
 
@@ -23,7 +24,7 @@ namespace DeadFrame2D::Engine
 
 
 	private:
-		Transform* transform;
+		ComponentHandle<Transform> transform;
 
 		b2Body* body;
 
