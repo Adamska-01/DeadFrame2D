@@ -78,11 +78,25 @@ namespace DeadFrame2D::Factories
 
 	void ColliderDrawer::DrawTransform(const b2Transform& xf)
 	{
-		// Optional: Draw local axes (useful for debugging transforms)
+		DrawPoint(xf.p, 2.0f, b2Color{ 1.0f, 1.0f, 1.0f, 1.0f });
 	}
 
 	void ColliderDrawer::DrawPoint(const b2Vec2& p, float size, const b2Color& color)
 	{
-		// TODO: Add this
+		const auto PIXEL_PER_METER = PhysicsEngine2D::GetPhysicsConfig().pixelPerMeter;
+
+		auto center = Vector2F(p.x * PIXEL_PER_METER, p.y * PIXEL_PER_METER);
+
+		auto sdlColor = SDL_Color(uint8_t(color.r * 255), uint8_t(color.g * 255), uint8_t(color.b * 255), uint8_t(color.a * 255));
+
+		auto halfSize = static_cast<int>(std::round(size * 0.5f));
+
+		for (auto dx = -halfSize; dx <= halfSize; ++dx)
+		{
+			for (auto dy = -halfSize; dy <= halfSize; ++dy)
+			{
+				TextureManager::DrawPixelWorldSpace(center + Vector2F(float(dx), float(dy)), sdlColor);
+			}
+		}
 	}
 }
