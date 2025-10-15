@@ -15,7 +15,7 @@ namespace DeadFrame2D::Core
 {
 	class DF2D_API UIManager : public ISubSystem
 	{
-		friend class SubSystems;
+		friend class SubSystemManager;
 
 
 	private:

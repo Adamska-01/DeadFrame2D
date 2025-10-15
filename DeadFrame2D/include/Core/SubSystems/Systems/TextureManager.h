@@ -19,7 +19,7 @@ namespace DeadFrame2D::Core
 {
 	class DF2D_API TextureManager : public ISubSystem
 	{
-		friend class SubSystems;
+		friend class SubSystemManager;
 		friend class DeadFrameRuntime;
 
 

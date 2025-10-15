@@ -3,7 +3,7 @@
 #include "DF2D_API.h"
 #include "Engine/SceneSystem/SceneManager.h"
 #include "Framerate/FrameTimer.h"
-#include "SubSystems/SubSystems.h"
+#include "SubSystems/SubSystemManager.h"
 
 
 namespace DeadFrame2D::Core
@@ -15,7 +15,7 @@ namespace DeadFrame2D::Core
 
 
 	protected:
-		std::unique_ptr<SubSystems> engineSubSystems;
+		std::unique_ptr<SubSystemManager> engineSubSystems;
 
 		std::unique_ptr<DeadFrame2D::Engine::SceneManager> sceneManager;
 

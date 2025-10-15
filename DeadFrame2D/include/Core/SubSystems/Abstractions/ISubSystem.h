@@ -6,7 +6,7 @@ namespace DeadFrame2D::Core
 {
 	class DF2D_API ISubSystem
 	{
-		friend class SubSystems;
+		friend class SubSystemManager;
 
 
 	protected:

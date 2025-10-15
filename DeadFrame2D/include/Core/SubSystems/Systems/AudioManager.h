@@ -13,7 +13,7 @@ namespace DeadFrame2D::Core
 {
 	class DF2D_API AudioManager : public ISubSystem
 	{
-		friend class SubSystems;
+		friend class SubSystemManager;
 
 
 	private:
