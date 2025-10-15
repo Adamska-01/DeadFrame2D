@@ -103,8 +103,7 @@ namespace DeadFrame2D::Engine
 			if (!comp.IsActive())
 				return;
 
-			// TODO: implement LateUpdate in GameComponents
-			// comp.LateUpdate(deltaTime);
+			comp.LateUpdate(deltaTime);
 		});
 
 		for (const auto& child : children)
