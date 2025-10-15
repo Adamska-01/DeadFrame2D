@@ -19,8 +19,7 @@ namespace DeadFrame2D::Engine
 
 	void UIComponent::Init()
 	{
-		// TODO: try to assign in this way and rename it "AgainstNullAssignment" (Also create another called AgainstNull that doesn't assign)
-		transform = Guard::AgainstNull(OwningObject.lock()->GetComponent<Transform>(), NAME_OF(transform));
+		transform = Guard::AgainstNullAssignment(OwningObject.lock()->GetComponent<Transform>(), NAME_OF(transform));
 	}
 
 	void UIComponent::SetAnchor(UIAnchor newAnchor)

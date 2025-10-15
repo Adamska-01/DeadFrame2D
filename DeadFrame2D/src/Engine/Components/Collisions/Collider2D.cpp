@@ -78,6 +78,7 @@ namespace DeadFrame2D::Engine
 		// because the world is locked. Defer deletion until the next frame update.
 		co_await WaitFrame();
 
+		// TODO: instead of destroying the fixture, disable the body
 		rigidBody->DestroyFixture(fixture);
 		fixture = nullptr;
 	}

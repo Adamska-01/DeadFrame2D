@@ -54,9 +54,7 @@ namespace DeadFrame2D::Engine
 
 	void RigidBody2D::Init()
 	{
-		transform = OwningObject.lock()->GetTransform();
-	
-		Guard::AgainstNull(transform, NAME_OF(transform));
+		transform = Guard::AgainstNullAssignment(OwningObject.lock()->GetTransform(), NAME_OF(transform));
 
 		lastTransformPosition = transform->GetWorldPosition();
 		lastTransformRotation = transform->GetWorldRotation();
