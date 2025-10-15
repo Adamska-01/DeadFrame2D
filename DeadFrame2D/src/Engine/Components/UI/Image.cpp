@@ -15,16 +15,6 @@ namespace DeadFrame2D::Engine
 	{
 	}
 
-	void Image::Start()
-	{
-
-	}
-
-	void Image::Update(float deltaTime)
-	{
-
-	}
-
 	void Image::Draw()
 	{
 		auto currentPosition = transform->GetWorldPosition();

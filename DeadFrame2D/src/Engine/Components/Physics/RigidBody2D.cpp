@@ -66,11 +66,6 @@ namespace DeadFrame2D::Engine
 		body->SetTransform(b2Vec2(lastTransformPosition.x * METER_PER_PIXEL, lastTransformPosition.y * METER_PER_PIXEL), angleRad);
 	}
 
-	void RigidBody2D::Start()
-	{
-
-	}
-
 	void RigidBody2D::Update(float deltaTime)
 	{
 		// TODO: Move this stuff in the LateUpdate!!!! (Leaving it here could break transform movement)
@@ -112,11 +107,6 @@ namespace DeadFrame2D::Engine
 
 		lastTransformPosition = transform->GetWorldPosition();
 		lastTransformRotation = transform->GetWorldRotation();
-	}
-
-	void RigidBody2D::Draw()
-	{
-	
 	}
 
 	b2Fixture* RigidBody2D::CreateFixture(const b2FixtureDef* fixtureDef)

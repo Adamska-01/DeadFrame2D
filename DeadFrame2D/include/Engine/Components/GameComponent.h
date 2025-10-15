@@ -46,13 +46,15 @@ namespace DeadFrame2D::Engine
 		virtual const DeadFrame2D::Core::TypeInfo* GetTypeInfo() const = 0;
 
 
-		virtual void Init() = 0;
+		virtual void Init();
 
-		virtual void Start() = 0;
+		virtual void Start();
 
-		virtual void Update(float deltaTime) = 0;
+		virtual void Update(float deltaTime);
 
-		virtual void Draw() = 0;
+		virtual void LateUpdate(float deltaTime);
+
+		virtual void Draw();
 
 
 		virtual void MarkDirty();

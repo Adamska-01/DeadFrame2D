@@ -53,21 +53,6 @@ namespace DeadFrame2D::Engine
 		transform = Guard::AgainstNullAssignment(OwningObject.lock()->GetComponent<Transform>(), NAME_OF(transform));
 	}
 
-	void Camera::Start()
-	{
-
-	}
-
-	void Camera::Update(float deltaTime)
-	{
-
-	}
-
-	void Camera::Draw()
-	{
-
-	}
-
 	void Camera::SetZoom(float zoom)
 	{
 		this->zoom = std::max(0.01f, zoom); // Prevent negative or zero

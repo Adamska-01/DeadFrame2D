@@ -70,10 +70,6 @@ namespace DeadFrame2D::Engine
 		MarkDirty();
 	}
 
-	void LayoutGroup::Init()
-	{
-	}
-
 	void LayoutGroup::Start()
 	{
 		UpdateLayout();
@@ -85,10 +81,6 @@ namespace DeadFrame2D::Engine
 		{
 			UpdateLayout();
 		}
-	}
-
-	void LayoutGroup::Draw()
-	{
 	}
 
 	void LayoutGroup::UpdateLayout()

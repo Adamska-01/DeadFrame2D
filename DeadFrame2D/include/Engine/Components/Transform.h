@@ -62,13 +62,7 @@ namespace DeadFrame2D::Engine
 		void RotateByDegrees(float degreeAngle);
 
 
-		void Init() override;
-
-		void Start() override;
-
 		void Update(float dt) override;
-
-		void Draw() override;
 
 
 		DeadFrame2D::Core::Vector2F GetStartFramePosition() const;

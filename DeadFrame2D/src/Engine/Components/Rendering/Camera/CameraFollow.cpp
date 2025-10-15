@@ -49,15 +49,6 @@ namespace DeadFrame2D::Engine
 		resolutionTarget = renderTargetSizeChangeEvent->renderTargetSize;
 	}
 
-	void CameraFollow::Init()
-	{
-	}
-
-	void CameraFollow::Start()
-	{
-
-	}
-
 	void CameraFollow::Update(float deltaTime)
 	{
 		if (target.expired() || !camera)
@@ -104,11 +95,6 @@ namespace DeadFrame2D::Engine
 		const auto newPos = Vector2F::Lerp(currentPos, desiredCenter, t);
 
 		cameraTransform->SetWorldPosition(newPos);
-	}
-
-	void CameraFollow::Draw()
-	{
-
 	}
 
 	void CameraFollow::SetTarget(std::weak_ptr<GameObject> newTarget)

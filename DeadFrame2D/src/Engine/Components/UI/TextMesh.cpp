@@ -37,15 +37,6 @@ namespace DeadFrame2D::Engine
 		transform->SetLocalScale(initialObjectScale);
 	}
 
-	void TextMesh::Start()
-	{
-
-	}
-
-	void TextMesh::Update(float deltaTime)
-	{
-	}
-
 	void TextMesh::Draw()
 	{
 		auto destRect = GetTextDestRect();

@@ -15,6 +15,31 @@ namespace DeadFrame2D::Engine
 		isDirty = true;
 	}
 
+	void GameComponent::Init()
+	{
+
+	}
+
+	void GameComponent::Start()
+	{
+
+	}
+
+	void GameComponent::Update(float deltaTime)
+	{
+
+	}
+
+	void GameComponent::LateUpdate(float deltaTime)
+	{
+
+	}
+
+	void GameComponent::Draw()
+	{
+
+	}
+
 	std::weak_ptr<GameObject> GameComponent::GetGameObject() const
 	{
 		return OwningObject;

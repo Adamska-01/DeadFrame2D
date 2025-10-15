@@ -30,11 +30,6 @@ namespace DeadFrame2D::Engine
 		sprite->SetActive(false);
 	}
 
-	void SpriteAnimator::Start()
-	{
-
-	}
-
 	void SpriteAnimator::Update(float dt)
 	{
 		auto spriteTexture = sprite->GetTexture();

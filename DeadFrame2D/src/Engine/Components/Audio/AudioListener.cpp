@@ -96,10 +96,6 @@ namespace DeadFrame2D::Engine
 		isDirty = true;
 	}
 
-	void AudioListener::Start()
-	{
-	}
-
 	void AudioListener::Update(float deltaTime)
 	{
 		if (isDirty)

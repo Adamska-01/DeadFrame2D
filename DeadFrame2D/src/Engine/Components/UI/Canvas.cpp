@@ -8,26 +8,6 @@ namespace DeadFrame2D::Engine
 	{
 	}
 
-	void Canvas::Init()
-	{
-
-	}
-
-	void Canvas::Start()
-	{
-
-	}
-
-	void Canvas::Update(float deltaTime)
-	{
-
-	}
-
-	void Canvas::Draw()
-	{
-
-	}
-
 	int Canvas::GetSortOrder() const
 	{
 		return sortOrder;

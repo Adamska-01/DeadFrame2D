@@ -150,11 +150,6 @@ namespace DeadFrame2D::Engine
 		isDirty = true;
 	}
 
-	void AudioSource::Start()
-	{
-
-	}
-
 	void AudioSource::Update(float deltaTime)
 	{
 		if (isDirty)

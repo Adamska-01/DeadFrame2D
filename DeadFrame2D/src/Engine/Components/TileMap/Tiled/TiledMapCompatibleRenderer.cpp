@@ -32,15 +32,6 @@ namespace DeadFrame2D::Engine
 		}
 	}
 
-	void TiledMapCompatibleRenderer::Start()
-	{
-
-	}
-
-	void TiledMapCompatibleRenderer::Update(float dt)
-	{
-	}
-
 	void TiledMapCompatibleRenderer::Draw()
 	{
 		const auto& tileSets = tileMap->tileSets;

@@ -35,10 +35,6 @@ namespace DeadFrame2D::Engine
 
 		virtual void Init() override;
 
-		virtual void Update(float deltaTime) override = 0;
-
-		virtual void Draw() override = 0;
-
 
 		void SetAnchor(DeadFrame2D::Data::UIAnchor newAnchor);
 

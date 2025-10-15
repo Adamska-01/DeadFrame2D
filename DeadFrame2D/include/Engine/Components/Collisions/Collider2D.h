@@ -61,11 +61,7 @@ namespace DeadFrame2D::Engine
 	public:
 		virtual void Init();
 
-		virtual void Start();
-
 		virtual void Update(float dt);
-
-		virtual void Draw();
 
 
 		bool IsTrigger() const;

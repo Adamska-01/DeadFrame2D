@@ -21,15 +21,6 @@ namespace DeadFrame2D::Engine
 		transform = OwningObject.lock()->GetComponent<Transform>();
 	}
 
-	void Sprite::Start()
-	{
-
-	}
-
-	void Sprite::Update(float deltaTime)
-	{
-	}
-
 	void Sprite::Draw()
 	{
 		auto worldPosition = transform->GetWorldPosition();

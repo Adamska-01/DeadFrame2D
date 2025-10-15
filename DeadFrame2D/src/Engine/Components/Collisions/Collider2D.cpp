@@ -138,21 +138,12 @@ namespace DeadFrame2D::Engine
 		MarkDirty();
 	}
 
-	void Collider2D::Start()
-	{
-
-	}
-
 	void Collider2D::Update(float dt)
 	{
 		if (isDirty)
 		{
 			RebuildFixture();
 		}
-	}
-
-	void Collider2D::Draw()
-	{
 	}
 
 	bool Collider2D::IsTrigger() const

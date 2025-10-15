@@ -107,15 +107,6 @@ namespace DeadFrame2D::Engine
 		UIComponent::Init();
 	}
 
-	void Button::Start()
-	{
-
-	}
-
-	void Button::Update(float deltaTime)
-	{
-	}
-
 	void Button::Draw()
 	{
 		auto destRect = GetBoundingBox();
