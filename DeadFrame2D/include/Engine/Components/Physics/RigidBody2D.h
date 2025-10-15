@@ -51,6 +51,8 @@ namespace DeadFrame2D::Engine
 
 		void Update(float deltaTime) override;
 
+		void LateUpdate(float deltaTime) override;
+
 
 		b2Fixture* CreateFixture(const b2FixtureDef* fixtureDef);
 

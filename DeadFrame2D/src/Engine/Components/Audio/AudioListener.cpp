@@ -102,11 +102,15 @@ namespace DeadFrame2D::Engine
 		{
 			RebuildFixture();
 		}
+	}
 
+	void AudioListener::LateUpdate(float deltaTime)
+	{
 		auto currentTransformPosition = transform->GetWorldPosition();
 		auto currentTransformRotation = transform->GetWorldRotation();
 
-		if (currentTransformPosition == lastTransformPosition && currentTransformRotation == currentTransformRotation)
+		if (currentTransformPosition == lastTransformPosition 
+			&& currentTransformRotation == lastTransformRotation)
 			return;
 
 		currentTransformPosition *= DeadFrame2D::Core::PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;

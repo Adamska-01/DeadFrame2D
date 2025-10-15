@@ -68,15 +68,16 @@ namespace DeadFrame2D::Engine
 
 	void RigidBody2D::Update(float deltaTime)
 	{
-		// TODO: Move this stuff in the LateUpdate!!!! (Leaving it here could break transform movement)
-		// Edit: Fucking do this already!!!!!
 		if (!pendingActions.IsEmpty())
 		{
 			pendingActions();
 
 			pendingActions.Clear();
 		}
+	}
 
+	void RigidBody2D::LateUpdate(float deltaTime)
+	{
 		auto PIXEL_PER_METER = PhysicsEngine2D::GetPhysicsConfig().pixelPerMeter;
 		auto METER_PER_PIXEL = PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
 

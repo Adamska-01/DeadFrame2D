@@ -153,9 +153,13 @@ namespace DeadFrame2D::Engine
 	void AudioSource::Update(float deltaTime)
 	{
 		if (isDirty)
+		{
 			RebuildFixture();
+		}
+	}
 
-		// TODO: Use LateUpdate for this!!!
+	void AudioSource::LateUpdate(float deltaTime)
+	{
 		auto safeDelta = std::max(deltaTime, std::numeric_limits<float>::epsilon());
 
 		auto currentTransformPosition = transform->GetWorldPosition();
@@ -171,11 +175,15 @@ namespace DeadFrame2D::Engine
 			collisionBody->SetAwake(true);
 		}
 
+		if (playingChannel == -1)
+			return;
+
 		// Audio attenuation logic 
 		if (audioListenerInContact == nullptr || sfxClip == nullptr)
 			return;
 
 		auto listenerTransform = audioListenerInContact->GetGameObject().lock()->GetTransform();
+
 		if (listenerTransform == nullptr)
 			return;
 
@@ -191,10 +199,7 @@ namespace DeadFrame2D::Engine
 
 		auto attenuatedVolume = (1.0f - t) * volume;
 
-		if (playingChannel != -1)
-		{
-			AudioManager::SetSFXVolume(attenuatedVolume, playingChannel);
-		}
+		AudioManager::SetSFXVolume(attenuatedVolume, playingChannel);
 	}
 
 	void AudioSource::Draw()
