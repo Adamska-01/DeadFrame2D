@@ -7,6 +7,7 @@
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
 #include "Engine/Entity/GameObject.h"
 #include "Utilities/Helpers/Coroutines/CoroutineHelpers.h"
+#include <Utilities/Debugging/Guards.h>
 
 
 namespace DeadFrame2D::Engine
@@ -32,55 +33,6 @@ namespace DeadFrame2D::Engine
 		fixture->GetUserData().pointer = 0;
 
 		rigidBody->DestroyFixture(fixture);
-	}
-
-	void Collider2D::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
-	{
-		// This wouldn't work (dangling pointers)
-		if (fixture != nullptr && rigidBody != nullptr)
-			return;
-
-		auto gameObjEvent = DispatchableEvent::SafeCast<GameObjectCreatedEvent>(dispatchableEvent);
-
-		if (gameObjEvent == nullptr || gameObjEvent->gameObjectCreated == nullptr)
-			return;
-
-		auto& target = gameObjEvent->gameObjectCreated;
-
-		if (!target->IsChildOf(OwningObject))
-			return;
-
-		MarkDirty();
-	}
-
-	void Collider2D::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
-	{
-		// This wouldn't work (dangling pointers)
-		if (fixture != nullptr && rigidBody != nullptr)
-			return;
-
-		auto gameObjEvent = DispatchableEvent::SafeCast<GameObjectDestroyedEvent>(dispatchableEvent);
-
-		if (!gameObjEvent || gameObjEvent->gameObjectDestroyed.lock() == nullptr)
-			return;
-
-		auto target = gameObjEvent->gameObjectDestroyed;
-
-		if (!target.lock()->IsChildOf(OwningObject))
-			return;
-
-		MarkDirty();
-	}
-
-	Task Collider2D::Disable()
-	{
-		// Can't delete a fixture during a Box2D callback (e.g., BeginContact)
-		// because the world is locked. Defer deletion until the next frame update.
-		co_await WaitFrame();
-
-		// TODO: instead of destroying the fixture, disable the body
-		rigidBody->DestroyFixture(fixture);
-		fixture = nullptr;
 	}
 
 	void Collider2D::RebuildFixture()
@@ -117,21 +69,9 @@ namespace DeadFrame2D::Engine
 		rigidBody = OwningObject.lock()->GetComponentInParent<RigidBody2D>(true);
 	}
 
-	void Collider2D::OnGameObjectActiveStateChangedHandler(GameObject* obj, bool isActive)
-	{
-		if (isActive)
-		{
-			MarkDirty();
-		}
-		else
-		{
-			CoroutineScheduler::StartCoroutine(Disable());
-		}
-	}
-
 	void Collider2D::Init()
 	{
-		transform = OwningObject.lock()->GetComponent<Transform>();
+		transform = Guard::AgainstNullAssignment(OwningObject.lock()->GetComponent<Transform>(), NAME_OF(transform));
 
 		SearchRigidBody();
 

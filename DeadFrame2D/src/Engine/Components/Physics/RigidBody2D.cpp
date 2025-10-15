@@ -1,10 +1,12 @@
 #include "Converters/Physics/PhysicsConversions.h"
+#include "Core/SubSystems/Systems/CoroutineScheduler.h"
 #include "Core/SubSystems/Systems/Physics/PhysicsEngine2D.h"
 #include "Data/Physics/BodyDefinition2D.h"
 #include "Engine/Components/Physics/RigidBody2D.h"
 #include "Engine/Components/Transform.h"
 #include "Engine/Entity/GameObject.h"
 #include "Utilities/Debugging/Guards.h"
+#include "Utilities/Helpers/Coroutines/CoroutineHelpers.h"
 #include <box2d/b2_body.h>
 
 
@@ -50,6 +52,20 @@ namespace DeadFrame2D::Engine
 		}
 
 		PhysicsEngine2D::DestroyBody(body);
+	}
+
+	void RigidBody2D::OnGameObjectActiveStateChangedHandler(GameObject* obj, bool isActive)
+	{
+		CoroutineScheduler::StartCoroutine(SetEnabled(isActive));
+	}
+
+	Task RigidBody2D::SetEnabled(bool isEnabled)
+	{
+		// Can't delete a fixture during a Box2D callback (e.g., BeginContact)
+		// because the world is locked. Defer deletion until the next frame update.
+		co_await WaitFrame();
+
+		body->SetEnabled(isEnabled);
 	}
 
 	void RigidBody2D::Init()

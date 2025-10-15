@@ -26,14 +26,6 @@ namespace DeadFrame2D::Engine
 		friend class ContactListener;
 
 
-	private:
-		void GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
-
-		void GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
-
-		DeadFrame2D::Core::Task Disable();
-
-
 	protected:
 		b2Fixture* fixture;
 
@@ -53,9 +45,6 @@ namespace DeadFrame2D::Engine
 
 
 		void SearchRigidBody();
-
-
-		virtual void OnGameObjectActiveStateChangedHandler(GameObject* obj, bool isActive) override;
 
 
 	public:

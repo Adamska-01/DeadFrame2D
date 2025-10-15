@@ -1,4 +1,5 @@
 #pragma once
+#include "Core/Coroutines/Task.h"
 #include "Core/Math/Vector2.h"
 #include "Data/Physics/BodyDefinition2D.h"
 #include "Data/Physics/BodyType2D.h"
@@ -37,6 +38,12 @@ namespace DeadFrame2D::Engine
 		DeadFrame2D::Core::Vector2F lastTransformPosition;
 
 		float lastTransformRotation;
+
+
+	protected:
+		virtual void OnGameObjectActiveStateChangedHandler(GameObject* obj, bool isActive) override;
+
+		DeadFrame2D::Core::Task SetEnabled(bool isEnabled);
 
 
 	public:
