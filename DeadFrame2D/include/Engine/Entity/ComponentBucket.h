@@ -20,6 +20,8 @@ namespace DeadFrame2D::Engine
 
 		friend class GameComponent;
 
+		friend class ComponentHandleBase;
+
 		template<typename T>
 		friend class ComponentHandle;
 
@@ -44,7 +46,7 @@ namespace DeadFrame2D::Engine
 
 		void LinkComponentToOwner(std::weak_ptr<GameObject> owner, GameComponent* toInitialize);
 
-		bool IsAlive(uint32_t index, uint32_t generation) const;
+		bool IsValid(uint32_t index, uint32_t generation) const;
 
 
 		template<typename F> // Forward rvalue or lvalue without allocation
@@ -103,10 +105,10 @@ namespace DeadFrame2D::Engine
 
 	inline uint32_t ComponentBucket::FindFreeSlot()
 	{
-		for (uint32_t i = 0; i < components.size(); ++i)
+		for (size_t i = 0; i < components.size(); ++i)
 		{
 			if (!components[i].alive)
-				return i;
+				return static_cast<uint32_t>(i);
 		}
 
 		components.emplace_back();
@@ -121,7 +123,7 @@ namespace DeadFrame2D::Engine
 		toInitialize->RegisterAllHandlers(owner);
 	}
 
-	inline bool ComponentBucket::IsAlive(uint32_t index, uint32_t generation) const
+	inline bool ComponentBucket::IsValid(uint32_t index, uint32_t generation) const
 	{
 		if (index >= components.size()) 
 			return false;
@@ -210,7 +212,7 @@ namespace DeadFrame2D::Engine
 		if (locked == nullptr)
 			return;
 
-		if (!locked->IsAlive(handle.index, handle.generation))
+		if (!locked->IsValid(handle.index, handle.generation))
 			return;
 
 		auto& entry = locked->components[handle.index];
