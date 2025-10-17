@@ -23,37 +23,37 @@ namespace DeadFrame2D::Core
 		static const Vector2<T> Up;
 
 		static const Vector2<T> Down;
-	
+
 		static const Vector2<T> Left;
-	
+
 		static const Vector2<T> Right;
 
 
-		Vector2() : x(0), y(0) { }
+		Vector2() : x(0), y(0) {}
 
-		Vector2(T x, T y) : x(x), y(y) { }
-	
+		Vector2(T x, T y) : x(x), y(y) {}
+
 		virtual	~Vector2() = default;
 
 
 		constexpr T Distance(const Vector2<T>& other) const;
 
 		constexpr T Magnitude() const;
-	
+
 		constexpr T AngleBetween(const Vector2<T> other) const;
 
 		constexpr T Dot(const Vector2<T>& other) const;
 
 		constexpr T Cross(const Vector2<T>& other) const;
-	
+
 		constexpr Vector2<T> Min(const Vector2<T>& other) const;
-	
+
 		constexpr Vector2<T> Max(const Vector2<T>& other) const;
-	
+
 		constexpr Vector2<T> Rotated(float angleInDegrees) const;
 
 		constexpr Vector2<T>& Normalize();
-	
+
 		constexpr bool IsZero() const;
 
 
@@ -91,7 +91,7 @@ namespace DeadFrame2D::Core
 		constexpr bool operator==(const Vector2<T>& other) const;
 
 		// Allow this to be used in an ordered map as key
-		constexpr bool operator<(const Vector2<T>& other) const; 
+		constexpr bool operator<(const Vector2<T>& other) const;
 
 
 		inline friend std::ostream& operator<<(std::ostream& out, const Vector2<T>& v)
@@ -101,8 +101,11 @@ namespace DeadFrame2D::Core
 			return out;
 		}
 	};
+}
 
 
+namespace DeadFrame2D::Core
+{
 	// Static member initializations
 	template <typename T>
 	const Vector2<T> Vector2<T>::Zero = Vector2<T>(0, 0);
