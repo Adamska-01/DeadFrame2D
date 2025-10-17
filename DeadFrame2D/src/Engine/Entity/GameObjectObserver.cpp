@@ -67,4 +67,8 @@ namespace DeadFrame2D::Engine
 	void GameObjectObserver::OnNewComponentAddedHandler(const ComponentHandle<GameComponent>& comp)
 	{
 	}
+
+	void GameObjectObserver::OnComponentRemovedHandler(const ComponentHandle<GameComponent>& comp)
+	{
+	}
 }

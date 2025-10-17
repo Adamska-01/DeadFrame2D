@@ -27,6 +27,11 @@ namespace DeadFrame2D::Engine
 		OnNewComponentAdded.RegisterCallback(handler, identifier);
 	}
 
+	void GameObjectNotifier::RegisterOnComponentRemovedHandler(std::function<void(const ComponentHandle<GameComponent>&)> handler, uintptr_t identifier)
+	{
+		OnComponentRemoved.RegisterCallback(handler, identifier);
+	}
+
 	void GameObjectNotifier::DeregisterOnActiveStateChangedHandler(uintptr_t identifier)
 	{
 		OnActiveStateChanged.DeregisterCallback(identifier);
@@ -35,5 +40,10 @@ namespace DeadFrame2D::Engine
 	void GameObjectNotifier::DeregisterOnNewComponentAddedHandler(uintptr_t identifier)
 	{
 		OnNewComponentAdded.DeregisterCallback(identifier);
+	}
+
+	void GameObjectNotifier::DeregisterOnComponentRemovedHandler(uintptr_t identifier)
+	{
+		OnComponentRemoved.DeregisterCallback(identifier);
 	}
 }

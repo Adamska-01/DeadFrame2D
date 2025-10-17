@@ -33,5 +33,7 @@ namespace DeadFrame2D::Engine
 		virtual void OnGameObjectActiveStateChangedHandler(GameObject* obj, bool isActive);
 
 		virtual void OnNewComponentAddedHandler(const ComponentHandle<GameComponent>& comp);
+
+		virtual void OnComponentRemovedHandler(const ComponentHandle<GameComponent>& comp);
 	};
 }
