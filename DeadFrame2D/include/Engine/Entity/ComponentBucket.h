@@ -1,6 +1,5 @@
 #pragma once
 #include "Core/Reflection/TypeInfoCheck.h"
-#include "Engine/Entity/ComponentEntry.h"
 #include <cassert>
 #include <memory>
 #include <vector>
@@ -25,10 +24,20 @@ namespace DeadFrame2D::Engine
 		friend class ComponentHandle;
 
 
+		struct ComponentEntry
+		{
+			std::unique_ptr<GameComponent> instance;
+
+			uint32_t generation = 0;
+
+			bool alive = false;
+		};
+
+
 	private:
 		std::vector<ComponentEntry> components;
 
-
+		// TODO: Move all non-template functions in a cpp
 		GameComponent* GetAt(uint32_t index) const;
 
 		uint32_t FindFreeSlot();
