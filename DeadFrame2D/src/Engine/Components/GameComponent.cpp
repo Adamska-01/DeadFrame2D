@@ -47,7 +47,7 @@ namespace DeadFrame2D::Engine
 
 	bool GameComponent::IsActive() const
 	{
-		return isActive;
+		return isActive && OwningObject.lock()->IsActive();
 	}
 
 	void GameComponent::SetActive(bool value)
