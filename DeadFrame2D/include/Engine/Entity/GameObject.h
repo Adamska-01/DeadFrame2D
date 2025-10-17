@@ -245,8 +245,8 @@ namespace DeadFrame2D::Engine
 	template<typename T>
 	inline void GameObject::RemoveComponent(const ComponentHandle<T>& handle)
 	{
-		componentBucket->RemoveComponent<T>(handle);
+		OnComponentRemoved(handle);
 
-		// TODO: Add OnComponentRemoved callback
+		componentBucket->RemoveComponent<T>(handle);
 	}
 }
