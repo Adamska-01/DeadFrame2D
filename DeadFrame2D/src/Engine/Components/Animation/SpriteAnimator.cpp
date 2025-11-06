@@ -4,12 +4,14 @@
 #include "Engine/Components/Rendering/Sprite.h"
 #include "Engine/Components/Transform.h"
 #include "Engine/Entity/GameObject.h"
+#include "Utilities/Debugging/Guards.h"
 
 
 namespace DeadFrame2D::Engine
 {
 	using namespace DeadFrame2D::Core;
 	using namespace DeadFrame2D::Data;
+	using namespace DeadFrame2D::Utilities;
 
 
 	SpriteAnimator::SpriteAnimator()
@@ -21,8 +23,10 @@ namespace DeadFrame2D::Engine
 
 	void SpriteAnimator::Init()
 	{
-		transform = OwningObject.lock()->GetComponent<Transform>();
-		sprite = OwningObject.lock()->GetComponent<Sprite>();
+		auto gameObject = GetGameObject();
+
+		transform = Guard::AgainstNullAssignment(gameObject->GetTransform(), NAME_OF(transform));
+		sprite = Guard::AgainstNullAssignment(gameObject->GetComponent<Sprite>(), NAME_OF(sprite));
 
 		if (sprite == nullptr)
 			return;

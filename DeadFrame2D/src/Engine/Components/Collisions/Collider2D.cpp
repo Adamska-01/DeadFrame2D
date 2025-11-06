@@ -61,17 +61,19 @@ namespace DeadFrame2D::Engine
 		if (rigidBody != nullptr)
 			return;
 
-		rigidBody = OwningObject.lock()->GetComponent<RigidBody2D>();
+		auto gameObject = GetGameObject();
+
+		rigidBody = gameObject->GetComponent<RigidBody2D>();
 
 		if (rigidBody != nullptr)
 			return;
 
-		rigidBody = OwningObject.lock()->GetComponentInParent<RigidBody2D>(true);
+		rigidBody = gameObject->GetComponentInParent<RigidBody2D>(true);
 	}
 
 	void Collider2D::Init()
 	{
-		transform = Guard::AgainstNullAssignment(OwningObject.lock()->GetComponent<Transform>(), NAME_OF(transform));
+		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
 
 		SearchRigidBody();
 

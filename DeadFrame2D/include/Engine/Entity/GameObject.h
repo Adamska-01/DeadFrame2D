@@ -1,10 +1,7 @@
 #pragma once
 #include "Core/Coroutines/Task.h"
 #include "DF2D_API.h"
-#include "Engine/EngineEvents/EventDispatcher.h"
-#include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectCreatedEvent.h"
 #include "Engine/Entity/Abstractions/IObject.h"
-#include "Engine/Entity/ComponentBucket.h"
 #include "Engine/Entity/ComponentHandle.h"
 #include "Engine/Entity/GameObjectNotifier.h"
 #include <memory>
@@ -14,9 +11,16 @@ namespace DeadFrame2D::Engine
 {
 	class Transform;
 
+	class Scene;
+
+	class ComponentBucket;
+
 
 	class DF2D_API GameObject : public IObject, public GameObjectNotifier
 	{
+		friend class Scene;
+
+
 	private:
 		bool isInitialized;
 
@@ -26,16 +30,13 @@ namespace DeadFrame2D::Engine
 		void PropagateActiveStateToChildren();
 
 
+		static Scene* SafeGetActiveScene();
+
+
 	protected:
 		bool isActive;
 
 		bool hasActiveParent;
-
-		std::weak_ptr<GameObject> thisWeak;
-
-		std::weak_ptr<GameObject> parent;
-
-		std::vector<std::weak_ptr<GameObject>> children;
 
 		ComponentHandle<Transform> transform;
 
@@ -64,7 +65,7 @@ namespace DeadFrame2D::Engine
 
 
 		template<typename T, typename ...Args>
-		static std::weak_ptr<T> Instantiate(Args && ...args);
+		static ObjectHandle<T> Instantiate(Args&&... args);
 
 
 		template <typename T>
@@ -88,22 +89,17 @@ namespace DeadFrame2D::Engine
 		template<typename T>
 		void RemoveComponent(const ComponentHandle<T>& handle);
 
-		void AddChildGameObject(std::weak_ptr<GameObject> child);
+		void AddChildGameObject(ObjectHandle<GameObject> child);
 
-		bool IsChildOf(std::weak_ptr<GameObject> potentialChild, bool recursive = false) const;
+		bool IsChildOf(ObjectHandle<GameObject> potentialChild, bool recursive = false) const;
 
 		void Destroy();
 
 		DeadFrame2D::Core::Task Destroy(float delaySeconds);
 
 
-		std::weak_ptr<GameObject> GetThisWeak() const;
-
-		std::weak_ptr<GameObject> GetParent() const;
-
 		ComponentHandle<Transform> GetTransform() const;
 
-		std::vector<std::weak_ptr<GameObject>> GetChildren() const;
 		bool IsActive() const;
 
 		void SetActive(bool value);
@@ -111,28 +107,19 @@ namespace DeadFrame2D::Engine
 }
 
 
+#include "Engine/Components/GameComponent.h"
+#include "Engine/Entity/ComponentBucket.h"
+#include "Engine/SceneSystem/Scene.h"
+
+
 namespace DeadFrame2D::Engine
 {
 	template<typename T, typename ...Args>
-	inline std::weak_ptr<T> GameObject::Instantiate(Args && ...args)
+	inline ObjectHandle<T> GameObject::Instantiate(Args && ...args)
 	{
 		static_assert(std::is_base_of<GameObject, T>::value, "T must derive from GameObject");
 
-		auto obj = std::shared_ptr<T>(new T(std::forward<Args>(args)...));
-
-		obj->thisWeak = obj;
-
-		// This is necessary due to smart pointer/C++ limitations
-		obj->componentBucket->ForEach([&obj](GameComponent& comp) 
-		{
-			obj->componentBucket->LinkComponentToOwner(obj, &comp);
-		});
-
-		EventDispatcher::SendEvent(std::make_shared<GameObjectCreatedEvent>(obj));
-
-		obj->ConstructGameObject();
-
-		return obj;
+		return SafeGetActiveScene()->template Instantiate<T>(std::forward<Args>(args)...);
 	}
 
 	template<typename T>
@@ -144,10 +131,8 @@ namespace DeadFrame2D::Engine
 	template<typename T>
 	inline ComponentHandle<T> GameObject::GetComponentInChildren(bool recursive) const
 	{
-		for (const auto& weakChild : children)
+		for (const auto& child : children)
 		{
-			auto child = weakChild.lock();
-
 			if (child == nullptr || child->isDestroyed)
 				continue;
 
@@ -169,10 +154,8 @@ namespace DeadFrame2D::Engine
 	{
 		std::vector<ComponentHandle<T>> results;
 
-		for (const auto& weakChild : children)
+		for (const auto& child : children)
 		{
-			auto child = weakChild.lock();
-
 			if (child == nullptr || child->isDestroyed)
 				continue;
 
@@ -193,7 +176,7 @@ namespace DeadFrame2D::Engine
 	template<typename T>
 	inline ComponentHandle<T> GameObject::GetComponentInParent(bool recursive) const
 	{
-		auto current = parent.lock();
+		auto current = parent;
 
 		while (current != nullptr)
 		{
@@ -203,7 +186,7 @@ namespace DeadFrame2D::Engine
 			if (!recursive)
 				break;
 
-			current = current->parent.lock();
+			current = current->parent;
 		}
 
 		return ComponentHandle<T>();
@@ -214,7 +197,7 @@ namespace DeadFrame2D::Engine
 	{
 		std::vector<ComponentHandle<T>> results;
 
-		auto current = parent.lock();
+		auto current = parent;
 
 		while (current != nullptr)
 		{
@@ -224,7 +207,7 @@ namespace DeadFrame2D::Engine
 			if (!recursive)
 				break;
 
-			current = current->parent.lock();
+			current = current->parent;
 		}
 
 		return results;
@@ -235,7 +218,7 @@ namespace DeadFrame2D::Engine
 	{
 		static_assert(std::is_base_of_v<GameComponent, T>, "T must derive from GameComponent");
 
-		auto newComponent = componentBucket->AddComponent<T>(thisWeak, isInitialized, std::forward<TArgs>(args)...);
+		auto newComponent = componentBucket->AddComponent<T>(thisGameObject, isInitialized, std::forward<TArgs>(args)...);
 
 		OnNewComponentAdded(ComponentHandle<GameComponent>::From(newComponent));
 

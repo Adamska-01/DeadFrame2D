@@ -28,6 +28,13 @@ namespace DeadFrame2D::Core
 		frameTimer.SetTargetFramerate(systemConfig.rendering.targetFramerate);
 	}
 
+	DeadFrameRuntime::~DeadFrameRuntime()
+	{
+		// Delete subsystems last
+		sceneManager.reset();
+		engineSubSystems.reset();
+	}
+
 	std::optional<int> DeadFrameRuntime::RenderSplashScreen()
 	{
 		auto splashTexture = TextureManager::LoadTexture(Paths::Files::SPLASH_SCREEN);

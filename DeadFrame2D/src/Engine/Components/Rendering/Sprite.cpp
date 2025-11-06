@@ -2,11 +2,13 @@
 #include "Engine/Components/Rendering/Sprite.h"
 #include "Engine/Components/Transform.h"
 #include "Engine/Entity/GameObject.h"
+#include "Utilities/Debugging/Guards.h"
 
 
 namespace DeadFrame2D::Engine
 {
 	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Utilities;
 
 
 	Sprite::Sprite(std::string_view texturePath)
@@ -18,7 +20,7 @@ namespace DeadFrame2D::Engine
 
 	void Sprite::Init()
 	{
-		transform = OwningObject.lock()->GetComponent<Transform>();
+		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
 	}
 
 	void Sprite::Draw()

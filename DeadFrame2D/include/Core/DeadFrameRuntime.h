@@ -27,7 +27,7 @@ namespace DeadFrame2D::Core
 	public:
 		DeadFrameRuntime();
 
-		virtual ~DeadFrameRuntime() = default;
+		virtual ~DeadFrameRuntime();
 
 
 		std::optional<int> Run();

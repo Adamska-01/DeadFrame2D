@@ -50,7 +50,7 @@ namespace DeadFrame2D::Engine
 
 	void Camera::Init()
 	{
-		transform = Guard::AgainstNullAssignment(OwningObject.lock()->GetComponent<Transform>(), NAME_OF(transform));
+		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
 	}
 
 	void Camera::SetZoom(float zoom)

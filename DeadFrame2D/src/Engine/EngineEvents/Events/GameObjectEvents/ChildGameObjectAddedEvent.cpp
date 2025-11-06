@@ -1,9 +1,10 @@
 #include "Engine/EngineEvents/Events/GameObjectEvents/ChildGameObjectAddedEvent.h"
+#include "Engine/Entity/GameObject.h"
 
 
 namespace DeadFrame2D::Engine
 {
-	ChildGameObjectAddedEvent::ChildGameObjectAddedEvent(std::weak_ptr<GameObject> childGameObject)
+	ChildGameObjectAddedEvent::ChildGameObjectAddedEvent(ObjectHandle<GameObject> childGameObject)
 		: childGameObject(childGameObject)
 	{
 	}

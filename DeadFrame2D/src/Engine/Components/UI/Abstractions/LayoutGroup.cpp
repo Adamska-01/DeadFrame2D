@@ -34,12 +34,12 @@ namespace DeadFrame2D::Engine
 	{
 		auto gameObjEvent = DispatchableEvent::SafeCast<GameObjectCreatedEvent>(dispatchableEvent);
 
-		if (gameObjEvent == nullptr || gameObjEvent->gameObjectCreated == nullptr)
+		if (gameObjEvent == nullptr || gameObjEvent->GetGameObject() == nullptr)
 			return;
 	
-		auto& target = gameObjEvent->gameObjectCreated; 
+		auto& target = gameObjEvent->GetGameObject();
 
-		if (!target->IsChildOf(OwningObject))
+		if (!target->IsChildOf(GetGameObject()))
 			return;
 
 		DeregisterAllHandlers(target);
@@ -52,12 +52,12 @@ namespace DeadFrame2D::Engine
 	{
 		auto gameObjEvent = DispatchableEvent::SafeCast<GameObjectDestroyedEvent>(dispatchableEvent);
 
-		if (!gameObjEvent || gameObjEvent->gameObjectDestroyed.lock() == nullptr)
+		if (!gameObjEvent || gameObjEvent->gameObjectDestroyed == nullptr)
 			return;
 
 		auto target = gameObjEvent->gameObjectDestroyed;
 
-		if (!target.lock()->IsChildOf(OwningObject))
+		if (!target->IsChildOf(GetGameObject()))
 			return;
 
 		DeregisterAllHandlers(target);
@@ -65,7 +65,7 @@ namespace DeadFrame2D::Engine
 		MarkDirty();
 	}
 
-	void LayoutGroup::OnGameObjectActiveStateChangedHandler(GameObject* child, bool activeState)
+	void LayoutGroup::OnGameObjectActiveStateChangedHandler(const ObjectHandle<GameObject>& child, bool activeState)
 	{
 		MarkDirty();
 	}
@@ -85,7 +85,7 @@ namespace DeadFrame2D::Engine
 
 	void LayoutGroup::UpdateLayout()
 	{
-		for (const auto& ui : OwningObject.lock()->GetComponentsInChildren<UIComponent>())
+		for (const auto& ui : GetGameObject()->GetComponentsInChildren<UIComponent>())
 		{
 			DeregisterAllHandlers(ui->GetGameObject());
 			RegisterAllHandlers(ui->GetGameObject());

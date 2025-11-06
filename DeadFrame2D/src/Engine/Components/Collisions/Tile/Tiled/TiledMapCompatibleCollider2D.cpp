@@ -100,7 +100,9 @@ namespace DeadFrame2D::Engine
 	{
 		TileCollider2D::Init();
 
-		tileMapRenderer = Guard::AgainstNullAssignment(OwningObject.lock()->GetComponent<TiledMapCompatibleRenderer>(), NAME_OF(tileMapRenderer));
+		auto gameObject = GetGameObject();
+
+		tileMapRenderer = Guard::AgainstNullAssignment(gameObject->GetComponent<TiledMapCompatibleRenderer>(), NAME_OF(tileMapRenderer));
 
 		const auto& tileMap = tileMapRenderer->GetTileMap();
 

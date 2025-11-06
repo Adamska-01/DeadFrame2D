@@ -1,52 +1,52 @@
 #pragma once
 #include "Core/Reflection/TypeInfoCheck.h"
-#include <cassert>
+#include "DF2D_API.h"
+#include "Engine/Entity/ComponentEntry.h"
 #include <memory>
 #include <vector>
 
 
 namespace DeadFrame2D::Engine
 {
-	class GameComponent;
 	class GameObject;
 
-	template<typename T> 
+	class GameComponent;
+
+	template<typename T>
 	class ComponentHandle;
+
+	template<typename T>
+	class ObjectHandle;
 
 
 	class ComponentBucket : public std::enable_shared_from_this<ComponentBucket>
 	{
+		friend class Scene;
+
 		friend class GameObject;
 
 		friend class GameComponent;
 
+		template<typename T>
+		friend class ComponentHandle;
+		
 		friend class ComponentHandleBase;
 
 		template<typename T>
-		friend class ComponentHandle;
-
-
-		struct ComponentEntry
-		{
-			std::unique_ptr<GameComponent> instance;
-
-			uint32_t generation = 0;
-
-			bool alive = false;
-		};
+		friend class ObjectHandle;
 
 
 	private:
 		std::vector<ComponentEntry> components;
 
-		// TODO: Move all non-template functions in a cpp
-		GameComponent* GetAt(uint32_t index) const;
 
-		uint32_t FindFreeSlot();
+		DF2D_API GameComponent* GetAt(uint32_t index) const;
 
-		void LinkComponentToOwner(std::weak_ptr<GameObject> owner, GameComponent* toInitialize);
+		DF2D_API uint32_t FindFreeSlot();
 
-		bool IsValid(uint32_t index, uint32_t generation) const;
+		DF2D_API void LinkComponentToOwner(const ObjectHandle<GameObject>& owner, GameComponent* toInitialize);
+
+		DF2D_API bool IsValid(uint32_t index, uint32_t generation) const;
 
 
 		template<typename F> // Forward rvalue or lvalue without allocation
@@ -54,9 +54,9 @@ namespace DeadFrame2D::Engine
 
 
 	public:
-		ComponentBucket();
+		DF2D_API ComponentBucket();
 
-		~ComponentBucket();
+		DF2D_API ~ComponentBucket();
 
 		ComponentBucket(const ComponentBucket&) = delete;
 
@@ -71,7 +71,7 @@ namespace DeadFrame2D::Engine
 		ComponentHandle<T> GetComponent();
 
 		template<typename T, typename... Args>
-		ComponentHandle<T> AddComponent(std::weak_ptr<GameObject> owner, bool canInitialize, Args&&... args);
+		ComponentHandle<T> AddComponent(const ObjectHandle<GameObject>& owner, bool canInitialize, Args&&... args);
 
 		template<typename T>
 		void RemoveComponent(const ComponentHandle<T>& handle);
@@ -80,59 +80,12 @@ namespace DeadFrame2D::Engine
 
 
 #include "Engine/Components/GameComponent.h"
+#include "Engine/Entity/Handles/GameObject/ObjectHandle.h"
 #include "Engine/Entity/ComponentHandle.h"
 
 
 namespace DeadFrame2D::Engine
 {
-	inline ComponentBucket::ComponentBucket()
-	{
-		components.clear();
-	}
-
-	inline ComponentBucket::~ComponentBucket()
-	{
-		components.clear();
-	}
-
-
-	inline GameComponent* ComponentBucket::GetAt(uint32_t index) const
-	{
-		assert(index < components.size());
-
-		return components[index].instance.get();
-	}
-
-	inline uint32_t ComponentBucket::FindFreeSlot()
-	{
-		for (size_t i = 0; i < components.size(); ++i)
-		{
-			if (!components[i].alive)
-				return static_cast<uint32_t>(i);
-		}
-
-		components.emplace_back();
-
-		return static_cast<uint32_t>(components.size() - 1);
-	}
-
-	inline void ComponentBucket::LinkComponentToOwner(std::weak_ptr<GameObject> owner, GameComponent* toInitialize)
-	{
-		toInitialize->OwningObject = owner;
-
-		toInitialize->RegisterAllHandlers(owner);
-	}
-
-	inline bool ComponentBucket::IsValid(uint32_t index, uint32_t generation) const
-	{
-		if (index >= components.size()) 
-			return false;
-
-		const auto& entry = components[index];
-
-		return entry.alive && entry.generation == generation;
-	}
-
 	template<typename F>
 	inline void ComponentBucket::ForEach(F&& func)
 	{
@@ -171,7 +124,7 @@ namespace DeadFrame2D::Engine
 	}
 
 	template<typename T, typename ...Args>
-	inline ComponentHandle<T> ComponentBucket::AddComponent(std::weak_ptr<GameObject> owner, bool canInitialize, Args && ...args)
+	inline ComponentHandle<T> ComponentBucket::AddComponent(const ObjectHandle<GameObject>& owner, bool canInitialize, Args && ...args)
 	{
 		static_assert(std::is_base_of<GameComponent, T>::value, "GameComponent T must derive from GameComponent");
 		static_assert(DeadFrame2D::Core::HasTypeInfo<T>::value, "GameComponent T must declare TYPE_INFO");
@@ -184,7 +137,7 @@ namespace DeadFrame2D::Engine
 		entry.alive = true;
 
 		// This is necessary due to smart pointer/C++ limitations
-		if (owner.lock() != nullptr)
+		if (owner != nullptr)
 		{
 			LinkComponentToOwner(owner, entry.instance.get());
 		}

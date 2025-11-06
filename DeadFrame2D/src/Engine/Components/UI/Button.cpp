@@ -36,7 +36,7 @@ namespace DeadFrame2D::Engine
 
 	std::optional<int> Button::ProcessEvents(const SDL_Event& sdlEvent)
 	{
-		if (!IsActive() || !OwningObject.lock()->IsActive())
+		if (!IsActive() || !GetGameObject()->IsActive())
 			return std::nullopt;
 
 		switch (sdlEvent.type)

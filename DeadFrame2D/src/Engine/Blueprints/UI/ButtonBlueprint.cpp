@@ -22,10 +22,10 @@ namespace DeadFrame2D::Engine
 
 		auto textMeshObject = GameObject::Instantiate<GameObject>();
 
-		auto comp = textMeshObject.lock()->AddComponent<TextMesh>(buttonBlueprintConfiguration.textMeshComponentModel);
+		auto comp = textMeshObject->AddComponent<TextMesh>(buttonBlueprintConfiguration.textMeshComponentModel);
 
 		AddChildGameObject(textMeshObject);
 
-		textMeshObject.lock()->GetComponent<Transform>()->SetLocalPosition(Vector2F::Zero);
+		textMeshObject->GetTransform()->SetLocalPosition(Vector2F::Zero);
 	}
 }

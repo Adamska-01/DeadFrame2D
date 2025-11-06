@@ -21,9 +21,9 @@ namespace DeadFrame2D::Engine
 
 		std::vector<ComponentHandle<UIComponent>> interactables;
 
-		for (const auto& ui : OwningObject.lock()->GetComponentsInChildren<UIComponent>())
+		for (const auto& ui : GetGameObject()->GetComponentsInChildren<UIComponent>())
 		{
-			if (ui == nullptr || !ui->GetGameObject().lock()->IsActive())
+			if (ui == nullptr || !ui->GetGameObject()->IsActive())
 				continue;
 
 			interactables.push_back(ui);
@@ -54,7 +54,7 @@ namespace DeadFrame2D::Engine
 		{
 			auto size = interactable->GetWidgetSize();
 
-			auto transform = interactable->GetGameObject().lock()->GetComponent<Transform>();
+			auto transform = interactable->GetGameObject()->GetTransform();
 		
 			if (transform == nullptr)
 				continue;

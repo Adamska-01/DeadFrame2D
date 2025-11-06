@@ -1,7 +1,7 @@
 #pragma once
 #include "DF2D_API.h"
 #include "Engine/EngineEvents/DispatchableEvent.h"
-#include <memory>
+#include "Engine/Entity/Handles/GameObject/ObjectHandle.h"
 
 
 namespace DeadFrame2D::Engine
@@ -12,9 +12,9 @@ namespace DeadFrame2D::Engine
 	class DF2D_API ChildGameObjectAddedEvent : public DispatchableEvent
 	{
 	public:
-		std::weak_ptr<GameObject> childGameObject;
+		ObjectHandle<GameObject> childGameObject;
 
 
-		ChildGameObjectAddedEvent(std::weak_ptr<GameObject> childGameObject);
+		ChildGameObjectAddedEvent(ObjectHandle<GameObject> childGameObject);
 	};
 }

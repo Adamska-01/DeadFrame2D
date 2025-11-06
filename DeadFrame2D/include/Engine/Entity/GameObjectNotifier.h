@@ -1,5 +1,6 @@
 #pragma once
 #include "DF2D_API.h"
+#include "Engine/Entity/Handles/GameObject/IGameEntityHandle.h"
 #include "Utilities/Delegates/MulticastDelegate.h"
 #include <functional>
 
@@ -12,8 +13,11 @@ namespace DeadFrame2D::Engine
 	template<typename T>
 	class ComponentHandle;
 
+	template<typename T>
+	class ObjectHandle;
 
-	class DF2D_API GameObjectNotifier
+
+	class DF2D_API GameObjectNotifier : public IGameEntityHandle
 	{
 	protected:
 		GameObjectNotifier();
@@ -21,7 +25,7 @@ namespace DeadFrame2D::Engine
 		~GameObjectNotifier();
 
 
-		DeadFrame2D::Utilities::MulticastDelegate<GameObject*, bool> OnActiveStateChanged;
+		DeadFrame2D::Utilities::MulticastDelegate<ObjectHandle<GameObject>, bool> OnActiveStateChanged;
 
 		DeadFrame2D::Utilities::MulticastDelegate<const ComponentHandle<GameComponent>&> OnNewComponentAdded;
 
@@ -29,7 +33,7 @@ namespace DeadFrame2D::Engine
 
 
 	public:
-		void RegisterOnActiveStateChangedHandler(std::function<void(GameObject*, bool)> handler, uintptr_t identifier);
+		void RegisterOnActiveStateChangedHandler(std::function<void(ObjectHandle<GameObject>, bool)> handler, uintptr_t identifier);
 
 		void RegisterOnNewComponentAddedHandler(std::function<void(const ComponentHandle<GameComponent>&)> handler, uintptr_t identifier);
 

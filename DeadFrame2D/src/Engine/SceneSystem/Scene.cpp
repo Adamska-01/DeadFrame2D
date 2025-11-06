@@ -1,11 +1,11 @@
 #include "Engine/Components/UI/Canvas.h"
-#include "Engine/EngineEvents/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/ChildGameObjectAddedEvent.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectCreatedEvent.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
 #include "Engine/SceneSystem/Scene.h"
 #include "Utilities/Helpers/Events/EventHelpers.h"
 #include <algorithm>
+#include <cassert>
 
 
 namespace DeadFrame2D::Engine
@@ -20,8 +20,7 @@ namespace DeadFrame2D::Engine
 		Exit();
 
 		auto identifier = reinterpret_cast<uintptr_t>(this);
-	
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &Scene::GameObjectCreatedHandler), identifier);
+
 		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &Scene::GameObjectDestroyedHandler), identifier);
 		EventDispatcher::RegisterEventHandler(std::type_index(typeid(ChildGameObjectAddedEvent)), EventHelpers::BindFunction(this, &Scene::ChildGameObjectAddedHandler), identifier);
 	}
@@ -31,40 +30,51 @@ namespace DeadFrame2D::Engine
 		Exit();
 
 		auto identifier = reinterpret_cast<uintptr_t>(this);
-	
-		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), identifier);
+
 		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), identifier);
 		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(ChildGameObjectAddedEvent)), identifier);
 	}
 
-	void Scene::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
+	uint32_t Scene::FindFreeSlot()
 	{
-		auto gameObjEvent = DispatchableEvent::SafeCast<GameObjectCreatedEvent>(dispatchableEvent);
-
-		if (gameObjEvent == nullptr || gameObjEvent->gameObjectCreated == nullptr)
-			return;
-
-		auto target = gameObjEvent->gameObjectCreated;
-
-		gameObjects.push_back(target);
-		objectsPendingCreation.push_back(target);
-
-		if (isRunning)
+		for (size_t i = 0; i < entries.size(); ++i)
 		{
-			target->Init();
-			target->Start();
-
-			return;
+			if (!entries[i].alive)
+				return static_cast<uint32_t>(i);
 		}
 
-		gameObjectsToInitialize.push_back(target);
+		entries.emplace_back();
+
+		return static_cast<uint32_t>(entries.size() - 1);
+	}
+
+	GameObject* Scene::GetAt(uint32_t index) const
+	{
+		assert(index < entries.size());
+
+		return entries[index].object.get();
+	}
+
+	bool Scene::IsValid(uint32_t index, uint32_t generation) const
+	{
+		if (index >= entries.size()) 
+			return false;
+		
+		const auto& e = entries[index];
+		
+		return e.alive && e.generation == generation;
+	}
+
+	void Scene::SendGameObjectCreatedEvent(const ObjectHandle<GameObject>& obj)
+	{
+		EventDispatcher::SendEvent(std::make_shared<GameObjectCreatedEvent>(obj));
 	}
 
 	void Scene::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
 	{
 		auto gameObjEvent = DispatchableEvent::SafeCast<GameObjectDestroyedEvent>(dispatchableEvent);
 
-		if (!gameObjEvent || gameObjEvent->gameObjectDestroyed.lock() == nullptr)
+		if (!gameObjEvent || gameObjEvent->gameObjectDestroyed == nullptr)
 			return;
 
 		auto toDestroyPtr = gameObjEvent->gameObjectDestroyed;
@@ -77,11 +87,10 @@ namespace DeadFrame2D::Engine
 	{
 		auto gameObjEvent = DispatchableEvent::SafeCast<ChildGameObjectAddedEvent>(dispatchableEvent);
 
-		if (!gameObjEvent || gameObjEvent->childGameObject.lock() == nullptr)
+		if (!gameObjEvent || gameObjEvent->childGameObject == nullptr)
 			return;
 
 		childAddedPendingAction.push_back(gameObjEvent->childGameObject);
-	
 	}
 
 	void Scene::CleanupDestroyedObjects()
@@ -89,15 +98,14 @@ namespace DeadFrame2D::Engine
 		if (objectsPendingDestroy.empty())
 			return;
 
-		for (const auto& weakTarget : objectsPendingDestroy)
+		for (const auto& target : objectsPendingDestroy)
 		{
-			auto targetPtr = weakTarget.lock();
-			if (!targetPtr)
+			if (target == nullptr)
 				continue;
 
-			const auto matchesTarget = [&targetPtr](const std::shared_ptr<GameObject>& obj)
+			const auto matchesTarget = [&target](const ObjectHandle<GameObject>& obj)
 				{
-					return obj.get() == targetPtr.get();
+					return obj == target;
 				};
 
 			gameObjects.erase(
@@ -107,15 +115,24 @@ namespace DeadFrame2D::Engine
 					matchesTarget),
 				gameObjects.end());
 
-			if (targetPtr->GetParent().expired())
-			{
-				gameObjectParents.erase(
-					std::remove_if(
-						gameObjectParents.begin(), 
-						gameObjectParents.end(), 
-						matchesTarget),
-					gameObjectParents.end());
-			}
+			if (target->GetParent() != nullptr)
+				continue;
+
+			gameObjectParents.erase(
+				std::remove_if(
+					gameObjectParents.begin(), 
+					gameObjectParents.end(), 
+					matchesTarget),
+				gameObjectParents.end());
+		}
+
+		for (const auto& target : objectsPendingDestroy)
+		{
+			auto& entry = entries[target.index];
+
+			entry.alive = false;
+			entry.generation++;
+			entry.object.reset();
 		}
 
 		objectsPendingDestroy.clear();
@@ -123,6 +140,7 @@ namespace DeadFrame2D::Engine
 
 	void Scene::Init()
 	{
+		// TODO: The way Init and Start are called feels wrong. Fix it (All the Inits must be called before all the Starts, and must follow instantiation-order)
 		// Some game objects might create other game objects in their Init function.
 		// However, we want to ensure that only the game objects in the current
 		// initialization queue are considered part of this initial phase. 
@@ -132,44 +150,36 @@ namespace DeadFrame2D::Engine
 
 		for (const auto& toInitialize : currentToInitialize)
 		{
-			auto toInitPtr = toInitialize.lock();
-
-			if (toInitPtr == nullptr)
+			if (toInitialize == nullptr)
 				continue;
 
-			toInitPtr->Init();
+			toInitialize->Init();
 		}
 
 		for (const auto& toInitialize : currentToInitialize)
 		{
-			auto toInitPtr = toInitialize.lock();
-
-			if (toInitPtr == nullptr)
+			if (toInitialize == nullptr)
 				continue;
 
-			toInitPtr->Start();
+			toInitialize->Start();
 		}
 
 		isRunning = true;
 
 		for (const auto& toInitialize : gameObjectsToInitialize)
 		{
-			auto toInitPtr = toInitialize.lock();
-
-			if (toInitPtr == nullptr)
+			if (toInitialize == nullptr)
 				continue;
 
-			toInitPtr->Init();
+			toInitialize->Init();
 		}
 
 		for (const auto& toInitialize : gameObjectsToInitialize)
 		{
-			auto toInitPtr = toInitialize.lock();
-
-			if (toInitPtr == nullptr)
+			if (toInitialize == nullptr)
 				continue;
 
-			toInitPtr->Start();
+			toInitialize->Start();
 		}
 
 		currentToInitialize.clear();
@@ -187,15 +197,15 @@ namespace DeadFrame2D::Engine
 				auto& obj = objectsPendingCreation[i];
 
 				gameObjectParents.push_back(obj);
-
-				std::stable_partition(
-					gameObjectParents.begin(),
-					gameObjectParents.end(),
-					[](const std::shared_ptr<GameObject>& obj)
-					{
-						return obj->GetComponent<Canvas>() == nullptr;
-					});
 			}
+
+			std::stable_partition(
+				gameObjectParents.begin(),
+				gameObjectParents.end(),
+				[](const auto& obj)
+				{
+					return obj->GetComponent<Canvas>() == nullptr;
+				});
 
 			objectsPendingCreation.clear();
 		}
@@ -206,7 +216,7 @@ namespace DeadFrame2D::Engine
 		{
 			for (size_t i = 0; i < childAddedPendingActionSize; ++i)
 			{
-				auto& childObj = childAddedPendingAction[i];
+				const auto& childObj = childAddedPendingAction[i];
 
 				gameObjectParents.erase(
 					std::remove_if(
@@ -214,18 +224,18 @@ namespace DeadFrame2D::Engine
 						gameObjectParents.end(),
 						[&childObj](const auto& obj)
 						{
-							return obj.get() == childObj.lock().get();
+							return obj == childObj;
 						}),
 					gameObjectParents.end());
-
-				std::stable_partition(
-					gameObjectParents.begin(),
-					gameObjectParents.end(),
-					[](const std::shared_ptr<GameObject>& obj)
-					{
-						return obj->GetComponent<Canvas>() == nullptr;
-					});
 			}
+
+			std::stable_partition(
+				gameObjectParents.begin(),
+				gameObjectParents.end(),
+				[](const auto& obj)
+				{
+					return obj->GetComponent<Canvas>() == nullptr;
+				});
 
 			childAddedPendingAction.clear();
 		}
@@ -273,6 +283,13 @@ namespace DeadFrame2D::Engine
 
 	void Scene::Exit()
 	{
+		for (auto& entry : entries)
+		{
+			entry.alive = false;
+			entry.generation++;
+			entry.object.reset();
+		}
+		entries.clear();
 		gameObjects.clear();
 		gameObjectParents.clear();
 		gameObjectsToInitialize.clear();

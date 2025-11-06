@@ -23,7 +23,7 @@ namespace DeadFrame2D::Engine
 
 		ComponentHandle<Transform> transform;
 
-		std::weak_ptr<GameObject> target;
+		ObjectHandle<GameObject> target;
 
 		SDL_FRect worldBounds;
 
@@ -38,7 +38,7 @@ namespace DeadFrame2D::Engine
 
 
 	public:
-		CameraFollow(ComponentHandle<Camera> camera, std::weak_ptr<GameObject> target);
+		CameraFollow(ComponentHandle<Camera> camera, ObjectHandle<GameObject> target);
 
 		virtual ~CameraFollow() override;
 
@@ -46,7 +46,7 @@ namespace DeadFrame2D::Engine
 		virtual void Update(float deltaTime) override;
 
 
-		void SetTarget(std::weak_ptr<GameObject> newTarget);
+		void SetTarget(ObjectHandle<GameObject> newTarget);
 
 		void SetBounds(const SDL_FRect& bounds);
 

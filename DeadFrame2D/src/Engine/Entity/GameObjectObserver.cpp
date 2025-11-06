@@ -2,6 +2,7 @@
 #include "Engine/Entity/ComponentHandle.h"
 #include "Engine/Entity/GameObject.h"
 #include "Engine/Entity/GameObjectObserver.h"
+#include "Engine/Entity/Handles/GameObject/ObjectHandle.h"
 #include "Utilities/Helpers/Events/EventHelpers.h"
 
 
@@ -17,7 +18,7 @@ namespace DeadFrame2D::Engine
 
 	GameObjectObserver::~GameObjectObserver()
 	{
-		for (auto obj : allRegisteredGameObjects)
+		for (const auto& obj : allRegisteredGameObjects)
 		{
 			DeregisterAllHandlers(obj);
 		}
@@ -25,16 +26,17 @@ namespace DeadFrame2D::Engine
 		allRegisteredGameObjects.clear();
 	}
 
-	void GameObjectObserver::RegisterAllHandlers(std::weak_ptr<GameObject> owner)
+	void GameObjectObserver::RegisterAllHandlers(const ObjectHandleBase& owner)
 	{
-		auto ownerPtr = owner.lock();
-		if (ownerPtr == nullptr)
+		if (owner == nullptr)
 			return;
 
-		auto it = std::remove_if(allRegisteredGameObjects.begin(), allRegisteredGameObjects.end(),
-			[ownerPtr](const std::weak_ptr<GameObject>& other)
+		auto it = std::remove_if(
+			allRegisteredGameObjects.begin(),
+			allRegisteredGameObjects.end(),
+			[owner](const auto& other)
 			{
-				return other.lock().get() == ownerPtr.get();
+				return other == owner;
 			});
 
 		if (it == allRegisteredGameObjects.end())
@@ -43,24 +45,25 @@ namespace DeadFrame2D::Engine
 		}
 	
 		auto identifier = reinterpret_cast<uintptr_t>(this);
+		auto typedOwner = ObjectHandle<GameObject>::From(owner);
 
-		ownerPtr->RegisterOnActiveStateChangedHandler(EventHelpers::BindFunction(this, &GameObjectObserver::OnGameObjectActiveStateChangedHandler), identifier);
-		ownerPtr->RegisterOnNewComponentAddedHandler(EventHelpers::BindFunction(this, &GameObjectObserver::OnNewComponentAddedHandler), identifier);
+		typedOwner->RegisterOnActiveStateChangedHandler(EventHelpers::BindFunction(this, &GameObjectObserver::OnGameObjectActiveStateChangedHandler), identifier);
+		typedOwner->RegisterOnNewComponentAddedHandler(EventHelpers::BindFunction(this, &GameObjectObserver::OnNewComponentAddedHandler), identifier);
 	}
 
-	void GameObjectObserver::DeregisterAllHandlers(std::weak_ptr<GameObject> owner)
+	void GameObjectObserver::DeregisterAllHandlers(const ObjectHandleBase& owner)
 	{
-		auto ownerPtr = owner.lock();
-		if (ownerPtr == nullptr)
+		if (owner == nullptr)
 			return;
 
 		auto identifier = reinterpret_cast<uintptr_t>(this);
+		auto typedOwner = ObjectHandle<GameObject>::From(owner);
 
-		ownerPtr->DeregisterOnActiveStateChangedHandler(identifier);
-		ownerPtr->DeregisterOnNewComponentAddedHandler(identifier);
+		typedOwner->DeregisterOnActiveStateChangedHandler(identifier);
+		typedOwner->DeregisterOnNewComponentAddedHandler(identifier);
 	}
 
-	void GameObjectObserver::OnGameObjectActiveStateChangedHandler(GameObject* obj, bool isActive)
+	void GameObjectObserver::OnGameObjectActiveStateChangedHandler(const ObjectHandle<GameObject>& obj, bool isActive)
 	{
 	}
 

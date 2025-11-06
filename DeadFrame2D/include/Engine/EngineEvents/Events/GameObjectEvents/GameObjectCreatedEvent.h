@@ -1,7 +1,7 @@
 #pragma once
 #include "DF2D_API.h"
 #include "Engine/EngineEvents/DispatchableEvent.h"
-#include <memory>
+#include "Engine/Entity/Handles/GameObject/ObjectHandle.h"
 
 
 namespace DeadFrame2D::Engine
@@ -11,10 +11,14 @@ namespace DeadFrame2D::Engine
 
 	class DF2D_API GameObjectCreatedEvent : public DispatchableEvent
 	{
+	private:
+		ObjectHandle<GameObject> gameObjectCreated;
+
+
 	public:
-		std::shared_ptr<GameObject> gameObjectCreated;
+		GameObjectCreatedEvent(const ObjectHandle<GameObject>& createdObject);
 
 
-		GameObjectCreatedEvent(std::shared_ptr<GameObject> gameObjectDestroyed);
+		const ObjectHandle<GameObject>& GetGameObject() const;
 	};
 }

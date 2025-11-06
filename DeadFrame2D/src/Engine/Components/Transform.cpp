@@ -17,9 +17,9 @@ namespace DeadFrame2D::Engine
 
 	void Transform::RecalculateWorldTransform() const
 	{
-		auto owningObjectPtr = OwningObject.lock();
+		auto gameObject = GetGameObject();
 
-		if (owningObjectPtr == nullptr || owningObjectPtr->GetParent().lock() == nullptr)
+		if (gameObject == nullptr || gameObject->GetParent() == nullptr)
 		{
 			position = localPosition;
 			scale = localScale;
@@ -27,7 +27,7 @@ namespace DeadFrame2D::Engine
 		}
 		else
 		{
-			auto parentTransform = owningObjectPtr->GetParent().lock()->GetComponent<Transform>();
+			auto parentTransform = gameObject->GetParent()->GetTransform();
 
 			if (parentTransform != nullptr)
 			{
@@ -60,19 +60,20 @@ namespace DeadFrame2D::Engine
 
 		isDirty = true;
 
+		auto gameObject = GetGameObject();
+
 		// Propagate to children
-		auto owningOnjectPtr = OwningObject.lock();
-		if (owningOnjectPtr == nullptr)
+		if (gameObject == nullptr)
 			return;
 
-		const auto& children = owningOnjectPtr->GetChildren();
-		for (const auto& weakChild : children)
+		const auto& children = gameObject->GetChildren();
+		for (const auto& child : children)
 		{
-			auto child = weakChild.lock();
 			if (!child)
 				continue;
 
 			auto childTransform = child->GetComponent<Transform>();
+
 			if (childTransform == nullptr)
 				continue;
 
@@ -201,8 +202,9 @@ namespace DeadFrame2D::Engine
 
 	void Transform::SetWorldPosition(const Vector2F& worldPos)
 	{
-		auto parent = OwningObject.lock() ? OwningObject.lock()->GetParent().lock() : nullptr;
-		auto parentTransform = parent != nullptr ? parent->GetComponent<Transform>() : ComponentHandle<Transform>();
+		auto gameObject = GetGameObject();
+		auto parent = gameObject->GetParent();
+		auto parentTransform = parent != nullptr ? parent->GetTransform() : ComponentHandle<Transform>();
 
 		if (parentTransform == nullptr)
 		{
@@ -239,8 +241,10 @@ namespace DeadFrame2D::Engine
 
 	void Transform::SetWorldScale(const Vector2F& worldScale)
 	{
-		auto parent = OwningObject.lock() ? OwningObject.lock()->GetParent().lock() : nullptr;
-		auto parentTransform = parent != nullptr ? parent->GetComponent<Transform>() : ComponentHandle<Transform>();
+		auto gameObject = GetGameObject();
+		
+		auto parent = gameObject != nullptr ? gameObject->GetParent() : ObjectHandle<GameObject>();
+		auto parentTransform = parent != nullptr ? parent->GetTransform() : ComponentHandle<Transform>();
 
 		if (parentTransform == nullptr)
 		{
@@ -267,8 +271,10 @@ namespace DeadFrame2D::Engine
 
 	void Transform::SetWorldRotation(float worldRotation)
 	{
-		auto parent = OwningObject.lock() ? OwningObject.lock()->GetParent().lock() : nullptr;
-		auto parentTransform = parent != nullptr ? parent->GetComponent<Transform>() : ComponentHandle<Transform>();
+		auto gameObject = GetGameObject();
+		
+		auto parent = gameObject != nullptr ? gameObject->GetParent() : ObjectHandle<GameObject>();
+		auto parentTransform = parent != nullptr ? parent->GetTransform() : ComponentHandle<Transform>();
 
 		localRotation = parentTransform
 			? worldRotation - parentTransform->GetWorldRotation()

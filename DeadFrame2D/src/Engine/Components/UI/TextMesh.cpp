@@ -4,12 +4,14 @@
 #include "Engine/Components/Transform.h"
 #include "Engine/Components/UI/TextMesh.h"
 #include "Engine/Entity/GameObject.h"
+#include "Utilities/Debugging/Guards.h"
 
 
 namespace DeadFrame2D::Engine
 {
 	using namespace DeadFrame2D::Core;
 	using namespace DeadFrame2D::Data;
+	using namespace DeadFrame2D::Utilities;
 
 
 	TextMesh::TextMesh(const TextMeshComponentModel& textMeshConfiguration)
@@ -32,7 +34,7 @@ namespace DeadFrame2D::Engine
 	{
 		UIComponent::Init();
 
-		transform = OwningObject.lock()->GetComponent<Transform>();
+		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
 
 		transform->SetLocalScale(initialObjectScale);
 	}

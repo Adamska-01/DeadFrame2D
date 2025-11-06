@@ -4,20 +4,15 @@
 #include "Engine/SceneSystem/SceneManager.h"
 
 
+
 namespace DeadFrame2D::Engine
 {
 	using namespace DeadFrame2D::Core;
 
 
-	std::unique_ptr<Scene> SceneManager::currentScene;
-	std::function<std::unique_ptr<Scene>()> SceneManager::newSceneFactory;
+	std::shared_ptr<Scene> SceneManager::currentScene = nullptr;
+	std::function<std::shared_ptr<Scene>()> SceneManager::newSceneFactory = {};
 
-
-	SceneManager::SceneManager()
-	{
-		currentScene = nullptr;
-		newSceneFactory = nullptr;
-	}
 
 	SceneManager::~SceneManager()
 	{
@@ -50,7 +45,7 @@ namespace DeadFrame2D::Engine
 
 	bool SceneManager::LoadNewSceneIfAvailable()
 	{
-		if (newSceneFactory == nullptr)
+		if (!newSceneFactory)
 			return false;
 
 		CoroutineScheduler::Reset();
@@ -69,8 +64,13 @@ namespace DeadFrame2D::Engine
 
 		currentScene->Init();
 
-		newSceneFactory = nullptr;
+		newSceneFactory = {};
 
 		return true;
+	}	
+
+	const Scene* SceneManager::GetActiveScene()
+	{
+		return currentScene.get();
 	}
 }

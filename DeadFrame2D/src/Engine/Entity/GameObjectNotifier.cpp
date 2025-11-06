@@ -1,6 +1,8 @@
 #include "Engine/Components/GameComponent.h"
 #include "Engine/Entity/ComponentHandle.h"
+#include "Engine/Entity/GameObject.h"
 #include "Engine/Entity/GameObjectNotifier.h"
+#include "Engine/Entity/Handles/GameObject/ObjectHandle.h"
 
 
 namespace DeadFrame2D::Engine
@@ -17,7 +19,7 @@ namespace DeadFrame2D::Engine
 		OnNewComponentAdded.Clear();
 	}
 
-	void GameObjectNotifier::RegisterOnActiveStateChangedHandler(std::function<void(GameObject*, bool)> handler, uintptr_t identifier)
+	void GameObjectNotifier::RegisterOnActiveStateChangedHandler(std::function<void(ObjectHandle<GameObject>, bool)> handler, uintptr_t identifier)
 	{
 		OnActiveStateChanged.RegisterCallback(handler, identifier);
 	}

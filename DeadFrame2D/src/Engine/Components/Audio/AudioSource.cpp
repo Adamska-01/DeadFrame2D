@@ -4,6 +4,7 @@
 #include "Engine/Components/Audio/AudioSource.h"
 #include "Engine/Components/Transform.h"
 #include "Engine/Entity/GameObject.h"
+#include "Utilities/Debugging/Guards.h"
 #include "Utilities/Helpers/Events/EventHelpers.h"
 #include <algorithm>
 #include <box2d/b2_body.h>
@@ -70,10 +71,10 @@ namespace DeadFrame2D::Engine
 
 	void AudioSource::OnAudioSourceEnterHandler(const CollisionInfo& collisionInfo)
 	{
-		if (collisionInfo.otherGameObject.expired())
+		if (collisionInfo.otherGameObject == nullptr)
 			return;
 
-		auto audioListener = collisionInfo.otherGameObject.lock()->GetComponent<AudioListener>();
+		auto audioListener = collisionInfo.otherGameObject->GetComponent<AudioListener>();
 
 		if (audioListener == nullptr)
 			return;
@@ -83,10 +84,10 @@ namespace DeadFrame2D::Engine
 
 	void AudioSource::OnAudioSourceExitHandler(const CollisionInfo& collisionInfo)
 	{
-		if (collisionInfo.otherGameObject.expired())
+		if (collisionInfo.otherGameObject == nullptr)
 			return;
 
-		auto audioListener = collisionInfo.otherGameObject.lock()->GetComponent<AudioListener>();
+		auto audioListener = collisionInfo.otherGameObject->GetComponent<AudioListener>();
 
 		if (audioListener == nullptr)
 			return;
@@ -145,7 +146,7 @@ namespace DeadFrame2D::Engine
 
 	void AudioSource::Init()
 	{
-		transform = OwningObject.lock()->GetTransform();
+		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
 
 		isDirty = true;
 	}
@@ -165,7 +166,7 @@ namespace DeadFrame2D::Engine
 		auto currentTransformPosition = transform->GetWorldPosition();
 		auto currentTransformRotation = transform->GetWorldRotation();
 
-		if (currentTransformPosition != lastTransformPosition || currentTransformRotation != currentTransformRotation)
+		if (currentTransformPosition != lastTransformPosition || currentTransformRotation != lastTransformRotation)
 		{
 			currentTransformPosition *= DeadFrame2D::Core::PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
 
@@ -182,7 +183,7 @@ namespace DeadFrame2D::Engine
 		if (audioListenerInContact == nullptr || sfxClip == nullptr)
 			return;
 
-		auto listenerTransform = audioListenerInContact->GetGameObject().lock()->GetTransform();
+		auto listenerTransform = audioListenerInContact->GetGameObject()->GetTransform();
 
 		if (listenerTransform == nullptr)
 			return;

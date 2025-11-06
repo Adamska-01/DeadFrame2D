@@ -1,8 +1,10 @@
 #pragma once
 #include "DF2D_API.h"
 #include "Engine/Entity/ComponentHandle.h"
-#include "Engine/SceneSystem/Scene.h"
+#include <functional>
 #include <memory>
+#include <tuple>
+#include <type_traits>
 #include <vector>
 
 
@@ -14,15 +16,18 @@ namespace DeadFrame2D::Core
 
 namespace DeadFrame2D::Engine
 {
+	class Scene;
+
+
 	class DF2D_API SceneManager
 	{
 		friend DeadFrame2D::Core::DeadFrameRuntime;
 
 
 	private:
-		static std::unique_ptr<Scene> currentScene;
+		static std::shared_ptr<Scene> currentScene;
 
-		static std::function<std::unique_ptr<Scene>()> newSceneFactory;
+		static std::function<std::shared_ptr<Scene>()> newSceneFactory;
 
 
 		void UpdateScene(float deltaTime) const;
@@ -35,7 +40,7 @@ namespace DeadFrame2D::Engine
 
 
 	public:
-		SceneManager();
+		SceneManager() = default;
 
 		~SceneManager();
 
@@ -48,20 +53,29 @@ namespace DeadFrame2D::Engine
 
 		template <typename T>
 		static std::vector<ComponentHandle<T>> FindObjectsOfType();
+
+
+		static const Scene* GetActiveScene();
 	};
+}
 
 
+#include "Engine/SceneSystem/Scene.h"
+
+
+namespace DeadFrame2D::Engine
+{
 	template<typename TScene, typename ...Args>
 	inline void SceneManager::LoadScene(Args && ...args)
 	{
 		static_assert(std::is_base_of_v<Scene, TScene>, "TScene must derive from Scene");
 
-		newSceneFactory = [argsTuple = std::make_tuple(std::forward<Args>(args)...)]() mutable 
+		newSceneFactory = [argsTuple = std::make_tuple(std::forward<Args>(args)...)]() mutable
 			{
-				return std::apply([](auto&&... unpackedArgs) 
+				return std::apply([](auto&&... unpackedArgs)
 					{
-						return std::make_unique<TScene>(std::forward<decltype(unpackedArgs)>(unpackedArgs)...);
-					}, 
+						return std::make_shared<TScene>(std::forward<decltype(unpackedArgs)>(unpackedArgs)...);
+					},
 					std::move(argsTuple));
 			};
 	}
@@ -69,12 +83,12 @@ namespace DeadFrame2D::Engine
 	template<typename T>
 	inline ComponentHandle<T> SceneManager::FindObjectOfType()
 	{
-		return currentScene->FindObjectOfType<T>();
+		return currentScene ? currentScene->template FindObjectOfType<T>() : ComponentHandle<T>();
 	}
 
 	template<typename T>
 	inline std::vector<ComponentHandle<T>> SceneManager::FindObjectsOfType()
 	{
-		return currentScene->FindObjectsOfType<T>();
+		return currentScene ? currentScene->template FindObjectsOfType<T>() : std::vector<ComponentHandle<T>>();
 	}
 }

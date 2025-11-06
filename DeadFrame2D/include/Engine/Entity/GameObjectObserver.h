@@ -1,6 +1,6 @@
 #pragma once
 #include "DF2D_API.h"
-#include <memory>
+#include "Engine/Entity/Handles/GameObject/ObjectHandleBase.h"
 #include <vector>
 
 
@@ -12,11 +12,14 @@ namespace DeadFrame2D::Engine
 	template<typename T>
 	class ComponentHandle;
 
+	template<typename T>
+	class ObjectHandle;
+
 
 	class DF2D_API GameObjectObserver
 	{
 	private: 
-		std::vector<std::weak_ptr<GameObject>> allRegisteredGameObjects;
+		std::vector<ObjectHandleBase> allRegisteredGameObjects;
 
 
 	protected:
@@ -25,12 +28,12 @@ namespace DeadFrame2D::Engine
 		virtual ~GameObjectObserver();
 
 
-		void RegisterAllHandlers(std::weak_ptr<GameObject> owner);
+		void RegisterAllHandlers(const ObjectHandleBase& owner);
 
-		void DeregisterAllHandlers(std::weak_ptr<GameObject> owner);
+		void DeregisterAllHandlers(const ObjectHandleBase& owner);
 
 
-		virtual void OnGameObjectActiveStateChangedHandler(GameObject* obj, bool isActive);
+		virtual void OnGameObjectActiveStateChangedHandler(const ObjectHandle<GameObject>& obj, bool isActive);
 
 		virtual void OnNewComponentAddedHandler(const ComponentHandle<GameComponent>& comp);
 

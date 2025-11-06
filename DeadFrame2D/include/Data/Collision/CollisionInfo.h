@@ -1,12 +1,6 @@
 #pragma once
 #include "Core/Math/Vector2.h"
-#include <memory>
-
-
-namespace DeadFrame2D::Engine
-{
-	class GameObject;
-}
+#include "Engine/Entity/Handles/GameObject/ObjectHandle.h"
 
 
 namespace DeadFrame2D::Data
@@ -17,8 +11,8 @@ namespace DeadFrame2D::Data
 
 		DeadFrame2D::Core::Vector2F normal = DeadFrame2D::Core::Vector2F::Zero;
 
-		std::weak_ptr<DeadFrame2D::Engine::GameObject> thisGameObject;
+		DeadFrame2D::Engine::ObjectHandle<DeadFrame2D::Engine::GameObject> thisGameObject;
 
-		std::weak_ptr<DeadFrame2D::Engine::GameObject> otherGameObject;
+		DeadFrame2D::Engine::ObjectHandle<DeadFrame2D::Engine::GameObject> otherGameObject;
 	};
 }

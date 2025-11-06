@@ -36,6 +36,19 @@ namespace DeadFrame2D::Engine
 		ComponentHandleBase(const ComponentHandleBase& other);
 
 
-		bool IsValid() const noexcept;
+		bool IsValid() const;
+
+
+		bool operator==(const ComponentHandleBase& other) const;
+
+		bool operator!=(const ComponentHandleBase& other) const;
+
+		bool operator==(std::nullptr_t) const;
+
+		bool operator!=(std::nullptr_t) const;
+
+		explicit operator bool() const;
+
+		ComponentHandleBase& operator=(std::nullptr_t);
 	};
 }

@@ -28,7 +28,7 @@ namespace DeadFrame2D::Engine
 		DeadFrame2D::Data::LayoutPadding layoutPadding;
 
 
-		virtual void OnGameObjectActiveStateChangedHandler(GameObject* child, bool activeState) override;
+		virtual void OnGameObjectActiveStateChangedHandler(const ObjectHandle<GameObject>& child, bool activeState) override;
 
 
 	public:

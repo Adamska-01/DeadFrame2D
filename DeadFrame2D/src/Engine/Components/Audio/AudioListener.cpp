@@ -4,6 +4,7 @@
 #include "Engine/Components/Audio/AudioListener.h"
 #include "Engine/Components/Transform.h"
 #include "Engine/Entity/GameObject.h"
+#include "Utilities/Debugging/Guards.h"
 
 
 namespace DeadFrame2D::Engine
@@ -12,6 +13,7 @@ namespace DeadFrame2D::Engine
 	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Constants;
 	using namespace DeadFrame2D::Converters;
+	using namespace DeadFrame2D::Utilities;
 
 
 	AudioListener::AudioListener()
@@ -91,7 +93,7 @@ namespace DeadFrame2D::Engine
 
 	void AudioListener::Init()
 	{
-		transform = OwningObject.lock()->GetTransform();
+		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
 
 		isDirty = true;
 	}

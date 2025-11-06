@@ -15,11 +15,12 @@ namespace DeadFrame2D::Engine
 		isMusic(isMusic),
 		loop(loop)
 	{
-		transform->SetWorldPosition(position);
 	}
 
 	void AudioClipBlueprint::ConstructGameObject()
 	{
+		transform->SetWorldPosition(position);
+
 		audioSource = AddComponent<AudioSource>();
 
 		audioSource->LoadAudio(audioSourcePath, isMusic);

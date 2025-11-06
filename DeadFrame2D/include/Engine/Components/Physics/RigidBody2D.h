@@ -41,7 +41,7 @@ namespace DeadFrame2D::Engine
 
 
 	protected:
-		virtual void OnGameObjectActiveStateChangedHandler(GameObject* obj, bool isActive) override;
+		virtual void OnGameObjectActiveStateChangedHandler(const ObjectHandle<GameObject>& obj, bool isActive) override;
 
 		DeadFrame2D::Core::Task SetEnabled(bool isEnabled);
 

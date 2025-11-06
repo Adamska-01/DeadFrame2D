@@ -2,6 +2,7 @@
 #include "Engine/Components/Rendering/Camera.h"
 #include "Engine/Components/Rendering/Camera/CameraFollow.h"
 #include "Engine/Components/Transform.h"
+#include "Engine/EngineEvents/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/SubSystems/Renderer/RenderTargetSizeChangedEvent.h"
 #include "Engine/Entity/GameObject.h"
 #include "Utilities/Helpers/Events/EventHelpers.h"
@@ -15,7 +16,7 @@ namespace DeadFrame2D::Engine
 	using namespace DeadFrame2D::Utilities;
 
 
-	CameraFollow::CameraFollow(ComponentHandle<Camera> camera, std::weak_ptr<GameObject> target)
+	CameraFollow::CameraFollow(ComponentHandle<Camera> camera, ObjectHandle<GameObject> target)
 		: camera(camera),
 		target(target),
 		offset(Vector2F::Zero),
@@ -51,17 +52,16 @@ namespace DeadFrame2D::Engine
 
 	void CameraFollow::Update(float deltaTime)
 	{
-		if (target.expired() || !camera)
+		if (!target || !camera)
 			return;
 
-		auto targetLocked = target.lock();
-		auto cameraGO = camera->GetGameObject().lock();
+		auto cameraGO = camera->GetGameObject();
 
-		if (!targetLocked || !cameraGO)
+		if (!cameraGO)
 			return;
 
 		auto cameraTransform = cameraGO->GetTransform();
-		auto targetTransform = targetLocked->GetTransform();
+		auto targetTransform = target->GetTransform();
 
 		const auto targetPos = targetTransform->GetWorldPosition();
 		const auto zoom = std::max(camera->GetZoom(), 0.01f);
@@ -97,7 +97,7 @@ namespace DeadFrame2D::Engine
 		cameraTransform->SetWorldPosition(newPos);
 	}
 
-	void CameraFollow::SetTarget(std::weak_ptr<GameObject> newTarget)
+	void CameraFollow::SetTarget(ObjectHandle<GameObject> newTarget)
 	{
 		target = newTarget;
 	}

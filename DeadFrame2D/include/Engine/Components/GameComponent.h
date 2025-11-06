@@ -3,6 +3,7 @@
 #include "DF2D_API.h"
 #include "Engine/Entity/ComponentHandleBase.h"
 #include "Engine/Entity/GameObjectObserver.h"
+#include "Engine/Entity/Handles/GameObject/ObjectHandleBase.h"
 #include <memory>
 #include <type_traits>
 
@@ -11,8 +12,8 @@ namespace DeadFrame2D::Engine
 {
 	class GameObject;
 
-	template<typename T>
-	class ComponentHandle;
+	template<typename T> 
+	class ObjectHandle;
 
 
 	class DF2D_API GameComponent : public GameObjectObserver
@@ -22,6 +23,14 @@ namespace DeadFrame2D::Engine
 
 	private:
 		ComponentHandleBase selfHandle;
+		
+		ObjectHandleBase gameObject;
+
+		struct Impl;
+		std::shared_ptr<Impl> pImpl;
+
+
+		void SetGameObject(const ObjectHandle<GameObject>& handle);
 
 
 	protected:
@@ -29,18 +38,16 @@ namespace DeadFrame2D::Engine
 
 		bool isActive;
 
-		std::weak_ptr<GameObject> OwningObject;
-
 
 	public:
-		static inline const DeadFrame2D::Core::TypeInfo StaticTypeInfo{ "GameComponent", nullptr};
+		static inline const DeadFrame2D::Core::TypeInfo StaticTypeInfo{ "GameComponent", nullptr };
 
 
 		GameComponent();
 
 		GameComponent(GameComponent&& other) = default;
 
-		virtual ~GameComponent() override = default;
+		virtual ~GameComponent() override;
 
 
 		virtual const DeadFrame2D::Core::TypeInfo* GetTypeInfo() const = 0;
@@ -60,14 +67,14 @@ namespace DeadFrame2D::Engine
 		virtual void MarkDirty();
 
 
-		std::weak_ptr<GameObject> GetGameObject() const;
-
 		bool IsActive() const;
 
 		void SetActive(bool value);
 
 		bool IsA(const DeadFrame2D::Core::TypeInfo* type) const;
 
+
+		ObjectHandle<GameObject> GetGameObject() const;
 
 		template<typename T>
 		ComponentHandle<T> GetHandleAs() const;

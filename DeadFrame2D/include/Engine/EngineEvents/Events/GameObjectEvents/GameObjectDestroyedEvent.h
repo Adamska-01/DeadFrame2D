@@ -1,18 +1,20 @@
 #pragma once
 #include "DF2D_API.h"
 #include "Engine/EngineEvents/DispatchableEvent.h"
-#include "Engine/Entity/GameObject.h"
-#include <memory>
+#include "Engine/Entity/Handles/GameObject/ObjectHandle.h"
 
 
 namespace DeadFrame2D::Engine
 {
+	class GameObject;
+
+
 	class DF2D_API GameObjectDestroyedEvent : public DispatchableEvent
 	{
 	public:
-		std::weak_ptr<GameObject> gameObjectDestroyed;
+		ObjectHandle<GameObject> gameObjectDestroyed;
 
 
-		GameObjectDestroyedEvent(std::weak_ptr<GameObject> gameObjectDestroyed);
+		GameObjectDestroyedEvent(ObjectHandle<GameObject> gameObjectDestroyed);
 	};
 }

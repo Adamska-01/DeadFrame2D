@@ -1,9 +1,10 @@
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
+#include "Engine/Entity/GameObject.h"
 
 
 namespace DeadFrame2D::Engine
 {
-	GameObjectDestroyedEvent::GameObjectDestroyedEvent(std::weak_ptr<GameObject> gameObjectDestroyed)
+	GameObjectDestroyedEvent::GameObjectDestroyedEvent(ObjectHandle<GameObject> gameObjectDestroyed)
 		: gameObjectDestroyed(gameObjectDestroyed)
 	{
 	}

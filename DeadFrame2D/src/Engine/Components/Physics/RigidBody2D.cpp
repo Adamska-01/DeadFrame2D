@@ -54,7 +54,7 @@ namespace DeadFrame2D::Engine
 		PhysicsEngine2D::DestroyBody(body);
 	}
 
-	void RigidBody2D::OnGameObjectActiveStateChangedHandler(GameObject* obj, bool isActive)
+	void RigidBody2D::OnGameObjectActiveStateChangedHandler(const ObjectHandle<GameObject>& obj, bool isActive)
 	{
 		CoroutineScheduler::StartCoroutine(SetEnabled(isActive));
 	}
@@ -70,7 +70,7 @@ namespace DeadFrame2D::Engine
 
 	void RigidBody2D::Init()
 	{
-		transform = Guard::AgainstNullAssignment(OwningObject.lock()->GetTransform(), NAME_OF(transform));
+		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
 
 		lastTransformPosition = transform->GetWorldPosition();
 		lastTransformRotation = transform->GetWorldRotation();

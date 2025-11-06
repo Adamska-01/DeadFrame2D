@@ -1,7 +1,10 @@
 #include "Engine/Components/Transform.h"
+#include "Engine/EngineEvents/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/ChildGameObjectAddedEvent.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
 #include "Engine/Entity/GameObject.h"
+#include "Engine/SceneSystem/Scene.h"
+#include "Engine/SceneSystem/SceneManager.h"
 #include "Utilities/Helpers/Coroutines/CoroutineHelpers.h"
 
 
@@ -28,25 +31,35 @@ namespace DeadFrame2D::Engine
 	{
 		for (const auto& child : children)
 		{
-			auto childPtr = child.lock();
-
-			if (childPtr == nullptr || childPtr->isDestroyed)
+			if (child == nullptr || child->isDestroyed)
 				continue;
 
-			bool oldState = childPtr->IsActive();
+			bool oldState = child->IsActive();
 
 			// Update child's parent state before re-evaluating
-			childPtr->hasActiveParent = IsActive();
+			child->hasActiveParent = IsActive();
 
-			bool newState = childPtr->IsActive();
+			bool newState = child->IsActive();
 
 			if (oldState != newState)
 			{
-				childPtr->OnActiveStateChanged(childPtr.get(), newState);
+				child->OnActiveStateChanged(child, newState);
 
-				childPtr->PropagateActiveStateToChildren();
+				child->PropagateActiveStateToChildren();
 			}
 		}
+	}
+
+	Scene* GameObject::SafeGetActiveScene()
+	{
+		auto activeScene = SceneManager::GetActiveScene();
+
+		if (!activeScene)
+		{
+			throw std::runtime_error("There is no active scene! Load a scene before instantiating a GameObject!");
+		}
+
+		return const_cast<Scene*>(activeScene);
 	}
 
 	void GameObject::ConstructGameObject()
@@ -87,12 +100,10 @@ namespace DeadFrame2D::Engine
 
 		for (const auto& child : children)
 		{
-			auto childPtr = child.lock();
-
-			if (childPtr == nullptr)
+			if (child == nullptr || !child->IsActive())
 				continue;
 
-			childPtr->Update(deltaTime);
+			child->Update(deltaTime);
 		}
 	}
 
@@ -108,12 +119,10 @@ namespace DeadFrame2D::Engine
 
 		for (const auto& child : children)
 		{
-			auto childPtr = child.lock();
-
-			if (childPtr == nullptr)
+			if (child == nullptr || !child->IsActive())
 				continue;
 
-			childPtr->LateUpdate(deltaTime);
+			child->LateUpdate(deltaTime);
 		}
 	}
 
@@ -129,46 +138,42 @@ namespace DeadFrame2D::Engine
 
 		for (const auto& child : children)
 		{
-			auto childPtr = child.lock();
-		
-			if (childPtr == nullptr || !childPtr->IsActive())
+			if (child == nullptr || !child->IsActive())
 				continue;
 
-			childPtr->Draw();
+			child->Draw();
 		}
 	}
 
-	void GameObject::AddChildGameObject(std::weak_ptr<GameObject> child)
+	void GameObject::AddChildGameObject(ObjectHandle<GameObject> child)
 	{
-		auto childPtr = child.lock();
-		if (!childPtr)
+		if (child == nullptr)
 			return;
 
 		// Step 1: Cache world transform before parenting
-		auto transform = childPtr->GetComponent<Transform>();
+		auto transform = child->GetTransform();
 	
 		auto worldPos = transform->GetWorldPosition();
 		auto worldScale = transform->GetWorldScale();
 		auto worldRot = transform->GetWorldRotation();
 
 		// Step 2: Remove from previous parent
-		auto parentPtr = childPtr->parent.lock();
+		auto parentPtr = child->parent;
 		if (parentPtr != nullptr)
 		{
 			auto& siblings = parentPtr->children;
 
 			siblings.erase(
 				std::remove_if(siblings.begin(), siblings.end(),
-					[&](const std::weak_ptr<GameObject>& weakSibling)
+					[&](const ObjectHandle<GameObject>& sibling)
 					{
-						auto sibling = weakSibling.lock();
-						return sibling && sibling.get() == childPtr.get();
+						return sibling != nullptr && sibling == child;
 					}),
 				siblings.end());
 		}
 
 		// Step 3: Reparent
-		childPtr->parent = thisWeak;
+		child->parent = thisGameObject;
 		children.push_back(child);
 
 		// Step 4: Convert world transform back to local under new parent
@@ -177,29 +182,27 @@ namespace DeadFrame2D::Engine
 		transform->SetWorldRotation(worldRot);
 
 		// Propagate active state
-		childPtr->hasActiveParent = IsActive();
+		child->hasActiveParent = IsActive();
 		PropagateActiveStateToChildren();
 
 		EventDispatcher::SendEvent(std::make_shared<ChildGameObjectAddedEvent>(child));
 	}
 
-	bool GameObject::IsChildOf(std::weak_ptr<GameObject> potentialChild, bool recursive) const
+	bool GameObject::IsChildOf(ObjectHandle<GameObject> potentialChild, bool recursive) const
 	{
-		auto potentialChildPtr = potentialChild.lock();
-		if (potentialChildPtr == nullptr)
+		if (potentialChild == nullptr)
 			return false;
 
-		auto currentParentPtr = parent.lock();
-		if (currentParentPtr == nullptr)
+		if (parent == nullptr)
 			return false;
 
-		if (currentParentPtr == potentialChildPtr)
+		if (parent == potentialChild)
 			return true;
 
 		if (!recursive)
 			return false;
 
-		return currentParentPtr->IsChildOf(potentialChildPtr, true);
+		return parent->IsChildOf(potentialChild, true);
 	}
 
 	void GameObject::Destroy()
@@ -209,31 +212,30 @@ namespace DeadFrame2D::Engine
 
 		isDestroyed = true;
 
-		EventDispatcher::SendEvent(std::make_shared<GameObjectDestroyedEvent>(thisWeak));
+		EventDispatcher::SendEvent(std::make_shared<GameObjectDestroyedEvent>(thisGameObject));
 
-		auto parentPtr = parent.lock();
-		if (parentPtr != nullptr)
+		if (parent != nullptr)
 		{
 			auto it = std::find_if(
-				parentPtr->children.begin(),
-				parentPtr->children.end(),
-				[this](const std::weak_ptr<GameObject>& child)
+				parent->children.begin(),
+				parent->children.end(),
+				[this](const ObjectHandle<GameObject>& child)
 				{
-					return child.lock() == thisWeak.lock();
+					return child == thisGameObject;
 				});
 
-			if (it != parentPtr->children.end())
+			if (it != parent->children.end())
 			{
-				parentPtr->children.erase(it);
+				parent->children.erase(it);
 			}
 		}
 
 		for (auto& child : children)
 		{
-			auto childPtr = child.lock();
+			if (child == nullptr)
+				continue;
 
-			if (childPtr != nullptr)
-				childPtr->Destroy();
+			child->Destroy();
 		}
 	}
 
@@ -247,24 +249,9 @@ namespace DeadFrame2D::Engine
 		Destroy();
 	}
 
-	std::weak_ptr<GameObject> GameObject::GetThisWeak() const
-	{
-		return thisWeak;
-	}
-
-	std::weak_ptr<GameObject> GameObject::GetParent() const
-	{
-		return parent;
-	}
-
 	ComponentHandle<Transform> GameObject::GetTransform() const
 	{
 		return transform;
-	}
-
-	std::vector<std::weak_ptr<GameObject>> GameObject::GetChildren() const
-	{
-		return children;
 	}
 
 	bool GameObject::IsActive() const
@@ -283,18 +270,16 @@ namespace DeadFrame2D::Engine
 		// Only notify if it changed
 		if (oldState != newState)
 		{
-			OnActiveStateChanged(this, newState);
+			OnActiveStateChanged(thisGameObject, newState);
 		}
 
 		for (const auto& child : children) 
 		{
-			auto childPtr = child.lock();
-
-			if (childPtr == nullptr || childPtr->isDestroyed)
+			if (child == nullptr || child->isDestroyed)
 				continue;
 
-			childPtr->hasActiveParent = newState;
-			childPtr->PropagateActiveStateToChildren();
+			child->hasActiveParent = newState;
+			child->PropagateActiveStateToChildren();
 		}
 	}
 }
