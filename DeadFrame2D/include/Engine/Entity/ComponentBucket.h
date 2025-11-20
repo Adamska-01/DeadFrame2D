@@ -136,6 +136,10 @@ namespace DeadFrame2D::Engine
 		entry.instance = std::make_unique<T>(std::forward<Args>(args)...);
 		entry.alive = true;
 
+		auto handle = ComponentHandle<T>(weak_from_this(), index, entry.generation);
+
+		entry.instance.get()->selfHandle = handle;
+
 		// This is necessary due to smart pointer/C++ limitations
 		if (owner != nullptr)
 		{
@@ -149,10 +153,6 @@ namespace DeadFrame2D::Engine
 			entry.instance->Init();
 			entry.instance->Start();
 		}
-
-		auto handle = ComponentHandle<T>(weak_from_this(), index, entry.generation);
-
-		entry.instance.get()->selfHandle = handle;
 
 		return handle;
 	}
