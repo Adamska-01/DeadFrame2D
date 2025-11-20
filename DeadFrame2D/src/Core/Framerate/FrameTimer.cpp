@@ -86,6 +86,11 @@ namespace DeadFrame2D::Core
 		return deltaTime * timeScale;
 	}
 
+	float FrameTimer::DeltaTimeUnscaled()
+	{
+		return deltaTime;
+	}
+
 	int FrameTimer::Framerate()
 	{
 		return currentFPS;

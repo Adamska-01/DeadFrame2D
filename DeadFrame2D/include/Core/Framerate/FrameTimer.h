@@ -49,6 +49,8 @@ namespace DeadFrame2D::Core
 
 		static float DeltaTime();
 
+		static float DeltaTimeUnscaled();
+
 		static int Framerate();
 
 		static void SetTimeScale(float scale);
