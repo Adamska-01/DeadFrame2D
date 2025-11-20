@@ -24,8 +24,8 @@ namespace DeadFrame2D::Engine
 		audioSource = AddComponent<AudioSource>();
 
 		audioSource->LoadAudio(audioSourcePath, isMusic);
-		audioSource->SetVolume(volume);
 		audioSource->Play(loop);
+		audioSource->SetVolume(volume);
 	}
 
 	ComponentHandle<AudioSource> AudioClipBlueprint::GetAudioSource()
