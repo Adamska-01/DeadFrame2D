@@ -42,7 +42,7 @@ namespace DeadFrame2D::Core
 		collisionMasks = DeserializeFromFile<CollisionMasks>(Paths::Files::COLLISION_MASKS);
 
 
-		std::cout << "[Info] SDL_image successfully initialized." << std::endl;
+		std::cout << "[Info] PhysicsEngine2D successfully initialized." << std::endl;
 	}
 
 	PhysicsEngine2D::~PhysicsEngine2D()
