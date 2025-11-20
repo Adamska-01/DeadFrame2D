@@ -1,0 +1,110 @@
+#pragma once
+#include "Engine/Entity/Handles/GameObject/ObjectHandleBase.h"
+#include "Engine/Entity/ComponentHandleBase.h"
+#include "Utilities/Delegates/Listeners/Abstractions/IListener.h"
+#include <functional>
+#include <variant>
+
+
+namespace DeadFrame2D::Utilities
+{
+	/**
+	 * @brief Listener bound to an engine handle (ObjectHandleBase or ComponentHandleBase).
+	 * It automatically validates the handle before invocation and skips expired ones.
+	 */
+	template<typename... Args>
+	struct HandleListener final : IListener<Args...>
+	{
+		std::variant<
+			DeadFrame2D::Engine::ComponentHandleBase,
+			DeadFrame2D::Engine::ObjectHandleBase
+		> handle;
+
+		std::function<void(Args...)> func;
+
+
+		HandleListener(const DeadFrame2D::Engine::ComponentHandleBase& compHandle, std::function<void(Args...)> f);
+
+		HandleListener(const DeadFrame2D::Engine::ObjectHandleBase& objHandle, std::function<void(Args...)> f);
+
+
+		void Invoke(const Args& ...args) override;
+
+		bool IsExpired() const override;
+
+		bool MatchesIdentity(const void* identity, const std::type_info& type) const override;
+	};
+}
+
+
+namespace DeadFrame2D::Utilities
+{
+	template<typename ...Args>
+	inline HandleListener<Args...>::HandleListener(const DeadFrame2D::Engine::ComponentHandleBase& compHandle, std::function<void(Args...)> f)
+		: handle(compHandle), func(std::move(f))
+	{
+	}
+
+	template<typename ...Args>
+	inline HandleListener<Args...>::HandleListener(const DeadFrame2D::Engine::ObjectHandleBase& objHandle, std::function<void(Args...)> f)
+		: handle(objHandle), func(std::move(f)) 
+	{
+	}
+
+
+	template<typename ...Args>
+	inline void HandleListener<Args...>::Invoke(const Args& ...args)
+	{
+		std::visit([&](auto&& h)
+			{
+				if (h == nullptr)
+					return;
+
+				func(args...);
+			}, 
+			handle);
+	}
+
+	template<typename ...Args>
+	inline bool HandleListener<Args...>::IsExpired() const
+	{
+		auto expired = true;
+		
+		std::visit([&](auto&& h)
+			{
+				expired = (h == nullptr);
+			}, 
+			handle);
+
+		return expired;
+	}
+
+	template<typename ...Args>
+	inline bool HandleListener<Args...>::MatchesIdentity(const void* identity, const std::type_info& type) const
+	{
+		using namespace DeadFrame2D::Engine;
+
+
+		if (type == typeid(ObjectHandleBase))
+		{
+			const auto& given = *static_cast<const ObjectHandleBase*>(identity);
+
+			if (std::holds_alternative<ObjectHandleBase>(handle))
+				return std::get<ObjectHandleBase>(handle) == given;
+
+			return false;
+		}
+
+		if (type == typeid(ComponentHandleBase))
+		{
+			const auto& given = *static_cast<const ComponentHandleBase*>(identity);
+
+			if (std::holds_alternative<ComponentHandleBase>(handle))
+				return std::get<ComponentHandleBase>(handle) == given;
+
+			return false;
+		}
+
+		return false;
+	}
+}
