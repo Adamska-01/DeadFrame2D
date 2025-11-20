@@ -243,7 +243,7 @@ namespace DeadFrame2D::Engine
 	{
 		if (delaySeconds > 0.0f)
 		{
-			co_await WaitSeconds(delaySeconds);
+			co_await WaitSecondsUnscaled(delaySeconds);
 		}
 
 		Destroy();
