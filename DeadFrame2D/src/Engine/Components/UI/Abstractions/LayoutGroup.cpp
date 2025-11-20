@@ -16,18 +16,14 @@ namespace DeadFrame2D::Engine
 	LayoutGroup::LayoutGroup(float layoutSpacing, LayoutPadding layoutPadding)
 		: layoutSpacing(layoutSpacing), layoutPadding(layoutPadding)
 	{
-		auto identifier = reinterpret_cast<uintptr_t>(this);
-	
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), EventHelpers::BindFunction(this, &LayoutGroup::GameObjectCreatedHandler), identifier);
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &LayoutGroup::GameObjectDestroyedHandler), identifier);
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), this, &LayoutGroup::GameObjectCreatedHandler);
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), this, &LayoutGroup::GameObjectDestroyedHandler);
 	}
 
 	LayoutGroup::~LayoutGroup()
 	{
-		auto identifier = reinterpret_cast<uintptr_t>(this);
-
-		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), identifier);
-		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), identifier);
+		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), this);
+		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), this);
 	}
 
 	void LayoutGroup::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)

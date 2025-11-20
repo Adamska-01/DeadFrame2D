@@ -86,7 +86,7 @@ namespace DeadFrame2D::Engine
 	{
 		if (!pendingActions.IsEmpty())
 		{
-			pendingActions();
+			pendingActions.Broadcast();
 
 			pendingActions.Clear();
 		}
@@ -133,11 +133,10 @@ namespace DeadFrame2D::Engine
 
 	void RigidBody2D::ChangeBodyType(BodyType2D newBodyType)
 	{
-		pendingActions.RegisterCallback([this, newBodyType]()
+		pendingActions.AddLambda([this, newBodyType]()
 			{
 				body->SetType(Physics::ToB2BodyType(newBodyType));
-			},
-			reinterpret_cast<uintptr_t>(this));
+			});
 	}
 
 	void RigidBody2D::DestroyFixture(b2Fixture* fixtureDef)

@@ -25,13 +25,17 @@ namespace DeadFrame2D::Engine
 		virtual ~ContactEventProvider() override;
 
 
-		virtual void RegisterContactEnterHandler(const std::function<void(const DeadFrame2D::Data::CollisionInfo&)>& handler, std::uintptr_t identifier);
+		void RegisterContactEnterHandler(const ObjectHandleBase& listener, const std::function<void(const DeadFrame2D::Data::CollisionInfo&)>& handler);
+		void RegisterContactEnterHandler(const ComponentHandleBase& listener, const std::function<void(const DeadFrame2D::Data::CollisionInfo&)>& handler);
 
-		virtual void RegisterContactExitHandler(const std::function<void(const DeadFrame2D::Data::CollisionInfo&)>& handler, std::uintptr_t identifier);
+		void RegisterContactExitHandler(const ObjectHandleBase& listener, const std::function<void(const DeadFrame2D::Data::CollisionInfo&)>& handler);
+		void RegisterContactExitHandler(const ComponentHandleBase& listener, const std::function<void(const DeadFrame2D::Data::CollisionInfo&)>& handler);
 
-		virtual void DeregisterContactEnterHandler(std::uintptr_t identifier);
+		void DeregisterContactEnterHandler(const ObjectHandleBase& listener);
+		void DeregisterContactEnterHandler(const ComponentHandleBase& listener);
 
-		virtual void DeregisterContactExitHandler(std::uintptr_t identifier);
+		void DeregisterContactExitHandler(const ObjectHandleBase& listener);
+		void DeregisterContactExitHandler(const ComponentHandleBase& listener);
 
 
 		virtual void InvokeCollisionEnter(const DeadFrame2D::Data::CollisionInfo& info);

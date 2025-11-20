@@ -1,6 +1,6 @@
 #include "Constants/CommonColors.h"
 #include "Core/SubSystems/Systems/TextureManager.h"
-#include "Data/Components/UI/ButtonComponentModel.h"
+#include "Data/Components/UI/Button/ButtonComponentModel.h"
 #include "Engine/Components/Transform.h"
 #include "Engine/Components/UI/Button.h"
 #include "Engine/Entity/GameObject.h"
@@ -22,8 +22,17 @@ namespace DeadFrame2D::Engine
 
 		this->widgetSize = buttonConfiguration.buttonSize;
 
-		AddPressedCallback(buttonConfiguration.onPressedHandler, buttonConfiguration.identifier);
-		AddEnterCallback(buttonConfiguration.onEnterHandler, buttonConfiguration.identifier);
+		if (buttonConfiguration.onPressedHandler)
+		{
+			const auto& handler = *buttonConfiguration.onPressedHandler;
+			AddPressedCallback(handler.handle, handler.callback);
+		}
+
+		if (buttonConfiguration.onEnterHandler)
+		{
+			const auto& handler = *buttonConfiguration.onEnterHandler;
+			AddEnterCallback(handler.handle, handler.callback);
+		}
 	
 		SetIdleButtonImageSource(buttonConfiguration.idleButtonSource);
 		SetHoveredButtonImageSource(buttonConfiguration.hoveredButtonSource);
@@ -140,7 +149,7 @@ namespace DeadFrame2D::Engine
 	{
 		isHovered = true;
 
-		onEnterCallback();
+		onEnterCallback.Broadcast();
 
 		currentButtonImage = buttonHoveredImage;
 	}
@@ -168,7 +177,7 @@ namespace DeadFrame2D::Engine
 
 		if (isHovered)
 		{
-			onPressedCallback();
+			onPressedCallback.Broadcast();
 
 			currentButtonImage = buttonHoveredImage;
 		}
@@ -178,14 +187,14 @@ namespace DeadFrame2D::Engine
 		}
 	}
 
-	void Button::AddPressedCallback(std::function<void()> onPressedHandler, std::uintptr_t identifier)
+	void Button::AddPressedCallback(const ComponentHandleBase& handle, std::function<void()> onPressedHandler)
 	{
-		this->onPressedCallback.RegisterCallback(onPressedHandler, identifier);
+		this->onPressedCallback.AddHandle(handle, onPressedHandler);
 	}
 
-	void Button::AddEnterCallback(std::function<void()> onEnterCallback, std::uintptr_t identifier)
+	void Button::AddEnterCallback(const ComponentHandleBase& handle, std::function<void()> onEnterHandler)
 	{
-		this->onEnterCallback.RegisterCallback(onEnterCallback, identifier);
+		this->onEnterCallback.AddHandle(handle, onEnterHandler);
 	}
 
 	SDL_Rect Button::GetBoundingBox() const

@@ -28,12 +28,12 @@ namespace DeadFrame2D::Engine
 
 		resolutionTarget = Renderer::GetResolutionTarget();
 
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), EventHelpers::BindFunction(this, &Camera::RenderTargetSizeChangedEventHandler), reinterpret_cast<uintptr_t>(this));
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), this, &Camera::RenderTargetSizeChangedEventHandler);
 	}
 
 	Camera::~Camera()
 	{
-		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), reinterpret_cast<uintptr_t>(this));
+		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), this);
 
 		std::erase(cameras, this);
 	}

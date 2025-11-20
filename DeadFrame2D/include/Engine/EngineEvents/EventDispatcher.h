@@ -18,15 +18,50 @@ namespace DeadFrame2D::Engine
 		static std::unordered_map<std::type_index, EventHandler> eventHandlers;
 
 
-		// Prevent instantiation
 		EventDispatcher() = delete;
 
 
 	public:
-		static void RegisterEventHandler(const std::type_index& eventType, const std::function<void(std::shared_ptr<DispatchableEvent>)>& handler, std::uintptr_t identifier);
+		template<typename T>
+		static void RegisterEventHandler(const std::type_index& eventType, T* instance, void(T::* func)(std::shared_ptr<DispatchableEvent>));
 
-		static void DeregisterEventHandler(const std::type_index& eventType, std::uintptr_t identifier);
+		template<typename T>
+		static void DeregisterEventHandler(const std::type_index& eventType, T* instance);
+
 
 		static void SendEvent(std::shared_ptr<DispatchableEvent> event);
 	};
+	
+}
+
+
+namespace DeadFrame2D::Engine
+{
+	template<typename T>
+	inline void EventDispatcher::RegisterEventHandler(const std::type_index& eventType, T* instance, void(T::* func)(std::shared_ptr<DispatchableEvent>))
+	{
+		if (eventHandlers.find(eventType) == eventHandlers.end())
+		{
+			eventHandlers[eventType] = EventHandler();
+		}
+
+		eventHandlers[eventType].AddRaw(instance, func);
+	}
+
+	template<typename T>
+	inline void EventDispatcher::DeregisterEventHandler(const std::type_index& eventType, T* instance)
+	{
+		auto it = eventHandlers.find(eventType);
+
+		if (it == eventHandlers.end())
+		{
+			std::cout << "No handler registered for event type: " << eventType.name() << std::endl;
+			return;
+		}
+
+		it->second.RemoveByListener(instance);
+
+		if (it->second.IsEmpty())
+			eventHandlers.erase(it);
+	}
 }

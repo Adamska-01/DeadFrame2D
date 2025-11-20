@@ -19,33 +19,33 @@ namespace DeadFrame2D::Engine
 		OnNewComponentAdded.Clear();
 	}
 
-	void GameObjectNotifier::RegisterOnActiveStateChangedHandler(std::function<void(ObjectHandle<GameObject>, bool)> handler, uintptr_t identifier)
+	void GameObjectNotifier::RegisterOnActiveStateChangedHandler(const ComponentHandleBase& listener, std::function<void(ObjectHandle<GameObject>, bool)> handler)
 	{
-		OnActiveStateChanged.RegisterCallback(handler, identifier);
+		OnActiveStateChanged.AddHandle(listener, handler);
 	}
 
-	void GameObjectNotifier::RegisterOnNewComponentAddedHandler(std::function<void(const ComponentHandle<GameComponent>&)> handler, uintptr_t identifier)
+	void GameObjectNotifier::RegisterOnNewComponentAddedHandler(const ComponentHandleBase& listener, std::function<void(const ComponentHandle<GameComponent>&)> handler)
 	{
-		OnNewComponentAdded.RegisterCallback(handler, identifier);
+		OnNewComponentAdded.AddHandle(listener, handler);
 	}
 
-	void GameObjectNotifier::RegisterOnComponentRemovedHandler(std::function<void(const ComponentHandle<GameComponent>&)> handler, uintptr_t identifier)
+	void GameObjectNotifier::RegisterOnComponentRemovedHandler(const ComponentHandleBase& listener, std::function<void(const ComponentHandle<GameComponent>&)> handler)
 	{
-		OnComponentRemoved.RegisterCallback(handler, identifier);
+		OnComponentRemoved.AddHandle(listener, handler);
 	}
 
-	void GameObjectNotifier::DeregisterOnActiveStateChangedHandler(uintptr_t identifier)
+	void GameObjectNotifier::DeregisterOnActiveStateChangedHandler(const ComponentHandleBase& listener)
 	{
-		OnActiveStateChanged.DeregisterCallback(identifier);
+		OnActiveStateChanged.RemoveByListener(&listener);
 	}
 
-	void GameObjectNotifier::DeregisterOnNewComponentAddedHandler(uintptr_t identifier)
+	void GameObjectNotifier::DeregisterOnNewComponentAddedHandler(const ComponentHandleBase& listener)
 	{
-		OnNewComponentAdded.DeregisterCallback(identifier);
+		OnNewComponentAdded.RemoveByListener(&listener);
 	}
 
-	void GameObjectNotifier::DeregisterOnComponentRemovedHandler(uintptr_t identifier)
+	void GameObjectNotifier::DeregisterOnComponentRemovedHandler(const ComponentHandleBase& listener)
 	{
-		OnComponentRemoved.DeregisterCallback(identifier);
+		OnComponentRemoved.RemoveByListener(&listener);
 	}
 }

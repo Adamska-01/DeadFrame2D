@@ -43,7 +43,7 @@ namespace DeadFrame2D::Engine
 
 			if (oldState != newState)
 			{
-				child->OnActiveStateChanged(child, newState);
+				child->OnActiveStateChanged.Broadcast(child, newState);
 
 				child->PropagateActiveStateToChildren();
 			}
@@ -270,7 +270,7 @@ namespace DeadFrame2D::Engine
 		// Only notify if it changed
 		if (oldState != newState)
 		{
-			OnActiveStateChanged(thisGameObject, newState);
+			OnActiveStateChanged.Broadcast(thisGameObject, newState);
 		}
 
 		for (const auto& child : children) 

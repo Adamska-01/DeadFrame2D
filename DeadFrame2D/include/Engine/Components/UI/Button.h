@@ -62,9 +62,9 @@ namespace DeadFrame2D::Engine
 		virtual void OnPointerUp() override;
 
 
-		void AddPressedCallback(std::function<void()> onPressedHandler, std::uintptr_t identifier);
+		void AddPressedCallback(const ComponentHandleBase& handle, std::function<void()> onPressedHandler);
 
-		void AddEnterCallback(std::function<void()> onEnterCallback, std::uintptr_t identifier);
+		void AddEnterCallback(const ComponentHandleBase& handle, std::function<void()> onEnterHandler);
 
 		SDL_Rect GetBoundingBox() const;
 

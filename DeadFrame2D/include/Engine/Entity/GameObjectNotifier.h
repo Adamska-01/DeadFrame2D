@@ -9,6 +9,7 @@ namespace DeadFrame2D::Engine
 {
 	class GameObject;
 	class GameComponent;
+	class ComponentHandleBase;
 
 	template<typename T>
 	class ComponentHandle;
@@ -33,17 +34,17 @@ namespace DeadFrame2D::Engine
 
 
 	public:
-		void RegisterOnActiveStateChangedHandler(std::function<void(ObjectHandle<GameObject>, bool)> handler, uintptr_t identifier);
+		void RegisterOnActiveStateChangedHandler(const ComponentHandleBase& listener, std::function<void(ObjectHandle<GameObject>, bool)> handler);
 
-		void RegisterOnNewComponentAddedHandler(std::function<void(const ComponentHandle<GameComponent>&)> handler, uintptr_t identifier);
+		void RegisterOnNewComponentAddedHandler(const ComponentHandleBase& listener, std::function<void(const ComponentHandle<GameComponent>&)> handler);
 
-		void RegisterOnComponentRemovedHandler(std::function<void(const ComponentHandle<GameComponent>&)> handler, uintptr_t identifier);
+		void RegisterOnComponentRemovedHandler(const ComponentHandleBase& listener, std::function<void(const ComponentHandle<GameComponent>&)> handler);
 
 
-		void DeregisterOnActiveStateChangedHandler(uintptr_t identifier);
+		void DeregisterOnActiveStateChangedHandler(const ComponentHandleBase& listener);
 
-		void DeregisterOnNewComponentAddedHandler(uintptr_t identifier);
+		void DeregisterOnNewComponentAddedHandler(const ComponentHandleBase& listener);
 
-		void DeregisterOnComponentRemovedHandler(uintptr_t identifier);
+		void DeregisterOnComponentRemovedHandler(const ComponentHandleBase& listener);
 	};
 }

@@ -18,33 +18,53 @@ namespace DeadFrame2D::Engine
 		onContactExit.Clear();
 	}
 
-	void ContactEventProvider::RegisterContactEnterHandler(const std::function<void(const CollisionInfo&)>& handler, std::uintptr_t identifier)
+	void ContactEventProvider::RegisterContactEnterHandler(const ObjectHandleBase& listener, const std::function<void(const DeadFrame2D::Data::CollisionInfo&)>& handler)
 	{
-		onContactEnter.RegisterCallback(handler, identifier);
+		onContactEnter.AddHandle(listener, handler);
 	}
 
-	void ContactEventProvider::RegisterContactExitHandler(const std::function<void(const CollisionInfo&)>& handler, std::uintptr_t identifier)
+	void ContactEventProvider::RegisterContactEnterHandler(const ComponentHandleBase& listener, const std::function<void(const CollisionInfo&)>& handler)
 	{
-		onContactExit.RegisterCallback(handler, identifier);
+		onContactEnter.AddHandle(listener, handler);
 	}
 
-	void ContactEventProvider::DeregisterContactEnterHandler(std::uintptr_t identifier)
+	void ContactEventProvider::RegisterContactExitHandler(const ObjectHandleBase& listener, const std::function<void(const DeadFrame2D::Data::CollisionInfo&)>& handler)
 	{
-		onContactEnter.DeregisterCallback(identifier);
+		onContactExit.AddHandle(listener, handler);
 	}
 
-	void ContactEventProvider::DeregisterContactExitHandler(std::uintptr_t identifier)
+	void ContactEventProvider::RegisterContactExitHandler(const ComponentHandleBase& listener, const std::function<void(const CollisionInfo&)>& handler)
 	{
-		onContactExit.DeregisterCallback(identifier);
+		onContactExit.AddHandle(listener, handler);
+	}
+
+	void ContactEventProvider::DeregisterContactEnterHandler(const ObjectHandleBase& listener)
+	{
+		onContactEnter.RemoveByListener(&listener);
+	}
+
+	void ContactEventProvider::DeregisterContactEnterHandler(const ComponentHandleBase& listener)
+	{
+		onContactEnter.RemoveByListener(&listener);
+	}
+
+	void ContactEventProvider::DeregisterContactExitHandler(const ObjectHandleBase& listener)
+	{
+		onContactEnter.RemoveByListener(&listener);
+	}
+
+	void ContactEventProvider::DeregisterContactExitHandler(const ComponentHandleBase& listener)
+	{
+		onContactEnter.RemoveByListener(&listener);
 	}
 
 	void ContactEventProvider::InvokeCollisionEnter(const CollisionInfo& info)
 	{
-		onContactEnter(info);
+		onContactEnter.Broadcast(info);
 	}
 
 	void ContactEventProvider::InvokeCollisionExit(const CollisionInfo& info)
 	{
-		onContactExit(info);
+		onContactExit.Broadcast(info);
 	}
 }

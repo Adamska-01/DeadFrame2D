@@ -220,7 +220,7 @@ namespace DeadFrame2D::Engine
 
 		auto newComponent = componentBucket->AddComponent<T>(thisGameObject, isInitialized, std::forward<TArgs>(args)...);
 
-		OnNewComponentAdded(ComponentHandle<GameComponent>::From(newComponent));
+		OnNewComponentAdded.Broadcast(ComponentHandle<GameComponent>::From(newComponent));
 
 		return newComponent;
 	}
