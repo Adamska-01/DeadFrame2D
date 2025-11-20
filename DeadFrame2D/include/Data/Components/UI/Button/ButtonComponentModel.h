@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Math/Vector2.h"
-#include <functional>
+#include "Data/Components/UI/Button/ButtonCallback.h"
+#include <optional>
 #include <string_view>
 
 
@@ -8,18 +9,16 @@ namespace DeadFrame2D::Data
 {
 	struct ButtonComponentModel
 	{
-		std::uintptr_t identifier = 0;
+		std::optional<ButtonCallback> onPressedHandler;
 
-		std::function<void()> onPressedHandler = []() {};
-
-		std::function<void()> onEnterHandler = []() {};
+		std::optional<ButtonCallback> onEnterHandler;
 
 		std::string_view idleButtonSource = "";
-	
+
 		std::string_view hoveredButtonSource = "";
-	
+
 		std::string_view pressedButtonSource = "";
-	
+
 		DeadFrame2D::Core::Vector2F buttonSize = DeadFrame2D::Core::Vector2F(100.f, 50.f);
 	};
 }
