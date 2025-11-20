@@ -31,8 +31,6 @@ namespace DeadFrame2D::Engine
 		lastTransformPosition(Vector2F::Zero),
 		lastTransformRotation(0.0f)
 	{
-		RegisterContactEnterHandler(EventHelpers::BindFunction(this, &AudioSource::OnAudioSourceEnterHandler), reinterpret_cast<uintptr_t>(this));
-		RegisterContactExitHandler(EventHelpers::BindFunction(this, &AudioSource::OnAudioSourceExitHandler), reinterpret_cast<uintptr_t>(this));
 	}
 
 	AudioSource::AudioSource(const std::string& audioSource, bool isMusic, float volume)
@@ -42,31 +40,18 @@ namespace DeadFrame2D::Engine
 		this->volume = std::clamp(volume, 0.0f, 1.0f);
 
 		LoadAudio(audioSource, isMusic);
-
-		RegisterContactEnterHandler(EventHelpers::BindFunction(this, &AudioSource::OnAudioSourceEnterHandler), reinterpret_cast<uintptr_t>(this));
-		RegisterContactExitHandler(EventHelpers::BindFunction(this, &AudioSource::OnAudioSourceExitHandler), reinterpret_cast<uintptr_t>(this));
 	}
 
 	AudioSource::~AudioSource()
 	{
+		DeregisterContactEnterHandler(GetHandle());
+		DeregisterContactExitHandler(GetHandle());
+
 		if (collisionBody == nullptr)
 			return;
 
-		auto fixture = collisionBody->GetFixtureList();
-
-		while (fixture != nullptr)
-		{
-			auto next = fixture->GetNext();
-
-			collisionBody->DestroyFixture(fixture);
-
-			fixture = next;
-		}
-
 		PhysicsEngine2D::DestroyBody(collisionBody);
-
-		DeregisterContactEnterHandler(reinterpret_cast<uintptr_t>(this));
-		DeregisterContactExitHandler(reinterpret_cast<uintptr_t>(this));
+		collisionBody = nullptr;
 	}
 
 	void AudioSource::OnAudioSourceEnterHandler(const CollisionInfo& collisionInfo)
@@ -146,6 +131,9 @@ namespace DeadFrame2D::Engine
 
 	void AudioSource::Init()
 	{
+		RegisterContactEnterHandler(GetHandle(), EventHelpers::BindFunction(this, &AudioSource::OnAudioSourceEnterHandler));
+		RegisterContactExitHandler(GetHandle(), EventHelpers::BindFunction(this, &AudioSource::OnAudioSourceExitHandler));
+
 		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
 
 		isDirty = true;
@@ -239,7 +227,7 @@ namespace DeadFrame2D::Engine
 		else if (sfxClip)
 		{
 			playingChannel = AudioManager::PlaySFX(sfxClip, loop ? -1 : 0);
-			AudioManager::SetSFXVolume(0.0f, playingChannel);
+			AudioManager::SetSFXVolume(volume, playingChannel);
 		}
 	}
 
