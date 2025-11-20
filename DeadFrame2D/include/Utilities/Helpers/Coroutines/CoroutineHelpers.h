@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Coroutines/WaitForSeconds.h"
+#include "Core/Coroutines/WaitForSecondsUnscaled.h"
 #include "Core/Coroutines/WaitOneFrame.h"
 
 
@@ -27,6 +28,21 @@ namespace DeadFrame2D::Utilities
 		}
 
 		auto* awaitable = new DeadFrame2D::Core::WaitForSeconds(seconds);
+
+		DeadFrame2D::Core::Task::GetCurrentTask()->AddAwaitable(awaitable);
+
+		return *awaitable;
+	}
+
+
+	inline DeadFrame2D::Core::WaitForSecondsUnscaled& WaitSecondsUnscaled(float seconds)
+	{
+		if (!DeadFrame2D::Core::Task::GetCurrentTask())
+		{
+			throw std::runtime_error("WaitSeconds must be called inside a running Task.");
+		}
+
+		auto* awaitable = new DeadFrame2D::Core::WaitForSecondsUnscaled(seconds);
 
 		DeadFrame2D::Core::Task::GetCurrentTask()->AddAwaitable(awaitable);
 
