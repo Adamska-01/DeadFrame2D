@@ -26,41 +26,39 @@ namespace DeadFrame2D::Engine
 		allRegisteredGameObjects.clear();
 	}
 
-	void GameObjectObserver::RegisterAllHandlers(const ObjectHandleBase& owner)
+	void GameObjectObserver::RegisterAllHandlers(const ObjectHandleBase& targetObj)
 	{
-		if (owner == nullptr)
+		if (targetObj == nullptr)
 			return;
 
 		auto it = std::remove_if(
 			allRegisteredGameObjects.begin(),
 			allRegisteredGameObjects.end(),
-			[owner](const auto& other)
+			[targetObj](const auto& other)
 			{
-				return other == owner;
+				return other == targetObj;
 			});
 
 		if (it == allRegisteredGameObjects.end())
 		{
-			allRegisteredGameObjects.push_back(owner);
+			allRegisteredGameObjects.push_back(targetObj);
 		}
 	
-		auto identifier = reinterpret_cast<uintptr_t>(this);
-		auto typedOwner = ObjectHandle<GameObject>::From(owner);
+		auto typedHandle = ObjectHandle<GameObject>::From(targetObj);
 
-		typedOwner->RegisterOnActiveStateChangedHandler(EventHelpers::BindFunction(this, &GameObjectObserver::OnGameObjectActiveStateChangedHandler), identifier);
-		typedOwner->RegisterOnNewComponentAddedHandler(EventHelpers::BindFunction(this, &GameObjectObserver::OnNewComponentAddedHandler), identifier);
+		typedHandle->RegisterOnActiveStateChangedHandler(GetHandle(), EventHelpers::BindFunction(this, &GameObjectObserver::OnGameObjectActiveStateChangedHandler));
+		typedHandle->RegisterOnNewComponentAddedHandler(GetHandle(), EventHelpers::BindFunction(this, &GameObjectObserver::OnNewComponentAddedHandler));
 	}
 
-	void GameObjectObserver::DeregisterAllHandlers(const ObjectHandleBase& owner)
+	void GameObjectObserver::DeregisterAllHandlers(const ObjectHandleBase& targetObj)
 	{
-		if (owner == nullptr)
+		if (targetObj == nullptr)
 			return;
 
-		auto identifier = reinterpret_cast<uintptr_t>(this);
-		auto typedOwner = ObjectHandle<GameObject>::From(owner);
+		auto typedHandle = ObjectHandle<GameObject>::From(targetObj);
 
-		typedOwner->DeregisterOnActiveStateChangedHandler(identifier);
-		typedOwner->DeregisterOnNewComponentAddedHandler(identifier);
+		typedHandle->DeregisterOnActiveStateChangedHandler(GetHandle());
+		typedHandle->DeregisterOnNewComponentAddedHandler(GetHandle());
 	}
 
 	void GameObjectObserver::OnGameObjectActiveStateChangedHandler(const ObjectHandle<GameObject>& obj, bool isActive)

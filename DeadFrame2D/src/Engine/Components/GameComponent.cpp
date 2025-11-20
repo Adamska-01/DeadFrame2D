@@ -5,26 +5,13 @@
 
 namespace DeadFrame2D::Engine
 {
-	struct GameComponent::Impl
-	{
-		ObjectHandle<GameObject> cachedHandle;
-	};
-
-
 	GameComponent::GameComponent()
-		: pImpl(std::make_shared<Impl>())
 	{
 		isActive = true;
 		isDirty = false;
 	}
 
 	GameComponent::~GameComponent() = default;
-
-	void GameComponent::SetGameObject(const ObjectHandle<GameObject>& handle)
-	{
-		gameObject = handle;
-		pImpl->cachedHandle = handle;
-	}
 
 	void GameComponent::MarkDirty()
 	{
@@ -79,10 +66,5 @@ namespace DeadFrame2D::Engine
 		}
 		
 		return false;
-	}
-
-	ObjectHandle<GameObject> GameComponent::GetGameObject() const
-	{
-		return pImpl->cachedHandle;
 	}
 }

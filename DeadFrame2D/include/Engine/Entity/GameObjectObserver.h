@@ -1,5 +1,6 @@
 #pragma once
 #include "DF2D_API.h"
+#include "Engine/Components/ComponentContext.h"
 #include "Engine/Entity/Handles/GameObject/ObjectHandleBase.h"
 #include <vector>
 
@@ -16,8 +17,11 @@ namespace DeadFrame2D::Engine
 	class ObjectHandle;
 
 
-	class DF2D_API GameObjectObserver
+	class DF2D_API GameObjectObserver : public ComponentContext
 	{
+		friend class ComponentBucket;
+
+
 	private: 
 		std::vector<ObjectHandleBase> allRegisteredGameObjects;
 
@@ -28,9 +32,9 @@ namespace DeadFrame2D::Engine
 		virtual ~GameObjectObserver();
 
 
-		void RegisterAllHandlers(const ObjectHandleBase& owner);
+		void RegisterAllHandlers(const ObjectHandleBase& targetObj);
 
-		void DeregisterAllHandlers(const ObjectHandleBase& owner);
+		void DeregisterAllHandlers(const ObjectHandleBase& targetObj);
 
 
 		virtual void OnGameObjectActiveStateChangedHandler(const ObjectHandle<GameObject>& obj, bool isActive);
