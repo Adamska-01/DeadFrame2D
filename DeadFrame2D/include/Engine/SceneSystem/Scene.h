@@ -63,6 +63,8 @@ namespace DeadFrame2D::Engine
 
 		void CleanupDestroyedObjects();
 
+		void Exit();
+
 
 	public:
 		Scene();
@@ -91,9 +93,6 @@ namespace DeadFrame2D::Engine
 		virtual void Draw();
 
 
-		void Exit();
-
-
 		template <typename T>
 		ComponentHandle<T> FindObjectOfType();
 
@@ -104,7 +103,6 @@ namespace DeadFrame2D::Engine
 
 
 #include "Engine/Entity/GameObject.h"
-#include "Engine/EngineEvents/EventDispatcher.h"
 #include "Engine/Components/GameComponent.h"
 
 

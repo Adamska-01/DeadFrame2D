@@ -53,8 +53,6 @@ namespace DeadFrame2D::Engine
 
 		if (currentScene != nullptr)
 		{
-			currentScene->Exit();
-
 			currentScene.reset();
 		}
 

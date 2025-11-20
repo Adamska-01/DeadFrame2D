@@ -1,38 +1,31 @@
 #include "Engine/Components/UI/Canvas.h"
+#include "Engine/EngineEvents/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/ChildGameObjectAddedEvent.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectCreatedEvent.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
 #include "Engine/SceneSystem/Scene.h"
-#include "Utilities/Helpers/Events/EventHelpers.h"
 #include <algorithm>
 #include <cassert>
 
 
 namespace DeadFrame2D::Engine
 {
-	using namespace DeadFrame2D::Utilities;
-
-
 	Scene::Scene()
 	{
 		isRunning = false;
 
 		Exit();
 
-		auto identifier = reinterpret_cast<uintptr_t>(this);
-
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), EventHelpers::BindFunction(this, &Scene::GameObjectDestroyedHandler), identifier);
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(ChildGameObjectAddedEvent)), EventHelpers::BindFunction(this, &Scene::ChildGameObjectAddedHandler), identifier);
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), this, &Scene::GameObjectDestroyedHandler);
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(ChildGameObjectAddedEvent)), this, &Scene::ChildGameObjectAddedHandler);
 	}
 
 	Scene::~Scene()
 	{
 		Exit();
 
-		auto identifier = reinterpret_cast<uintptr_t>(this);
-
-		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), identifier);
-		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(ChildGameObjectAddedEvent)), identifier);
+		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), this);
+		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(ChildGameObjectAddedEvent)), this);
 	}
 
 	uint32_t Scene::FindFreeSlot()
@@ -135,6 +128,23 @@ namespace DeadFrame2D::Engine
 			entry.object.reset();
 		}
 
+		objectsPendingDestroy.clear();
+	}
+
+	void Scene::Exit()
+	{
+		for (auto& entry : entries)
+		{
+			entry.alive = false;
+			entry.generation++;
+			entry.object.reset();
+		}
+
+		entries.clear();
+		gameObjects.clear();
+		gameObjectParents.clear();
+		gameObjectsToInitialize.clear();
+		objectsPendingCreation.clear();
 		objectsPendingDestroy.clear();
 	}
 
@@ -279,21 +289,5 @@ namespace DeadFrame2D::Engine
 
 			obj->Draw();
 		}
-	}
-
-	void Scene::Exit()
-	{
-		for (auto& entry : entries)
-		{
-			entry.alive = false;
-			entry.generation++;
-			entry.object.reset();
-		}
-		entries.clear();
-		gameObjects.clear();
-		gameObjectParents.clear();
-		gameObjectsToInitialize.clear();
-		objectsPendingCreation.clear();
-		objectsPendingDestroy.clear();
 	}
 }
