@@ -29,16 +29,8 @@ namespace DeadFrame2D::Engine
 		if (collisionBody == nullptr)
 			return;
 
-		auto fixture = collisionBody->GetFixtureList();
-
-		while (fixture != nullptr)
-		{
-			auto next = fixture->GetNext();
-
-			collisionBody->DestroyFixture(fixture);
-
-			fixture = next;
-		}
+		PhysicsEngine2D::DestroyBody(collisionBody);
+		collisionBody = nullptr;
 	}
 
 	void AudioListener::RebuildFixture()
