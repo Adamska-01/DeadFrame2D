@@ -1,6 +1,6 @@
 #pragma once
-#include "InputDeviceType.h"
-#include <SDL_stdinc.h>
+#include "Models/Input/InputDeviceType.h"
+#include <stdint.h>
 
 
 namespace Shared::Models
@@ -9,7 +9,7 @@ namespace Shared::Models
 	{
 		InputDeviceType inputDeviceType;
 
-		Uint8 inputKey;
+		uint8_t inputKey;
 	};
 
 
