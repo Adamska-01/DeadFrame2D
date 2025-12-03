@@ -1,7 +1,6 @@
 #pragma once
 #include "Core/SubSystems/Systems/Input/Devices/DeviceManager.h"
 #include "Core/SubSystems/Systems/Input/User/InputUser.h"
-#include <functional>
 #include <map>
 #include <memory>
 
