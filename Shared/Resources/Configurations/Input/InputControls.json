@@ -4,108 +4,139 @@
 // Controller -> SDL_GameControllerButton (https://wiki.libsdl.org/SDL2/SDL_GameControllerButton)
 
 {
-	"Left": [
+	"actionMaps": [
 		{
-			"inputDeviceType": "KEYBOARD",
-			"inputKey": 4
-		},
-		{
-			"inputDeviceType": "CONTROLLER",
-			"inputKey": 13
-		}
-	],
-	"Right": [
-		{
-			"inputDeviceType": "KEYBOARD",
-			"inputKey": 7
-		},
-		{
-			"inputDeviceType": "CONTROLLER",
-			"inputKey": 14
-		}
-	],
-	"Up": [
-		{
-			"inputDeviceType": "KEYBOARD",
-			"inputKey": 26
-		},
-		{
-			"inputDeviceType": "CONTROLLER",
-			"inputKey": 11
-		}
-	],
-	"Down": [
-		{
-			"inputDeviceType": "KEYBOARD",
-			"inputKey": 22
-		},
-		{
-			"inputDeviceType": "CONTROLLER",
-			"inputKey": 12
-		}
-	],
-	"Left2": [
-		{
-			"inputDeviceType": "KEYBOARD",
-			"inputKey": 80
-		}
-	],
-	"Right2": [
-		{
-			"inputDeviceType": "KEYBOARD",
-			"inputKey": 79
-		}
-	],
-	"Up2": [
-		{
-			"inputDeviceType": "KEYBOARD",
-			"inputKey": 82
-		}
-	],
-	"Down2": [
-		{
-			"inputDeviceType": "KEYBOARD",
-			"inputKey": 81
-		}
-	],
-	"Jump": [
-		{
-			"inputDeviceType": "KEYBOARD",
-			"inputKey": 44
-		},
-		{
-			"inputDeviceType": "CONTROLLER",
-			"inputKey": 0
-		}
-	],
-	"Pause": [
-		{
-			"inputDeviceType": "KEYBOARD",
-			"inputKey": 41 // Escape
-		}, 
-		{
-			"inputDeviceType": "CONTROLLER",
-			"inputKey": 6
-		}
-	],
-	"Confirm": [
-		{
-			"inputDeviceType": "KEYBOARD",
-			"inputKey": 40 // Escape
-		},
-		{
-			"inputDeviceType": "CONTROLLER",
-			"inputKey": 0
-		}
-	],
-	"Back": [
-		{
-			"inputDeviceType": "KEYBOARD",
-			"inputKey": 41 // Escape
-		},
-		{
-			"inputDeviceType": "CONTROLLER",
-			"inputKey": 1
+			"name": "Default",
+			"actions": [
+				{
+					"name": "Move",
+					"type": "Value",
+					"valueType": "Vector2"
+				},
+				{
+					"name": "Jump",
+					"type": "Button",
+					"valueType": "Bool"
+				},
+				{
+					"name": "Pause",
+					"type": "Button",
+					"valueType": "Bool"
+				},
+				{
+					"name": "Confirm",
+					"type": "Button",
+					"valueType": "Bool"
+				},
+				{
+					"name": "Back",
+					"type": "Button",
+					"valueType": "Bool"
+				}
+			],
+			"bindings": [
+				/* MOVE */
+				{
+					"name": "Move_Keyboard",
+					"action": "Move",
+					"device": "Keyboard",
+					"type": "Composite2D",
+					"composite2D": {
+						"up": 26,
+						"down": 22,
+						"left": 4,
+						"right": 7 
+					}
+				},
+				{
+					"name": "Move_Controller",
+					"action": "Move",
+					"device": "Controller",
+					"type": "Composite2D",
+					"composite2D": {
+						"up": 11,
+						"down": 12,
+						"left": 13,
+						"right": 14
+					}
+				},
+				{
+					"name": "Move_Keyboard2",
+					"action": "Move",
+					"device": "Keyboard",
+					"type": "Composite2D",
+					"composite2D": {
+						"up": 82,
+						"down": 81,
+						"left": 80,
+						"right": 79
+					}
+				},
+
+				/* JUMP */
+				{
+					"name": "Jump_Keyboard",
+					"action": "Jump",
+					"device": "Keyboard",
+					"type": "Simple",
+					"control": 44
+				},
+				{
+					"name": "Jump_Controller",
+					"action": "Jump",
+					"device": "Controller",
+					"type": "Simple",
+					"control": 0
+				},
+
+				/* PAUSE */
+				{
+					"name": "Pause_Keyboard",
+					"action": "Pause",
+					"device": "Keyboard",
+					"type": "Simple",
+					"control": 41
+				},
+				{
+					"name": "Pause_Controller",
+					"action": "Pause",
+					"device": "Controller",
+					"type": "Simple",
+					"control": 6
+				},
+
+				/* CONFIRM */
+				{
+					"name": "Confirm_Keyboard",
+					"action": "Confirm",
+					"device": "Keyboard",
+					"type": "Simple",
+					"control": 40
+				},
+				{
+					"name": "Confirm_Controller",
+					"action": "Confirm",
+					"device": "Controller",
+					"type": "Simple",
+					"control": 0
+				},
+
+				/* BACK */
+				{
+					"name": "Back_Keyboard",
+					"action": "Back",
+					"device": "Keyboard",
+					"type": "Simple",
+					"control": 41
+				},
+				{
+					"name": "Back_Controller",
+					"action": "Back",
+					"device": "Controller",
+					"type": "Simple",
+					"control": 1
+				}
+			]
 		}
 	]
 }
