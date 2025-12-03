@@ -23,12 +23,15 @@ namespace Shared::Models
 
 		static SystemConfig LoadFromFiles()
 		{
+			using namespace Shared::Constants::Paths;
+
+
 			return SystemConfig
 			{
-				.window = Shared::Tools::DeserializeFromFile<WindowConfig>(Shared::Constants::Paths::Files::WINDOW_CONFIGURATION),
-				.rendering = Shared::Tools::DeserializeFromFile<RendererConfig>(Shared::Constants::Paths::Files::RENDER_CONFIGURATION),
-				.audio = Shared::Tools::DeserializeFromFile<AudioConfig>(Shared::Constants::Paths::Files::AUDIO_CONFIGURATION),
-				.physics = Shared::Tools::DeserializeFromFile<PhysicsConfig>(Shared::Constants::Paths::Files::PHYSICS_CONFIGURATION)
+				.window = Shared::Tools::DeserializeFromFile<WindowConfig>(Files::WINDOW_CONFIGURATION),
+				.rendering = Shared::Tools::DeserializeFromFile<RendererConfig>(Files::RENDER_CONFIGURATION),
+				.audio = Shared::Tools::DeserializeFromFile<AudioConfig>(Files::AUDIO_CONFIGURATION),
+				.physics = Shared::Tools::DeserializeFromFile<PhysicsConfig>(Files::PHYSICS_CONFIGURATION)
 			};
 		}
 	};
