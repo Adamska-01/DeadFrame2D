@@ -1,22 +1,28 @@
 #pragma once
 #include "Core/CoreEvents/Abstractions/IEventProcessor.h"
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
-#include "Core/SubSystems/Systems/Input/Devices/Abstractions/InputDevice.h"
-#include "Data/Input/PlayerInputSlot.h"
+#include "Core/SubSystems/Systems/Input/Actions/RuntimeActionMap.h"
 #include "DF2D_API.h"
 #include "Engine/EngineEvents/DispatchableEvent.h"
 #include <memory>
-#include <vector>
 
 
 namespace DeadFrame2D::Core
 {
+	class InputActionResolver;
+	class InputUserManager;
+	class DeviceManager;
+
+
 	class DF2D_API Input : public IEventProcessor, public ISubSystem
 	{
 		friend class SubSystemManager;
 
 
 	private:
+		static Input* instance;
+
+
 		Input();
 
 		virtual ~Input() override;
@@ -29,19 +35,21 @@ namespace DeadFrame2D::Core
 		Input& operator=(Input&&) = delete;
 
 
-		static std::unique_ptr<InputDevice> keyboardDevice;
+		std::shared_ptr<DeviceManager> deviceManager;
 
-		static std::unique_ptr<InputDevice> mouseDevice;
+		std::shared_ptr<InputUserManager> userManager;
 
-		static std::vector<std::unique_ptr<InputDevice>> controllerDevices;
-
-
-		void DisconnectControllerHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
+		std::shared_ptr<InputActionResolver> inputActionResolver;
 
 
-		virtual void Update(float deltaTime) override;
+		void DeviceAddedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
+
+		void DeviceRemovedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
+
 
 		virtual void BeginFrame() override;
+
+		virtual void Update(float deltaTime) override;
 
 		virtual void EndUpdate() override;
 
@@ -52,11 +60,17 @@ namespace DeadFrame2D::Core
 		std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
 
 
-		static bool IsButtonPressed(DeadFrame2D::Data::PlayerInputSlot playerSlot, const char* actionName);
+		static std::shared_ptr<DeviceManager> Devices();
 
-		static bool IsButtonHeld(DeadFrame2D::Data::PlayerInputSlot playerSlot, const char* actionName);
+		static std::shared_ptr<InputUserManager> Users();
 
-		// TODO: Implement input axis
-		static float GetAxisValue(DeadFrame2D::Data::PlayerInputSlot playerSlot, const char* actionName);
+		static bool EnableActionMap(const std::string& actionMapName);
+
+		static bool DisableActionMap(const std::string& actionMapName);
+
+		static bool SwitchToActionMap(const std::string& actionMapName);
+
+
+		static std::optional<RuntimeInputAction> TestActionQuery(const std::string& actionMapName, const std::string& actionName);
 	};
 }

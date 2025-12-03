@@ -1,19 +1,16 @@
-#include "Core/SubSystems/Systems/Input/Devices/ControllerInputDevice.h"
-#include "Core/SubSystems/Systems/Input/Devices/KeyboardInputDevice.h"
-#include "Core/SubSystems/Systems/Input/Devices/MouseInputDevice.h"
+#include "Core/SubSystems/Systems/Input/Actions/inputActionResolver.h"
+#include "Core/SubSystems/Systems/Input/Devices/DeviceManager.h"
 #include "Core/SubSystems/Systems/Input/Input.h"
-#include "Core/SubSystems/Systems/Input/InputControls.h"
+#include "Core/SubSystems/Systems/Input/User/InputUserManager.h"
 #include "Engine/EngineEvents/EventDispatcher.h"
-#include "Engine/EngineEvents/Events/SubSystems/Input/ControllerDisconnectedEvent.h"
-#include "Utilities/Helpers/Events/EventHelpers.h"
-#include <Constants/ResourcePaths.h>
+#include "Engine/EngineEvents/Events/SubSystems/Input/DeviceAddedEvent.h"
+#include "Engine/EngineEvents/Events/SubSystems/Input/DeviceRemovedEvent.h"
 #include <iostream>
-#include <unordered_set>
+#include <cassert>
 
 
 namespace DeadFrame2D::Core
 {
-	using namespace Shared::Constants;
 	using namespace Shared::Models;
 
 	using namespace DeadFrame2D::Engine;
@@ -21,101 +18,77 @@ namespace DeadFrame2D::Core
 	using namespace DeadFrame2D::Utilities;
 
 
-	std::unique_ptr<InputDevice> Input::keyboardDevice;
-
-	std::unique_ptr<InputDevice> Input::mouseDevice;
-
-	std::vector<std::unique_ptr<InputDevice>> Input::controllerDevices = {};
+	Input* Input::instance = nullptr;
 
 
 	Input::Input()
 	{
-		if (SDL_WasInit(SDL_INIT_GAMECONTROLLER) != 0)
-		{
-			std::cout << "[Info] SDL_GAMECONTROLLER subsystem already initialized." << std::endl;
+		assert(instance == nullptr && "Input System was already initialized!");
 
-			return;
-		}
+		instance = this;
 
-		if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) < 0)
-		{
-			std::cerr << "[Error] Failed to initialize SDL_GAMECONTROLLER subsystem: " << SDL_GetError() << std::endl;
-			
-			return;
-		}
-
-		std::cout << "[Info] SDL_GAMECONTROLLER subsystem successfully initialized." << std::endl;
+		deviceManager = std::make_shared<DeviceManager>();
+		userManager = std::make_shared<InputUserManager>(deviceManager);
+		inputActionResolver = std::make_shared<InputActionResolver>();
 	
-		// Disable correlation between RawInput and XInput for Xbox controllers. This prevents 
-		// SDL from detecting the same physical Xbox controller twice, once through RawInput 
-		// and once through XInput, which can lead to duplicate devices being detected.
-		SDL_SetHint(SDL_HINT_JOYSTICK_RAWINPUT_CORRELATE_XINPUT, "0");
-
-		InputControls::Deserialize(Paths::Files::INPUT_CONTROLS);
-
-		// Initialize default devices
-		keyboardDevice = std::make_unique<KeyboardInputDevice>();
-		mouseDevice = std::make_unique<MouseInputDevice>();
-
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(ControllerDisconnectedEvent)), this, &Input::DisconnectControllerHandler);
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(DeviceAddedEvent)), this, &Input::DeviceAddedEventHandler);
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(DeviceRemovedEvent)), this, &Input::DeviceRemovedEventHandler);
 	}
 
 	Input::~Input()
 	{
-		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(ControllerDisconnectedEvent)), this);
+		instance = nullptr;
 
-		controllerDevices.clear();
+		deviceManager.reset();
+		userManager.reset();
+		inputActionResolver.reset();
 
-		if (SDL_WasInit(SDL_INIT_GAMECONTROLLER) != 0) 
-		{
-			SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
-	
-			std::cout << "[Info] SDL_GAMECONTROLLER subsystem successfully shut down." << std::endl;
-		}
-		else 
-		{
-			std::cout << "[Info] SDL_GAMECONTROLLER subsystem was not initialized, no need to shut down." << std::endl;
-		}
+		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(DeviceAddedEvent)), this);
+		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(DeviceRemovedEvent)), this);
 	}
 
-	void Input::DisconnectControllerHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
+	void Input::DeviceAddedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent)
 	{
-		auto controllerDisconnectedEvent = DispatchableEvent::SafeCast<ControllerDisconnectedEvent>(dispatchableEvent);
+		auto deviceAddedEvent = DispatchableEvent::SafeCast<DeviceAddedEvent>(dispatchableEvent);
 
-		if (controllerDisconnectedEvent == nullptr || controllerDisconnectedEvent->controllerDevice == nullptr)
+		if (deviceAddedEvent == nullptr || deviceAddedEvent->GetDeviceAdded() == nullptr)
 			return;
 
-		auto target = controllerDisconnectedEvent->controllerDevice;
+		auto deviceAdded = deviceAddedEvent->GetDeviceAdded();
 
-		auto it = std::remove_if(
-			controllerDevices.begin(),
-			controllerDevices.end(),
-			[target](const std::unique_ptr<InputDevice>& device)
-			{
-				return device.get() == target;
-			});
+		std::cout << "[Input] Device added: " << deviceAdded->Name() << " (ID: " << deviceAdded->ID() << ")" << std::endl;
+	};
 
-		if (it == controllerDevices.end())
+	void Input::DeviceRemovedEventHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
+	{
+		auto deviceRemovedEvent = DispatchableEvent::SafeCast<DeviceRemovedEvent>(dispatchableEvent);
+
+		if (deviceRemovedEvent == nullptr || deviceRemovedEvent->GetDeviceRemoved() == nullptr)
 			return;
 
-		controllerDevices.erase(it, controllerDevices.end());
-	}
+		auto deviceRemoved = deviceRemovedEvent->GetDeviceRemoved();
 
+		for (const auto& user : userManager->GetAllUsers())
+		{
+			user->UnpairDevice(deviceRemoved->ID());
+		}
 
-	void Input::Update(float deltaTime)
-	{
-
+		std::cout << "[Input] Device removed: " << deviceRemoved->Name() << " (ID: " << deviceRemoved->ID() << ")" << std::endl;
 	}
 
 	void Input::BeginFrame()
 	{
-		for (const auto& device : controllerDevices)
-		{
-			device->BeginInputFrame();
-		}
+		deviceManager->BeginFrame();
 
-		keyboardDevice->BeginInputFrame();
-		mouseDevice->BeginInputFrame();
+		for (auto& d : deviceManager->GetAllDevices())
+		{
+			d->BeginFrame();
+		}
+	}
+
+	void Input::Update(float deltaTime)
+	{
+		inputActionResolver->ProcessAndSend(deviceManager->GetAllDevices());
 	}
 
 	void Input::EndUpdate()
@@ -125,149 +98,45 @@ namespace DeadFrame2D::Core
 
 	void Input::EndDraw()
 	{
-
+		// Could evaluate actions per-user and dispatch action events here.
+		// For now, leave action polling to game's code via Users()->GetUser(...) EvaluateAction(...)
 	}
+
 
 	std::optional<int> Input::ProcessEvents(const SDL_Event& sdlEvent)
 	{
-		switch (sdlEvent.type)
-		{
-		case SDL_EventType::SDL_CONTROLLERBUTTONDOWN:
-		case SDL_EventType::SDL_CONTROLLERBUTTONUP:
-		case SDL_EventType::SDL_CONTROLLERAXISMOTION:
-		case SDL_EventType::SDL_CONTROLLERDEVICEREMOVED:
-			for (const auto& device : controllerDevices)
-			{
-				device->ProcessEvent(sdlEvent);
-			}
-			break;
-
-		case SDL_EventType::SDL_KEYDOWN:
-		case SDL_EventType::SDL_KEYUP:
-			keyboardDevice->ProcessEvent(sdlEvent);
-			break;
-
-		case SDL_EventType::SDL_MOUSEBUTTONDOWN:
-		case SDL_EventType::SDL_MOUSEBUTTONUP:
-		case SDL_EventType::SDL_MOUSEMOTION:
-			mouseDevice->ProcessEvent(sdlEvent);
-			break;
+		deviceManager->HandleEvent(sdlEvent);
 		
-		case SDL_EventType::SDL_CONTROLLERDEVICEADDED:
-			// THIS LOGIC IS TEMPORARY
-			auto newController = new ControllerInputDevice((int)sdlEvent.cdevice.which);
-
-			auto playerAssigned = PlayerInputSlot::NONE;
-			std::unordered_set<PlayerInputSlot> assignedSlots;
-
-			for (const auto& controller : controllerDevices)
-			{
-				assignedSlots.insert(controller->GetAssignedPlayer());
-			}
-
-			// Find first unassigned slot
-			for (int i = (int)PlayerInputSlot::PLAYER_1; i <= (int)PlayerInputSlot::PLAYER_4; i++)
-			{
-				auto currentSlot = static_cast<PlayerInputSlot>(i);
-			
-				if (assignedSlots.contains(currentSlot))
-					continue;
-
-				playerAssigned = currentSlot;
-
-				break;
-			}
-
-			newController->AssignedPlayer(playerAssigned);
-
-			controllerDevices.push_back(std::unique_ptr<ControllerInputDevice>(std::move(newController)));
-			break;
-		}
-
 		return std::nullopt;
 	}
 
-	bool Input::IsButtonPressed(PlayerInputSlot playerSlot, const char* actionName)
+	std::shared_ptr<DeviceManager> Input::Devices()
 	{
-		auto controlAction = InputControls::GetAction(actionName);
-
-		if (controlAction == std::nullopt)
-			return false;
-
-		for (const auto& action : controlAction.value())
-		{
-			switch (action.inputDeviceType)
-			{
-			case InputDeviceType::KEYBOARD:
-				if (playerSlot == PlayerInputSlot::PLAYER_1 && keyboardDevice->IsKeyPressed(action.inputKey))
-					return true;
-				break;
-
-			case InputDeviceType::MOUSE:
-				if (playerSlot == PlayerInputSlot::PLAYER_1 && mouseDevice->IsKeyPressed(action.inputKey))
-					return true;
-				break;
-
-			case InputDeviceType::CONTROLLER:
-				auto controller = std::find_if(
-					controllerDevices.begin(),
-					controllerDevices.end(),
-					[playerSlot, &action](const auto& controller)
-					{
-						return controller->GetAssignedPlayer() == playerSlot && controller->IsKeyPressed(action.inputKey);
-					});
-
-				if (controller != controllerDevices.end())
-					return true;
-				break;
-			}
-		}
-
-		return false;
+		return instance->deviceManager;
 	}
 
-	bool Input::IsButtonHeld(PlayerInputSlot playerSlot, const char* actionName)
+	std::shared_ptr<InputUserManager> Input::Users()
 	{
-		auto controlAction = InputControls::GetAction(actionName);
-
-		if (controlAction == std::nullopt)
-			return false;
-
-		for (const auto& action : controlAction.value())
-		{
-			switch (action.inputDeviceType)
-			{
-			case InputDeviceType::KEYBOARD:
-				if (playerSlot == PlayerInputSlot::PLAYER_1 && keyboardDevice->IsKeyHeld(action.inputKey))
-					return true;
-				break;
-
-			case InputDeviceType::MOUSE:
-				if (playerSlot == PlayerInputSlot::PLAYER_1 && mouseDevice->IsKeyHeld(action.inputKey))
-					return true;
-				break;
-
-			case InputDeviceType::CONTROLLER:
-				auto controller = std::find_if(
-					controllerDevices.begin(),
-					controllerDevices.end(),
-					[playerSlot, &action](const auto& controller)
-					{
-						return controller->GetAssignedPlayer() == playerSlot && controller->IsKeyHeld(action.inputKey);
-					});
-
-				if (controller != controllerDevices.end())
-					return true;
-				break;
-			}
-		}
-
-		return false;
+		return instance->userManager;
 	}
 
-	// TODO: Implement input axis
-	float Input::GetAxisValue(PlayerInputSlot playerSlot, const char* actionName)
+	bool Input::EnableActionMap(const std::string& actionMapName)
 	{
-		return 0.0f;
+		return instance->inputActionResolver->EnableActionMap(actionMapName);
+	}
+
+	bool Input::DisableActionMap(const std::string& actionMapName)
+	{
+		return instance->inputActionResolver->DisableActionMap(actionMapName);
+	}
+
+	bool Input::SwitchToActionMap(const std::string& actionMapName)
+	{
+		return instance->inputActionResolver->SwitchToActionMap(actionMapName);
+	}
+
+	std::optional<RuntimeInputAction> Input::TestActionQuery(const std::string& actionMapName, const std::string& actionName)
+	{
+		return instance->inputActionResolver->GetActionStateTEST(actionName);
 	}
 }
