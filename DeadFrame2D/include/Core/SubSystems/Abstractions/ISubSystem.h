@@ -13,9 +13,9 @@ namespace DeadFrame2D::Core
 		virtual ~ISubSystem() = default;
 
 
-		virtual void Update(float deltaTime) = 0;
-
 		virtual void BeginFrame() = 0;
+
+		virtual void Update(float deltaTime) = 0;
 
 		virtual void EndUpdate() = 0;
 
