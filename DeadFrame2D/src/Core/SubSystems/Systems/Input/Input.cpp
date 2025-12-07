@@ -37,11 +37,11 @@ namespace DeadFrame2D::Core
 
 	Input::~Input()
 	{
-		instance = nullptr;
-
 		inputActionResolver.reset();
 		deviceManager.reset();
 		userManager.reset();
+
+		instance = nullptr;
 
 		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(DeviceAddedEvent)), this);
 		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(DeviceRemovedEvent)), this);
