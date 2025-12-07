@@ -23,7 +23,7 @@ namespace DeadFrame2D::Core
 		~InputUserManager() = default;
 
 
-		std::shared_ptr<InputUser> CreateUser(const std::string& name = "");
+		std::shared_ptr<InputUser> CreateUser(const std::string& name = "Player");
 
 		void DestroyUser(UserID id);
 
