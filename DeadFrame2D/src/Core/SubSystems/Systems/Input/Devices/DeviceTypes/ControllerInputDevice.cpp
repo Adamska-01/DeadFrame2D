@@ -1,4 +1,5 @@
 #include "Constants/Input/InputConstants.h"
+#include "Core/SubSystems/Systems/Input/Actions/inputActionResolver.h"
 #include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/ControllerInputDevice.h"
 #include "Data/Input/DefaultDeviceNames.h"
 
@@ -47,7 +48,7 @@ namespace DeadFrame2D::Core
 	}
 
 
-	void ControllerInputDevice::BeginFrame()
+	void ControllerInputDevice::BeginFrame(InputActionResolver* inputActionResolver)
 	{
 		for (auto button : activeButtons)
 		{
@@ -57,12 +58,16 @@ namespace DeadFrame2D::Core
 			{
 				state.pressed = false;
 				state.held = true;
+
+				inputActionResolver->ProcessBinding(*this, button);
 			}
 			
 			if (state.released)
 			{
 				state.released = false;
 				state.value = 0.0f;
+
+				inputActionResolver->ProcessBinding(*this, button);
 			}
 		}
 
@@ -74,12 +79,16 @@ namespace DeadFrame2D::Core
 			{
 				state.pressed = false;
 				state.held = true;
+
+				inputActionResolver->ProcessBinding(*this, axis);
 			}
 
 			if (state.released)
 			{
 				state.released = false;
 				state.value = 0.0f;
+
+				inputActionResolver->ProcessBinding(*this, axis);
 			}
 		}
 
@@ -87,14 +96,14 @@ namespace DeadFrame2D::Core
 		activeAxes.clear();
 	}
 
-	int ControllerInputDevice::ProcessEvent(const SDL_Event& event)
+	void ControllerInputDevice::ProcessEvent(const SDL_Event& event, InputActionResolver* inputActionResolver)
 	{
 		switch (event.type)
 		{
 			case SDL_EventType::SDL_CONTROLLERBUTTONDOWN:
 			{
 				if (event.cbutton.which != instanceID)
-					return -1;
+					return;
 
 				auto controlID = event.cbutton.button;
 				auto& state = buttonStates[controlID];
@@ -107,6 +116,8 @@ namespace DeadFrame2D::Core
 					state.released = false;
 
 					activeButtons.insert(controlID);
+
+					inputActionResolver->ProcessBinding(*this, controlID);
 				}
 
 				break;
@@ -115,7 +126,7 @@ namespace DeadFrame2D::Core
 			case SDL_EventType::SDL_CONTROLLERBUTTONUP:
 			{
 				if (event.cbutton.which != instanceID)
-					return -1;
+					return;
 
 				auto controlID = event.cbutton.button;
 				auto& state = buttonStates[controlID];
@@ -127,13 +138,15 @@ namespace DeadFrame2D::Core
 
 				activeButtons.insert(controlID);
 
+				inputActionResolver->ProcessBinding(*this, controlID);
+
 				break;
 			}
 
 			case SDL_EventType::SDL_CONTROLLERAXISMOTION:
 			{
 				if (event.caxis.which != instanceID)
-					return -1;
+					return;
 
 				auto controlID = event.caxis.axis;
 
@@ -155,14 +168,14 @@ namespace DeadFrame2D::Core
 
 				activeAxes.insert(controlID);
 
+				inputActionResolver->ProcessBinding(*this, controlID);
+
 				break;
 			}
 
 			default:
 				break;
 		}
-
-		return -1;
 	}
 
 	InputControlState ControllerInputDevice::GetKeyState(int controlID) const

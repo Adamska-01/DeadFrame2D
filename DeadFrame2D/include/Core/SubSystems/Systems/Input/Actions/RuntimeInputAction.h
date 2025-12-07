@@ -23,8 +23,11 @@ namespace DeadFrame2D::Core
 
 		std::variant<bool, float, Vector2F> previousValue;
 
-		ActionPhase phase;
+		std::variant<bool, float, Vector2F> pendingValue;
 
+		bool isValuePending;
+
+		ActionPhase phase;
 
 		std::vector<Shared::Models::Binding> bindings;
 
@@ -36,11 +39,8 @@ namespace DeadFrame2D::Core
 		RuntimeInputAction(const std::string& name, Shared::Models::ValueType valueType, std::vector<Shared::Models::Binding> bindings);
 
 
-
 		template<typename T>
 		T ReadValue();
-
-		const std::vector<Shared::Models::Binding>& GetBindings() const;
 
 		bool IsWaiting() const;
 

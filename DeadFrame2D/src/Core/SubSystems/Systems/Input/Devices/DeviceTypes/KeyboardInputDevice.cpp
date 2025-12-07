@@ -1,3 +1,4 @@
+#include "Core/SubSystems/Systems/Input/Actions/inputActionResolver.h"
 #include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/KeyboardInputDevice.h"
 #include "Data/Input/DefaultDeviceIDs.h"
 #include "Data/Input/DefaultDeviceNames.h"
@@ -25,30 +26,34 @@ namespace DeadFrame2D::Core
 		return DefaultDeviceIDs::KEYBOARD;
 	}
 
-	void KeyboardInputDevice::BeginFrame()
+	void KeyboardInputDevice::BeginFrame(InputActionResolver* inputActionResolver)
 	{
-		for (auto& keyCode : activeKeys)
+		for (auto& controlID : activeControlIDs)
 		{
-			auto& state = states[keyCode];
+			auto& state = states[controlID];
 
 			// pressed is true only the first frame, then becomes held
 			if (state.pressed)
 			{
 				state.pressed = false;
 				state.held = true;
+
+				inputActionResolver->ProcessBinding(*this, controlID);
 			}
 
 			// released is true only the frame the key was released
 			if (state.released)
 			{
 				state.released = false;
+			
+				inputActionResolver->ProcessBinding(*this, controlID);
 			}
 		}
 
-		activeKeys.clear();
+		activeControlIDs.clear();
 	}
 
-	int KeyboardInputDevice::ProcessEvent(const SDL_Event& event)
+	void KeyboardInputDevice::ProcessEvent(const SDL_Event& event, InputActionResolver* inputActionResolver)
 	{
 		auto eventType = event.type;
 
@@ -56,8 +61,8 @@ namespace DeadFrame2D::Core
 		{
 			case SDL_EventType::SDL_KEYDOWN:
 			{
-				auto keyCode = event.key.keysym.scancode;
-				auto& state = states[keyCode];
+				auto controlID = event.key.keysym.scancode;
+				auto& state = states[controlID];
 
 				// Only set pressed if it wasn't already held
 				if (!state.held && !state.pressed)
@@ -67,22 +72,26 @@ namespace DeadFrame2D::Core
 					state.held = false;
 					state.released = false;
 
-					activeKeys.insert(keyCode);
+					activeControlIDs.insert(controlID);
+
+					inputActionResolver->ProcessBinding(*this, controlID);
 				}
 
 				break;
 			}
 			case SDL_EventType::SDL_KEYUP:
 			{
-				auto keyCode = event.key.keysym.scancode;
-				auto& state = states[keyCode];
+				auto controlID = event.key.keysym.scancode;
+				auto& state = states[controlID];
 
 				state.value = 0.0f;
 				state.pressed = false;
 				state.held = false;
 				state.released = true;
 
-				activeKeys.insert(keyCode);
+				activeControlIDs.insert(controlID);
+				
+				inputActionResolver->ProcessBinding(*this, controlID);
 
 				break;
 			}
@@ -90,8 +99,6 @@ namespace DeadFrame2D::Core
 			default:
 				break;
 		}
-
-		return -1;
 	}
 
 	InputControlState KeyboardInputDevice::GetKeyState(int controlID) const

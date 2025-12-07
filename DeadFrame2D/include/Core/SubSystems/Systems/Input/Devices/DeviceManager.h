@@ -9,6 +9,9 @@
 
 namespace DeadFrame2D::Core
 {
+	class InputActionResolver;
+
+
 	/**
 	 * @brief Responsible for opening/closing SDL controllers and keeping devices
 	 * keyed by instance id. Also holds keyboard and mouse singletons.
@@ -16,9 +19,10 @@ namespace DeadFrame2D::Core
 	class DeviceManager
 	{
 	private:
-		std::unordered_map<std::shared_ptr<InputDevice>, std::vector<int>> activeKeys;
+		std::shared_ptr<InputActionResolver> inputActionResolver;
 
-		std::unordered_map<DeviceID, std::shared_ptr<InputDevice>> devices;
+
+		std::unordered_map<DeviceID, std::shared_ptr<InputDevice>> otherDevices;
 
 		std::shared_ptr<KeyboardInputDevice> keyboard;
 
@@ -31,7 +35,7 @@ namespace DeadFrame2D::Core
 
 
 	public:
-		DeviceManager();
+		DeviceManager(std::shared_ptr<InputActionResolver> inputActionResolver);
 
 		~DeviceManager();
 
@@ -48,7 +52,5 @@ namespace DeadFrame2D::Core
 		std::shared_ptr<KeyboardInputDevice> Keyboard();
 
 		std::shared_ptr<MouseInputDevice> Mouse();
-
-		const std::unordered_map<std::shared_ptr<InputDevice>, std::vector<int>>& GetActiveKeys();
 	};
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include "Core/CoreEvents/Abstractions/IEventProcessor.h"
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
-#include "Core/SubSystems/Systems/Input/Actions/RuntimeActionMap.h"
+#include "Core/SubSystems/Systems/Input/Actions/RuntimeInputAction.h"
 #include "DF2D_API.h"
 #include "Engine/EngineEvents/DispatchableEvent.h"
 #include <memory>
@@ -35,11 +35,11 @@ namespace DeadFrame2D::Core
 		Input& operator=(Input&&) = delete;
 
 
+		std::shared_ptr<InputActionResolver> inputActionResolver;
+
 		std::shared_ptr<DeviceManager> deviceManager;
 
 		std::shared_ptr<InputUserManager> userManager;
-
-		std::shared_ptr<InputActionResolver> inputActionResolver;
 
 
 		void DeviceAddedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);

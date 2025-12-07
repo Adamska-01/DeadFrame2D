@@ -22,7 +22,7 @@ namespace DeadFrame2D::Core
 
 		std::array<DeadFrame2D::Data::InputControlState, DeadFrame2D::Constants::InputConstants::MAX_MOUSE_BUTTONS> buttonStates;
 
-		std::unordered_set<uint8_t> activeButtons;
+		std::unordered_set<uint8_t> activeControlIDs;
 
 		
 	public:
@@ -36,9 +36,9 @@ namespace DeadFrame2D::Core
 		DeviceID ID() const override;
 
 
-		void BeginFrame() override;
+		void BeginFrame(InputActionResolver* inputActionResolver) override;
 
-		int ProcessEvent(const SDL_Event& event) override;
+		void ProcessEvent(const SDL_Event& event, InputActionResolver* inputActionResolver) override;
 
 		DeadFrame2D::Data::InputControlState GetKeyState(int controlID) const override;
 

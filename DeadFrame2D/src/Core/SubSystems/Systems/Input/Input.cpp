@@ -27,9 +27,9 @@ namespace DeadFrame2D::Core
 
 		instance = this;
 
-		deviceManager = std::make_shared<DeviceManager>();
-		userManager = std::make_shared<InputUserManager>(deviceManager);
 		inputActionResolver = std::make_shared<InputActionResolver>();
+		deviceManager = std::make_shared<DeviceManager>(inputActionResolver);
+		userManager = std::make_shared<InputUserManager>(deviceManager);
 	
 		EventDispatcher::RegisterEventHandler(std::type_index(typeid(DeviceAddedEvent)), this, &Input::DeviceAddedEventHandler);
 		EventDispatcher::RegisterEventHandler(std::type_index(typeid(DeviceRemovedEvent)), this, &Input::DeviceRemovedEventHandler);
@@ -39,9 +39,9 @@ namespace DeadFrame2D::Core
 	{
 		instance = nullptr;
 
+		inputActionResolver.reset();
 		deviceManager.reset();
 		userManager.reset();
-		inputActionResolver.reset();
 
 		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(DeviceAddedEvent)), this);
 		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(DeviceRemovedEvent)), this);
@@ -78,28 +78,22 @@ namespace DeadFrame2D::Core
 
 	void Input::BeginFrame()
 	{
+		// The call order here matters!
+		inputActionResolver->BeginFrame();
 		deviceManager->BeginFrame();
-
-		for (auto& d : deviceManager->GetAllDevices())
-		{
-			d->BeginFrame();
-		}
 	}
 
 	void Input::Update(float deltaTime)
 	{
-		inputActionResolver->ProcessAndSend(deviceManager->GetAllDevices());
+		inputActionResolver->FinalizeActions();
 	}
 
 	void Input::EndUpdate()
 	{
-
 	}
 
 	void Input::EndDraw()
 	{
-		// Could evaluate actions per-user and dispatch action events here.
-		// For now, leave action polling to game's code via Users()->GetUser(...) EvaluateAction(...)
 	}
 
 

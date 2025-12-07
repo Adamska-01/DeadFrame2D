@@ -9,19 +9,23 @@ namespace DeadFrame2D::Core
 	RuntimeInputAction::RuntimeInputAction(const std::string& name, ValueType valueType, std::vector<Shared::Models::Binding> bindings)
 		: name(name),
 		bindings(bindings),
+		isValuePending(false),
 		phase(ActionPhase::WAITING)
 	{
 		switch (valueType)
 		{
 			case ValueType::BOOL:
-				value = previousValue = false;
+				value = previousValue = pendingValue = false;
 				break;
+
 			case ValueType::FLOAT:
-				value = previousValue = 0.0f;
+				value = previousValue = pendingValue = 0.0f;
 				break;
+
 			case ValueType::VECTOR2:
-				value = previousValue = Vector2F::Zero;
+				value = previousValue = pendingValue = Vector2F::Zero;
 				break;
+
 			default:
 				break;
 		}
@@ -31,25 +35,27 @@ namespace DeadFrame2D::Core
 	{
 		previousValue = value;
 
+		auto isHeld = phase == ActionPhase::PERFORMED;
+
 		if (std::holds_alternative<bool>(value))
 		{
-			value = false;
+			value = isHeld ? value : false;
+			pendingValue = false;
 		}
 		else if (std::holds_alternative<float>(value))
 		{
-			value = 0.0f;
+			value = isHeld ? value : 0.0f;
+			pendingValue = 0.0f;
 		}
 		else if (std::holds_alternative<Vector2F>(value))
 		{
-			value = Vector2F::Zero;
+			value = isHeld ? value : Vector2F::Zero;
+			pendingValue = Vector2F::Zero;
 		}
 
-		phase = ActionPhase::WAITING;
-	}
+		phase = isHeld ? phase : ActionPhase::WAITING;
 
-	const std::vector<Binding>& RuntimeInputAction::GetBindings() const
-	{
-		return bindings;
+		isValuePending = false;
 	}
 
 	bool RuntimeInputAction::IsWaiting() const

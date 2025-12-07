@@ -1,9 +1,13 @@
 #pragma once
+#include "Core/SubSystems/Systems/Input/Actions/ActionBindingLink.h"
 #include "Core/SubSystems/Systems/Input/Actions/ActionPhase.h"
 #include "DF2D_API.h"
+#include "Utilities/Hashing/TupleHash.h"
 #include <memory>
 #include <optional>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 
@@ -23,7 +27,14 @@ namespace DeadFrame2D::Core
 	class DF2D_API InputActionResolver
 	{
 	private:
-		std::vector<std::shared_ptr<RuntimeActionMap>> activeActionMaps;
+		std::vector<std::shared_ptr<RuntimeActionMap>> runtimeActionMaps;
+
+		std::unordered_map<
+			std::tuple<std::string, Shared::Models::InputDeviceType, int>, 
+			std::vector<ActionBindingLink>, 
+			DeadFrame2D::Utilities::TupleHash> fastLookupActionMaps;
+
+		std::unordered_set<RuntimeInputAction*> activeActions;
 
 
 		ActionPhase ResolvePhase(bool started, bool held, bool cancelled);
@@ -41,7 +52,11 @@ namespace DeadFrame2D::Core
 		~InputActionResolver() = default;
 
 
-		void ProcessAndSend(const std::vector<std::shared_ptr<InputDevice>>& allDevices);
+		void BeginFrame();
+
+		void ProcessBinding(const InputDevice& device, int controlID);
+
+		void FinalizeActions();
 
 
 		bool EnableActionMap(const std::string& name);

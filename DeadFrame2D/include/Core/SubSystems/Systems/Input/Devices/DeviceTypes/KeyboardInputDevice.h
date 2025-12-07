@@ -15,7 +15,7 @@ namespace DeadFrame2D::Core
 	private:
 		std::array<DeadFrame2D::Data::InputControlState, SDL_Scancode::SDL_NUM_SCANCODES> states;
 
-		std::unordered_set<SDL_Scancode> activeKeys;
+		std::unordered_set<SDL_Scancode> activeControlIDs;
 
 
 	public:
@@ -29,9 +29,9 @@ namespace DeadFrame2D::Core
 		DeviceID ID() const override;
 
 
-		void BeginFrame() override;
+		void BeginFrame(InputActionResolver* inputActionResolver) override;
 
-		int ProcessEvent(const SDL_Event& event) override;
+		void ProcessEvent(const SDL_Event& event, InputActionResolver* inputActionResolver) override;
 
 		DeadFrame2D::Data::InputControlState GetKeyState(int controlID) const override;
 	};

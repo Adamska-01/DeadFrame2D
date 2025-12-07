@@ -5,7 +5,6 @@
 #include <unordered_set>
 
 
-
 namespace DeadFrame2D::Core
 {
 	class DF2D_API ControllerInputDevice : public InputDevice
@@ -38,9 +37,9 @@ namespace DeadFrame2D::Core
 		DeviceID ID() const override;
 
 
-		void BeginFrame() override;
+		void BeginFrame(InputActionResolver* inputActionResolver) override;
 
-		int ProcessEvent(const SDL_Event& event) override;
+		void ProcessEvent(const SDL_Event& event, InputActionResolver* inputActionResolver) override;
 
 		DeadFrame2D::Data::InputControlState GetKeyState(int controlId) const override;
 	};

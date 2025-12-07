@@ -1,3 +1,4 @@
+#include "Core/SubSystems/Systems/Input/Actions/inputActionResolver.h"
 #include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/MouseInputDevice.h"
 #include "Data/Input/DefaultDeviceIDs.h"
 #include "Data/Input/DefaultDeviceNames.h"
@@ -25,27 +26,31 @@ namespace DeadFrame2D::Core
 		return DefaultDeviceIDs::MOUSE;
 	}
 
-	void MouseInputDevice::BeginFrame()
+	void MouseInputDevice::BeginFrame(InputActionResolver* inputActionResolver)
 	{
-		for (auto& keyCode : activeButtons)
+		for (auto& controlID : activeControlIDs)
 		{
-			auto& state = buttonStates[keyCode];
+			auto& state = buttonStates[controlID];
 
 			// pressed is true only the first frame, then becomes held
 			if (state.pressed)
 			{
 				state.pressed = false;
 				state.held = true;
+
+				inputActionResolver->ProcessBinding(*this, controlID);
 			}
 
 			// released is true only the frame the key was released
 			if (state.released)
 			{
 				state.released = false;
+
+				inputActionResolver->ProcessBinding(*this, controlID);
 			}
 		}
 
-		activeButtons.clear();
+		activeControlIDs.clear();
 
 
 		mouseDelta.x = 0.0f;
@@ -57,14 +62,14 @@ namespace DeadFrame2D::Core
 		wasMotionThisFrame = false;
 	}
 
-	int MouseInputDevice::ProcessEvent(const SDL_Event& event)
+	void MouseInputDevice::ProcessEvent(const SDL_Event& event, InputActionResolver* inputActionResolver)
 	{
 		switch (event.type)
 		{
 			case SDL_EventType::SDL_MOUSEBUTTONDOWN:
 			{
-				auto buttonCode = event.button.button;
-				auto& state = buttonStates[buttonCode];
+				auto controlID = event.button.button;
+				auto& state = buttonStates[controlID];
 
 				// Only set pressed if it wasn't already held
 				if (!state.held && !state.pressed)
@@ -74,7 +79,9 @@ namespace DeadFrame2D::Core
 					state.held = false;
 					state.released = false;
 
-					activeButtons.insert(buttonCode);
+					activeControlIDs.insert(controlID);
+
+					inputActionResolver->ProcessBinding(*this, controlID);
 				}
 
 				break;
@@ -82,16 +89,18 @@ namespace DeadFrame2D::Core
 
 			case SDL_EventType::SDL_MOUSEBUTTONUP:
 			{
-				auto buttonCode = event.button.button;
-				auto& state = buttonStates[buttonCode];
+				auto controlID = event.button.button;
+				auto& state = buttonStates[controlID];
 
 				state.value = 0.0f;
 				state.pressed = false;
 				state.held = false;
 				state.released = true;
 
-				activeButtons.insert(buttonCode);
+				activeControlIDs.insert(controlID);
 
+				inputActionResolver->ProcessBinding(*this, controlID);
+				
 				break;
 			}
 
@@ -109,8 +118,6 @@ namespace DeadFrame2D::Core
 
 				break;
 		}
-
-		return -1;
 	}
 
 	InputControlState MouseInputDevice::GetKeyState(int controlId) const
