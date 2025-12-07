@@ -61,17 +61,17 @@ namespace DeadFrame2D::Core
 		std::cout << "[Info] Window successfully destroyed." << std::endl;
 	}
 
-	void Window::Update(float deltaTime)
-	{
-
-	}
-
 	void Window::BeginFrame()
 	{
 
 	}
 
-	void Window::EndUpdate()
+	void Window::PreUpdate(float deltaTime)
+	{
+
+	}
+
+	void Window::EndUpdate(float deltaTime)
 	{
 
 	}

@@ -36,11 +36,11 @@ namespace DeadFrame2D::Core
 		static std::unordered_map<std::pair<std::string, int>, std::shared_ptr<TTF_Font>, DeadFrame2D::Utilities::PairHash> fontCache;
 
 
-		virtual void Update(float deltaTime) override;
-
 		virtual void BeginFrame() override;
 
-		virtual void EndUpdate() override;
+		virtual void PreUpdate(float deltaTime) override;
+
+		virtual void EndUpdate(float deltaTime) override;
 
 		virtual void EndDraw() override;
 

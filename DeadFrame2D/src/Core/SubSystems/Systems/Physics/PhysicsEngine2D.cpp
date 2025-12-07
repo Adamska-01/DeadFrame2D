@@ -54,19 +54,19 @@ namespace DeadFrame2D::Core
 		std::cout << "[Info] PhysicsEngine2D subsystem successfully quit." << std::endl;
 	}
 
-	void PhysicsEngine2D::Update(float deltaTime)
-	{
-
-	}
-
 	void PhysicsEngine2D::BeginFrame()
 	{
 
 	}
 
-	void PhysicsEngine2D::EndUpdate()
+	void PhysicsEngine2D::PreUpdate(float deltaTime)
 	{
-		world->Step(FrameTimer::DeltaTime(), physicsConfig.velocityIterations, physicsConfig.positionIterations);
+
+	}
+
+	void PhysicsEngine2D::EndUpdate(float deltaTime)
+	{
+		world->Step(deltaTime, physicsConfig.velocityIterations, physicsConfig.positionIterations);
 	}
 
 	void PhysicsEngine2D::EndDraw()

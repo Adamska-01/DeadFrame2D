@@ -49,14 +49,6 @@ namespace DeadFrame2D::Core
 		subSystems[7] = new CoroutineScheduler();
 	}
 
-	void SubSystemManager::Update(float deltaTime)
-	{
-		for (const auto& subSystem : subSystems)
-		{
-			subSystem->Update(deltaTime);
-		}
-	}
-
 	void SubSystemManager::BeginFrame()
 	{
 		for (const auto& subSystem : subSystems)
@@ -65,11 +57,19 @@ namespace DeadFrame2D::Core
 		}
 	}
 
-	void SubSystemManager::EndUpdate()
+	void SubSystemManager::PreUpdate(float deltaTime)
 	{
 		for (const auto& subSystem : subSystems)
 		{
-			subSystem->EndUpdate();
+			subSystem->PreUpdate(deltaTime);
+		}
+	}
+
+	void SubSystemManager::EndUpdate(float deltaTime)
+	{
+		for (const auto& subSystem : subSystems)
+		{
+			subSystem->EndUpdate(deltaTime);
 		}
 	}
 

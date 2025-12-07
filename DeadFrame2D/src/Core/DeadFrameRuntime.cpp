@@ -113,11 +113,11 @@ namespace DeadFrame2D::Core
 			if (const auto ecode = eventManager.ProcessEvents())
 				return *ecode;
 
-			engineSubSystems->Update(deltaTime);
+			engineSubSystems->PreUpdate(deltaTime);
 
 			sceneManager->UpdateScene(deltaTime);
 
-			engineSubSystems->EndUpdate();
+			engineSubSystems->EndUpdate(deltaTime);
 
 			sceneManager->LateUpdateScene(deltaTime);
 

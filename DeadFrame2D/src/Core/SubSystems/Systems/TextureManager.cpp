@@ -39,17 +39,17 @@ namespace DeadFrame2D::Core
 		std::cout << "[Info] SDL_image subsystem successfully quit." << std::endl;
 	}
 
-	void TextureManager::Update(float deltaTime)
-	{
-
-	}
-
 	void TextureManager::BeginFrame()
 	{
 
 	}
 
-	void TextureManager::EndUpdate()
+	void TextureManager::PreUpdate(float deltaTime)
+	{
+
+	}
+
+	void TextureManager::EndUpdate(float deltaTime)
 	{
 
 	}

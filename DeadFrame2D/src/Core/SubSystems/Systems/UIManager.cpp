@@ -34,17 +34,17 @@ namespace DeadFrame2D::Core
 		std::cout << "[Info] SDL_TTF subsystem successfully quit." << std::endl;
 	}
 
-	void UIManager::Update(float deltaTime)
-	{
-
-	}
-
 	void UIManager::BeginFrame()
 	{
 
 	}
 
-	void UIManager::EndUpdate()
+	void UIManager::PreUpdate(float deltaTime)
+	{
+
+	}
+
+	void UIManager::EndUpdate(float deltaTime)
 	{
 
 	}

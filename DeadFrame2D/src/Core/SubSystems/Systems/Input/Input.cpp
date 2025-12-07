@@ -5,8 +5,8 @@
 #include "Engine/EngineEvents/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/SubSystems/Input/DeviceAddedEvent.h"
 #include "Engine/EngineEvents/Events/SubSystems/Input/DeviceRemovedEvent.h"
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
 
 namespace DeadFrame2D::Core
@@ -83,12 +83,12 @@ namespace DeadFrame2D::Core
 		deviceManager->BeginFrame();
 	}
 
-	void Input::Update(float deltaTime)
+	void Input::PreUpdate(float deltaTime)
 	{
 		inputActionResolver->FinalizeActions();
 	}
 
-	void Input::EndUpdate()
+	void Input::EndUpdate(float deltaTime)
 	{
 	}
 

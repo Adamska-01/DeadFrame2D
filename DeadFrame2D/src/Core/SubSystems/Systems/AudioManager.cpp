@@ -46,17 +46,17 @@ namespace DeadFrame2D::Core
 		std::cout << "[Info] SDL_Mixer subsystem successfully quit." << std::endl;
 	}
 
-	void AudioManager::Update(float deltaTime)
-	{
-
-	}
-
 	void AudioManager::BeginFrame()
 	{
 
 	}
 
-	void AudioManager::EndUpdate()
+	void AudioManager::PreUpdate(float deltaTime)
+	{
+
+	}
+
+	void AudioManager::EndUpdate(float deltaTime)
 	{
 
 	}

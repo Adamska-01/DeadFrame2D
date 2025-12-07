@@ -21,11 +21,11 @@ namespace DeadFrame2D::Core
 		void InitializeSubSystems(Shared::Models::SystemConfig config);
 
 
-		void Update(float deltaTime);
-
 		void BeginFrame();
 
-		void EndUpdate();
+		void PreUpdate(float deltaTime);
+
+		void EndUpdate(float deltaTime);
 
 		void EndDraw();
 	};

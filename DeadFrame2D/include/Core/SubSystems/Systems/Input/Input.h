@@ -49,9 +49,9 @@ namespace DeadFrame2D::Core
 
 		virtual void BeginFrame() override;
 
-		virtual void Update(float deltaTime) override;
+		virtual void PreUpdate(float deltaTime) override;
 
-		virtual void EndUpdate() override;
+		virtual void EndUpdate(float deltaTime) override;
 
 		virtual void EndDraw() override;
 

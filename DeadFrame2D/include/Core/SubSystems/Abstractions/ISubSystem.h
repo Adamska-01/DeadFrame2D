@@ -15,9 +15,9 @@ namespace DeadFrame2D::Core
 
 		virtual void BeginFrame() = 0;
 
-		virtual void Update(float deltaTime) = 0;
+		virtual void PreUpdate(float deltaTime) = 0;
 
-		virtual void EndUpdate() = 0;
+		virtual void EndUpdate(float deltaTime) = 0;
 
 		virtual void EndDraw() = 0;
 	};

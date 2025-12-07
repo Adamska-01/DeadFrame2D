@@ -45,11 +45,11 @@ namespace DeadFrame2D::Core
 		PhysicsEngine2D(PhysicsEngine2D&&) = delete;
 
 
-		virtual void Update(float deltaTime) override;
-
 		virtual void BeginFrame() override;
 
-		virtual void EndUpdate() override;
+		virtual void PreUpdate(float deltaTime) override;
+
+		virtual void EndUpdate(float deltaTime) override;
 
 		virtual void EndDraw() override;
 

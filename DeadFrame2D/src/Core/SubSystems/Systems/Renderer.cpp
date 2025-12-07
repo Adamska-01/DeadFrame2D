@@ -61,17 +61,17 @@ namespace DeadFrame2D::Core
 		std::cout << "[Info] Renderer successfully destroyed and SDL_VIDEO successfully quit." << std::endl;
 	}
 
-	void Renderer::Update(float deltaTime)
-	{
-
-	}
-
 	void Renderer::BeginFrame()
 	{
 
 	}
 
-	void Renderer::EndUpdate()
+	void Renderer::PreUpdate(float deltaTime)
+	{
+
+	}
+
+	void Renderer::EndUpdate(float deltaTime)
 	{
 
 	}

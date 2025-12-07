@@ -37,7 +37,12 @@ namespace DeadFrame2D::Core
 		instance = nullptr;
 	}
 
-	void CoroutineScheduler::Update(float deltaTime)
+	void CoroutineScheduler::BeginFrame()
+	{
+
+	}
+
+	void CoroutineScheduler::PreUpdate(float deltaTime)
 	{
 		Guard::AgainstNull(instance, NAME_OF(instance));
 
@@ -64,12 +69,7 @@ namespace DeadFrame2D::Core
 		Task::SetCurrentTask(nullptr);
 	}
 
-	void CoroutineScheduler::BeginFrame()
-	{
-
-	}
-
-	void CoroutineScheduler::EndUpdate()
+	void CoroutineScheduler::EndUpdate(float deltaTime)
 	{
 
 	}

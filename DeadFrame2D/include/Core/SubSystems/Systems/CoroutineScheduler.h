@@ -1,8 +1,6 @@
 #pragma once
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
 #include "DF2D_API.h"
-#include <coroutine>
-#include <memory>
 #include <vector>
 
 
@@ -33,11 +31,11 @@ namespace DeadFrame2D::Core
 		CoroutineScheduler& operator=(const CoroutineScheduler&) = delete;
 
 
-		virtual void Update(float deltaTime) override;
-
 		virtual void BeginFrame() override;
 
-		virtual void EndUpdate() override;
+		virtual void PreUpdate(float deltaTime) override;
+
+		virtual void EndUpdate(float deltaTime) override;
 
 		virtual void EndDraw() override;
 
