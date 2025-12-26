@@ -15,9 +15,9 @@ namespace DeadFrame2D::Engine
 
 
 	protected:
-		bool isPressed;
+		bool isPressed = false;
 
-		bool isHovered;
+		bool isHovered = false;
 
 
 	public:
