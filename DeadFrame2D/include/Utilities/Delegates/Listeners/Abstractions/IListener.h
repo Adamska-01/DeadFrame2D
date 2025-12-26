@@ -1,12 +1,10 @@
 #pragma once
+#include "Utilities/Delegates/Listeners/ListenerID.h"
 #include <typeinfo>
 
 
 namespace DeadFrame2D::Utilities
 {
-	using ListenerID = uint64_t;
-
-
 	template<typename... Args>
 	struct IListener
 	{
@@ -19,7 +17,7 @@ namespace DeadFrame2D::Utilities
 
 
 	protected:
-		ListenerID id;
+		ListenerID id = 0;
 
 
 	public:
