@@ -1,38 +1,31 @@
 #pragma once
-#include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/Abstractions/InputDevice.h"
-#include <memory>
+#include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/InputDeviceID.h"
+#include "Core/SubSystems/Systems/Input/User/InputUserID.h"
 #include <string>
 #include <vector>
 
 
 namespace DeadFrame2D::Core
 {
-	using UserID = uint32_t;
-
-
 	class InputUser
 	{
 	private:
-		UserID id;
+		InputUserID id;
 
 		std::string name;
 
-		std::vector<std::shared_ptr<InputDevice>> devices;
-
 
 	public:
-		InputUser(UserID id, const std::string& name = "User");
+		InputUser(InputUserID id, const std::string& name = "User");
 
 
-		UserID ID() const;
+		InputUserID ID() const;
 
 		const std::string& Name() const;
 
 
-		void PairDevice(std::shared_ptr<InputDevice> device);
+		bool IsDevicePaired(InputDeviceID deviceID) const;
 
-		void UnpairDevice(DeviceID deviceId);
-
-		const std::vector<std::shared_ptr<InputDevice>>& Devices() const;
+		const std::vector<InputDeviceID>& PairedDevices() const;
 	};
 }

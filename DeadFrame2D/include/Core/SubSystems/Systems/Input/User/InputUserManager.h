@@ -1,40 +1,59 @@
 #pragma once
-#include "Core/SubSystems/Systems/Input/Devices/DeviceManager.h"
-#include "Core/SubSystems/Systems/Input/User/InputUser.h"
-#include <map>
+#include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/InputDeviceID.h"
+#include "Core/SubSystems/Systems/Input/User/InputUserID.h"
 #include <memory>
+#include <unordered_map>
+
+
+namespace DeadFrame2D::Engine
+{
+	class DispatchableEvent;
+}
 
 
 namespace DeadFrame2D::Core
 {
+	class InputDevice;
+	class InputUser;
+
+
 	class InputUserManager
 	{
 	private:
-		UserID nextID;
+		InputUserID nextID;
 
-		std::map<UserID, std::shared_ptr<InputUser>> users;
+		std::unordered_map<InputUserID, std::unique_ptr<InputUser>> users;
+
+		std::unordered_map<InputDeviceID, InputUser*> pairedDeviceToUser;
+
+		std::unordered_map<InputUserID, std::vector<InputDeviceID>> userToPairedDevices;
+
 		
-		std::shared_ptr<DeviceManager> deviceManager;
+		void DeviceRemovedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
 
 
 	public:
-		InputUserManager(std::shared_ptr<DeviceManager> deviceManager);
+		InputUserManager();
 
-		~InputUserManager() = default;
+		~InputUserManager();
 
 
-		std::shared_ptr<InputUser> CreateUser(const std::string& name = "Player");
+		InputUser* CreateUser(const std::string& name = "Player");
 
-		void DestroyUser(UserID id);
+		InputUser* AutoCreateUserForDevice(InputDevice* device);
 
-		std::shared_ptr<InputUser> GetUser(UserID id) const;
+		void DestroyUser(InputUserID id);
 
-		std::vector<std::shared_ptr<InputUser>> GetAllUsers() const;
+		InputUser* GetUser(InputUserID id) const;
 
-		std::shared_ptr<InputUser> AutoCreateUserForDevice(std::shared_ptr<InputDevice> device);
+		std::vector<InputUser*> GetAllUsers() const;
 
-		void PairDeviceToUser(std::shared_ptr<InputUser> user, std::shared_ptr<InputDevice> device);
+		const std::vector<InputDeviceID>& GetDevicesPairedToUser(InputDeviceID userID) const;
 
-		void UnpairDevice(std::shared_ptr<InputUser> user, DeviceID deviceId);
+		InputUser* GetUserFromPairedDevice(InputDeviceID deviceID);
+
+		void PairDeviceToUser(InputUser* user, InputDeviceID deviceID);
+
+		void UnpairDevice(InputUser* user, InputDeviceID deviceID);
 	};
 }

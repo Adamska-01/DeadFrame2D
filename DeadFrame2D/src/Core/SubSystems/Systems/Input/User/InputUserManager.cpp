@@ -1,89 +1,194 @@
+#include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/Abstractions/InputDevice.h"
+#include "Core/SubSystems/Systems/Input/User/InputUser.h"
 #include "Core/SubSystems/Systems/Input/User/InputUserManager.h"
+#include "Data/Input/DefaultDeviceIDs.h"
 #include "Engine/EngineEvents/EventDispatcher.h"
+#include "Engine/EngineEvents/Events/SubSystems/Input/DeviceRemovedEvent.h"
 #include "Engine/EngineEvents/Events/SubSystems/Input/InputUserCreatedEvent.h"
+#include "Engine/EngineEvents/Events/SubSystems/Input/InputUserDestroyedEvent.h"
 
 
 namespace DeadFrame2D::Core
 {
 	using namespace DeadFrame2D::Engine;
+	using namespace DeadFrame2D::Data;
 
 
-	InputUserManager::InputUserManager(std::shared_ptr<DeviceManager> deviceManager)
-		: nextID(1), deviceManager(deviceManager)
+	InputUserManager::InputUserManager()
+		: nextID(0)
 	{
+		users.clear();
+		pairedDeviceToUser.clear();
+		userToPairedDevices.clear();
+
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(DeviceRemovedEvent)), this, &InputUserManager::DeviceRemovedEventHandler);
 	}
 
-	std::shared_ptr<InputUser> InputUserManager::CreateUser(const std::string& name)
+	InputUserManager::~InputUserManager()
 	{
-		auto newUser = std::make_shared<InputUser>(nextID++, name.empty() ? ("User" + std::to_string(nextID - 1)) : name);
+		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(DeviceRemovedEvent)), this);
+	}
 
-		users.emplace(newUser->ID(), newUser);
+	void InputUserManager::DeviceRemovedEventHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
+	{
+		auto deviceRemovedEvent = DispatchableEvent::SafeCast<DeviceRemovedEvent>(dispatchableEvent);
 
-		EventDispatcher::SendEvent(std::make_shared<InputUserCreatedEvent>(newUser));
+		if (deviceRemovedEvent == nullptr || deviceRemovedEvent->GetDeviceRemoved() == nullptr)
+			return;
+
+		auto deviceRemoved = deviceRemovedEvent->GetDeviceRemoved();
+
+		auto user = GetUserFromPairedDevice(deviceRemoved->ID());
+
+		UnpairDevice(user, deviceRemoved->ID());
+	}
+
+	InputUser* InputUserManager::CreateUser(const std::string& name)
+	{
+		auto userID = nextID++;
+
+		auto newUser = std::make_unique<InputUser>(userID, name.empty() ? ("User" + std::to_string(userID)) : name);
+
+		auto userPtr = newUser.get();
+
+		users.emplace(newUser->ID(), std::move(newUser));
+
+		if (GetUserFromPairedDevice(DefaultDeviceIDs::KEYBOARD) == nullptr)
+		{
+			PairDeviceToUser(userPtr, DefaultDeviceIDs::KEYBOARD);
+		}
+		if (GetUserFromPairedDevice(DefaultDeviceIDs::MOUSE) == nullptr)
+		{
+			PairDeviceToUser(userPtr, DefaultDeviceIDs::MOUSE);
+		}
+
+		EventDispatcher::SendEvent(std::make_shared<InputUserCreatedEvent>(userPtr));
+
+		return userPtr;
+	}
+
+	InputUser* InputUserManager::AutoCreateUserForDevice(InputDevice* device)
+	{
+		if (device == nullptr)
+			return nullptr;
+
+		// naive: create a user and pair the device
+		auto newUser = CreateUser();
+
+		PairDeviceToUser(newUser, device->ID());
 
 		return newUser;
 	}
 
-	void InputUserManager::DestroyUser(UserID id)
+	void InputUserManager::DestroyUser(InputUserID id)
 	{
 		auto it = users.find(id);
 
 		if (it == users.end()) 
 			return;
 		
-		auto& userToDestroy = it->second;
+		auto userToDestroyPtr = it->second.get();
+
+		// Remove all paired devices
+		if (auto devicesIt = userToPairedDevices.find(userToDestroyPtr->ID()); devicesIt != userToPairedDevices.end())
+		{
+			for (auto deviceID : devicesIt->second)
+			{
+				pairedDeviceToUser.erase(deviceID);
+			}
+
+			userToPairedDevices.erase(devicesIt);
+		}
+
+		std::erase_if(
+			pairedDeviceToUser, 
+			[userToDestroyPtr](const auto& pair)
+			{
+				return pair.second == userToDestroyPtr;
+			});
 		
-		// TODO: shared_ptr is not the way to go...
+		EventDispatcher::SendEvent(std::make_shared<InputUserDestroyedEvent>(userToDestroyPtr));
+
 		users.erase(it);
-		
-		EventDispatcher::SendEvent(std::make_shared<InputUserCreatedEvent>(userToDestroy));
 	}
 
-	std::shared_ptr<InputUser> InputUserManager::GetUser(UserID id) const
+	InputUser* InputUserManager::GetUser(InputUserID id) const
 	{
 		auto it = users.find(id);
 
-		if (it == users.end()) 
-			return nullptr;
-	
-		return it->second;
+		return it != users.end() ? it->second.get() : nullptr;
 	}
 
-	std::vector<std::shared_ptr<InputUser>> InputUserManager::GetAllUsers() const
+	std::vector<InputUser*> InputUserManager::GetAllUsers() const
 	{
-		std::vector<std::shared_ptr<InputUser>> out;
+		std::vector<InputUser*> out;
+		
+		out.reserve(users.size());
 
 		for (auto& p : users)
 		{
-			out.push_back(p.second);
+			out.push_back(p.second.get());
 		}
 
 		return out;
 	}
 
-	std::shared_ptr<InputUser> InputUserManager::AutoCreateUserForDevice(std::shared_ptr<InputDevice> device)
+	const std::vector<InputDeviceID>& InputUserManager::GetDevicesPairedToUser(InputDeviceID userID) const
 	{
-		// naive: create a user and pair the device
-		auto u = CreateUser();
-
-		PairDeviceToUser(u, device);
-
-		return u;
-	}
-
-	void InputUserManager::PairDeviceToUser(std::shared_ptr<InputUser> user, std::shared_ptr<InputDevice> device)
-	{
-		if (!user || !device) 
-			return;
+		static const std::vector<InputDeviceID> empty;
 		
-		user->PairDevice(device);
+		auto it = userToPairedDevices.find(userID);
+
+		return it != userToPairedDevices.end() ? it->second : empty;
 	}
 
-	void InputUserManager::UnpairDevice(std::shared_ptr<InputUser> user, DeviceID deviceId)
+	InputUser* InputUserManager::GetUserFromPairedDevice(InputDeviceID deviceID)
+	{
+		auto it = pairedDeviceToUser.find(deviceID);
+
+		if (it == pairedDeviceToUser.end())
+			return nullptr;
+
+		return it->second;
+	}
+
+	void InputUserManager::PairDeviceToUser(InputUser* user, InputDeviceID deviceID)
 	{
 		if (!user) 
 			return;
-		
-		user->UnpairDevice(deviceId);
+
+		pairedDeviceToUser[deviceID] = user;
+
+		auto& devices = userToPairedDevices[user->ID()];
+
+		if (std::find(devices.begin(), devices.end(), deviceID) == devices.end())
+		{
+			devices.push_back(deviceID);
+		}
+	}
+
+	void InputUserManager::UnpairDevice(InputUser* user, InputDeviceID deviceID)
+	{
+		if (!user) 
+			return;
+
+		pairedDeviceToUser.erase(deviceID);
+
+		if (auto it = userToPairedDevices.find(user->ID()); it != userToPairedDevices.end())
+		{
+			auto& devices = it->second;
+
+			devices.erase(
+				std::remove(
+					devices.begin(), 
+					devices.end(), 
+					deviceID), 
+				devices.end());
+			
+			if (devices.empty())
+			{
+				userToPairedDevices.erase(it);
+			}
+		}
 	}
 }
