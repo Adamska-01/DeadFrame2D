@@ -1,8 +1,12 @@
 #pragma once
+#include "Core/SubSystems/Systems/Input/Actions/Abstractions/IInputActions.h"
+#include "Core/SubSystems/Systems/Input/Actions/Abstractions/IInputActionsFrameManagement.h"
 #include "Core/SubSystems/Systems/Input/Actions/ActionBindingLink.h"
 #include "Core/SubSystems/Systems/Input/Actions/ActionPhase.h"
+#include "Core/SubSystems/Systems/Input/User/InputUserID.h"
 #include "DF2D_API.h"
 #include "Utilities/Hashing/TupleHash.h"
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
@@ -16,6 +20,13 @@ namespace Shared::Models
 	struct Binding;
 }
 
+namespace DeadFrame2D::Engine
+{
+	class DispatchableEvent;
+	class ComponentHandleBase;
+	class PlayerInput;
+}
+
 
 namespace DeadFrame2D::Core
 {
@@ -24,17 +35,21 @@ namespace DeadFrame2D::Core
 	class InputDevice;
 
 
-	class DF2D_API InputActionResolver
+	class DF2D_API InputActionResolver final : public IInputActions, public IInputActionsFrameManagement
 	{
 	private:
-		std::vector<std::shared_ptr<RuntimeActionMap>> runtimeActionMaps;
+		std::unordered_map<InputUserID, std::vector<std::shared_ptr<RuntimeActionMap>>> runtimeActionMaps;
 
 		std::unordered_map<
-			std::tuple<std::string, Shared::Models::InputDeviceType, int>, 
-			std::vector<ActionBindingLink>, 
-			DeadFrame2D::Utilities::TupleHash> fastLookupActionMaps;
+			InputUserID,
+			std::unordered_map<
+				std::tuple<std::string, Shared::Models::InputDeviceType, int>,
+				std::vector<ActionBindingLink>,
+				DeadFrame2D::Utilities::TupleHash>> fastLookupActionMaps;
 
-		std::unordered_set<RuntimeInputAction*> activeActions;
+		std::unordered_map<InputUserID, std::unordered_set<RuntimeInputAction*>> activeActions;
+
+		std::unordered_set<RuntimeInputAction*> callableActions;
 
 
 		ActionPhase ResolvePhase(bool started, bool held, bool cancelled);
@@ -45,26 +60,49 @@ namespace DeadFrame2D::Core
 
 		void ResolveComposite2D(const InputDevice& device, RuntimeInputAction& action, const Shared::Models::Binding& binding);
 
+		void InputUserCreatedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
+
+		void InputUserDestroyedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
+
+
+		void BeginFrame() override;
+
+		void ProcessBinding(const InputDevice& device, int controlID) override;
+
+		void FinalizeActions() override;
+
 
 	public:
 		InputActionResolver();
 
-		~InputActionResolver() = default;
+		~InputActionResolver() override;
 
 
-		void BeginFrame();
+		DeadFrame2D::Utilities::ListenerID RegisterAction(
+			InputUserID userID,
+			const std::string& actionMapName,
+			const std::string& actionName,
+			const DeadFrame2D::Engine::ComponentHandleBase& listener,
+			const std::function<void(const RuntimeInputAction&)>& handler) override;
 
-		void ProcessBinding(const InputDevice& device, int controlID);
+		void DeregisterAction(
+			InputUserID userID,
+			const std::string& actionMapName,
+			const std::string& actionName,
+			const DeadFrame2D::Engine::ComponentHandleBase& listener) override;
 
-		void FinalizeActions();
+		void DeregisterActionByID(
+			InputUserID userID,
+			const std::string& actionMapName,
+			const std::string& actionName,
+			DeadFrame2D::Utilities::ListenerID listenerID) override;
 
+		bool EnableActionMap(InputUserID userID, const std::string& name) override;
 
-		bool EnableActionMap(const std::string& name);
+		bool DisableActionMap(InputUserID userID, const std::string& name) override;
 
-		bool DisableActionMap(const std::string& name);
+		bool SwitchToActionMap(InputUserID userID, const std::string& name) override;
 
-		bool SwitchToActionMap(const std::string& name);
-
-		std::optional<RuntimeInputAction> GetActionStateTEST(const std::string actionName);
+		std::optional<RuntimeInputAction> GetActionState(InputUserID userID, const std::string actionName) override;
 	};
 }
