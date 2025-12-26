@@ -7,12 +7,12 @@ namespace DeadFrame2D::Engine
 	using namespace DeadFrame2D::Core;
 
 
-	InputUserCreatedEvent::InputUserCreatedEvent(std::shared_ptr<InputUser> inputUserCreated)
+	InputUserCreatedEvent::InputUserCreatedEvent(const InputUser* inputUserCreated)
 		: inputUserCreated(inputUserCreated)
 	{
 	}
 
-	std::shared_ptr<const InputUser> InputUserCreatedEvent::GetInputUserCreated() const
+	const InputUser* InputUserCreatedEvent::GetInputUserCreated() const
 	{
 		return inputUserCreated;
 	}
