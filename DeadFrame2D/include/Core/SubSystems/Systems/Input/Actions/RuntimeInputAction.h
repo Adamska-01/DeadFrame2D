@@ -3,6 +3,7 @@
 #include "Core/SubSystems/Systems/Input/Actions/ActionPhase.h"
 #include "DF2D_API.h"
 #include "Models/Input/ActionMap/Bindings/Binding.h"
+#include "Utilities/Delegates/MulticastDelegate.h"
 #include <Models/Input/ActionMap/Types/ValueType.h>
 #include <string>
 #include <variant>
@@ -31,6 +32,8 @@ namespace DeadFrame2D::Core
 
 		std::vector<Shared::Models::Binding> bindings;
 
+		DeadFrame2D::Utilities::MulticastDelegate<const RuntimeInputAction&> listeners;
+
 
 		void ResetFrame();
 
@@ -38,9 +41,17 @@ namespace DeadFrame2D::Core
 	public:
 		RuntimeInputAction(const std::string& name, Shared::Models::ValueType valueType, std::vector<Shared::Models::Binding> bindings);
 
+		RuntimeInputAction(const RuntimeInputAction& other);
+
+		RuntimeInputAction(RuntimeInputAction&& other) noexcept;
+
+		RuntimeInputAction& operator=(const RuntimeInputAction& other);
+
+		RuntimeInputAction& operator=(RuntimeInputAction&& other) noexcept;
+
 
 		template<typename T>
-		T ReadValue();
+		T ReadValue() const;
 
 		bool IsWaiting() const;
 
@@ -56,7 +67,7 @@ namespace DeadFrame2D::Core
 namespace DeadFrame2D::Core
 {
 	template<typename T>
-	inline T RuntimeInputAction::ReadValue()
+	inline T RuntimeInputAction::ReadValue() const
 	{
 		if (!std::holds_alternative<T>(value))
 			return T{};

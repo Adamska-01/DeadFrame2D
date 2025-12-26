@@ -31,6 +31,65 @@ namespace DeadFrame2D::Core
 		}
 	}
 
+	RuntimeInputAction::RuntimeInputAction(const RuntimeInputAction& other)
+		: name(other.name),
+		value(other.value),
+		previousValue(other.previousValue),
+		pendingValue(other.pendingValue),
+		isValuePending(other.isValuePending),
+		phase(other.phase),
+		bindings(other.bindings)
+	{
+		// listeners are intentionally NOT copied
+	}
+
+	RuntimeInputAction::RuntimeInputAction(RuntimeInputAction&& other) noexcept
+		: name(std::move(other.name)), 
+		value(std::move(other.value)),
+		previousValue(std::move(other.previousValue)),
+		pendingValue(std::move(other.pendingValue)),
+		isValuePending(other.isValuePending),
+		phase(other.phase),
+		bindings(std::move(other.bindings))
+	{
+		// listeners are intentionally NOT moved
+	}
+
+	RuntimeInputAction& RuntimeInputAction::operator=(const RuntimeInputAction& other)
+	{
+		if (this == &other)
+			return *this;
+
+		name = other.name;
+		value = other.value;
+		previousValue = other.previousValue;
+		pendingValue = other.pendingValue;
+		isValuePending = other.isValuePending;
+		phase = other.phase;
+		bindings = other.bindings;
+		// listeners not copied
+
+		return *this;
+	}
+
+	RuntimeInputAction& RuntimeInputAction::operator=(RuntimeInputAction&& other) noexcept
+	{
+		if (this == &other)
+			return *this;
+
+		name = std::move(other.name);
+		value = std::move(other.value);
+		previousValue = std::move(other.previousValue);
+		pendingValue = std::move(other.pendingValue);
+		isValuePending = other.isValuePending;
+		phase = other.phase;
+		bindings = std::move(other.bindings);
+		// listeners not moved
+
+		return *this;
+	}
+
+
 	void RuntimeInputAction::ResetFrame()
 	{
 		previousValue = value;
