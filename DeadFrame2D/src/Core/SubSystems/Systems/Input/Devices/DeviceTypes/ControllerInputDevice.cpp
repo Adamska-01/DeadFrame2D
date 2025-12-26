@@ -1,6 +1,8 @@
 #include "Constants/Input/InputConstants.h"
-#include "Core/SubSystems/Systems/Input/Actions/inputActionResolver.h"
+#include "Core/SubSystems/Systems/Input/Actions/Abstractions/IInputActionsFrameManagement.h"
+#include "Core/SubSystems/Systems/Input/Actions/InputActionResolver.h"
 #include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/ControllerInputDevice.h"
+#include "Core/SubSystems/Systems/Input/Input.h"
 #include "Data/Input/DefaultDeviceNames.h"
 
 
@@ -12,7 +14,7 @@ namespace DeadFrame2D::Core
 	using namespace Shared::Models;
 
 
-	ControllerInputDevice::ControllerInputDevice(SDL_GameController* controller, DeviceID instanceID)
+	ControllerInputDevice::ControllerInputDevice(SDL_GameController* controller, InputDeviceID instanceID)
 		: InputDevice(SDL_GameControllerName(controller) ? SDL_GameControllerName(controller) : DefaultDeviceNames::CONTROLLER),
 		controller(controller), 
 		instanceID(instanceID)
@@ -35,7 +37,7 @@ namespace DeadFrame2D::Core
 		return InputDeviceType::CONTROLLER;
 	}
 
-	DeviceID ControllerInputDevice::ID() const
+	InputDeviceID ControllerInputDevice::ID() const
 	{
 		return instanceID;
 	}
@@ -48,8 +50,10 @@ namespace DeadFrame2D::Core
 	}
 
 
-	void ControllerInputDevice::BeginFrame(InputActionResolver* inputActionResolver)
+	void ControllerInputDevice::BeginFrame()
 	{
+		auto actionsFrameManagement = static_cast<IInputActionsFrameManagement*>(Input::Actions());
+
 		for (auto button : activeButtons)
 		{
 			auto& state = buttonStates[button];
@@ -59,7 +63,7 @@ namespace DeadFrame2D::Core
 				state.pressed = false;
 				state.held = true;
 
-				inputActionResolver->ProcessBinding(*this, button);
+				actionsFrameManagement->ProcessBinding(*this, button);
 			}
 			
 			if (state.released)
@@ -67,7 +71,7 @@ namespace DeadFrame2D::Core
 				state.released = false;
 				state.value = 0.0f;
 
-				inputActionResolver->ProcessBinding(*this, button);
+				actionsFrameManagement->ProcessBinding(*this, button);
 			}
 		}
 
@@ -80,7 +84,7 @@ namespace DeadFrame2D::Core
 				state.pressed = false;
 				state.held = true;
 
-				inputActionResolver->ProcessBinding(*this, axis);
+				actionsFrameManagement->ProcessBinding(*this, axis);
 			}
 
 			if (state.released)
@@ -88,7 +92,7 @@ namespace DeadFrame2D::Core
 				state.released = false;
 				state.value = 0.0f;
 
-				inputActionResolver->ProcessBinding(*this, axis);
+				actionsFrameManagement->ProcessBinding(*this, axis);
 			}
 		}
 
@@ -96,8 +100,10 @@ namespace DeadFrame2D::Core
 		activeAxes.clear();
 	}
 
-	void ControllerInputDevice::ProcessEvent(const SDL_Event& event, InputActionResolver* inputActionResolver)
+	void ControllerInputDevice::ProcessEvent(const SDL_Event& event)
 	{
+		auto actionsFrameManagement = static_cast<IInputActionsFrameManagement*>(Input::Actions());
+
 		switch (event.type)
 		{
 			case SDL_EventType::SDL_CONTROLLERBUTTONDOWN:
@@ -117,7 +123,7 @@ namespace DeadFrame2D::Core
 
 					activeButtons.insert(controlID);
 
-					inputActionResolver->ProcessBinding(*this, controlID);
+					actionsFrameManagement->ProcessBinding(*this, controlID);
 				}
 
 				break;
@@ -138,7 +144,7 @@ namespace DeadFrame2D::Core
 
 				activeButtons.insert(controlID);
 
-				inputActionResolver->ProcessBinding(*this, controlID);
+				actionsFrameManagement->ProcessBinding(*this, controlID);
 
 				break;
 			}
@@ -168,7 +174,7 @@ namespace DeadFrame2D::Core
 
 				activeAxes.insert(controlID);
 
-				inputActionResolver->ProcessBinding(*this, controlID);
+				actionsFrameManagement->ProcessBinding(*this, controlID);
 
 				break;
 			}

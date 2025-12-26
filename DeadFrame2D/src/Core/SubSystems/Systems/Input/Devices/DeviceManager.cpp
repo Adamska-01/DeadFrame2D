@@ -1,6 +1,9 @@
-#include "Core/SubSystems/Systems/Input/Actions/inputActionResolver.h"
+#include "Core/SubSystems/Systems/Input/Actions/InputActionResolver.h"
 #include "Core/SubSystems/Systems/Input/Devices/DeviceManager.h"
+#include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/Abstractions/InputDevice.h"
 #include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/ControllerInputDevice.h"
+#include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/KeyboardInputDevice.h"
+#include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/MouseInputDevice.h"
 #include "Engine/EngineEvents/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/SubSystems/Input/DeviceAddedEvent.h"
 #include "Engine/EngineEvents/Events/SubSystems/Input/DeviceRemovedEvent.h"
@@ -14,8 +17,7 @@ namespace DeadFrame2D::Core
 	using namespace Shared::Models;
 
 
-	DeviceManager::DeviceManager(std::shared_ptr<InputActionResolver> inputActionResolver)
-		: inputActionResolver(inputActionResolver)
+	DeviceManager::DeviceManager()
 	{
 		// Keyboard and mouse are always initialised and registered
 		keyboard = std::make_shared<KeyboardInputDevice>();
@@ -107,7 +109,7 @@ namespace DeadFrame2D::Core
 		EventDispatcher::SendEvent(std::make_shared<DeviceAddedEvent>(newDevice));
 	}
 
-	void DeviceManager::CloseController(DeviceID instanceId)
+	void DeviceManager::CloseController(InputDeviceID instanceId)
 	{
 		auto it = otherDevices.find(instanceId);
 
@@ -124,12 +126,12 @@ namespace DeadFrame2D::Core
 
 	void DeviceManager::BeginFrame()
 	{
-		mouse->BeginFrame(inputActionResolver.get());
-		keyboard->BeginFrame(inputActionResolver.get());
+		mouse->BeginFrame();
+		keyboard->BeginFrame();
 
 		for (auto& d : otherDevices)
 		{
-			d.second->BeginFrame(inputActionResolver.get());
+			d.second->BeginFrame();
 		}
 	}
 
@@ -140,7 +142,7 @@ namespace DeadFrame2D::Core
 			// Keyboard
 			case SDL_KEYDOWN:
 			case SDL_KEYUP:
-				keyboard->ProcessEvent(event, inputActionResolver.get());
+				keyboard->ProcessEvent(event);
 				break;
 			
 			// Mouse
@@ -148,7 +150,7 @@ namespace DeadFrame2D::Core
 			case SDL_MOUSEBUTTONUP:
 			case SDL_MOUSEMOTION:
 			case SDL_MOUSEWHEEL:
-				mouse->ProcessEvent(event, inputActionResolver.get());
+				mouse->ProcessEvent(event);
 				break;
 
 			// Controller
@@ -170,7 +172,7 @@ namespace DeadFrame2D::Core
 
 				if (it != otherDevices.end())
 				{
-					it->second->ProcessEvent(event, inputActionResolver.get());
+					it->second->ProcessEvent(event);
 				}
 
 				break;
@@ -181,40 +183,40 @@ namespace DeadFrame2D::Core
 		}
 	}
 
-	std::shared_ptr<InputDevice> DeviceManager::GetDevice(DeviceID id)
+	InputDevice* DeviceManager::GetDevice(InputDeviceID id)
 	{
 		auto it = otherDevices.find(id);
 
 		if (it == otherDevices.end()) 
 			return nullptr;
 
-		return it->second;
+		return it->second.get();
 	}
 
-	std::vector<std::shared_ptr<InputDevice>> DeviceManager::GetAllDevices() const
+	std::vector<InputDevice*> DeviceManager::GetAllDevices() const
 	{
-		std::vector<std::shared_ptr<InputDevice>> out;
+		std::vector<InputDevice*> out;
 
 		// Always include keyboard and mouse
-		out.push_back(keyboard);
-		out.push_back(mouse);
+		out.push_back(keyboard.get());
+		out.push_back(mouse.get());
 
 		// Add all controllers
 		for (auto& p : otherDevices)
 		{
-			out.push_back(p.second);
+			out.push_back(p.second.get());
 		}
 
 		return out;
 	}
 
-	std::shared_ptr<KeyboardInputDevice> DeviceManager::Keyboard()
+	KeyboardInputDevice* DeviceManager::Keyboard()
 	{
-		return keyboard;
+		return keyboard.get();
 	}
 
-	std::shared_ptr<MouseInputDevice> DeviceManager::Mouse()
+	MouseInputDevice* DeviceManager::Mouse()
 	{
-		return mouse;
+		return mouse.get();
 	}
 }

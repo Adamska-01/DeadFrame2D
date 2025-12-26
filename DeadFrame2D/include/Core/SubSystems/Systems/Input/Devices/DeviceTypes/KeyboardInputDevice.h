@@ -26,12 +26,12 @@ namespace DeadFrame2D::Core
 
 		Shared::Models::InputDeviceType Type() const override;
 
-		DeviceID ID() const override;
+		InputDeviceID ID() const override;
 
 
-		void BeginFrame(InputActionResolver* inputActionResolver) override;
+		void BeginFrame() override;
 
-		void ProcessEvent(const SDL_Event& event, InputActionResolver* inputActionResolver) override;
+		void ProcessEvent(const SDL_Event& event) override;
 
 		DeadFrame2D::Data::InputControlState GetKeyState(int controlID) const override;
 	};

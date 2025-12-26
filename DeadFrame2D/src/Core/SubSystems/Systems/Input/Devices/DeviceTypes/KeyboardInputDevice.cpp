@@ -1,5 +1,6 @@
-#include "Core/SubSystems/Systems/Input/Actions/inputActionResolver.h"
+#include "Core/SubSystems/Systems/Input/Actions/InputActionResolver.h"
 #include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/KeyboardInputDevice.h"
+#include "Core/SubSystems/Systems/Input/Input.h"
 #include "Data/Input/DefaultDeviceIDs.h"
 #include "Data/Input/DefaultDeviceNames.h"
 
@@ -21,13 +22,15 @@ namespace DeadFrame2D::Core
 		return InputDeviceType::KEYBOARD;
 	}
 
-	DeviceID KeyboardInputDevice::ID() const
+	InputDeviceID KeyboardInputDevice::ID() const
 	{
 		return DefaultDeviceIDs::KEYBOARD;
 	}
 
-	void KeyboardInputDevice::BeginFrame(InputActionResolver* inputActionResolver)
+	void KeyboardInputDevice::BeginFrame()
 	{
+		auto actionsFrameManagement = static_cast<IInputActionsFrameManagement*>(Input::Actions());
+
 		for (auto& controlID : activeControlIDs)
 		{
 			auto& state = states[controlID];
@@ -38,7 +41,7 @@ namespace DeadFrame2D::Core
 				state.pressed = false;
 				state.held = true;
 
-				inputActionResolver->ProcessBinding(*this, controlID);
+				actionsFrameManagement->ProcessBinding(*this, controlID);
 			}
 
 			// released is true only the frame the key was released
@@ -46,15 +49,17 @@ namespace DeadFrame2D::Core
 			{
 				state.released = false;
 			
-				inputActionResolver->ProcessBinding(*this, controlID);
+				actionsFrameManagement->ProcessBinding(*this, controlID);
 			}
 		}
 
 		activeControlIDs.clear();
 	}
 
-	void KeyboardInputDevice::ProcessEvent(const SDL_Event& event, InputActionResolver* inputActionResolver)
+	void KeyboardInputDevice::ProcessEvent(const SDL_Event& event)
 	{
+		auto actionsFrameManagement = static_cast<IInputActionsFrameManagement*>(Input::Actions());
+		
 		auto eventType = event.type;
 
 		switch (eventType)
@@ -74,7 +79,7 @@ namespace DeadFrame2D::Core
 
 					activeControlIDs.insert(controlID);
 
-					inputActionResolver->ProcessBinding(*this, controlID);
+					actionsFrameManagement->ProcessBinding(*this, controlID);
 				}
 
 				break;
@@ -91,7 +96,7 @@ namespace DeadFrame2D::Core
 
 				activeControlIDs.insert(controlID);
 				
-				inputActionResolver->ProcessBinding(*this, controlID);
+				actionsFrameManagement->ProcessBinding(*this, controlID);
 
 				break;
 			}

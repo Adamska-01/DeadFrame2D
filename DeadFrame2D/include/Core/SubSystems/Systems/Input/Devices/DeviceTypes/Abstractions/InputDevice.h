@@ -1,4 +1,5 @@
 #pragma once
+#include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/InputDeviceID.h"
 #include "Data/Input/InputControlState.h"
 #include "DF2D_API.h"
 #include <Models/Input/InputDeviceType.h>
@@ -8,13 +9,6 @@
 
 namespace DeadFrame2D::Core
 {
-	class InputActionResolver;
-
-
-	// SDL_JoystickID or -1/-2 for keyboard/mouse
-	using DeviceID = int32_t;
-
-
 	/**
 	 * @brief Base for all input devices (keyboard, mouse, controller).
 	 *
@@ -23,7 +17,7 @@ namespace DeadFrame2D::Core
 	 */
 	class DF2D_API InputDevice
 	{
-	protected:
+	protected: 
 		std::string name;
 
 
@@ -38,19 +32,19 @@ namespace DeadFrame2D::Core
 
 		virtual Shared::Models::InputDeviceType Type() const = 0;
 
-		virtual DeviceID ID() const = 0;
+		virtual InputDeviceID ID() const = 0;
 
 
 		/**
 		 * Snapshot states at the beginning of the frame; called by InputManager. 
 		 */
-		virtual void BeginFrame(InputActionResolver* inputActionResolver) = 0;
+		virtual void BeginFrame() = 0;
 
 		/**
 		 * @brief Called when an SDL_Event relevant to this device arrives.
 		 * Device must update its internal ControlState map accordingly.
 		 */
-		virtual void ProcessEvent(const SDL_Event& event, InputActionResolver* inputActionResolver) = 0;
+		virtual void ProcessEvent(const SDL_Event& event) = 0;
 
 		/**
 		 * Query key state by the integer key id (platform-defined). 

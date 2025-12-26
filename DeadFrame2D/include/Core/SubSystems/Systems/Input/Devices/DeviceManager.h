@@ -1,28 +1,29 @@
 #pragma once
-#include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/Abstractions/InputDevice.h"
-#include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/KeyboardInputDevice.h"
-#include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/MouseInputDevice.h"
+#include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/InputDeviceID.h"
+#include "DF2D_API.h"
 #include <memory>
 #include <unordered_map>
 #include <vector>
 
 
+union SDL_Event;
+
+
 namespace DeadFrame2D::Core
 {
-	class InputActionResolver;
+	class InputDevice;
+	class KeyboardInputDevice;
+	class MouseInputDevice;
 
 
 	/**
 	 * @brief Responsible for opening/closing SDL controllers and keeping devices
 	 * keyed by instance id. Also holds keyboard and mouse singletons.
 	 */
-	class DeviceManager
+	class DF2D_API DeviceManager
 	{
 	private:
-		std::shared_ptr<InputActionResolver> inputActionResolver;
-
-
-		std::unordered_map<DeviceID, std::shared_ptr<InputDevice>> otherDevices;
+		std::unordered_map<InputDeviceID, std::shared_ptr<InputDevice>> otherDevices;
 
 		std::shared_ptr<KeyboardInputDevice> keyboard;
 
@@ -31,11 +32,11 @@ namespace DeadFrame2D::Core
 
 		void OpenController(int deviceIndex);
 
-		void CloseController(DeviceID instanceId);
+		void CloseController(InputDeviceID instanceId);
 
 
 	public:
-		DeviceManager(std::shared_ptr<InputActionResolver> inputActionResolver);
+		DeviceManager();
 
 		~DeviceManager();
 
@@ -45,12 +46,12 @@ namespace DeadFrame2D::Core
 		void HandleEvent(const SDL_Event& event);
 
 
-		std::shared_ptr<InputDevice> GetDevice(DeviceID id);
+		InputDevice* GetDevice(InputDeviceID id);
 
-		std::vector<std::shared_ptr<InputDevice>> GetAllDevices() const;
+		std::vector<InputDevice*> GetAllDevices() const;
 
-		std::shared_ptr<KeyboardInputDevice> Keyboard();
+		KeyboardInputDevice* Keyboard();
 
-		std::shared_ptr<MouseInputDevice> Mouse();
+		MouseInputDevice* Mouse();
 	};
 }

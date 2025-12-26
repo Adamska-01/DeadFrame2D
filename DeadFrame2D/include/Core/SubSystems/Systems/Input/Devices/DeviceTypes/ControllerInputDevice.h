@@ -12,7 +12,7 @@ namespace DeadFrame2D::Core
 	private:
 		SDL_GameController* controller;
 
-		DeviceID instanceID;
+		InputDeviceID instanceID;
 
 		std::array<DeadFrame2D::Data::InputControlState, SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_MAX> buttonStates;
 
@@ -27,19 +27,19 @@ namespace DeadFrame2D::Core
 
 
 	public:
-		ControllerInputDevice(SDL_GameController* controller, DeviceID instanceID);
+		ControllerInputDevice(SDL_GameController* controller, InputDeviceID instanceID);
 
 		virtual ~ControllerInputDevice() override;
 
 
 		Shared::Models::InputDeviceType Type() const override;
 		
-		DeviceID ID() const override;
+		InputDeviceID ID() const override;
 
 
-		void BeginFrame(InputActionResolver* inputActionResolver) override;
+		void BeginFrame() override;
 
-		void ProcessEvent(const SDL_Event& event, InputActionResolver* inputActionResolver) override;
+		void ProcessEvent(const SDL_Event& event) override;
 
 		DeadFrame2D::Data::InputControlState GetKeyState(int controlId) const override;
 	};
