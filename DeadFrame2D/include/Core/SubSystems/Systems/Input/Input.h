@@ -1,10 +1,15 @@
 #pragma once
 #include "Core/CoreEvents/Abstractions/IEventProcessor.h"
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
-#include "Core/SubSystems/Systems/Input/Actions/RuntimeInputAction.h"
+#include "Core/SubSystems/Systems/Input/User/InputUserID.h"
 #include "DF2D_API.h"
-#include "Engine/EngineEvents/DispatchableEvent.h"
 #include <memory>
+
+
+namespace DeadFrame2D::Engine
+{
+	class DispatchableEvent;
+}
 
 
 namespace DeadFrame2D::Core
@@ -42,6 +47,10 @@ namespace DeadFrame2D::Core
 		std::shared_ptr<InputUserManager> userManager;
 
 
+		void InputUserCreatedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
+
+		void InputUserDestroyedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
+
 		void DeviceAddedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
 
 		void DeviceRemovedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
@@ -60,17 +69,11 @@ namespace DeadFrame2D::Core
 		std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
 
 
-		static std::shared_ptr<DeviceManager> Devices();
+		// TODO: Create a wrapper around all these managers that exposes only the client API
+		static DeviceManager* Devices();
 
-		static std::shared_ptr<InputUserManager> Users();
+		static InputUserManager* Users();
 
-		static bool EnableActionMap(const std::string& actionMapName);
-
-		static bool DisableActionMap(const std::string& actionMapName);
-
-		static bool SwitchToActionMap(const std::string& actionMapName);
-
-
-		static std::optional<RuntimeInputAction> TestActionQuery(const std::string& actionMapName, const std::string& actionName);
+		static InputActionResolver* Actions();
 	};
 }
