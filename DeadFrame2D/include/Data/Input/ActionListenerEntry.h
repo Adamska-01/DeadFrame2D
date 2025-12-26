@@ -1,6 +1,6 @@
 #pragma once
-#include "Utilities/Delegates/Listeners/Abstractions/IListener.h"
 #include "Engine/Entity/ComponentHandleBase.h"
+#include "Utilities/Delegates/Listeners/ListenerID.h"
 #include <string>
 
 
