@@ -36,6 +36,7 @@ namespace Shared::Models
 		std::optional<Composite1D> composite1D;
 
 
+		// TODO: remove modifiers and interactions (make processors work)
 		std::vector<int> modifiers;
 
 		std::vector<InputProcessor> processors;
