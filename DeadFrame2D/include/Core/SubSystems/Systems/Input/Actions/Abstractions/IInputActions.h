@@ -1,7 +1,7 @@
 #pragma once
 #include "Core/SubSystems/Systems/Input/User/InputUserID.h"
-#include "Utilities/Delegates/Listeners/Abstractions/IListener.h"
 #include "DF2D_API.h"
+#include "Utilities/Delegates/Listeners/ListenerID.h"
 #include <functional>
 #include <optional>
 #include <string>
