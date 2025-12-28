@@ -9,6 +9,8 @@
 #include <vector>
 
 
+struct SDL_Texture;
+
 namespace DeadFrame2D::Core
 {
 	struct Circle;
@@ -26,9 +28,6 @@ namespace DeadFrame2D::Engine
 		TYPE_INFO(Camera, GameComponent);
 
 
-		friend class DeadFrame2D::Core::DeadFrameRuntime;
-
-
 	private:
 		static std::vector<Camera*> cameras;
 
@@ -38,6 +37,8 @@ namespace DeadFrame2D::Engine
 		DeadFrame2D::Core::Vector2I resolutionTarget;
 
 		SDL_FRect normalizedViewport;
+		
+		SDL_Texture* renderTarget = nullptr;
 
 		float zoom;
 
@@ -66,6 +67,11 @@ namespace DeadFrame2D::Engine
 		/** @brief Returns the screen-space viewbox for this camera. */
 		SDL_Rect GetViewBox() const;
 
+		/** @brief Returns the screen-space normalized viewbox for this camera. */
+		SDL_Rect GetNormalizedViewBox() const;
+
+		SDL_Texture* GetRenderTarget();
+
 		/** @brief Converts world position to screen position. */
 		DeadFrame2D::Core::Vector2F WorldToScreen(const DeadFrame2D::Core::Vector2F& worldPos) const;
 
@@ -93,5 +99,8 @@ namespace DeadFrame2D::Engine
 		 * @return True if any part of the line segment is inside the camera's viewport.
 		 */
 		bool IsVisible(const DeadFrame2D::Core::Vector2F& p1, const DeadFrame2D::Core::Vector2F& p2) const;
+
+
+		static const std::vector<Camera*>& GetCameras();
 	};
 }

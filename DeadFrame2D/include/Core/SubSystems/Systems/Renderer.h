@@ -7,6 +7,12 @@
 #include <SDL.h>
 
 
+namespace DeadFrame2D::Engine
+{
+	class Camera;
+}
+
+
 namespace DeadFrame2D::Core
 {
 	class DF2D_API Renderer : public ISubSystem
@@ -16,6 +22,8 @@ namespace DeadFrame2D::Core
 
 	private:
 		static SDL_Renderer* renderer;
+
+		static DeadFrame2D::Engine::Camera* activeCamera;
 
 
 		Renderer(SDL_Window* window, const Shared::Models::RendererConfig& config);
@@ -41,11 +49,15 @@ namespace DeadFrame2D::Core
 
 
 	public:
-		static void ClearBuffer();
+		static void ClearAndPresentBuffer();
 
-		static void PresentBuffer();
+		static void BeginCamera(DeadFrame2D::Engine::Camera* camera);
+
+		static void EndCamera();
 
 		static SDL_Renderer* GetRenderer();
+
+		static DeadFrame2D::Engine::Camera* GetActiveCamera();
 
 		static SDL_Color GetDisplayColor();
 

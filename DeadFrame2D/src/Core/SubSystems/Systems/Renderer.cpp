@@ -1,6 +1,7 @@
 #include "Core/Debugging/Debug.h"
 #include "Core/SubSystems/Systems/Renderer.h"
 #include "Core/SubSystems/Systems/Window.h"
+#include "Engine/Components/Rendering/Camera.h"
 #include "Engine/EngineEvents/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/SubSystems/Renderer/RenderTargetSizeChangedEvent.h"
 #include <SDL.h>
@@ -14,6 +15,8 @@ namespace DeadFrame2D::Core
 
 
 	SDL_Renderer* Renderer::renderer = nullptr;
+
+	Camera* Renderer::activeCamera = nullptr;
 
 
 	Renderer::Renderer(SDL_Window* window, const RendererConfig& config)
@@ -81,19 +84,52 @@ namespace DeadFrame2D::Core
 
 	}
 
-	void Renderer::ClearBuffer()
+	void Renderer::ClearAndPresentBuffer()
 	{
+		// Backbuffer
+		SDL_SetRenderTarget(renderer, NULL);
+
+		SetDisplayColor(0, 0, 0, 255);
+
 		SDL_RenderClear(renderer);
+
+		for (auto camera : Camera::GetCameras())
+		{
+			if (!camera->IsActive())
+				continue;
+
+			auto viewport = camera->GetNormalizedViewBox();
+
+			SDL_RenderCopy(
+				renderer,
+				camera->GetRenderTarget(),
+				nullptr,
+				&viewport);
+		}
+
+		SDL_RenderPresent(renderer);
 	}
 
-	void Renderer::PresentBuffer()
+	void Renderer::BeginCamera(Camera* camera)
 	{
-		SDL_RenderPresent(renderer);
+		activeCamera = camera;
+
+		SDL_SetRenderTarget(renderer, camera->GetRenderTarget());
+	}
+
+	void Renderer::EndCamera()
+	{
+		activeCamera = nullptr;
 	}
 
 	SDL_Renderer* Renderer::GetRenderer()
 	{
 		return renderer;
+	}
+
+	Camera* Renderer::GetActiveCamera()
+	{
+		return activeCamera;
 	}
 
 	SDL_Color Renderer::GetDisplayColor()

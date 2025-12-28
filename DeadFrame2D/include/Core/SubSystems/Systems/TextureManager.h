@@ -20,18 +20,15 @@ namespace DeadFrame2D::Core
 	class DF2D_API TextureManager : public ISubSystem
 	{
 		friend class SubSystemManager;
-		friend class DeadFrameRuntime;
 
 
 	private:
 		static std::unordered_map<std::string, std::weak_ptr<SDL_Texture>> textureCache;
 
-		static DeadFrame2D::Engine::Camera* currentCamera;
-
 
 		TextureManager();
 
-		virtual ~TextureManager() override;
+		~TextureManager() override;
 
 		TextureManager(const TextureManager&) = delete;
 
@@ -43,49 +40,13 @@ namespace DeadFrame2D::Core
 		TextureManager& operator=(TextureManager&&) = delete;
 
 
-		virtual void BeginFrame() override;
+		void BeginFrame() override;
 
-		virtual void PreUpdate(float deltaTime) override;
+		void PreUpdate(float deltaTime) override;
 
-		virtual void EndUpdate(float deltaTime) override;
+		void EndUpdate(float deltaTime) override;
 
-		virtual void EndDraw() override;
-
-
-		static void DrawLine(
-			const Vector2F& p1, 
-			const Vector2F& p2, 
-			SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, 
-			DeadFrame2D::Engine::Camera* camera = nullptr);
-
-		static void DrawRect(
-			SDL_Rect rect, 
-			float angleDegrees, 
-			SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, 
-			bool filled = false, 
-			DeadFrame2D::Engine::Camera* camera = nullptr);
-
-		static void DrawCircle(
-			Circle circle, 
-			SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, 
-			bool filled = false, 
-			DeadFrame2D::Engine::Camera* camera = nullptr);
-
-		static void DrawTexture(
-			std::shared_ptr<SDL_Texture> texture,
-			const SDL_Rect* srcRect = NULL,
-			const SDL_Rect* dstRect = NULL,
-			float angle = 0.0f,
-			SDL_Point* rotationOrigin = NULL,
-			SDL_RendererFlip flip = SDL_FLIP_NONE,
-			Uint8 alpha = 255,
-			SDL_Color colorMod = DeadFrame2D::Constants::CommonColors::WHITE,
-			DeadFrame2D::Engine::Camera* camera = nullptr);
-
-		static void DrawPixel(
-			const Vector2F& p, 
-			SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE,
-			DeadFrame2D::Engine::Camera* camera = nullptr);
+		void EndDraw() override;
 
 
 	public:
@@ -124,8 +85,8 @@ namespace DeadFrame2D::Core
 			Uint8 alpha = 255,
 			SDL_Color colorMod = DeadFrame2D::Constants::CommonColors::WHITE);
 
-		static void DrawPixelWorldSpace(const Vector2F& p, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE);
+		static void DrawPixelWorldSpace(const Vector2F& worldPos, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE);
 
-		static void DrawPixelScreenSpace(const Vector2F& p, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE);
+		static void DrawPixelScreenSpace(const Vector2F& screenPos, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE);
 	};
 }

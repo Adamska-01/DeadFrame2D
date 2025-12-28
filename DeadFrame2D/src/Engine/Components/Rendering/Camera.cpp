@@ -1,4 +1,5 @@
 #include "Core/SubSystems/Systems/Renderer.h"
+#include "Core/SubSystems/Systems/TextureManager.h"
 #include "Engine/Components/Rendering/Camera.h"
 #include "Engine/Components/Transform.h"
 #include "Engine/EngineEvents/EventDispatcher.h"
@@ -6,7 +7,6 @@
 #include "Engine/Entity/GameObject.h"
 #include "Utilities/Collisions/CollisionUtils.h"
 #include "Utilities/Debugging/Guards.h"
-#include "Utilities/Helpers/Events/EventHelpers.h"
 #include <typeindex>
 
 
@@ -20,13 +20,14 @@ namespace DeadFrame2D::Engine
 
 
 	Camera::Camera()
-		: // Fullscreen (Doesn't work currently)
-		normalizedViewport({ 0.0f, 0.0f, 1.0f, 1.0f }),
+		: normalizedViewport({ 0.0f, 0.0f, 1.0f, 1.0f }),
 		zoom(1.0f)
 	{
 		cameras.push_back(this);
 
 		resolutionTarget = Renderer::GetResolutionTarget();
+
+		renderTarget = SDL_CreateTexture(Renderer::GetRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, resolutionTarget.x, resolutionTarget.y);
 
 		EventDispatcher::RegisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), this, &Camera::RenderTargetSizeChangedEventHandler);
 	}
@@ -46,6 +47,13 @@ namespace DeadFrame2D::Engine
 			return;
 
 		resolutionTarget = renderTargetSizeChangeEvent->renderTargetSize;
+
+		if (renderTarget != nullptr)
+		{
+			SDL_DestroyTexture(renderTarget);
+		}
+
+		renderTarget = SDL_CreateTexture(Renderer::GetRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, resolutionTarget.x, resolutionTarget.y);
 	}
 
 	void Camera::Init()
@@ -77,11 +85,27 @@ namespace DeadFrame2D::Engine
 	{
 		return SDL_Rect
 		{
-			static_cast<int>(normalizedViewport.x * resolutionTarget.x),
-			static_cast<int>(normalizedViewport.y * resolutionTarget.y),
-			static_cast<int>(normalizedViewport.w * resolutionTarget.x),
-			static_cast<int>(normalizedViewport.h * resolutionTarget.y)
+			.x = 0,
+			.y = 0,
+			.w = resolutionTarget.x,
+			.h = resolutionTarget.y
 		};
+	}
+
+	SDL_Rect Camera::GetNormalizedViewBox() const
+	{
+		return SDL_Rect
+		{
+			.x = static_cast<int>(normalizedViewport.x * resolutionTarget.x),
+			.y = static_cast<int>(normalizedViewport.y * resolutionTarget.y),
+			.w = static_cast<int>(normalizedViewport.w * resolutionTarget.x),
+			.h = static_cast<int>(normalizedViewport.h * resolutionTarget.y)
+		};
+	}
+
+	SDL_Texture* Camera::GetRenderTarget()
+	{
+		return renderTarget;
 	}
 
 	Vector2F Camera::WorldToScreen(const Vector2F& worldPos) const
@@ -89,42 +113,37 @@ namespace DeadFrame2D::Engine
 		auto cameraWorldPos = transform->GetWorldPosition();
 		auto offset = worldPos - cameraWorldPos;
 
-		auto viewport = GetViewBox();
-
-		auto screenPosX = viewport.x + (offset.x * zoom) + viewport.w * 0.5f;
-		auto screenPosY = viewport.y + (offset.y * zoom) + viewport.h * 0.5f;
+		auto screenPosX = (offset.x * zoom) + resolutionTarget.x * 0.5f;
+		auto screenPosY = (offset.y * zoom) + resolutionTarget.y * 0.5f;
 
 		return Vector2F(screenPosX, screenPosY);
 	}
 
 	Vector2F Camera::ScreenToWorld(const Vector2F& screenPos) const
 	{
-		auto viewport = GetViewBox();
-
-		auto localX = (screenPos.x - viewport.x - viewport.w * 0.5f) / zoom;
-		auto localY = (screenPos.y - viewport.y - viewport.h * 0.5f) / zoom;
+		auto localX = (screenPos.x - resolutionTarget.x * 0.5f) / zoom;
+		auto localY = (screenPos.y - resolutionTarget.y * 0.5f) / zoom;
 
 		return transform->GetWorldPosition() + Vector2(localX, localY);
 	}
 
 	bool Camera::IsVisible(const SDL_Rect& screenRect) const
 	{
-		auto viewBox = GetViewBox();
-
-		return Collision::RectVsRect(viewBox, screenRect);
+		return Collision::RectVsRect(screenRect, GetViewBox());
 	}
 
 	bool Camera::IsVisible(const Circle& circle) const
 	{
-		auto viewBox = GetViewBox();
-
-		return Collision::CircleVsRect(circle, viewBox);
+		return Collision::CircleVsRect(circle, GetViewBox());
 	}
 
 	bool Camera::IsVisible(const Vector2F& p1, const Vector2F& p2) const
 	{
-		auto viewBox = GetViewBox();
+		return Collision::SegmentVsRect(p1, p2, GetViewBox());
+	}
 
-		return Collision::SegmentVsRect(p1, p2, viewBox);
+	const std::vector<Camera*>& Camera::GetCameras()
+	{
+		return cameras;
 	}
 }

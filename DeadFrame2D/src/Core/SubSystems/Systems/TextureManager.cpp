@@ -14,8 +14,6 @@ namespace DeadFrame2D::Core
 
 	std::unordered_map<std::string, std::weak_ptr<SDL_Texture>> TextureManager::textureCache = {};
 
-	Camera* TextureManager::currentCamera = nullptr;
-
 
 	TextureManager::TextureManager()
 	{
@@ -98,39 +96,133 @@ namespace DeadFrame2D::Core
 		return sharedPtr;
 	}
 
-	void TextureManager::DrawLine(const Vector2F& p1, const Vector2F& p2, SDL_Color color, Camera* camera)
+	void TextureManager::DrawLineWorldSpace(const Vector2F& p1, const Vector2F& p2, SDL_Color color)
 	{
 		auto renderer = Renderer::GetRenderer();
-	
+		auto camera = Renderer::GetActiveCamera();
+
+		if (renderer == nullptr || camera == nullptr || camera->GetRenderTarget() == nullptr)
+			return;
+
+		auto screenP1 = camera->WorldToScreen(p1);
+		auto screenP2 = camera->WorldToScreen(p2);
+
+		if (!camera->IsVisible(screenP1, screenP2)) 
+			return;
+
+		auto oldColor = Renderer::GetDisplayColor();
+		Renderer::SetDisplayColor(color.r, color.g, color.b, color.a);
+
+		SDL_RenderDrawLineF(renderer, screenP1.x, screenP1.y, screenP2.x, screenP2.y);
+
+		Renderer::SetDisplayColor(oldColor.r, oldColor.g, oldColor.b, oldColor.a);
+	}
+
+	void TextureManager::DrawLineScreenSpace(const Vector2F& p1, const Vector2F& p2, SDL_Color color)
+	{
+		auto renderer = Renderer::GetRenderer();
+
 		if (renderer == nullptr)
 			return;
 
-		auto screenP1 = p1;
-		auto screenP2 = p2;
-
-		if (camera != nullptr)
-		{
-			screenP1 = camera->WorldToScreen(p1);
-			screenP2 = camera->WorldToScreen(p2);
-
-			// Culling: skip if line is not visible on the screen
-			if (!camera->IsVisible(screenP1, screenP2))
-				return;
-		}
-
-		auto oldRenderColor = Renderer::GetDisplayColor();
-	
+		auto oldColor = Renderer::GetDisplayColor();
 		Renderer::SetDisplayColor(color.r, color.g, color.b, color.a);
 
-		SDL_RenderDrawLineF(
-			renderer,
-			screenP1.x, screenP1.y,
-			screenP2.x, screenP2.y);
+		SDL_RenderDrawLineF(renderer, p1.x, p1.y, p2.x, p2.y);
 
-		Renderer::SetDisplayColor(oldRenderColor.r, oldRenderColor.g, oldRenderColor.b, oldRenderColor.a);
+		Renderer::SetDisplayColor(oldColor.r, oldColor.g, oldColor.b, oldColor.a);
 	}
 
-	void TextureManager::DrawRect(SDL_Rect rect, float angleDegrees, SDL_Color color, bool filled, Camera* camera)
+	void TextureManager::DrawRectWorldSpace(SDL_Rect rect, float angleDegrees, SDL_Color color, bool filled)
+	{
+		auto renderer = Renderer::GetRenderer();
+		auto camera = Renderer::GetActiveCamera();
+
+		if (renderer == nullptr || camera == nullptr || camera->GetRenderTarget() == nullptr)
+			return;
+
+		SDL_FPoint corners[4] =
+		{
+			{-rect.w / 2.0f, -rect.h / 2.0f},
+			{ rect.w / 2.0f, -rect.h / 2.0f},
+			{ rect.w / 2.0f,  rect.h / 2.0f},
+			{-rect.w / 2.0f,  rect.h / 2.0f}
+		};
+
+		auto cx = rect.x + rect.w * 0.5f;
+		auto cy = rect.y + rect.h * 0.5f;
+
+		auto angleRad = angleDegrees * static_cast<float>(MathConstants::PI / 180.0f);
+		auto cosA = cosf(angleRad);
+		auto sinA = sinf(angleRad);
+
+		for (auto& p : corners)
+		{
+			auto x = p.x * cosA - p.y * sinA;
+			auto y = p.x * sinA + p.y * cosA;
+
+			auto worldPos = Vector2F(x + cx, y + cy);
+			auto screenPos = camera->WorldToScreen(worldPos);
+
+			p.x = screenPos.x;
+			p.y = screenPos.y;
+		}
+
+		// Culling via camera
+		auto minX = corners[0].x, maxX = corners[0].x;
+		auto minY = corners[0].y, maxY = corners[0].y;
+
+		for (auto i = 1; i < 4; ++i)
+		{
+			minX = std::min(minX, corners[i].x);
+			maxX = std::max(maxX, corners[i].x);
+			minY = std::min(minY, corners[i].y);
+			maxY = std::max(maxY, corners[i].y);
+		}
+
+		SDL_Rect screenBounds =
+		{
+			static_cast<int>(minX),
+			static_cast<int>(minY),
+			static_cast<int>(maxX - minX),
+			static_cast<int>(maxY - minY)
+		};
+
+		if (!camera->IsVisible(screenBounds))
+			return;
+
+		if (filled)
+		{
+			SDL_Vertex vertices[6] =
+			{
+				{corners[0], color, {0,0}},
+				{corners[1], color, {0,0}},
+				{corners[2], color, {0,0}},
+				{corners[2], color, {0,0}},
+				{corners[3], color, {0,0}},
+				{corners[0], color, {0,0}}
+			};
+
+			SDL_RenderGeometry(renderer, nullptr, vertices, 6, nullptr, 0);
+		}
+		else
+		{
+			auto oldColor = Renderer::GetDisplayColor();
+			Renderer::SetDisplayColor(color.r, color.g, color.b, color.a);
+
+			for (auto i = 0; i < 4; ++i)
+			{
+				SDL_RenderDrawLineF(
+					renderer, 
+					corners[i].x, corners[i].y,
+					corners[(i + 1) % 4].x, corners[(i + 1) % 4].y);
+			}
+
+			Renderer::SetDisplayColor(oldColor.r, oldColor.g, oldColor.b, oldColor.a);
+		}
+	}
+
+	void TextureManager::DrawRectScreenSpace(SDL_Rect rect, float angleDegrees, SDL_Color color, bool filled)
 	{
 		auto renderer = Renderer::GetRenderer();
 
@@ -140,16 +232,16 @@ namespace DeadFrame2D::Core
 		auto cx = rect.x + rect.w * 0.5f;
 		auto cy = rect.y + rect.h * 0.5f;
 
-		auto angleRad = angleDegrees * static_cast<float>(MathConstants::PI / 180.0);
+		auto angleRad = angleDegrees * static_cast<float>(MathConstants::PI / 180.0f);
 		auto cosA = cosf(angleRad);
 		auto sinA = sinf(angleRad);
 
-		SDL_FPoint corners[4] = 
+		SDL_FPoint corners[4] =
 		{
-			{ -rect.w / 2.0f, -rect.h / 2.0f },
-			{  rect.w / 2.0f, -rect.h / 2.0f },
-			{  rect.w / 2.0f,  rect.h / 2.0f },
-			{ -rect.w / 2.0f,  rect.h / 2.0f }
+			{-rect.w / 2.0f, -rect.h / 2.0f},
+			{ rect.w / 2.0f, -rect.h / 2.0f},
+			{ rect.w / 2.0f,  rect.h / 2.0f},
+			{-rect.w / 2.0f,  rect.h / 2.0f}
 		};
 
 		for (auto& p : corners)
@@ -159,78 +251,62 @@ namespace DeadFrame2D::Core
 
 			p.x = x + cx;
 			p.y = y + cy;
-
-			if (camera != nullptr)
-			{
-				auto pVec = Vector2F(p.x, p.y);
-
-				pVec = camera->WorldToScreen(pVec);
-
-				p.x = pVec.x;
-				p.y = pVec.y;
-			}
-		}
-
-		if (camera != nullptr)
-		{
-			// AABB-based culling from polygon points
-			// (Convert to non-rotated rect)
-			auto minX = corners[0].x, maxX = corners[0].x;
-			auto minY = corners[0].y, maxY = corners[0].y;
-
-			for (auto i = 1; i < 4; ++i)
-			{
-				if (corners[i].x < minX) minX = corners[i].x;
-				if (corners[i].x > maxX) maxX = corners[i].x;
-				if (corners[i].y < minY) minY = corners[i].y;
-				if (corners[i].y > maxY) maxY = corners[i].y;
-			}
-
-			SDL_Rect screenBounds = 
-			{
-				static_cast<int>(minX),
-				static_cast<int>(minY),
-				static_cast<int>(maxX - minX),
-				static_cast<int>(maxY - minY)
-			};
-
-			if (!camera->IsVisible(screenBounds))
-				return;
 		}
 
 		if (filled)
 		{
-			SDL_Vertex vertices[6]
+			SDL_Vertex vertices[6] =
 			{
-				{ corners[0], color, {0, 0} },
-				{ corners[1], color, {0, 0} },
-				{ corners[2], color, {0, 0} },
-				{ corners[2], color, {0, 0} },
-				{ corners[3], color, {0, 0} },
-				{ corners[0], color, {0, 0} }
+				{corners[0], color, {0,0}},
+				{corners[1], color, {0,0}},
+				{corners[2], color, {0,0}},
+				{corners[2], color, {0,0}},
+				{corners[3], color, {0,0}},
+				{corners[0], color, {0,0}}
 			};
 
 			SDL_RenderGeometry(renderer, nullptr, vertices, 6, nullptr, 0);
 		}
 		else
 		{
-			auto oldRenderColor = Renderer::GetDisplayColor();
-
+			auto oldColor = Renderer::GetDisplayColor();
 			Renderer::SetDisplayColor(color.r, color.g, color.b, color.a);
 
-			for (auto i = 0; i < 4; ++i)
+			for (int i = 0; i < 4; ++i)
 			{
 				SDL_RenderDrawLineF(
 					renderer,
 					corners[i].x, corners[i].y,
 					corners[(i + 1) % 4].x, corners[(i + 1) % 4].y);
 			}
-	
-			Renderer::SetDisplayColor(oldRenderColor.r, oldRenderColor.g, oldRenderColor.b, oldRenderColor.a);
+
+			Renderer::SetDisplayColor(oldColor.r, oldColor.g, oldColor.b, oldColor.a);
 		}
 	}
 
-	void TextureManager::DrawCircle(Circle circle, SDL_Color color, bool filled, Camera* camera)
+	void TextureManager::DrawCircleWorldSpace(Circle circle, SDL_Color color, bool filled)
+	{
+		auto renderer = Renderer::GetRenderer();
+		auto camera = Renderer::GetActiveCamera();
+
+		if (renderer == nullptr || camera == nullptr)
+			return;
+
+		auto screenCenter = circle.position;
+		auto radius = circle.radius;
+
+		screenCenter = camera->WorldToScreen(circle.position);
+		radius *= camera->GetZoom();
+
+		auto transformedCircle = Circle(screenCenter, radius);
+
+		if (!camera->IsVisible(transformedCircle))
+			return;
+
+		DrawCircleScreenSpace(transformedCircle, color, filled);
+	}
+
+	void TextureManager::DrawCircleScreenSpace(Circle circle, SDL_Color color, bool filled)
 	{
 		auto renderer = Renderer::GetRenderer();
 
@@ -239,17 +315,6 @@ namespace DeadFrame2D::Core
 
 		auto screenCenter = circle.position;
 		auto radius = circle.radius;
-	
-		if (camera != nullptr)
-		{
-			// Transform to screen space
-			screenCenter = camera->WorldToScreen(circle.position);
-			radius *= camera->GetZoom();
-
-			// Culling: skip if circle is fully outside the camera's view
-			if (!camera->IsVisible(Circle(screenCenter, radius)))
-				return;
-		}
 
 		// Increase segments for smoother circles
 		const auto segments = 64;
@@ -265,7 +330,7 @@ namespace DeadFrame2D::Core
 			for (auto i = 0; i <= segments; ++i)
 			{
 				auto angle = (2.0f * MathConstants::PI_f * i) / segments;
-				vertices[i + 1] = 
+				vertices[i + 1] =
 				{
 					.position = { screenCenter.x + cosf(angle) * radius, screenCenter.y + sinf(angle) * radius },
 					.color = color,
@@ -290,150 +355,19 @@ namespace DeadFrame2D::Core
 			Renderer::SetDisplayColor(color.r, color.g, color.b, color.a);
 
 			std::vector<SDL_Point> points(segments + 1);
-		
+
 			for (auto i = 0; i <= segments; ++i)
 			{
 				auto angle = (2.0f * MathConstants::PI_f * i) / segments;
-			
+
 				points[i].x = static_cast<int>(screenCenter.x + cosf(angle) * radius);
 				points[i].y = static_cast<int>(screenCenter.y + sinf(angle) * radius);
 			}
 
 			SDL_RenderDrawLines(renderer, points.data(), (int)points.size());
-		
+
 			Renderer::SetDisplayColor(oldRenderColor.r, oldRenderColor.g, oldRenderColor.b, oldRenderColor.a);
 		}
-	}
-
-	void TextureManager::DrawTexture(
-		std::shared_ptr<SDL_Texture> texture,
-		const SDL_Rect* srcRect,
-		const SDL_Rect* dstRect,
-		float angle,
-		SDL_Point* rotationOrigin,
-		SDL_RendererFlip flip,
-		Uint8 alpha,
-		SDL_Color colorMod, 
-		Camera* camera)
-	{
-		auto renderer = Renderer::GetRenderer();
-
-		if (renderer == nullptr || texture == nullptr)
-			return;
-
-		auto texturePtr = texture.get();
-
-		auto floatPos = Vector2F::Zero;
-		auto floatSize = Vector2F::Zero;
-
-		if (!dstRect)
-		{
-			auto texW = 0, texH = 0;
-			SDL_QueryTexture(texturePtr, nullptr, nullptr, &texW, &texH);
-
-			floatSize = { static_cast<float>(texW), static_cast<float>(texH) };
-		}
-		else
-		{
-			floatPos = { static_cast<float>(dstRect->x), static_cast<float>(dstRect->y) };
-			floatSize = { static_cast<float>(dstRect->w), static_cast<float>(dstRect->h) };
-		}
-
-		if (camera != nullptr)
-		{
-			floatPos = camera->WorldToScreen(floatPos);
-			floatSize *= camera->GetZoom();
-		}
-
-		// Convert to SDL_Rect after camera adjustments
-		SDL_Rect transformedDst
-		{
-			static_cast<int>(std::floor(floatPos.x)),
-			static_cast<int>(std::floor(floatPos.y)),
-			static_cast<int>(std::ceil(floatSize.x)),
-			static_cast<int>(std::ceil(floatSize.y))
-		};
-
-		if (camera != nullptr && !camera->IsVisible(transformedDst))
-			return;
-
-		// Backup texture state
-		Uint8 oldAlpha, oldR, oldG, oldB;
-		SDL_GetTextureAlphaMod(texturePtr, &oldAlpha);
-		SDL_GetTextureColorMod(texturePtr, &oldR, &oldG, &oldB);
-
-		SDL_SetTextureAlphaMod(texturePtr, alpha);
-		SDL_SetTextureColorMod(texturePtr, colorMod.r, colorMod.g, colorMod.b);
-
-		SDL_Point fallbackOrigin
-		{
-			static_cast<int>(std::roundf(floatSize.x * 0.5f)),
-			static_cast<int>(std::roundf(floatSize.y * 0.5f))
-		};
-
-		SDL_RenderCopyEx(
-			renderer, 
-			texturePtr, 
-			srcRect, 
-			&transformedDst, 
-			angle,
-			rotationOrigin ? rotationOrigin : &fallbackOrigin, 
-			flip);
-
-		// Restore texture state
-		SDL_SetTextureAlphaMod(texturePtr, oldAlpha);
-		SDL_SetTextureColorMod(texturePtr, oldR, oldG, oldB);
-	}
-
-	void TextureManager::DrawPixel(const Vector2F& p, SDL_Color color, Camera* camera)
-	{
-		auto renderer = Renderer::GetRenderer();
-
-		if (renderer == nullptr)
-			return;
-
-		auto finalPos = camera != nullptr ? camera->WorldToScreen(p) : p;
-
-		auto oldRenderColor = Renderer::GetDisplayColor();
-
-		Renderer::SetDisplayColor(color.r, color.g, color.b, color.a);
-
-		SDL_RenderDrawPoint(
-			renderer, 
-			static_cast<int>(finalPos.x),
-			static_cast<int>(finalPos.y));
-
-		Renderer::SetDisplayColor(oldRenderColor.r, oldRenderColor.g, oldRenderColor.b, oldRenderColor.a);
-	}
-
-	void TextureManager::DrawLineWorldSpace(const Vector2F& p1, const Vector2F& p2, SDL_Color color)
-	{
-		DrawLine(p1, p2, color, currentCamera);
-	}
-
-	void TextureManager::DrawLineScreenSpace(const Vector2F& p1, const Vector2F& p2, SDL_Color color)
-	{
-		DrawLine(p1, p2, color);
-	}
-
-	void TextureManager::DrawRectWorldSpace(SDL_Rect rect, float angleDegrees, SDL_Color color, bool filled)
-	{
-		DrawRect(rect, angleDegrees, color, filled, currentCamera);
-	}
-
-	void TextureManager::DrawRectScreenSpace(SDL_Rect rect, float angleDegrees, SDL_Color color, bool filled)
-	{
-		DrawRect(rect, angleDegrees, color, filled);
-	}
-
-	void TextureManager::DrawCircleWorldSpace(Circle circle, SDL_Color color, bool filled)
-	{
-		DrawCircle(circle, color, filled, currentCamera);
-	}
-
-	void TextureManager::DrawCircleScreenSpace(Circle circle, SDL_Color color, bool filled)
-	{
-		DrawCircle(circle, color, filled);
 	}
 
 	void TextureManager::DrawTextureWorldSpace(
@@ -446,7 +380,70 @@ namespace DeadFrame2D::Core
 		Uint8 alpha, 
 		SDL_Color colorMod)
 	{
-		DrawTexture(texture, srcRect, dstRect, angle, rotationOrigin, flip, alpha, colorMod, currentCamera);
+		auto renderer = Renderer::GetRenderer();
+		auto camera = Renderer::GetActiveCamera();
+
+		if (texture == nullptr || renderer == nullptr || camera == nullptr)
+			return;
+
+		auto texturePtr = texture.get();
+
+		auto pos = Vector2F::Zero;
+		auto size = Vector2F::Zero;
+
+		if (!dstRect)
+		{
+			int w, h;
+			SDL_QueryTexture(texture.get(), nullptr, nullptr, &w, &h);
+			
+			size = Vector2F(float(w), float(h));
+		}
+		else
+		{
+			pos = Vector2F(float(dstRect->x), float(dstRect->y));
+			size = Vector2F(float(dstRect->w), float(dstRect->h));
+		}
+
+		pos = camera->WorldToScreen(pos);
+		size *= camera->GetZoom();
+
+		auto dest = SDL_Rect
+		{
+			.x = static_cast<int>(pos.x),
+			.y = static_cast<int>(pos.y),
+			.w = static_cast<int>(size.x),
+			.h = static_cast<int>(size.y)
+		};
+
+		if (!camera->IsVisible(dest))
+			return;
+
+		// Backup texture state
+		Uint8 oldAlpha, oldR, oldG, oldB;
+		SDL_GetTextureAlphaMod(texturePtr, &oldAlpha);
+		SDL_GetTextureColorMod(texturePtr, &oldR, &oldG, &oldB);
+
+		SDL_SetTextureAlphaMod(texturePtr, alpha);
+		SDL_SetTextureColorMod(texturePtr, colorMod.r, colorMod.g, colorMod.b);
+
+		SDL_Point fallbackOrigin
+		{
+			static_cast<int>(std::roundf(dest.x * 0.5f)),
+			static_cast<int>(std::roundf(dest.y * 0.5f))
+		};
+
+		SDL_RenderCopyEx(
+			renderer,
+			texturePtr,
+			srcRect,
+			&dest,
+			angle,
+			rotationOrigin ? rotationOrigin : &fallbackOrigin,
+			flip);
+
+		// Restore texture state
+		SDL_SetTextureAlphaMod(texturePtr, oldAlpha);
+		SDL_SetTextureColorMod(texturePtr, oldR, oldG, oldB);
 	}
 
 	void TextureManager::DrawTextureScreenSpace(
@@ -459,16 +456,106 @@ namespace DeadFrame2D::Core
 		Uint8 alpha, 
 		SDL_Color colorMod)
 	{
-		DrawTexture(texture, srcRect, dstRect, angle, rotationOrigin, flip, alpha, colorMod);
+		auto renderer = Renderer::GetRenderer();
+
+		if (texture == nullptr || renderer == nullptr)
+			return;
+
+		auto dest = dstRect ? *dstRect : SDL_Rect{ 0,0,0,0 };
+
+		if (!dstRect)
+		{
+			int w, h;
+			SDL_QueryTexture(texture.get(), nullptr, nullptr, &w, &h);
+			
+			dest = SDL_Rect
+			{ 
+				.x = 0, 
+				.y = 0, 
+				.w = w, 
+				.h = h 
+			};
+		}
+
+		auto texturePtr = texture.get();
+
+		// Backup texture state
+		Uint8 oldAlpha, oldR, oldG, oldB;
+		SDL_GetTextureAlphaMod(texturePtr, &oldAlpha);
+		SDL_GetTextureColorMod(texturePtr, &oldR, &oldG, &oldB);
+
+		SDL_SetTextureAlphaMod(texturePtr, alpha);
+		SDL_SetTextureColorMod(texturePtr, colorMod.r, colorMod.g, colorMod.b);
+
+		SDL_Point fallbackOrigin
+		{
+			static_cast<int>(std::roundf(dest.x * 0.5f)),
+			static_cast<int>(std::roundf(dest.y * 0.5f))
+		};
+
+		SDL_RenderCopyEx(
+			renderer,
+			texturePtr,
+			srcRect,
+			&dest,
+			angle,
+			rotationOrigin ? rotationOrigin : &fallbackOrigin,
+			flip);
+
+		// Restore texture state
+		SDL_SetTextureAlphaMod(texturePtr, oldAlpha);
+		SDL_SetTextureColorMod(texturePtr, oldR, oldG, oldB);
 	}
 
-	void TextureManager::DrawPixelWorldSpace(const Vector2F& p, SDL_Color color)
+	void TextureManager::DrawPixelWorldSpace(const Vector2F& worldPos, SDL_Color color)
 	{
-		DrawPixel(p, color, currentCamera);
+		auto camera = Renderer::GetActiveCamera();
+		auto renderer = Renderer::GetRenderer();
+
+		if (camera == nullptr || renderer == nullptr)
+			return;
+
+		// Convert world position to screen using camera
+		auto worldToScreenPos = camera->WorldToScreen(worldPos);
+
+		auto testRect = SDL_Rect
+		{ 
+			.x = static_cast<int>(worldToScreenPos.x),
+			.y = static_cast<int>(worldToScreenPos.y),
+			.w = 1, 
+			.h = 1 
+		};
+
+		if (!camera->IsVisible(testRect))
+			return;
+
+		auto oldColor = Renderer::GetDisplayColor();
+		Renderer::SetDisplayColor(color.r, color.g, color.b, color.a);
+
+		SDL_RenderDrawPoint(
+			renderer,
+			static_cast<int>(worldToScreenPos.x),
+			static_cast<int>(worldToScreenPos.y));
+
+		Renderer::SetDisplayColor(oldColor.r, oldColor.g, oldColor.b, oldColor.a);
 	}
 
-	void TextureManager::DrawPixelScreenSpace(const Vector2F& p, SDL_Color color)
+	void TextureManager::DrawPixelScreenSpace(const Vector2F& screenPos, SDL_Color color)
 	{
-		DrawPixel(p, color);
+		auto renderer = Renderer::GetRenderer();
+
+		if (renderer == nullptr)
+			return;
+
+		auto oldColor = Renderer::GetDisplayColor();
+
+		Renderer::SetDisplayColor(color.r, color.g, color.b, color.a);
+
+		SDL_RenderDrawPoint(
+			renderer,
+			static_cast<int>(screenPos.x),
+			static_cast<int>(screenPos.y));
+
+		Renderer::SetDisplayColor(oldColor.r, oldColor.g, oldColor.b, oldColor.a);
 	}
 }
