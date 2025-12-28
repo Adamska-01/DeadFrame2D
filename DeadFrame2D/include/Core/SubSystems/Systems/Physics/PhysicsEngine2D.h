@@ -38,20 +38,20 @@ namespace DeadFrame2D::Core
 
 		PhysicsEngine2D(const Shared::Models::PhysicsConfig& physicsConfig);
 
-		virtual ~PhysicsEngine2D() override;
+		~PhysicsEngine2D() override;
 
 		PhysicsEngine2D(const PhysicsEngine2D&) = delete;
 
 		PhysicsEngine2D(PhysicsEngine2D&&) = delete;
 
 
-		virtual void BeginFrame() override;
+		void BeginFrame() override;
 
-		virtual void PreUpdate(float deltaTime) override;
+		void PreUpdate(float deltaTime) override;
 
-		virtual void EndUpdate(float deltaTime) override;
+		void EndUpdate(float deltaTime) override;
 
-		virtual void EndDraw() override;
+		void EndDraw() override;
 
 
 	public:

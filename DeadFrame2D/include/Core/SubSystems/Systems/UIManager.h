@@ -21,7 +21,7 @@ namespace DeadFrame2D::Core
 	private:
 		UIManager();
 
-		virtual ~UIManager() override;
+		~UIManager() override;
 
 		UIManager(const UIManager&) = delete;
 
@@ -36,13 +36,13 @@ namespace DeadFrame2D::Core
 		static std::unordered_map<std::pair<std::string, int>, std::shared_ptr<TTF_Font>, DeadFrame2D::Utilities::PairHash> fontCache;
 
 
-		virtual void BeginFrame() override;
+		void BeginFrame() override;
 
-		virtual void PreUpdate(float deltaTime) override;
+		void PreUpdate(float deltaTime) override;
 
-		virtual void EndUpdate(float deltaTime) override;
+		void EndUpdate(float deltaTime) override;
 
-		virtual void EndDraw() override;
+		void EndDraw() override;
 
 
 	public:

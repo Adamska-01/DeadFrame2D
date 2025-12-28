@@ -31,7 +31,7 @@ namespace DeadFrame2D::Core
 
 		AudioManager(const Shared::Models::AudioConfig& audioConfig);
 
-		virtual ~AudioManager() override;
+		~AudioManager() override;
 
 		AudioManager(const AudioManager&) = delete;
 
@@ -43,13 +43,13 @@ namespace DeadFrame2D::Core
 		AudioManager& operator=(AudioManager&&) = delete;
 
 
-		virtual void BeginFrame() override;
+		void BeginFrame() override;
 
-		virtual void PreUpdate(float deltaTime) override;
+		void PreUpdate(float deltaTime) override;
 
-		virtual void EndUpdate(float deltaTime) override;
+		void EndUpdate(float deltaTime) override;
 
-		virtual void EndDraw() override;
+		void EndDraw() override;
 
 
 	public:

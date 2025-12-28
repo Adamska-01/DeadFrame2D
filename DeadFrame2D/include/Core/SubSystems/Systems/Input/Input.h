@@ -30,7 +30,7 @@ namespace DeadFrame2D::Core
 
 		Input();
 
-		virtual ~Input() override;
+		~Input() override;
 
 		Input(Input&&) = delete;
 
@@ -56,13 +56,13 @@ namespace DeadFrame2D::Core
 		void DeviceRemovedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
 
 
-		virtual void BeginFrame() override;
+		void BeginFrame() override;
 
-		virtual void PreUpdate(float deltaTime) override;
+		void PreUpdate(float deltaTime) override;
 
-		virtual void EndUpdate(float deltaTime) override;
+		void EndUpdate(float deltaTime) override;
 
-		virtual void EndDraw() override;
+		void EndDraw() override;
 
 
 	public:

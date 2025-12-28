@@ -24,20 +24,20 @@ namespace DeadFrame2D::Core
 
 		CoroutineScheduler();
 
-		virtual ~CoroutineScheduler() override;
+		~CoroutineScheduler() override;
 
 		CoroutineScheduler(const CoroutineScheduler&) = delete;
 
 		CoroutineScheduler& operator=(const CoroutineScheduler&) = delete;
 
 
-		virtual void BeginFrame() override;
+		void BeginFrame() override;
 
-		virtual void PreUpdate(float deltaTime) override;
+		void PreUpdate(float deltaTime) override;
 
-		virtual void EndUpdate(float deltaTime) override;
+		void EndUpdate(float deltaTime) override;
 
-		virtual void EndDraw() override;
+		void EndDraw() override;
 
 
 	public:

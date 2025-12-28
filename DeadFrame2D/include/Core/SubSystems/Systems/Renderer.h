@@ -20,7 +20,7 @@ namespace DeadFrame2D::Core
 
 		Renderer(SDL_Window* window, const Shared::Models::RendererConfig& config);
 
-		virtual ~Renderer() override;
+		~Renderer() override;
 
 		Renderer(const Renderer&) = delete;
 
@@ -31,13 +31,13 @@ namespace DeadFrame2D::Core
 		Renderer& operator=(Renderer&&) = delete;
 
 
-		virtual void BeginFrame() override;
+		void BeginFrame() override;
 
-		virtual void PreUpdate(float deltaTime) override;
+		void PreUpdate(float deltaTime) override;
 
-		virtual void EndUpdate(float deltaTime) override;
+		void EndUpdate(float deltaTime) override;
 
-		virtual void EndDraw() override;
+		void EndDraw() override;
 
 
 	public:

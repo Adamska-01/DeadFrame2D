@@ -16,9 +16,12 @@ namespace DeadFrame2D::Core
 
 
 	private:
+		static SDL_Window* window;
+
+
 		Window(Shared::Models::WindowConfig windowConfig);
 
-		virtual ~Window() override;
+		~Window() override;
 
 		Window(const Window&) = delete;
 
@@ -30,16 +33,13 @@ namespace DeadFrame2D::Core
 		Window& operator=(Window&&) = delete;
 
 
-		static SDL_Window* window;
+		void BeginFrame() override;
 
+		void PreUpdate(float deltaTime) override;
 
-		virtual void BeginFrame() override;
+		void EndUpdate(float deltaTime) override;
 
-		virtual void PreUpdate(float deltaTime) override;
-
-		virtual void EndUpdate(float deltaTime) override;
-
-		virtual void EndDraw() override;
+		void EndDraw() override;
 
 
 	public:
