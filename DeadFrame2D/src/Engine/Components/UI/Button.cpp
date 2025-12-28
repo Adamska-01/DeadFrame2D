@@ -96,11 +96,11 @@ namespace DeadFrame2D::Engine
 						static_cast<float>(sdlEvent.motion.y)),
 					destRect);
 
-				if (isColliding && !isHovered)
+				if (isColliding && !isHovered && !isPressed)
 				{
 					OnPointerEnter();
 				}
-				else if (!isColliding && isHovered)
+				else if (!isColliding && isHovered && !isPressed)
 				{
 					OnPointerExit();
 				}
