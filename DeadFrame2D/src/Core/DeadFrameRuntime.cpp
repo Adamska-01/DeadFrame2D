@@ -85,9 +85,9 @@ namespace DeadFrame2D::Core
 				alpha = static_cast<uint8_t>(alpha * t);
 			}
 
-			Renderer::ClearBuffer();
-			TextureManager::DrawTexture(splashTexture, nullptr, &destRect, 0.0f, nullptr, SDL_RendererFlip::SDL_FLIP_NONE, alpha);
-			Renderer::PresentBuffer();
+			SDL_RenderClear(Renderer::GetRenderer());
+			TextureManager::DrawTextureScreenSpace(splashTexture, nullptr, &destRect, 0.0f, nullptr, SDL_RendererFlip::SDL_FLIP_NONE, alpha);
+			SDL_RenderPresent(Renderer::GetRenderer());
 
 			frameTimer.EndClock();
 			frameTimer.DelayByFrameTime();
@@ -121,25 +121,21 @@ namespace DeadFrame2D::Core
 
 			sceneManager->LateUpdateScene(deltaTime);
 
-			Renderer::ClearBuffer();
-
-			for (const auto& camera : Camera::cameras)
+			for (auto camera : Camera::GetCameras())
 			{
 				if (!camera->IsActive())
 					continue;
 
-				TextureManager::currentCamera = camera;
-
-				Renderer::SetViewport(camera->GetViewBox());
+				Renderer::BeginCamera(camera);
 
 				sceneManager->DrawScene();
 
 				engineSubSystems->EndDraw();
 
-				TextureManager::currentCamera = nullptr;
+				Renderer::EndCamera();
 			}
 
-			Renderer::PresentBuffer();
+			Renderer::ClearAndPresentBuffer();
 
 			sceneManager->LoadNewSceneIfAvailable();
 
