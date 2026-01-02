@@ -1,0 +1,18 @@
+#pragma once
+#include "Data/Rendering/Pipeline/Shapes/CircleRenderData.h"
+#include "Data/Rendering/Pipeline/Shapes/LineRenderData.h"
+#include "Data/Rendering/Pipeline/Shapes/PointRenderData.h"
+#include "Data/Rendering/Pipeline/Shapes/RectRenderData.h"
+#include "Data/Rendering/Pipeline/Shapes/SpriteRenderData.h"
+#include <variant>
+
+
+namespace DeadFrame2D::Data
+{
+	using RenderData = std::variant<
+		SpriteRenderData,
+		RectRenderData,
+		LineRenderData,
+		CircleRenderData,
+		PointRenderData>;
+}
