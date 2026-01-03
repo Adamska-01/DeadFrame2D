@@ -1,8 +1,10 @@
 #include "Constants/MathConstants.h"
 #include "Core/Debugging/Debug.h"
-#include "Core/SubSystems/Systems/Renderer.h"
+#include "Core/Math/Circle.h"
+#include "Core/SubSystems/Systems/Rendering/Renderer.h"
 #include "Core/SubSystems/Systems/Window.h"
 #include "Engine/Components/Rendering/Camera.h"
+#include "Engine/Components/UI/Canvas.h"
 #include "Engine/EngineEvents/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/SubSystems/Renderer/RenderTargetSizeChangedEvent.h"
 #include <SDL.h>
@@ -14,11 +16,10 @@ namespace DeadFrame2D::Core
 
 	using namespace DeadFrame2D::Engine;
 	using namespace DeadFrame2D::Constants;
+	using namespace DeadFrame2D::Data;
 
 
 	SDL_Renderer* Renderer::renderer = nullptr;
-
-	Camera* Renderer::activeCamera = nullptr;
 
 
 	Renderer::Renderer(SDL_Window* window, const RendererConfig& config)
@@ -114,7 +115,7 @@ namespace DeadFrame2D::Core
 		SetDisplayColor(previousBackgroundColor.r, previousBackgroundColor.g, previousBackgroundColor.b, previousBackgroundColor.a);
 	}
 
-	void Renderer::DrawRect(SDL_Rect rect, float angleDegrees, SDL_Color color, bool filled)
+	void Renderer::DrawRect(SDL_FRect rect, float angleDegrees, SDL_Color color, bool filled)
 	{
 		if (renderer == nullptr)
 			return;
@@ -239,7 +240,7 @@ namespace DeadFrame2D::Core
 		}
 	}
 
-	void Renderer::DrawTexture(SDL_Texture* texture, const SDL_Rect* srcRect, const SDL_FRect* dstRect, float angle, SDL_FPoint* rotationOrigin, SDL_RendererFlip flip, Uint8 alpha, SDL_Color colorMod)
+	void Renderer::DrawTexture(SDL_Texture* texture, const SDL_Rect* srcRect, const SDL_FRect* dstRect, const SDL_FPoint* rotationOrigin, float angle, SDL_RendererFlip flip, SDL_Color colorMod)
 	{
 		if (texture == nullptr || renderer == nullptr)
 			return;
@@ -262,7 +263,7 @@ namespace DeadFrame2D::Core
 		SDL_GetTextureAlphaMod(texture, &oldAlpha);
 		SDL_GetTextureColorMod(texture, &oldR, &oldG, &oldB);
 
-		SDL_SetTextureAlphaMod(texture, alpha);
+		SDL_SetTextureAlphaMod(texture, colorMod.a);
 		SDL_SetTextureColorMod(texture, colorMod.r, colorMod.g, colorMod.b);
 
 		// Determine rotation origin
@@ -286,13 +287,169 @@ namespace DeadFrame2D::Core
 		SDL_SetTextureColorMod(texture, oldR, oldG, oldB);
 	}
 
+	void Renderer::DrawFromTask(RenderTask& renderTask, ComponentHandle<Camera> camera, bool requiresSreenSpaceConversion)
+	{
+		switch (renderTask.renderType)
+		{
+			case RenderPrimitive::SPRITE:
+				{
+					auto& renderData = std::get<SpriteRenderData>(renderTask.renderData);
+
+					if (camera != nullptr && requiresSreenSpaceConversion)
+					{
+						auto screenPos = camera->WorldToScreen(Vector2F(renderData.destRect.x, renderData.destRect.y));
+
+						renderData.destRect.x = screenPos.x;
+						renderData.destRect.y = screenPos.y;
+						renderData.destRect.w *= camera->GetZoom();
+						renderData.destRect.h *= camera->GetZoom();
+
+						if (!camera->IsVisible(renderData.destRect))
+							return;
+					}
+
+					DrawTexture(
+						renderData.texture,
+						&renderData.srcRect,
+						&renderData.destRect,
+						&renderData.rotationOrigin,
+						renderData.rotation,
+						renderData.flip,
+						renderData.colorMod);
+				}
+				break;
+
+			case RenderPrimitive::RECT:
+				{
+					auto& renderData = std::get<RectRenderData>(renderTask.renderData);
+
+					if (camera != nullptr && requiresSreenSpaceConversion)
+					{
+						auto screenPos = camera->WorldToScreen(Vector2F(renderData.destRect.x, renderData.destRect.y));
+
+						renderData.destRect.x = screenPos.x;
+						renderData.destRect.y = screenPos.y;
+						renderData.destRect.w *= camera->GetZoom();
+						renderData.destRect.h *= camera->GetZoom();
+
+						if (!camera->IsVisible(renderData.destRect))
+							return;
+					}
+
+					DrawRect(
+						renderData.destRect,
+						renderData.rotation,
+						renderData.color,
+						renderData.filled);
+				}
+				break;
+
+			case RenderPrimitive::CIRCLE:
+				{
+					auto& renderData = std::get<CircleRenderData>(renderTask.renderData);
+
+					if (camera != nullptr && requiresSreenSpaceConversion)
+					{
+						renderData.center = camera->WorldToScreen(renderData.center);
+						renderData.radius *= camera->GetZoom();
+
+						if (!camera->IsVisible(Circle(renderData.center, renderData.radius)))
+							return;
+					}
+
+					DrawCircle(
+						renderData.center,
+						renderData.radius,
+						renderData.color,
+						renderData.filled);
+				}
+				break;
+
+			case RenderPrimitive::LINE:
+				{
+					auto& renderData = std::get<LineRenderData>(renderTask.renderData);
+
+					if (camera != nullptr && requiresSreenSpaceConversion)
+					{
+						renderData.p1 = camera->WorldToScreen(renderData.p1);
+						renderData.p2 = camera->WorldToScreen(renderData.p2);
+
+						if (!camera->IsVisible(renderData.p1, renderData.p2))
+							return;
+					}
+
+					DrawLine(
+						renderData.p1,
+						renderData.p2,
+						renderData.color);
+				}
+				break;
+			
+			case RenderPrimitive::POINT:
+				{
+					auto& renderData = std::get<PointRenderData>(renderTask.renderData);
+
+					if (camera != nullptr && requiresSreenSpaceConversion)
+					{
+						renderData.pos = camera->WorldToScreen(renderData.pos);
+
+						if (!camera->IsVisible(renderData.pos, renderData.pos))
+							return;
+					}
+
+					DrawPixel(renderData.pos, renderData.color);
+				}
+				break;
+		}
+	}
+
 	void Renderer::ClearAndPresentBuffer()
 	{
-		// Backbuffer
+		std::sort(
+			renderTasks.begin(), 
+			renderTasks.end(),
+			[](const RenderTask& a, const RenderTask& b)
+			{
+				return a.GetSortKey() < b.GetSortKey();
+			});
+
+		// ==============================================================
+		// 1) CAMERA PASSES: WORLD + DEBUG_WORLD + SCREEN_SPACE_CAMERA_UI
+		// ==============================================================
+		for (auto camera : Camera::GetCameras())
+		{
+			if (!camera->IsActive())
+				continue;
+
+			auto cameraHandle = camera->GetHandleAs<Camera>();
+
+			SDL_SetRenderTarget(renderer, camera->GetRenderTarget());
+
+			for (auto& task : renderTasks)
+			{
+				// All the WORLD ones are guaranteed come before SCREEN_SPACE_CAMERA_UI thanks to the sorting, so it's fine to do it in a single loop.
+				switch (task.renderPhase)
+				{
+					case RenderPhase::WORLD:
+					case RenderPhase::DEBUG_WORLD:
+						DrawFromTask(task, cameraHandle);
+						break;
+
+					case RenderPhase::SCREEN_SPACE_CAMERA_UI:
+						if (task.canvas->GetRenderCamera() == cameraHandle)
+							DrawFromTask(task, cameraHandle, false);
+						break;
+
+					default:
+						break;
+				}
+			}
+		}
+
+		// ==============================================================
+		// 2) COMPOSITE CAMERA RENDER TARGETS -> BACKBUFFER
+		// ==============================================================
 		SDL_SetRenderTarget(renderer, NULL);
-
-		SetDisplayColor(0, 0, 0, 255);
-
 		SDL_RenderClear(renderer);
 
 		for (auto camera : Camera::GetCameras())
@@ -300,38 +457,40 @@ namespace DeadFrame2D::Core
 			if (!camera->IsActive())
 				continue;
 
-			auto viewport = camera->GetNormalizedViewBox();
+			auto cameraHandle = camera->GetHandleAs<Camera>();
+			auto viewport = cameraHandle->GetNormalizedViewBox();
 
 			SDL_RenderCopy(
 				renderer,
-				camera->GetRenderTarget(),
+				cameraHandle->GetRenderTarget(),
 				nullptr,
 				&viewport);
+		}
+
+		// =========================================================
+		// 3) SCREEN-SPACE OVERLAY UI
+		// 4) DEBUG SCREEN OVERLAY
+		// =========================================================
+		for (auto& task : renderTasks)
+		{
+			switch (task.renderPhase)
+			{
+				case RenderPhase::SCREEN_SPACE_OVERLAY_UI:
+				case RenderPhase::DEBUG_OVERLAY:
+					DrawFromTask(task, {}, false);
+					break;
+
+				default:
+					break;
+			}
 		}
 
 		SDL_RenderPresent(renderer);
 	}
 
-	void Renderer::BeginCamera(Camera* camera)
-	{
-		activeCamera = camera;
-
-		SDL_SetRenderTarget(renderer, camera->GetRenderTarget());
-	}
-
-	void Renderer::EndCamera()
-	{
-		activeCamera = nullptr;
-	}
-
 	SDL_Renderer* Renderer::GetRenderer()
 	{
 		return renderer;
-	}
-
-	Camera* Renderer::GetActiveCamera()
-	{
-		return activeCamera;
 	}
 
 	SDL_Color Renderer::GetDisplayColor()
