@@ -1,5 +1,5 @@
 #include "Core/Debugging/Debug.h"
-#include "Core/SubSystems/Systems/Renderer.h"
+#include "Core/SubSystems/Systems/Rendering/Renderer.h"
 #include "Core/SubSystems/Systems/UIManager.h"
 #include <iostream>
 #include <sstream>

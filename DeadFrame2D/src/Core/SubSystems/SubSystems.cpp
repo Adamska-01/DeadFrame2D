@@ -3,7 +3,7 @@
 #include "Core/SubSystems/Systems/CoroutineScheduler.h"
 #include "Core/SubSystems/Systems/Input/Input.h"
 #include "Core/SubSystems/Systems/Physics/PhysicsEngine2D.h"
-#include "Core/SubSystems/Systems/Renderer.h"
+#include "Core/SubSystems/Systems/Rendering/Renderer.h"
 #include "Core/SubSystems/Systems/TextureManager.h"
 #include "Core/SubSystems/Systems/UIManager.h"
 #include "Core/SubSystems/Systems/Window.h"
