@@ -23,6 +23,11 @@ namespace DeadFrame2D::Engine
 		return sortOrder;
 	}
 
+	ComponentHandle<Camera> Canvas::GetRenderCamera()
+	{
+		return renderCamera;
+	}
+
 	void Canvas::SetSortOrder(int value)
 	{
 		sortOrder = value;
@@ -32,7 +37,7 @@ namespace DeadFrame2D::Engine
 	{
 		renderMode = CanvasRenderMode::SCREEN_SPACE_OVERLAY;
 
-		targetCamera = nullptr;
+		renderCamera = nullptr;
 	}
 
 	void Canvas::SetScreenSpaceCamera(ComponentHandle<Camera> targetCamera)
@@ -41,6 +46,6 @@ namespace DeadFrame2D::Engine
 			? CanvasRenderMode::SCREEN_SPACE_CAMERA
 			: CanvasRenderMode::SCREEN_SPACE_OVERLAY;
 
-		this->targetCamera = targetCamera;
+		this->renderCamera = targetCamera;
 	}
 }

@@ -32,7 +32,7 @@ namespace DeadFrame2D::Engine
 		 *
 		 * If null, the canvas behaves as if it were in screen space overlay mode.
 		 */
-		ComponentHandle<Camera> targetCamera;
+		ComponentHandle<Camera> renderCamera;
 
 
 	public:
@@ -52,6 +52,13 @@ namespace DeadFrame2D::Engine
 		 * @return The canvas sort order.
 		 */
 		int GetSortOrder() const;
+
+		/**
+		 * @brief Returns the render camera set to the canvas.
+		 *
+		 * @return The canvas render camera.
+		 */
+		ComponentHandle<Camera> GetRenderCamera();
 
 		/**
 		 * @brief Sets the sorting order of the canvas.
