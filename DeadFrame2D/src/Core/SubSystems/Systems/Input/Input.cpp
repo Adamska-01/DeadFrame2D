@@ -42,16 +42,16 @@ namespace DeadFrame2D::Core
 
 	Input::~Input()
 	{
+		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(InputUserCreatedEvent)), this);
+		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(InputUserDestroyedEvent)), this);
+		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(DeviceAddedEvent)), this);
+		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(DeviceRemovedEvent)), this);
+
 		inputActionResolver.reset();
 		deviceManager.reset();
 		userManager.reset();
 
 		instance = nullptr;
-
-		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(InputUserCreatedEvent)), this);
-		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(InputUserDestroyedEvent)), this);
-		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(DeviceAddedEvent)), this);
-		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(DeviceRemovedEvent)), this);
 	}
 
 	void Input::InputUserCreatedEventHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
