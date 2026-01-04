@@ -1,7 +1,6 @@
 #pragma once
 #include "Data/Rendering/Pipeline/RenderData.h"
 #include "Data/Rendering/Pipeline/RenderPhase.h"
-#include "Data/Rendering/Pipeline/RenderPrimitive.h"
 #include "Data/Rendering/Pipeline/RenderSortKey.h"
 #include "Engine/Entity/ComponentHandle.h"
 
@@ -25,8 +24,6 @@ namespace DeadFrame2D::Data
 
 	public:
 		RenderPhase renderPhase;
-
-		RenderPrimitive renderType;
 
 		RenderData renderData;
 
