@@ -16,11 +16,11 @@ namespace DeadFrame2D::Core
 			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera,
 			bool requiresScreenSpaceConversion) const
 		{
-			SDL_FRect destRect = renderData.destRect;
+			SDL_FRect destRect = *renderData.destRect;
 
-			if (camera != nullptr && requiresScreenSpaceConversion)
+			if (camera != nullptr && requiresScreenSpaceConversion && renderData.destRect)
 			{
-				auto screenPos = camera->WorldToScreen(Vector2F(renderData.destRect.x, renderData.destRect.y));
+				auto screenPos = camera->WorldToScreen(Vector2F(renderData.destRect->x, renderData.destRect->y));
 
 				destRect.x = screenPos.x;
 				destRect.y = screenPos.y;
@@ -33,7 +33,7 @@ namespace DeadFrame2D::Core
 
 			renderBackend.DrawTexture(
 				renderData.texture,
-				&renderData.srcRect,
+				renderData.srcRect,
 				&destRect,
 				&renderData.rotationOrigin,
 				renderData.rotation,

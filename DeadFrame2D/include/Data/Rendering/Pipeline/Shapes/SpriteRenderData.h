@@ -9,9 +9,9 @@ namespace DeadFrame2D::Data
 	{
 		SDL_Texture* texture = nullptr;
 
-		SDL_Rect srcRect = SDL_Rect{ 0, 0, 0, 0 };
+		const SDL_Rect* srcRect = NULL;
 
-		SDL_FRect destRect = SDL_FRect{ 0.0f, 0.0f, 0.0f, 0.0f };
+		const SDL_FRect* destRect = NULL;
 
 		SDL_RendererFlip flip = SDL_RendererFlip::SDL_FLIP_NONE;
 
