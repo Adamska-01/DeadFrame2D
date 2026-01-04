@@ -22,9 +22,20 @@ namespace DeadFrame2D::Core
 
 	SubSystemManager::~SubSystemManager()
 	{
-		for (const auto& subSystem : subSystems)
+		// Delete in reverse order to respect dependencies
+		for (int i = static_cast<int>(subSystems.size()) - 1; i >= 0; --i)
 		{
-			delete subSystem;
+			if (subSystems[i] == nullptr)
+				continue;
+
+			delete subSystems[i];
+		}
+
+		if (SDL_WasInit(SDL_INIT_EVERYTHING))
+		{
+			SDL_Quit();
+
+			std::cout << "[Info] SDL successfully quit.\n";
 		}
 	}
 
