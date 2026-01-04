@@ -2,7 +2,6 @@
 #include "Core/SubSystems/Systems/Rendering/Renderer.h"
 #include "Core/SubSystems/Systems/TextureManager.h"
 #include "Factories/Products/Debugging/ColliderDrawer.h"
-#include <SDL.h>
 
 
 namespace DeadFrame2D::Factories
@@ -10,8 +9,7 @@ namespace DeadFrame2D::Factories
 	using namespace DeadFrame2D::Core;
 
 
-	ColliderDrawer::ColliderDrawer(SDL_Renderer* renderer)
-		: renderer(renderer)
+	ColliderDrawer::ColliderDrawer()
 	{
 		SetFlags(
 			b2Draw::e_shapeBit |

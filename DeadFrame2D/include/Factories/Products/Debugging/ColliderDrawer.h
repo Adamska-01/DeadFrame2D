@@ -17,19 +17,12 @@
 // | Contact points			| Small colored dots		| Often red or orange, shown when contact debug is enabled.	|
 
 
-struct SDL_Renderer;
-
-
 namespace DeadFrame2D::Factories
 {
 	class ColliderDrawer : public b2Draw
 	{
-	private:
-		SDL_Renderer* renderer;
-
-
 	public:
-		ColliderDrawer(SDL_Renderer* renderer);
+		ColliderDrawer();
 	
 		~ColliderDrawer() override = default;
 
