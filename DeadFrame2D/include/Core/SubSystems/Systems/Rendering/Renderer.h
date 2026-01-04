@@ -2,9 +2,9 @@
 #include "Constants/CommonColors.h"
 #include "Core/Math/Vector2.h"
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
+#include "Core/SubSystems/Systems/Rendering/Abstractions/IRenderBackend.h"
 #include "Core/SubSystems/Systems/Rendering/RenderSystem.h"
 #include "DF2D_API.h"
-#include "Engine/Entity/ComponentHandle.h"
 #include <cstdint>
 #include <Models/Rendering/RendererConfig.h>
 #include <SDL.h>
@@ -18,13 +18,22 @@ namespace DeadFrame2D::Engine
 
 namespace DeadFrame2D::Core
 {
-	class DF2D_API Renderer : protected RenderSystem, public ISubSystem
+	class RenderPipeline;
+
+
+	class DF2D_API Renderer : public ISubSystem, protected RenderSystem, private IRenderBackend
 	{
+		friend class DeadFrameRuntime;
 		friend class SubSystemManager;
 
 
 	private:
-		static SDL_Renderer* renderer;
+		static Renderer* instance;
+
+
+		SDL_Renderer* renderer;
+
+		std::unique_ptr<RenderPipeline> renderPipeline;
 
 
 		Renderer(SDL_Window* window, const Shared::Models::RendererConfig& config);
@@ -49,30 +58,32 @@ namespace DeadFrame2D::Core
 		void EndDraw() override;
 
 
-	public:
-		static void DrawPixel(const Vector2F& pixelPos, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE);
+		void DrawPixel(const Vector2F& pixelPos, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE) override;
 		
-		static void DrawLine(const Vector2F& p1, const Vector2F& p2, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE);
+		void DrawLine(const Vector2F& p1, const Vector2F& p2, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE) override;
 
-		static void DrawRect(SDL_FRect rect, float angleDegrees, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false);
+		void DrawRect(SDL_FRect rect, float angleDegrees, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false) override;
 
-		static void DrawCircle(const Vector2F& center, float radius, SDL_Color color, bool filled);
+		void DrawCircle(const Vector2F& center, float radius, SDL_Color color, bool filled) override;
 
-		static void DrawTexture(
+		void DrawTexture(
 			SDL_Texture* texture,
 			const SDL_Rect* srcRect = NULL,
 			const SDL_FRect* dstRect = NULL,
 			const SDL_FPoint* rotationOrigin = NULL,
 			float angle = 0.0f,
 			SDL_RendererFlip flip = SDL_FLIP_NONE,
-			SDL_Color colorMod = DeadFrame2D::Constants::CommonColors::WHITE);
+			SDL_Color colorMod = DeadFrame2D::Constants::CommonColors::WHITE) override;
 
+		void SetRenderTarget(SDL_Texture* renderTarget) override;
 
-		static void DrawFromTask(DeadFrame2D::Data::RenderTask& renderTask, DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera = {}, bool requiresSreenSpaceConversion = true);
+		void ClearCurrentRenderTarget() override;
 
 
 		static void ClearAndPresentBuffer();
 
+
+	public:
 		static SDL_Renderer* GetRenderer();
 
 		static SDL_Color GetDisplayColor();
