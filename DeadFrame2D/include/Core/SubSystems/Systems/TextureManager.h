@@ -1,18 +1,12 @@
 #pragma once
-#include "Constants/CommonColors.h"
-#include "Core/Math/Circle.h"
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
 #include "DF2D_API.h"
 #include <memory>
-#include <SDL_image.h>
 #include <string>
 #include <unordered_map>
 
 
-namespace DeadFrame2D::Engine
-{
-	class Camera;
-}
+struct SDL_Texture;
 
 
 namespace DeadFrame2D::Core
@@ -51,42 +45,5 @@ namespace DeadFrame2D::Core
 
 	public:
 		static std::shared_ptr<SDL_Texture> LoadTexture(std::string_view filename);
-
-
-		static void DrawLineWorldSpace(const Vector2F& p1, const Vector2F& p2, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE);
-
-		static void DrawLineScreenSpace(const Vector2F& p1, const Vector2F& p2, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE);
-
-		static void DrawRectWorldSpace(SDL_Rect rect, float angleDegrees, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false);
-
-		static void DrawRectScreenSpace(SDL_Rect rect, float angleDegrees, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false);
-	
-		static void DrawCircleWorldSpace(Circle circle, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false);
-
-		static void DrawCircleScreenSpace(Circle circle, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false);
-	
-		static void DrawTextureWorldSpace(
-			std::shared_ptr<SDL_Texture> texture,
-			const SDL_Rect* srcRect = NULL, 
-			const SDL_Rect* dstRect = NULL, 
-			float angle = 0.0f, 
-			SDL_Point* rotationOrigin = NULL,
-			SDL_RendererFlip flip = SDL_FLIP_NONE, 
-			Uint8 alpha = 255, 
-			SDL_Color colorMod = DeadFrame2D::Constants::CommonColors::WHITE);
-
-		static void DrawTextureScreenSpace(
-			std::shared_ptr<SDL_Texture> texture,
-			const SDL_Rect* srcRect = NULL,
-			const SDL_Rect* dstRect = NULL,
-			float angle = 0.0f,
-			SDL_Point* rotationOrigin = NULL,
-			SDL_RendererFlip flip = SDL_FLIP_NONE,
-			Uint8 alpha = 255,
-			SDL_Color colorMod = DeadFrame2D::Constants::CommonColors::WHITE);
-
-		static void DrawPixelWorldSpace(const Vector2F& worldPos, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE);
-
-		static void DrawPixelScreenSpace(const Vector2F& screenPos, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE);
 	};
 }
