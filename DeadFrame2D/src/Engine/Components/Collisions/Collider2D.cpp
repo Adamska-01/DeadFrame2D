@@ -61,14 +61,7 @@ namespace DeadFrame2D::Engine
 		if (rigidBody != nullptr)
 			return;
 
-		auto gameObject = GetGameObject();
-
-		rigidBody = gameObject->GetComponent<RigidBody2D>();
-
-		if (rigidBody != nullptr)
-			return;
-
-		rigidBody = gameObject->GetComponentInParent<RigidBody2D>(true);
+		rigidBody = GetGameObject()->GetComponentInParent<RigidBody2D>(/*recursive*/ true, /*includeSelf*/ true);
 	}
 
 	void Collider2D::Init()
