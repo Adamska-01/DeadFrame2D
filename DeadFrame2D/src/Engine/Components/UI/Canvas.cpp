@@ -8,7 +8,8 @@ namespace DeadFrame2D::Engine
 
 
 	Canvas::Canvas()
-		: sortOrder(0),
+		// TODO: Create constants for sort orders
+		: sortOrder(2),
 		renderMode(CanvasRenderMode::SCREEN_SPACE_OVERLAY)
 	{
 	}
