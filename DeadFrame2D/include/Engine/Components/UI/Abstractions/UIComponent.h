@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Math/Vector2.h"
+#include "Data/Rendering/Pipeline/RenderTask.h"
 #include "Data/UI/UIAnchor.h"
 #include "DF2D_API.h"
 #include "Engine/Components/GameComponent.h"
@@ -9,6 +10,7 @@
 namespace DeadFrame2D::Engine
 {
 	class Transform;
+	class Canvas;
 
 
 	/**
@@ -20,11 +22,18 @@ namespace DeadFrame2D::Engine
 
 
 	protected:
+		ComponentHandle<Canvas> parentCanvas;
+
 		DeadFrame2D::Data::UIAnchor anchor;
 
 		DeadFrame2D::Core::Vector2F widgetSize;
 
 		ComponentHandle<Transform> transform;
+
+		DeadFrame2D::Data::RenderTask renderTask;
+
+
+		void OnParentGameObjectChangedHandler(const ObjectHandle<GameObject>& obj) override;
 
 
 	public:
@@ -33,7 +42,9 @@ namespace DeadFrame2D::Engine
 		virtual ~UIComponent() override = default;
 
 
-		virtual void Init() override;
+		void Init() override;
+
+		void Update(float deltaTime) override;
 
 
 		void SetAnchor(DeadFrame2D::Data::UIAnchor newAnchor);

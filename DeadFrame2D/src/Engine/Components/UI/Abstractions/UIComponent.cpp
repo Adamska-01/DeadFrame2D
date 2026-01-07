@@ -1,5 +1,6 @@
 #include "Engine/Components/Transform.h"
 #include "Engine/Components/UI/Abstractions/UIComponent.h"
+#include "Engine/Components/UI/Canvas.h"
 #include "Engine/Entity/GameObject.h"
 #include "Utilities/Debugging/Guards.h"
 
@@ -20,6 +21,25 @@ namespace DeadFrame2D::Engine
 	void UIComponent::Init()
 	{
 		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
+		
+		parentCanvas = GetGameObject()->GetComponentInParent<Canvas>(true, true);
+
+		MarkDirty();
+	}
+	
+	void UIComponent::Update(float deltaTime)
+	{
+		if (isDirty)
+		{
+			Guard::AgainstNull(parentCanvas, NAME_OF(parentCanvas));
+		}
+	}
+
+	void UIComponent::OnParentGameObjectChangedHandler(const ObjectHandle<GameObject>& obj)
+	{
+		parentCanvas = GetGameObject()->GetComponentInParent<Canvas>(true, true);
+
+		MarkDirty();
 	}
 
 	void UIComponent::SetAnchor(UIAnchor newAnchor)
