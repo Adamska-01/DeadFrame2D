@@ -1,5 +1,5 @@
 #include "Core/DeadFrameRuntime.h"
-#include "Core/SubSystems/Systems/Renderer.h"
+#include "Core/SubSystems/Systems/Rendering/Renderer.h"
 #include "Core/SubSystems/Systems/TextureManager.h"
 #include "Engine/Components/Rendering/Camera.h"
 #include <Constants/ResourcePaths.h>
@@ -86,7 +86,8 @@ namespace DeadFrame2D::Core
 			}
 
 			SDL_RenderClear(Renderer::GetRenderer());
-			TextureManager::DrawTextureScreenSpace(splashTexture, nullptr, &destRect, 0.0f, nullptr, SDL_RendererFlip::SDL_FLIP_NONE, alpha);
+			// TODO: Fix Splash Screen
+			//TextureManager::DrawTextureScreenSpace(splashTexture, nullptr, &destRect, 0.0f, nullptr, SDL_RendererFlip::SDL_FLIP_NONE, alpha);
 			SDL_RenderPresent(Renderer::GetRenderer());
 
 			frameTimer.EndClock();
@@ -121,25 +122,15 @@ namespace DeadFrame2D::Core
 
 			sceneManager->LateUpdateScene(deltaTime);
 
-			for (auto camera : Camera::GetCameras())
-			{
-				if (!camera->IsActive())
-					continue;
+			sceneManager->DrawScene();
 
-				Renderer::BeginCamera(camera);
-
-				sceneManager->DrawScene();
-
-				engineSubSystems->EndDraw();
-
-				Renderer::EndCamera();
-			}
+			engineSubSystems->EndDraw();
 
 			Renderer::ClearAndPresentBuffer();
 
 			sceneManager->LoadNewSceneIfAvailable();
 
-			//FPS and delay
+			// FPS and delay
 			frameTimer.EndClock();
 			frameTimer.DelayByFrameTime();
 		}
