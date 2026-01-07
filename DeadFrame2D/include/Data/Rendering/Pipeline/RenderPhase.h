@@ -14,6 +14,8 @@ namespace DeadFrame2D::Data
 
 		SCREEN_SPACE_OVERLAY_UI,
 
-		DEBUG_OVERLAY
+		DEBUG_OVERLAY,
+
+		RENDER_PHASE_COUNT
 	};
 }
