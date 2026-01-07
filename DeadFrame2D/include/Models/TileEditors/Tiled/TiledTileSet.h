@@ -1,8 +1,10 @@
 #pragma once
 #include "DF2D_API.h"
 #include <memory>
-#include <SDL.h>
 #include <string>
+
+
+struct SDL_Texture;
 
 
 namespace DeadFrame2D::Models
