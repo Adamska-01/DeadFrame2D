@@ -1,13 +1,17 @@
 #include "Constants/CommonColors.h"
+#include "Core/SubSystems/Systems/Rendering/RenderSystem.h"
 #include "Core/SubSystems/Systems/TextureManager.h"
 #include "Engine/Components/Transform.h"
+#include "Engine/Components/UI/Canvas.h"
 #include "Engine/Components/UI/Image.h"
 
 
 namespace DeadFrame2D::Engine
 {
-	using namespace DeadFrame2D::Core;
 	using namespace DeadFrame2D::Constants;
+	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Data;
+	using namespace DeadFrame2D::Engine;
 
 
 	Image::Image()
@@ -17,35 +21,48 @@ namespace DeadFrame2D::Engine
 
 	void Image::Draw()
 	{
+		UIComponent::Draw();
+
 		auto currentPosition = transform->GetWorldPosition();
 		auto worldRotation = transform->GetWorldRotation();
 		auto scaledSize = GetWidgetSize();
 		auto anchorVector = GetAnchorFromPreset(anchor);
 
-		auto destRect = SDL_Rect
+		auto destRect = SDL_FRect
 		{
-			static_cast<int>(currentPosition.x - ((scaledSize.x) * anchorVector.x)),
-			static_cast<int>(currentPosition.y - ((scaledSize.y) * anchorVector.y)),
-			static_cast<int>(scaledSize.x),
-			static_cast<int>(scaledSize.y)
+			currentPosition.x - (scaledSize.x * anchorVector.x),
+			currentPosition.y - (scaledSize.y * anchorVector.y),
+			scaledSize.x,
+			scaledSize.y
 		};
+
+		renderTask.renderPhase = parentCanvas->GetRenderMode() == CanvasRenderMode::SCREEN_SPACE_CAMERA ? RenderPhase::SCREEN_SPACE_CAMERA_UI : RenderPhase::SCREEN_SPACE_OVERLAY_UI;
+		renderTask.sortOrder = parentCanvas->GetSortOrder();
+		renderTask.canvas = parentCanvas;
 
 		if (sourceImage != nullptr)
 		{
-			TextureManager::DrawTextureScreenSpace(
-				sourceImage,
-				NULL,
-				&destRect,
-				worldRotation,
-				NULL,
-				SDL_RendererFlip::SDL_FLIP_NONE, 
-				255,
-				color);
+			renderTask.renderData = SpriteRenderData
+			{
+				.texture = sourceImage.get(),
+				.destRect = destRect,
+				.flip = SDL_RendererFlip::SDL_FLIP_NONE,
+				.rotation = worldRotation,
+				.colorMod = color
+			};
 		}
 		else
 		{
-			TextureManager::DrawRectScreenSpace(destRect, worldRotation, color, true);
+			renderTask.renderData = RectRenderData
+			{
+				.filled = true,
+				.destRect = destRect,
+				.rotation = worldRotation,
+				.color = color
+			};
 		}
+
+		RenderSystem::Submit(renderTask);
 	}
 
 	void Image::LoadSprite(std::string_view texturePath)

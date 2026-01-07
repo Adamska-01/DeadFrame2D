@@ -1,4 +1,5 @@
 #pragma once
+#include "Data/Rendering/Pipeline/RenderTask.h"
 #include "Engine/Components/GameComponent.h"
 
 
@@ -13,9 +14,11 @@ namespace DeadFrame2D::Engine
 	protected:
 		TMap tileMap;
 
+		DeadFrame2D::Data::RenderTask renderTask;
+
 
 	protected:
-		TileMapRenderer() = default;
+		TileMapRenderer();
 
 
 	public:
@@ -24,7 +27,17 @@ namespace DeadFrame2D::Engine
 
 		const TMap& GetTileMap() const;
 	};
+}
 
+
+namespace DeadFrame2D::Engine
+{
+	template<typename TMap>
+	inline TileMapRenderer<TMap>::TileMapRenderer()
+	{
+		renderTask.renderPhase = DeadFrame2D::Data::RenderPhase::WORLD;
+		renderTask.sortOrder = -1;
+	}
 
 	template<typename TMap>
 	inline const TMap& TileMapRenderer<TMap>::GetTileMap() const

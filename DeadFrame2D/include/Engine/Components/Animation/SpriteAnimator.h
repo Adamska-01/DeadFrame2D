@@ -1,8 +1,8 @@
 #pragma once
 #include "Data/Animation/SpriteAnimationProperties.h"
 #include "Data/Animation/SpriteAnimationState.h"
+#include "Data/Rendering/Pipeline/RenderTask.h"
 #include "DF2D_API.h"
-#include "Core/Reflection/TypeInfo.h"
 #include "Engine/Components/GameComponent.h"
 #include "Engine/Entity/ComponentHandle.h"
 #include <string>
@@ -30,6 +30,8 @@ namespace DeadFrame2D::Engine
 		std::string currentAnimationID;
 
 		DeadFrame2D::Data::SpriteAnimationState animState;
+
+		DeadFrame2D::Data::RenderTask renderTask;
 
 
 	public:

@@ -1,4 +1,5 @@
 #pragma once
+#include "Core/SubSystems/Systems/Rendering/RenderSystem.h"
 #include <box2d/box2d.h>
 
 
@@ -15,12 +16,17 @@
 // | Joints					| Pink / Red lines			| Connects two bodies (like springs, hinges, etc).			|
 // | AABBs (optional)		| Usually purple/magenta	| Axis-aligned bounding boxes (if enabled).					|
 // | Contact points			| Small colored dots		| Often red or orange, shown when contact debug is enabled.	|
+// | ---------------------- | ------------------------- | --------------------------------------------------------- |
 
 
 namespace DeadFrame2D::Factories
 {
 	class ColliderDrawer : public b2Draw
 	{
+	private:
+		DeadFrame2D::Data::RenderTask renderTask;
+
+
 	public:
 		ColliderDrawer();
 	

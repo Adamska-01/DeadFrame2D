@@ -1,3 +1,4 @@
+#include "Core/SubSystems/Systems/Rendering/RenderSystem.h"
 #include "Core/SubSystems/Systems/TextureManager.h"
 #include "Engine/Components/Rendering/Sprite.h"
 #include "Engine/Components/Transform.h"
@@ -8,6 +9,7 @@
 namespace DeadFrame2D::Engine
 {
 	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Utilities;
 
 
@@ -16,6 +18,9 @@ namespace DeadFrame2D::Engine
 		spriteSize = Vector2I::One;
 
 		LoadSprite(texturePath);
+
+		renderTask.renderPhase = RenderPhase::WORLD;
+		renderTask.sortOrder = 0;
 	}
 
 	void Sprite::Init()
@@ -29,15 +34,23 @@ namespace DeadFrame2D::Engine
 		auto worldScale = transform->GetWorldScale();
 		auto worldRotation = transform->GetWorldRotation();
 
-		auto scaledDest = SDL_Rect
+		auto scaledDest = SDL_FRect
 		{
-			static_cast<int>(worldPosition.x - (spriteSize.x * worldScale.x) / 2),
-			static_cast<int>(worldPosition.y - (spriteSize.y * worldScale.y) / 2),
-			static_cast<int>(spriteSize.x * worldScale.x),
-			static_cast<int>(spriteSize.y * worldScale.y)
+			.x = worldPosition.x - (spriteSize.x * worldScale.x) / 2.0f,
+			.y = worldPosition.y - (spriteSize.y * worldScale.y) / 2.0f,
+			.w = spriteSize.x * worldScale.x,
+			.h = spriteSize.y * worldScale.y
 		};
 
-		TextureManager::DrawTextureWorldSpace(spriteTexture, NULL, &scaledDest, worldRotation);
+		renderTask.renderData = SpriteRenderData
+		{
+			.texture = spriteTexture.get(),
+			.srcRect = std::nullopt,
+			.destRect = scaledDest,
+			.rotation = worldRotation
+		};
+
+		RenderSystem::Submit(renderTask);
 	}
 
 	void Sprite::LoadSprite(std::string_view texturePath)
@@ -50,5 +63,15 @@ namespace DeadFrame2D::Engine
 	std::shared_ptr<SDL_Texture> Sprite::GetTexture()
 	{
 		return spriteTexture;
+	}
+
+	int Sprite::GetSortOrder() const
+	{
+		return renderTask.sortOrder;
+	}
+
+	void Sprite::SetSortOrder(int sortOrder)
+	{
+		renderTask.sortOrder = sortOrder;
 	}
 }

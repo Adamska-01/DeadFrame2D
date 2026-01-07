@@ -1,8 +1,10 @@
 #include "Constants/CommonColors.h"
+#include "Core/SubSystems/Systems/Rendering/RenderSystem.h"
 #include "Core/SubSystems/Systems/TextureManager.h"
 #include "Data/Components/UI/Button/ButtonComponentModel.h"
 #include "Engine/Components/Transform.h"
 #include "Engine/Components/UI/Button.h"
+#include "Engine/Components/UI/Canvas.h"
 #include "Engine/Entity/GameObject.h"
 #include "Utilities/Collisions/CollisionUtils.h"
 
@@ -120,9 +122,18 @@ namespace DeadFrame2D::Engine
 	{
 		auto destRect = GetBoundingBox();
 
+		renderTask.renderPhase = parentCanvas->GetRenderMode() == CanvasRenderMode::SCREEN_SPACE_CAMERA ? RenderPhase::SCREEN_SPACE_CAMERA_UI : RenderPhase::SCREEN_SPACE_OVERLAY_UI;
+		renderTask.sortOrder = parentCanvas->GetSortOrder();
+		renderTask.canvas = parentCanvas;
+
 		if (currentButtonImage)
 		{
-			TextureManager::DrawTextureScreenSpace(currentButtonImage, nullptr, &destRect, transform->GetWorldRotation());
+			renderTask.renderData = SpriteRenderData
+			{
+				.texture = currentButtonImage.get(),
+				.destRect = destRect,
+				.rotation = transform->GetWorldRotation()
+			};
 		}
 		else
 		{
@@ -141,8 +152,16 @@ namespace DeadFrame2D::Engine
 				fillColor = idleFillColor;
 			}
 
-			TextureManager::DrawRectScreenSpace(destRect, transform->GetWorldRotation(), fillColor, true);
+			renderTask.renderData = RectRenderData
+			{
+				.filled = true,
+				.destRect = destRect,
+				.rotation = transform->GetWorldRotation(),
+				.color = fillColor
+			};
 		}
+
+		RenderSystem::Submit(renderTask);
 	}
 
 	void Button::OnPointerEnter()
@@ -197,18 +216,18 @@ namespace DeadFrame2D::Engine
 		this->onEnterCallback.AddHandle(handle, onEnterHandler);
 	}
 
-	SDL_Rect Button::GetBoundingBox() const
+	SDL_FRect Button::GetBoundingBox() const
 	{
 		auto currentPosition = transform->GetWorldPosition();
 		auto scaledSize = GetWidgetSize();
 		auto anchorVector = GetAnchorFromPreset(anchor);
 
-		return SDL_Rect
+		return SDL_FRect
 		{
-			static_cast<int>(currentPosition.x - ((scaledSize.x) * anchorVector.x)),
-			static_cast<int>(currentPosition.y - ((scaledSize.y) * anchorVector.y)),
-			static_cast<int>(scaledSize.x),
-			static_cast<int>(scaledSize.y)
+			currentPosition.x - (scaledSize.x * anchorVector.x),
+			currentPosition.y - (scaledSize.y * anchorVector.y),
+			scaledSize.x,
+			scaledSize.y
 		};
 	}
 

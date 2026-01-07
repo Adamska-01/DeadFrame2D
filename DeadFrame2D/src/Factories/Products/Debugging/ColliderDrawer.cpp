@@ -7,10 +7,15 @@
 namespace DeadFrame2D::Factories
 {
 	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Data;
 
 
 	ColliderDrawer::ColliderDrawer()
 	{
+		renderTask.renderPhase = RenderPhase::DEBUG_WORLD;
+		// TODO: Make some constants for this stuff
+		renderTask.sortOrder = 9999;
+		
 		SetFlags(
 			b2Draw::e_shapeBit |
 			b2Draw::e_jointBit |
@@ -25,15 +30,19 @@ namespace DeadFrame2D::Factories
 
 		for (int32 i = 0; i < vertexCount; ++i)
 		{
-			b2Vec2 p1 = vertices[i];
-			b2Vec2 p2 = vertices[(i + 1) % vertexCount];
+			auto p1 = vertices[i];
+			auto p2 = vertices[(i + 1) % vertexCount];
 
 			const auto PIXEL_PER_METER = PhysicsEngine2D::GetPhysicsConfig().pixelPerMeter;
 
-			TextureManager::DrawLineWorldSpace(
-				Vector2F(p1.x * PIXEL_PER_METER, p1.y * PIXEL_PER_METER),
-				Vector2F(p2.x * PIXEL_PER_METER, p2.y * PIXEL_PER_METER),
-				sdlColor);
+			renderTask.renderData = LineRenderData
+			{
+				.p1 = Vector2F(p1.x * PIXEL_PER_METER, p1.y * PIXEL_PER_METER),
+				.p2 = Vector2F(p2.x * PIXEL_PER_METER, p2.y * PIXEL_PER_METER),
+				.color = sdlColor
+			};
+
+			RenderSystem::Submit(renderTask);
 		}
 	}
 
@@ -51,10 +60,15 @@ namespace DeadFrame2D::Factories
 			center.x * PIXEL_PER_METER,
 			center.y * PIXEL_PER_METER);
 
-		TextureManager::DrawCircleWorldSpace(
-			Circle(pixelCenter, pixelRadius),
-			SDL_Color{ Uint8(color.r * 255), Uint8(color.g * 255), Uint8(color.b * 255), Uint8(color.a * 255) },
-			false);
+		renderTask.renderData = CircleRenderData
+		{
+			.center = pixelCenter,
+			.radius = pixelRadius,
+			.filled = false,
+			.color = SDL_Color{ Uint8(color.r * 255), Uint8(color.g * 255), Uint8(color.b * 255), Uint8(color.a * 255) }
+		};
+
+		RenderSystem::Submit(renderTask);
 	}
 
 	void ColliderDrawer::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color)
@@ -68,10 +82,14 @@ namespace DeadFrame2D::Factories
 		
 		auto sdlColor = SDL_Color(uint8_t(color.r * 255), uint8_t(color.g * 255), uint8_t(color.b * 255), uint8_t(color.a * 255));
 
-		TextureManager::DrawLineWorldSpace(
-			Vector2F(p1.x * PIXEL_PER_METER, p1.y * PIXEL_PER_METER),
-			Vector2F(p2.x * PIXEL_PER_METER, p2.y * PIXEL_PER_METER),
-			sdlColor);
+		renderTask.renderData = LineRenderData
+		{
+			.p1 = Vector2F(p1.x * PIXEL_PER_METER, p1.y * PIXEL_PER_METER),
+			.p2 = Vector2F(p2.x * PIXEL_PER_METER, p2.y * PIXEL_PER_METER),
+			.color = sdlColor
+		};
+
+		RenderSystem::Submit(renderTask);
 	}
 
 	void ColliderDrawer::DrawTransform(const b2Transform& xf)
@@ -93,7 +111,13 @@ namespace DeadFrame2D::Factories
 		{
 			for (auto dy = -halfSize; dy <= halfSize; ++dy)
 			{
-				TextureManager::DrawPixelWorldSpace(center + Vector2F(float(dx), float(dy)), sdlColor);
+				renderTask.renderData = PointRenderData
+				{
+					.pos = center + Vector2F(float(dx), float(dy)),
+					.color = sdlColor
+				};
+
+				RenderSystem::Submit(renderTask);
 			}
 		}
 	}

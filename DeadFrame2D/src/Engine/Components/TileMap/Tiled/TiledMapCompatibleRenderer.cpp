@@ -1,4 +1,5 @@
 #include "Core/SubSystems/Systems/Rendering/Renderer.h"
+#include "Core/SubSystems/Systems/Rendering/RenderSystem.h"
 #include "Core/SubSystems/Systems/TextureManager.h"
 #include "Engine/Components/TileMap/Tiled/TiledMapCompatibleRenderer.h"
 
@@ -6,6 +7,7 @@
 namespace DeadFrame2D::Engine
 {
 	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Models;
 
 
@@ -67,15 +69,22 @@ namespace DeadFrame2D::Engine
 						.w = tileSetSize,
 						.h = tileSetSize
 					};
-					auto dest = SDL_Rect
+					auto dest = SDL_FRect
 					{ 
-						.x = j * tileSetSize, 
-						.y = i * tileSetSize, 
-						.w = tileSetSize, 
-						.h = tileSetSize 
+						.x = static_cast<float>(j * tileSetSize), 
+						.y = static_cast<float>(i * tileSetSize), 
+						.w = static_cast<float>(tileSetSize), 
+						.h = static_cast<float>(tileSetSize) 
 					};
 
-					TextureManager::DrawTextureWorldSpace(tileSet.tileSetTexture, &src, &dest);
+					renderTask.renderData = SpriteRenderData
+					{
+						.texture = tileSet.tileSetTexture.get(),
+						.srcRect = src,
+						.destRect = dest
+					};
+
+					RenderSystem::Submit(renderTask);
 				}
 			}
 		}

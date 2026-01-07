@@ -66,7 +66,7 @@ namespace DeadFrame2D::Engine
 
 		void AddEnterCallback(const ComponentHandleBase& handle, std::function<void()> onEnterHandler);
 
-		SDL_Rect GetBoundingBox() const;
+		SDL_FRect GetBoundingBox() const;
 
 		SDL_Color GetIdleFillColor() const;
 

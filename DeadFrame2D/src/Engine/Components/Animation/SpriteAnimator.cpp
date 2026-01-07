@@ -1,5 +1,5 @@
 #include "Core/Math/Vector2.h"
-#include "Core/SubSystems/Systems/TextureManager.h"
+#include "Core/SubSystems/Systems/Rendering/RenderSystem.h"
 #include "Engine/Components/Animation/SpriteAnimator.h"
 #include "Engine/Components/Rendering/Sprite.h"
 #include "Engine/Components/Transform.h"
@@ -19,6 +19,9 @@ namespace DeadFrame2D::Engine
 		animState(SpriteAnimationState())
 	{
 		animations.clear();
+
+		renderTask.renderPhase = RenderPhase::WORLD;
+		renderTask.sortOrder = 0;
 	}
 
 	void SpriteAnimator::Init()
@@ -72,25 +75,39 @@ namespace DeadFrame2D::Engine
 			return;
 
 		const auto& props = animations.at(currentAnimationID);
-		auto dstRect = GetFrameRect();
-		auto currentPosition = transform->GetWorldPosition();
-		auto currentScale = transform->GetWorldScale();
 
-		dstRect.x = static_cast<int>(round(currentPosition.x - (dstRect.w * currentScale.x / 2)));
-		dstRect.y = static_cast<int>(round(currentPosition.y - (dstRect.h * currentScale.y / 2)));
+		const auto frameRect = GetFrameRect();
+		const auto frameIndex = static_cast<int>(animState.currentFrame);
+
+		const auto position = transform->GetWorldPosition();
+		const auto scale = transform->GetWorldScale();
 
 		auto srcRect = SDL_Rect
 		{
-			dstRect.w * static_cast<int>(animState.currentFrame),
-			dstRect.h * props.sourceRowNumber,
-			dstRect.w,
-			dstRect.h
+			.x = frameRect.w * frameIndex,
+			.y = frameRect.h * props.sourceRowNumber,
+			.w = frameRect.w,
+			.h = frameRect.h
 		};
 
-		dstRect.w = static_cast<int>(dstRect.w * currentScale.x);
-		dstRect.h = static_cast<int>(dstRect.h * currentScale.y);
+		auto dstRect = SDL_FRect
+		{
+			.x = std::round(position.x - (frameRect.w * scale.x * 0.5f)),
+			.y = std::round(position.y - (frameRect.h * scale.y * 0.5f)),
+			.w = frameRect.w * scale.x,
+			.h = frameRect.h * scale.y
+		};
 
-		TextureManager::DrawTextureWorldSpace(spriteTexture, &srcRect, &dstRect, transform->GetWorldRotation(), nullptr, animState.flipState);
+		renderTask.renderData = SpriteRenderData
+		{
+			.texture = spriteTexture.get(),
+			.srcRect = srcRect,
+			.destRect = dstRect,
+			.flip = animState.flipState,
+			.rotation = transform->GetWorldRotation()
+		};
+
+		RenderSystem::Submit(renderTask);
 	}
 
 	void SpriteAnimator::AddAnimation(const SpriteAnimationProperties& properties)
@@ -153,13 +170,28 @@ namespace DeadFrame2D::Engine
 
 	SDL_Rect SpriteAnimator::GetFrameRect() const
 	{
-		SDL_Rect srcRect;
-		SDL_QueryTexture(sprite->GetTexture().get(), NULL, NULL, &srcRect.w, &srcRect.h);
+		auto textureW = 0;
+		auto textureH = 0;
+
+		SDL_QueryTexture(
+			sprite->GetTexture().get(),
+			nullptr,
+			nullptr,
+			&textureW,
+			&textureH);
 
 		//Get the size of a single frame in a sprite sheet
-		srcRect.w = static_cast<int>(round((float)srcRect.w / animations.at(currentAnimationID).columnCount));
-		srcRect.h = static_cast<int>(round((float)srcRect.h / animations.at(currentAnimationID).rowCount));
+		const auto& props = animations.at(currentAnimationID);
 
-		return srcRect;
+		const int frameWidth = textureW / props.columnCount;
+		const int frameHeight = textureH / props.rowCount;
+
+		return SDL_Rect
+		{
+			.x = 0,
+			.y = 0,
+			.w = frameWidth,
+			.h = frameHeight
+		};
 	}
 }

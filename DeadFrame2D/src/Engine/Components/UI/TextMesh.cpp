@@ -1,7 +1,9 @@
+#include "Core/SubSystems/Systems/Rendering/RenderSystem.h"
 #include "Core/SubSystems/Systems/TextureManager.h"
 #include "Core/SubSystems/Systems/UIManager.h"
 #include "Data/Components/UI/TextMeshComponentModel.h"
 #include "Engine/Components/Transform.h"
+#include "Engine/Components/UI/Canvas.h"
 #include "Engine/Components/UI/TextMesh.h"
 #include "Engine/Entity/GameObject.h"
 #include "Utilities/Debugging/Guards.h"
@@ -41,9 +43,22 @@ namespace DeadFrame2D::Engine
 
 	void TextMesh::Draw()
 	{
+		UIComponent::Draw();
+
 		auto destRect = GetTextDestRect();
 
-		TextureManager::DrawTextureScreenSpace(textTexture, NULL, &destRect, transform->GetWorldRotation());
+		renderTask.renderPhase = parentCanvas->GetRenderMode() == CanvasRenderMode::SCREEN_SPACE_CAMERA ? RenderPhase::SCREEN_SPACE_CAMERA_UI : RenderPhase::SCREEN_SPACE_OVERLAY_UI;
+		renderTask.sortOrder = parentCanvas->GetSortOrder();
+		renderTask.canvas = parentCanvas;
+		renderTask.renderData = SpriteRenderData
+		{
+			.texture = textTexture.get(),
+			.srcRect = std::nullopt,
+			.destRect = destRect,
+			.rotation = transform->GetWorldRotation()
+		};
+
+		RenderSystem::Submit(renderTask);
 	}
 
 	void TextMesh::SetFontSize(unsigned int newFontSize)
@@ -90,18 +105,18 @@ namespace DeadFrame2D::Engine
 		return text;
 	}
 
-	SDL_Rect TextMesh::GetTextDestRect()
+	SDL_FRect TextMesh::GetTextDestRect()
 	{
 		auto currentPosition = transform->GetWorldPosition();
 		auto scaledSize = GetWidgetSize();
 		auto anchorVector = GetAnchorFromPreset(anchor);
 
-		return SDL_Rect
+		return SDL_FRect
 		{
-			static_cast<int>(currentPosition.x - ((scaledSize.x) * anchorVector.x)),
-			static_cast<int>(currentPosition.y - ((scaledSize.y) * anchorVector.y)),
-			static_cast<int>(scaledSize.x),
-			static_cast<int>(scaledSize.y)
+			currentPosition.x - (scaledSize.x * anchorVector.x),
+			currentPosition.y - (scaledSize.y * anchorVector.y),
+			scaledSize.x,
+			scaledSize.y
 		};
 	}
 }

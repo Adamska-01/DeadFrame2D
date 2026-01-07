@@ -69,6 +69,6 @@ namespace DeadFrame2D::Engine
 
 		std::string GetText();
 
-		SDL_Rect GetTextDestRect();
+		SDL_FRect GetTextDestRect();
 	};
 }

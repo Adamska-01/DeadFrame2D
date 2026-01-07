@@ -97,15 +97,22 @@ namespace DeadFrame2D::Engine
 		{
 			for (auto x = 0; x < (isHorizontal ? tilesX : 1); ++x)
 			{
-				auto destRect = SDL_Rect
+				auto destRect = SDL_FRect
 				{
-					.x = x * scaledTileWidth - (isHorizontal ? static_cast<int>(scrollOffset) : 0) + static_cast<int>(position.x),
-					.y = y * scaledTileHeight - (isHorizontal ? 0 : static_cast<int>(scrollOffset)) + static_cast<int>(position.y),
-					.w = scaledTileWidth,
-					.h = scaledTileHeight
+					.x = x * scaledTileWidth - (isHorizontal ? scrollOffset : 0) + position.x,
+					.y = y * scaledTileHeight - (isHorizontal ? 0 : scrollOffset) + position.y,
+					.w = static_cast<float>(scaledTileWidth),
+					.h = static_cast<float>(scaledTileHeight)
 				};
 
-				TextureManager::DrawTextureWorldSpace(spriteTexture, NULL, &destRect, transform->GetWorldRotation());
+				renderTask.renderData = SpriteRenderData
+				{
+					.texture = spriteTexture.get(),
+					.destRect = destRect,
+					.rotation = transform->GetWorldRotation(),
+				};
+
+				RenderSystem::Submit(renderTask);
 			}
 		}
 	}
