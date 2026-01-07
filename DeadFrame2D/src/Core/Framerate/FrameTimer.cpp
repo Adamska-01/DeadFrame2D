@@ -14,6 +14,8 @@ namespace DeadFrame2D::Core
 
 	int FrameTimer::currentFPS = 0;
 
+	std::chrono::duration<float> FrameTimer::workTime;
+
 
 	FrameTimer::FrameTimer()
 		: countedFrames(0),
@@ -21,7 +23,7 @@ namespace DeadFrame2D::Core
 		isFpsLocked(true)
 	{
 		start = system_clock::now();
-		end = system_clock::now();
+		end = start;
 
 		SetTargetFramerate(60);
 	}
@@ -49,29 +51,45 @@ namespace DeadFrame2D::Core
 	void FrameTimer::EndClock()
 	{
 		end = system_clock::now();
-		workTime = end - start;
+
+		workTime = duration<float>(end - start); // seconds
+		deltaTime = workTime.count() * timeScale;
+
+		// Update FPS
+		countedFrames++;
+		counterDelay += workTime.count();
+
+		if (counterDelay >= 1.0f) // 1 second
+		{
+			currentFPS = countedFrames;
+			countedFrames = 0;
+			counterDelay = 0.0f;
+		}
 	}
 
 	void FrameTimer::DelayByFrameTime()
 	{
-		CalculateFPS();
-
-		if (!isFpsLocked || workTime.count() >= frameTime)
+		if (!isFpsLocked)
 			return;
 
-		// Lock framerate to target
-		duration<float, std::milli> delta_ms(frameTime - workTime.count());
+		auto targetDelta = frameTime; // seconds per frame
+		auto remainingTime = targetDelta - workTime.count();
 
-		auto delta_ms_duration = duration_cast<std::chrono::milliseconds>(delta_ms);
+		if (remainingTime > 0.0f)
+		{
+			auto sleepDuration = duration<float>(remainingTime);
 
-		counterDelay += delta_ms_duration.count(); // For FPS calculation
+			std::this_thread::sleep_for(duration_cast<milliseconds>(sleepDuration));
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(delta_ms_duration.count()));
+			workTime += duration<float>(remainingTime);
+
+			deltaTime = workTime.count() * timeScale;
+		}
 	}
 
 	void FrameTimer::SetTargetFramerate(unsigned int fps)
 	{
-		frameTime = 1000.0f / fps;
+		frameTime = 1.0f / static_cast<float>(fps); // seconds per frame
 
 		isFpsLocked = true;
 	}
@@ -88,7 +106,7 @@ namespace DeadFrame2D::Core
 
 	float FrameTimer::DeltaTimeUnscaled()
 	{
-		return deltaTime;
+		return workTime.count();
 	}
 
 	int FrameTimer::Framerate()

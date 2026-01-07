@@ -14,12 +14,13 @@ namespace DeadFrame2D::Core
 
 		static int currentFPS;
 
+		static std::chrono::duration<float> workTime;
+
 
 		std::chrono::system_clock::time_point start;
 
 		std::chrono::system_clock::time_point end;
 
-		std::chrono::duration<float> workTime;
 
 		int countedFrames;
 
