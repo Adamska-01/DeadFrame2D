@@ -7,9 +7,16 @@ namespace DeadFrame2D::Core
 {
 	using namespace DeadFrame2D::Engine;
 	using namespace DeadFrame2D::Data;
+	using namespace DeadFrame2D::Utilities;
 
 
-	void CompositeRenderPass::Execute(IRenderBackend& renderBackend, const std::vector<RenderTask>& renderTasks)
+	void CompositeRenderPass::Execute(
+		IRenderBackend& renderBackend, 
+		std::array<
+			std::unordered_map<
+				Camera*, 
+				std::vector<RenderTask>>, 
+			(int)RenderPhase::RENDER_PHASE_COUNT>& renderTasks)
 	{
 		renderBackend.SetRenderTarget(NULL);
 		renderBackend.ClearCurrentRenderTarget();
@@ -21,7 +28,7 @@ namespace DeadFrame2D::Core
 
 			auto viewport = camera->GetNormalizedViewBox();
 
-			SDL_RenderCopy(
+			SDL_RenderCopyF(
 				Renderer::GetRenderer(),
 				camera->GetRenderTarget(),
 				nullptr,

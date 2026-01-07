@@ -1,35 +1,60 @@
 #include "Core/SubSystems/Systems/Rendering/Abstractions/IRenderBackend.h"
 #include "Core/SubSystems/Systems/Rendering/Pipeline/CameraRenderPass.h"
 #include "Core/SubSystems/Systems/Rendering/Resolvers/RenderResolver.h"
-#include "Data/Rendering/Pipeline/RenderPhase.h"
 #include "Engine/Components/Rendering/Camera.h"
-#include "Engine/Components/UI/Canvas.h"
 
 
 namespace DeadFrame2D::Core
 {
 	using namespace DeadFrame2D::Engine;
 	using namespace DeadFrame2D::Data;
+	using namespace DeadFrame2D::Utilities;
 
 
-	void CameraRenderPass::Execute(IRenderBackend& renderBackend, const std::vector<RenderTask>& renderTasks)
+	CameraRenderPass::CameraRenderPass()
+		: phasesInOrder{
+			RenderPhase::WORLD,
+			RenderPhase::DEBUG_WORLD,
+			RenderPhase::SCREEN_SPACE_CAMERA_UI
+		}
+	{
+	}
+
+	void CameraRenderPass::Execute(
+		IRenderBackend& renderBackend, 
+		std::array<
+			std::unordered_map<
+				Camera*, 
+				std::vector<RenderTask>>, 
+			(int)RenderPhase::RENDER_PHASE_COUNT>& renderTasks)
 	{
 		for (auto camera : Camera::GetCameras())
 		{
-			if (!camera->IsActive())
-				continue;
+			renderBackend.SetRenderTarget(camera->GetRenderTarget());
 
 			auto cameraHandle = camera->GetHandleAs<Camera>();
 
-			renderBackend.SetRenderTarget(camera->GetRenderTarget());
-
-			for (auto& task : renderTasks)
+			for (auto phase : phasesInOrder)
 			{
-				// All the WORLD ones are guaranteed come before SCREEN_SPACE_CAMERA_UI thanks to the sorting, so it's fine to do it in a single loop.
-				switch (task.renderPhase)
+				auto key = static_cast<int>(phase);
+
+				auto phaseTasksIT = renderTasks[key].find(camera);
+
+				if (phaseTasksIT == renderTasks[key].end())
+					continue;
+
+				auto& tasks = phaseTasksIT->second;
+
+				std::sort(
+					tasks.begin(),
+					tasks.end(),
+					[](const RenderTask& a, const RenderTask& b)
+					{
+						return a.GetSortKey() < b.GetSortKey();
+					});
+
+				for (auto& task : tasks)
 				{
-				case RenderPhase::WORLD:
-				case RenderPhase::DEBUG_WORLD:
 					std::visit(
 						[&](const auto& data)
 						{
@@ -39,31 +64,9 @@ namespace DeadFrame2D::Core
 								renderBackend,
 								data,
 								cameraHandle,
-								true);
+								task.renderPhase != RenderPhase::SCREEN_SPACE_CAMERA_UI);
 						},
 						task.renderData);
-					break;
-
-				case RenderPhase::SCREEN_SPACE_CAMERA_UI:
-					if (task.canvas->GetRenderCamera() == cameraHandle)
-					{
-						std::visit(
-							[&](const auto& data)
-							{
-								using T = std::decay_t<decltype(data)>;
-
-								RenderResolver::GetRenderResolver<T>()(
-									renderBackend,
-									data,
-									cameraHandle,
-									false);
-							},
-							task.renderData);
-					}
-					break;
-
-				default:
-					break;
 				}
 			}
 		}

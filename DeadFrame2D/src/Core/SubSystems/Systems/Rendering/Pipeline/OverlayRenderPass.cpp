@@ -1,7 +1,6 @@
 #include "Core/SubSystems/Systems/Rendering/Abstractions/IRenderBackend.h"
 #include "Core/SubSystems/Systems/Rendering/Pipeline/OverlayRenderPass.h"
 #include "Core/SubSystems/Systems/Rendering/Resolvers/RenderResolver.h"
-#include "Data/Rendering/Pipeline/RenderPhase.h"
 #include "Engine/Components/Rendering/Camera.h"
 #include <variant>
 
@@ -10,42 +9,60 @@ namespace DeadFrame2D::Core
 {
 	using namespace DeadFrame2D::Engine;
 	using namespace DeadFrame2D::Data;
+	using namespace DeadFrame2D::Utilities;
 
 
-	void OverlayRenderPass::Execute(IRenderBackend& renderBackend, const std::vector<RenderTask>& renderTasks)
+	OverlayRenderPass::OverlayRenderPass()
+		: phasesInOrder{ 
+			RenderPhase::SCREEN_SPACE_OVERLAY_UI, 
+			RenderPhase::DEBUG_OVERLAY 
+		}
+	{
+	}
+
+	void OverlayRenderPass::Execute(
+		IRenderBackend& renderBackend, 
+		std::array<
+			std::unordered_map<
+				Camera*, 
+				std::vector<RenderTask>>, 
+			(int)RenderPhase::RENDER_PHASE_COUNT>& renderTasks)
 	{
 		renderBackend.SetRenderTarget(NULL);
-		renderBackend.ClearCurrentRenderTarget();
 
-		for (auto camera : Camera::GetCameras())
+		for (auto phase : phasesInOrder)
 		{
-			auto cameraHandle = camera->GetHandleAs<Camera>();
+			auto key = static_cast<int>(phase);
 
-			for (auto& task : renderTasks)
+			auto phaseTasksIT = renderTasks[key].find(nullptr);
+
+			if (phaseTasksIT == renderTasks[key].end())
+				continue;
+
+			auto& tasks = phaseTasksIT->second;
+
+			std::sort(
+				tasks.begin(),
+				tasks.end(),
+				[](const RenderTask& a, const RenderTask& b)
+				{
+					return a.GetSortKey() < b.GetSortKey();
+				});
+
+			for (auto& task : tasks)
 			{
-				switch (task.renderPhase)
-				{
-				case RenderPhase::SCREEN_SPACE_OVERLAY_UI:
-				case RenderPhase::DEBUG_OVERLAY:
-				{
-					std::visit(
-						[&](const auto& data)
-						{
-							using T = std::decay_t<decltype(data)>;
+				std::visit(
+					[&](const auto& data)
+					{
+						using T = std::decay_t<decltype(data)>;
 
-							RenderResolver::GetRenderResolver<T>()(
-								renderBackend,
-								data,
-								cameraHandle,
-								false);
-						},
-						task.renderData);
-				}
-					break;
-
-				default:
-					break;
-				}
+						RenderResolver::GetRenderResolver<T>()(
+							renderBackend,
+							data,
+							{},
+							false);
+					},
+					task.renderData);
 			}
 		}
 	}
