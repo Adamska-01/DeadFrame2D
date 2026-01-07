@@ -78,7 +78,7 @@ namespace DeadFrame2D::Engine
 		std::vector<ComponentHandle<T>> GetComponentsInChildren(bool recursive = false) const;
 
 		template<typename T>
-		ComponentHandle<T> GetComponentInParent(bool recursive = false) const;
+		ComponentHandle<T> GetComponentInParent(bool recursive = false, bool includeSelf = false) const;
 
 		template<typename T>
 		std::vector<ComponentHandle<T>> GetComponentsInParent(bool recursive = false) const;
@@ -174,9 +174,9 @@ namespace DeadFrame2D::Engine
 	}
 
 	template<typename T>
-	inline ComponentHandle<T> GameObject::GetComponentInParent(bool recursive) const
+	inline ComponentHandle<T> GameObject::GetComponentInParent(bool recursive, bool includeSelf) const
 	{
-		auto current = parent;
+		ObjectHandle<GameObject> current = includeSelf ? thisGameObject : parent;
 
 		while (current != nullptr)
 		{
