@@ -1,5 +1,6 @@
 #pragma once
 #include "Constants/CommonColors.h"
+#include <optional>
 #include <SDL_render.h>
 
 
@@ -9,15 +10,15 @@ namespace DeadFrame2D::Data
 	{
 		SDL_Texture* texture = nullptr;
 
-		const SDL_Rect* srcRect = NULL;
+		std::optional<SDL_Rect> srcRect = std::nullopt;
 
-		const SDL_FRect* destRect = NULL;
+		std::optional<SDL_FRect> destRect = std::nullopt;
 
 		SDL_RendererFlip flip = SDL_RendererFlip::SDL_FLIP_NONE;
 
 		float rotation = 0.0f;
 
-		SDL_FPoint rotationOrigin = SDL_FPoint{ 0.0f, 0.0f };
+		std::optional<SDL_FPoint> rotationOrigin = std::nullopt;
 
 		SDL_Color colorMod = DeadFrame2D::Constants::CommonColors::WHITE;
 	};
