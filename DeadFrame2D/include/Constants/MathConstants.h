@@ -7,4 +7,6 @@ namespace DeadFrame2D::Constants::MathConstants
 	inline constexpr double PI = std::numbers::pi;
 
 	inline constexpr float PI_f = std::numbers::pi_v<float>;
+
+	inline constexpr float EPSILON = 1e-6f;
 }
