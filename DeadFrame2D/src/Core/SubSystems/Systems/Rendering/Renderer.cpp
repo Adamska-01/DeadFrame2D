@@ -1,11 +1,7 @@
 #include "Constants/MathConstants.h"
 #include "Core/Debugging/Debug.h"
-#include "Core/Math/Circle.h"
 #include "Core/SubSystems/Systems/Rendering/Renderer.h"
 #include "Core/SubSystems/Systems/Rendering/RenderPipeline.h"
-#include "Core/SubSystems/Systems/Window.h"
-#include "Engine/Components/Rendering/Camera.h"
-#include "Engine/Components/UI/Canvas.h"
 #include "Engine/EngineEvents/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/SubSystems/Renderer/RenderTargetSizeChangedEvent.h"
 
@@ -17,6 +13,9 @@ namespace DeadFrame2D::Core
 	using namespace DeadFrame2D::Engine;
 	using namespace DeadFrame2D::Constants;
 	using namespace DeadFrame2D::Data;
+
+
+	Renderer* Renderer::instance = nullptr;
 
 
 	Renderer::Renderer(SDL_Window* window, const RendererConfig& config)
@@ -303,17 +302,14 @@ namespace DeadFrame2D::Core
 
 	void Renderer::ClearAndPresentBuffer()
 	{
-		std::sort(
-			renderTasks.begin(), 
-			renderTasks.end(),
-			[](const RenderTask& a, const RenderTask& b)
-			{
-				return a.GetSortKey() < b.GetSortKey();
-			});
-
 		instance->renderPipeline->Execute(*instance, renderTasks);
 
 		SDL_RenderPresent(instance->renderer);
+
+		for (auto& phaseMap : renderTasks)
+		{
+			phaseMap.clear();
+		}
 	}
 
 	SDL_Renderer* Renderer::GetRenderer()
