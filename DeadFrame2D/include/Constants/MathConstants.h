@@ -1,4 +1,5 @@
 #pragma once
+#include <limits>
 #include <numbers>
 
 
@@ -8,5 +9,5 @@ namespace DeadFrame2D::Constants::MathConstants
 
 	inline constexpr float PI_f = std::numbers::pi_v<float>;
 
-	inline constexpr float EPSILON = 1e-6f;
+	inline constexpr float EPSILON = std::numeric_limits<float>::epsilon();
 }
