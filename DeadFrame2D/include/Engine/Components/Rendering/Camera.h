@@ -65,10 +65,10 @@ namespace DeadFrame2D::Engine
 		const SDL_FRect& GetViewport() const;
 
 		/** @brief Returns the screen-space viewbox for this camera. */
-		SDL_Rect GetViewBox() const;
+		SDL_FRect GetViewBox() const;
 
 		/** @brief Returns the screen-space normalized viewbox for this camera. */
-		SDL_Rect GetNormalizedViewBox() const;
+		SDL_FRect GetNormalizedViewBox() const;
 
 		SDL_Texture* GetRenderTarget();
 
@@ -77,28 +77,6 @@ namespace DeadFrame2D::Engine
 
 		/** @brief Converts screen position to world position. */
 		DeadFrame2D::Core::Vector2F ScreenToWorld(const DeadFrame2D::Core::Vector2F& screenPos) const;
-
-		/**
-		 * @brief Checks if the given screen-space rectangle is visible within this camera's view box.
-		 * @param screenRect The non-rotated rectangle in screen coordinates.
-		 * @return True if any part of the rectangle is inside the camera's viewport.
-		 */
-		bool IsVisible(const SDL_Rect& screenRect) const;
-
-		/**
-		 * @brief Checks if the given screen-space rectangle is visible within this camera's view box.
-		 * @param circle The circle in screen coordinates.
-		 * @return True if any part of the circle is inside the camera's viewport.
-		 */
-		bool IsVisible(const DeadFrame2D::Core::Circle& circle) const;
-
-		/**
-		 * @brief Checks if the given screen-space line segment is visible within this camera's view box.
-		 * @param p1 The first endpoint of the line segment in screen coordinates.
-		 * @param p2 The second endpoint of the line segment in screen coordinates.
-		 * @return True if any part of the line segment is inside the camera's viewport.
-		 */
-		bool IsVisible(const DeadFrame2D::Core::Vector2F& p1, const DeadFrame2D::Core::Vector2F& p2) const;
 
 
 		static const std::vector<Camera*>& GetCameras();

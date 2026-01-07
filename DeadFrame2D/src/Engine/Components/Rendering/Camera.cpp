@@ -81,25 +81,25 @@ namespace DeadFrame2D::Engine
 		return normalizedViewport;
 	}
 
-	SDL_Rect Camera::GetViewBox() const
+	SDL_FRect Camera::GetViewBox() const
 	{
-		return SDL_Rect
+		return SDL_FRect
 		{
-			.x = 0,
-			.y = 0,
-			.w = resolutionTarget.x,
-			.h = resolutionTarget.y
+			.x = 0.0f,
+			.y = 0.0f,
+			.w = static_cast<float>(resolutionTarget.x),
+			.h = static_cast<float>(resolutionTarget.y)
 		};
 	}
 
-	SDL_Rect Camera::GetNormalizedViewBox() const
+	SDL_FRect Camera::GetNormalizedViewBox() const
 	{
-		return SDL_Rect
+		return SDL_FRect
 		{
-			.x = static_cast<int>(normalizedViewport.x * resolutionTarget.x),
-			.y = static_cast<int>(normalizedViewport.y * resolutionTarget.y),
-			.w = static_cast<int>(normalizedViewport.w * resolutionTarget.x),
-			.h = static_cast<int>(normalizedViewport.h * resolutionTarget.y)
+			.x = normalizedViewport.x * resolutionTarget.x,
+			.y = normalizedViewport.y * resolutionTarget.y,
+			.w = normalizedViewport.w * resolutionTarget.x,
+			.h = normalizedViewport.h * resolutionTarget.y
 		};
 	}
 
@@ -125,21 +125,6 @@ namespace DeadFrame2D::Engine
 		auto localY = (screenPos.y - resolutionTarget.y * 0.5f) / zoom;
 
 		return transform->GetWorldPosition() + Vector2(localX, localY);
-	}
-
-	bool Camera::IsVisible(const SDL_Rect& screenRect) const
-	{
-		return Collision::RectVsRect(screenRect, GetViewBox());
-	}
-
-	bool Camera::IsVisible(const Circle& circle) const
-	{
-		return Collision::CircleVsRect(circle, GetViewBox());
-	}
-
-	bool Camera::IsVisible(const Vector2F& p1, const Vector2F& p2) const
-	{
-		return Collision::SegmentVsRect(p1, p2, GetViewBox());
 	}
 
 	const std::vector<Camera*>& Camera::GetCameras()
