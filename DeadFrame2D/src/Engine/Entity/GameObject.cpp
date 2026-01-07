@@ -6,6 +6,7 @@
 #include "Engine/SceneSystem/Scene.h"
 #include "Engine/SceneSystem/SceneManager.h"
 #include "Utilities/Helpers/Coroutines/CoroutineHelpers.h"
+#include <stack>
 
 
 namespace DeadFrame2D::Engine
@@ -186,6 +187,38 @@ namespace DeadFrame2D::Engine
 		PropagateActiveStateToChildren();
 
 		EventDispatcher::SendEvent(std::make_shared<ChildGameObjectAddedEvent>(child));
+
+		ObjectHandle<GameObject> current = thisGameObject;
+		while (current != nullptr)
+		{
+			current->OnChildGameObjectAdded.Broadcast(child);
+
+			current = current->parent;
+		}
+
+		std::stack<ObjectHandle<GameObject>> stack;
+
+		// Push all direct children initially
+		for (auto& child : thisGameObject->children)
+		{
+			stack.push(child);
+		}
+
+		while (!stack.empty())
+		{
+			ObjectHandle<GameObject> current = stack.top();
+			
+			stack.pop();
+
+			// Notify the current child
+			current->OnParentGameObjectChanged.Broadcast(thisGameObject);
+
+			// Push this child's children onto the stack
+			for (auto& child : current->children)
+			{
+				stack.push(child);
+			}
+		}
 	}
 
 	bool GameObject::IsChildOf(ObjectHandle<GameObject> potentialChild, bool recursive) const
@@ -271,6 +304,14 @@ namespace DeadFrame2D::Engine
 		if (oldState != newState)
 		{
 			OnActiveStateChanged.Broadcast(thisGameObject, newState);
+
+			ObjectHandle<GameObject> current = parent;
+			while (current != nullptr)
+			{
+				current->OnChildActiveStateChanged.Broadcast(thisGameObject, newState);
+
+				current = current->parent;
+			}
 		}
 
 		for (const auto& child : children) 

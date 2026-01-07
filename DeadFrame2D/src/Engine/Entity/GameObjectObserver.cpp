@@ -46,8 +46,12 @@ namespace DeadFrame2D::Engine
 	
 		auto typedHandle = ObjectHandle<GameObject>::From(targetObj);
 
-		typedHandle->RegisterOnActiveStateChangedHandler(GetHandle(), EventHelpers::BindFunction(this, &GameObjectObserver::OnGameObjectActiveStateChangedHandler));
+		typedHandle->RegisterOnGameObjectActiveStateChangedHandler(GetHandle(), EventHelpers::BindFunction(this, &GameObjectObserver::OnGameObjectActiveStateChangedHandler));
+		typedHandle->RegisterOnChildActiveStateChangedHandler(GetHandle(), EventHelpers::BindFunction(this, &GameObjectObserver::OnChildActiveStateChangedHandler));
 		typedHandle->RegisterOnNewComponentAddedHandler(GetHandle(), EventHelpers::BindFunction(this, &GameObjectObserver::OnNewComponentAddedHandler));
+		typedHandle->RegisterOnComponentRemovedHandler(GetHandle(), EventHelpers::BindFunction(this, &GameObjectObserver::OnComponentRemovedHandler));
+		typedHandle->RegisterOnChildGameObjectAdded(GetHandle(), EventHelpers::BindFunction(this, &GameObjectObserver::OnChildGameObjectAddedHandler));
+		typedHandle->RegisterOnParentGameObjectChanged(GetHandle(), EventHelpers::BindFunction(this, &GameObjectObserver::OnParentGameObjectChangedHandler));
 	}
 
 	void GameObjectObserver::DeregisterAllHandlers(const ObjectHandleBase& targetObj)
@@ -57,11 +61,20 @@ namespace DeadFrame2D::Engine
 
 		auto typedHandle = ObjectHandle<GameObject>::From(targetObj);
 
-		typedHandle->DeregisterOnActiveStateChangedHandler(GetHandle());
+		typedHandle->DeregisterOnGameObjectActiveStateChangedHandler(GetHandle());
+		typedHandle->DeregisterOnChildActiveStateChangedHandler(GetHandle());
 		typedHandle->DeregisterOnNewComponentAddedHandler(GetHandle());
+		typedHandle->DeregisterOnComponentRemovedHandler(GetHandle());
+		typedHandle->DeregisterOnChildGameObjectAdded(GetHandle());
+		typedHandle->DeregisterOnParentGameObjectChanged(GetHandle());
 	}
 
+
 	void GameObjectObserver::OnGameObjectActiveStateChangedHandler(const ObjectHandle<GameObject>& obj, bool isActive)
+	{
+	}
+
+	void GameObjectObserver::OnChildActiveStateChangedHandler(const ObjectHandle<GameObject>& child, bool isActive)
 	{
 	}
 
@@ -70,6 +83,14 @@ namespace DeadFrame2D::Engine
 	}
 
 	void GameObjectObserver::OnComponentRemovedHandler(const ComponentHandle<GameComponent>& comp)
+	{
+	}
+
+	void GameObjectObserver::OnChildGameObjectAddedHandler(const ObjectHandle<GameObject>& obj)
+	{
+	}
+
+	void GameObjectObserver::OnParentGameObjectChangedHandler(const ObjectHandle<GameObject>& obj)
 	{
 	}
 }

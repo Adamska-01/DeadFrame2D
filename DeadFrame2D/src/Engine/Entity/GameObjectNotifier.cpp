@@ -19,9 +19,14 @@ namespace DeadFrame2D::Engine
 		OnNewComponentAdded.Clear();
 	}
 
-	void GameObjectNotifier::RegisterOnActiveStateChangedHandler(const ComponentHandleBase& listener, std::function<void(ObjectHandle<GameObject>, bool)> handler)
+	void GameObjectNotifier::RegisterOnGameObjectActiveStateChangedHandler(const ComponentHandleBase& listener, std::function<void(ObjectHandle<GameObject>, bool)> handler)
 	{
 		OnActiveStateChanged.AddHandle(listener, handler);
+	}
+
+	void GameObjectNotifier::RegisterOnChildActiveStateChangedHandler(const ComponentHandleBase& listener, std::function<void(ObjectHandle<GameObject>, bool)> handler)
+	{
+		OnChildActiveStateChanged.AddHandle(listener, handler);
 	}
 
 	void GameObjectNotifier::RegisterOnNewComponentAddedHandler(const ComponentHandleBase& listener, std::function<void(const ComponentHandle<GameComponent>&)> handler)
@@ -34,9 +39,24 @@ namespace DeadFrame2D::Engine
 		OnComponentRemoved.AddHandle(listener, handler);
 	}
 
-	void GameObjectNotifier::DeregisterOnActiveStateChangedHandler(const ComponentHandleBase& listener)
+	void GameObjectNotifier::RegisterOnChildGameObjectAdded(const ComponentHandleBase& listener, std::function<void(ObjectHandle<GameObject>)> handler)
+	{
+		OnChildGameObjectAdded.AddHandle(listener, handler);
+	}
+
+	void GameObjectNotifier::RegisterOnParentGameObjectChanged(const ComponentHandleBase& listener, std::function<void(ObjectHandle<GameObject>)> handler)
+	{
+		OnParentGameObjectChanged.AddHandle(listener, handler);
+	}
+
+	void GameObjectNotifier::DeregisterOnGameObjectActiveStateChangedHandler(const ComponentHandleBase& listener)
 	{
 		OnActiveStateChanged.RemoveByListener(&listener);
+	}
+
+	void GameObjectNotifier::DeregisterOnChildActiveStateChangedHandler(const ComponentHandleBase& listener)
+	{
+		OnChildActiveStateChanged.RemoveByListener(&listener);
 	}
 
 	void GameObjectNotifier::DeregisterOnNewComponentAddedHandler(const ComponentHandleBase& listener)
@@ -47,5 +67,15 @@ namespace DeadFrame2D::Engine
 	void GameObjectNotifier::DeregisterOnComponentRemovedHandler(const ComponentHandleBase& listener)
 	{
 		OnComponentRemoved.RemoveByListener(&listener);
+	}
+
+	void GameObjectNotifier::DeregisterOnChildGameObjectAdded(const ComponentHandleBase& listener)
+	{
+		OnChildGameObjectAdded.RemoveByListener(&listener);
+	}
+	
+	void GameObjectNotifier::DeregisterOnParentGameObjectChanged(const ComponentHandleBase& listener)
+	{
+		OnParentGameObjectChanged.RemoveByListener(&listener);
 	}
 }
