@@ -3,7 +3,14 @@
 #include "Data/Rendering/Pipeline/RenderSortKey.h"
 #include "Data/Rendering/Pipeline/RenderTask.h"
 #include "DF2D_API.h"
-#include <vector>
+#include <array>
+#include <unordered_map>
+
+
+namespace DeadFrame2D::Engine
+{
+	class Camera;
+}
 
 
 namespace DeadFrame2D::Core
@@ -11,11 +18,15 @@ namespace DeadFrame2D::Core
 	class DF2D_API RenderSystem
 	{
 	private:
-		static DeadFrame2D::Data::RenderSortKey BuildRenderKey(DeadFrame2D::Data::RenderPhase phase, int sortingOrder, uint32_t tieBreaker);
-	
-	
+		static DeadFrame2D::Data::RenderSortKey BuildRenderKey(int sortingOrder, uint32_t tieBreaker);
+
+
 	protected:
-		static std::vector<DeadFrame2D::Data::RenderTask> renderTasks;
+		static std::array<
+			std::unordered_map<
+				DeadFrame2D::Engine::Camera*, 
+				std::vector<DeadFrame2D::Data::RenderTask>>,
+			(int)DeadFrame2D::Data::RenderPhase::RENDER_PHASE_COUNT> renderTasks;
 
 
 	public:
