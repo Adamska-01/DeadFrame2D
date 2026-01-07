@@ -56,7 +56,5 @@ namespace DeadFrame2D::Engine
 
 			currentPosition.x += interactable->GetWidgetSize().x + layoutSpacing;
 		}
-
-		isDirty = false;
 	}
 }

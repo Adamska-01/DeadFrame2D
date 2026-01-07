@@ -65,7 +65,5 @@ namespace DeadFrame2D::Engine
 			// Move down by full height + spacing
 			currentPosition.y += size.y + layoutSpacing;
 		}
-
-		isDirty = false;
 	}
 }

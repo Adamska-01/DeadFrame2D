@@ -17,8 +17,6 @@ namespace DeadFrame2D::Engine
 
 
 	private:
-		void GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
-
 		void GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
 
 
@@ -28,7 +26,9 @@ namespace DeadFrame2D::Engine
 		DeadFrame2D::Data::LayoutPadding layoutPadding;
 
 
-		virtual void OnGameObjectActiveStateChangedHandler(const ObjectHandle<GameObject>& child, bool activeState) override;
+		virtual void OnChildActiveStateChangedHandler(const ObjectHandle<GameObject>& child, bool activeState) override;
+
+		virtual void OnChildGameObjectAddedHandler(const ObjectHandle<GameObject>& obj) override;
 
 
 	public:

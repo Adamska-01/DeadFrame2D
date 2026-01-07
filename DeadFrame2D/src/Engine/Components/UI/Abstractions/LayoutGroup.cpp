@@ -2,7 +2,6 @@
 #include "Engine/Components/UI/Abstractions/UIComponent.h"
 #include "Engine/EngineEvents/DispatchableEvent.h"
 #include "Engine/EngineEvents/EventDispatcher.h"
-#include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectCreatedEvent.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
 #include "Utilities/Helpers/Events/EventHelpers.h"
 
@@ -16,32 +15,13 @@ namespace DeadFrame2D::Engine
 	LayoutGroup::LayoutGroup(float layoutSpacing, LayoutPadding layoutPadding)
 		: layoutSpacing(layoutSpacing), layoutPadding(layoutPadding)
 	{
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), this, &LayoutGroup::GameObjectCreatedHandler);
+		// TODO: Fucking remove this! Add proper events to the GameObjectNotifier
 		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), this, &LayoutGroup::GameObjectDestroyedHandler);
 	}
 
 	LayoutGroup::~LayoutGroup()
 	{
-		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectCreatedEvent)), this);
 		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), this);
-	}
-
-	void LayoutGroup::GameObjectCreatedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
-	{
-		auto gameObjEvent = DispatchableEvent::SafeCast<GameObjectCreatedEvent>(dispatchableEvent);
-
-		if (gameObjEvent == nullptr || gameObjEvent->GetGameObject() == nullptr)
-			return;
-	
-		auto& target = gameObjEvent->GetGameObject();
-
-		if (!target->IsChildOf(GetGameObject()))
-			return;
-
-		DeregisterAllHandlers(target);
-		RegisterAllHandlers(target);
-
-		MarkDirty();
 	}
 
 	void LayoutGroup::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
@@ -61,7 +41,12 @@ namespace DeadFrame2D::Engine
 		MarkDirty();
 	}
 
-	void LayoutGroup::OnGameObjectActiveStateChangedHandler(const ObjectHandle<GameObject>& child, bool activeState)
+	void LayoutGroup::OnChildActiveStateChangedHandler(const ObjectHandle<GameObject>& child, bool activeState)
+	{
+		MarkDirty();
+	}
+
+	void LayoutGroup::OnChildGameObjectAddedHandler(const ObjectHandle<GameObject>& obj)
 	{
 		MarkDirty();
 	}
@@ -76,17 +61,12 @@ namespace DeadFrame2D::Engine
 		if (isDirty)
 		{
 			UpdateLayout();
+
+			isDirty = false;
 		}
 	}
 
 	void LayoutGroup::UpdateLayout()
 	{
-		for (const auto& ui : GetGameObject()->GetComponentsInChildren<UIComponent>())
-		{
-			DeregisterAllHandlers(ui->GetGameObject());
-			RegisterAllHandlers(ui->GetGameObject());
-		}
-
-		isDirty = false;
 	}
 }
