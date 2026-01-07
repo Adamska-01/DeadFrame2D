@@ -106,21 +106,25 @@ namespace DeadFrame2D::Engine
 	{
 		static_assert(std::is_base_of<GameComponent, T>::value, "T must derive from GameComponent");
 
-		for (size_t i = 0; i < components.size(); ++i)
+		const auto* wantedType = &T::StaticTypeInfo;
+
+		auto componentsSize = static_cast<uint32_t>(components.size());
+
+		for (uint32_t i = 0; i < componentsSize; ++i)
 		{
 			const auto& entry = components[i];
 
 			if (!entry.alive)
 				continue;
 
-			auto ptr = dynamic_cast<T*>(entry.instance.get());
+			if (!entry.instance->IsA(wantedType))
+				continue;
 
-			if (ptr != nullptr)
-				return ComponentHandle<T>((weak_from_this()), static_cast<uint32_t>(i), entry.generation);
+			return ComponentHandle<T>(weak_from_this(), i, entry.generation);
 		}
 
 		// No match found
-		return ComponentHandle<T>();
+		return {};
 	}
 
 	template<typename T, typename ...Args>
