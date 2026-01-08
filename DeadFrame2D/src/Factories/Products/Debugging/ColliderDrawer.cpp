@@ -1,6 +1,5 @@
 #include "Core/SubSystems/Systems/Physics/PhysicsEngine2D.h"
-#include "Core/SubSystems/Systems/Rendering/Renderer.h"
-#include "Core/SubSystems/Systems/TextureManager.h"
+#include "Core/SubSystems/Systems/Rendering/RenderSystem.h"
 #include "Factories/Products/Debugging/ColliderDrawer.h"
 
 
@@ -26,23 +25,23 @@ namespace DeadFrame2D::Factories
 
 	void ColliderDrawer::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 	{
-		auto sdlColor = SDL_Color(uint8_t(color.r * 255), uint8_t(color.g * 255), uint8_t(color.b * 255), uint8_t(color.a * 255));
+		const auto PIXEL_PER_METER = PhysicsEngine2D::GetPhysicsConfig().pixelPerMeter;
+
+		auto lineColor = SDL_Color(uint8_t(color.r * 255), uint8_t(color.g * 255), uint8_t(color.b * 255), uint8_t(color.a * 255));
 
 		for (int32 i = 0; i < vertexCount; ++i)
 		{
 			auto p1 = vertices[i];
 			auto p2 = vertices[(i + 1) % vertexCount];
 
-			const auto PIXEL_PER_METER = PhysicsEngine2D::GetPhysicsConfig().pixelPerMeter;
-
-			renderTask.renderData = LineRenderData
+			auto lineData = LineRenderData
 			{
 				.p1 = Vector2F(p1.x * PIXEL_PER_METER, p1.y * PIXEL_PER_METER),
 				.p2 = Vector2F(p2.x * PIXEL_PER_METER, p2.y * PIXEL_PER_METER),
-				.color = sdlColor
+				.color = lineColor
 			};
 
-			RenderSystem::Submit(renderTask);
+			lineBatchData.lineBatch.push_back(lineData);
 		}
 	}
 
@@ -55,20 +54,15 @@ namespace DeadFrame2D::Factories
 	{
 		const auto PIXEL_PER_METER = PhysicsEngine2D::GetPhysicsConfig().pixelPerMeter;
 
-		auto pixelRadius = radius * PIXEL_PER_METER;
-		auto pixelCenter = Vector2F(
-			center.x * PIXEL_PER_METER,
-			center.y * PIXEL_PER_METER);
-
-		renderTask.renderData = CircleRenderData
+		auto circleRenderData = CircleRenderData
 		{
-			.center = pixelCenter,
-			.radius = pixelRadius,
+			.center = Vector2F(center.x * PIXEL_PER_METER, center.y * PIXEL_PER_METER),
+			.radius = radius * PIXEL_PER_METER,
 			.filled = false,
 			.color = SDL_Color{ Uint8(color.r * 255), Uint8(color.g * 255), Uint8(color.b * 255), Uint8(color.a * 255) }
 		};
 
-		RenderSystem::Submit(renderTask);
+		circleBatchData.circleBatch.push_back(circleRenderData);
 	}
 
 	void ColliderDrawer::DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color)
@@ -80,16 +74,14 @@ namespace DeadFrame2D::Factories
 	{
 		const auto PIXEL_PER_METER = PhysicsEngine2D::GetPhysicsConfig().pixelPerMeter;
 		
-		auto sdlColor = SDL_Color(uint8_t(color.r * 255), uint8_t(color.g * 255), uint8_t(color.b * 255), uint8_t(color.a * 255));
-
-		renderTask.renderData = LineRenderData
+		auto lineRenderData = LineRenderData
 		{
 			.p1 = Vector2F(p1.x * PIXEL_PER_METER, p1.y * PIXEL_PER_METER),
 			.p2 = Vector2F(p2.x * PIXEL_PER_METER, p2.y * PIXEL_PER_METER),
-			.color = sdlColor
+			.color = SDL_Color(uint8_t(color.r * 255), uint8_t(color.g * 255), uint8_t(color.b * 255), uint8_t(color.a * 255))
 		};
 
-		RenderSystem::Submit(renderTask);
+		lineBatchData.lineBatch.push_back(lineRenderData);
 	}
 
 	void ColliderDrawer::DrawTransform(const b2Transform& xf)
@@ -103,22 +95,52 @@ namespace DeadFrame2D::Factories
 
 		auto center = Vector2F(p.x * PIXEL_PER_METER, p.y * PIXEL_PER_METER);
 
-		auto sdlColor = SDL_Color(uint8_t(color.r * 255), uint8_t(color.g * 255), uint8_t(color.b * 255), uint8_t(color.a * 255));
-
 		auto halfSize = static_cast<int>(std::round(size * 0.5f));
+
+		auto pointColor = SDL_Color(uint8_t(color.r * 255), uint8_t(color.g * 255), uint8_t(color.b * 255), uint8_t(color.a * 255));
 
 		for (auto dx = -halfSize; dx <= halfSize; ++dx)
 		{
 			for (auto dy = -halfSize; dy <= halfSize; ++dy)
 			{
-				renderTask.renderData = PointRenderData
+				auto pointData = PointRenderData
 				{
 					.pos = center + Vector2F(float(dx), float(dy)),
-					.color = sdlColor
+					.color = pointColor
 				};
 
-				RenderSystem::Submit(renderTask);
+				pointBatchData.pointBatch.push_back(pointData);
 			}
+		}
+	}
+
+	void ColliderDrawer::Flush()
+	{
+		if (!lineBatchData.lineBatch.empty())
+		{
+			renderTask.renderData = std::move(lineBatchData);
+			
+			RenderSystem::Submit(renderTask);
+			
+			lineBatchData.lineBatch.clear();
+		}
+
+		if (!pointBatchData.pointBatch.empty())
+		{
+			renderTask.renderData = std::move(pointBatchData);
+			
+			RenderSystem::Submit(renderTask);
+			
+			pointBatchData.pointBatch.clear();
+		}
+
+		if (!circleBatchData.circleBatch.empty())
+		{
+			renderTask.renderData = std::move(circleBatchData);
+
+			RenderSystem::Submit(renderTask);
+
+			circleBatchData.circleBatch.clear();
 		}
 	}
 }

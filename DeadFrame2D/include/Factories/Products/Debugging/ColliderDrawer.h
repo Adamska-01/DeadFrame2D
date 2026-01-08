@@ -1,5 +1,8 @@
 #pragma once
 #include "Core/SubSystems/Systems/Rendering/RenderSystem.h"
+#include "Data/Rendering/Pipeline/Shapes/CircleBatchRenderData.h"
+#include "Data/Rendering/Pipeline/Shapes/LineBatchRenderData.h"
+#include "Data/Rendering/Pipeline/Shapes/PointBatchRenderData.h"
 #include <box2d/box2d.h>
 
 
@@ -26,10 +29,16 @@ namespace DeadFrame2D::Factories
 	private:
 		DeadFrame2D::Data::RenderTask renderTask;
 
+		DeadFrame2D::Data::LineBatchRenderData lineBatchData;
+
+		DeadFrame2D::Data::PointBatchRenderData pointBatchData;
+
+		DeadFrame2D::Data::CircleBatchRenderData circleBatchData;
+
 
 	public:
 		ColliderDrawer();
-	
+
 		~ColliderDrawer() override = default;
 
 
@@ -46,5 +55,8 @@ namespace DeadFrame2D::Factories
 		virtual void DrawTransform(const b2Transform& xf) override;
 
 		virtual void DrawPoint(const b2Vec2& p, float size, const b2Color& color) override;
+
+
+		void Flush();
 	};
 }
