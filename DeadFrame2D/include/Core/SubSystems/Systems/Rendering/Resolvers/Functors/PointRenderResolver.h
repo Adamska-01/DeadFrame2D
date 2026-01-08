@@ -4,6 +4,7 @@
 #include "Engine/Components/Rendering/Camera.h"
 #include "Engine/Entity/ComponentHandle.h"
 #include "Utilities/Collisions/CollisionUtils.h"
+#include <optional>
 
 
 namespace DeadFrame2D::Core
@@ -28,7 +29,7 @@ namespace DeadFrame2D::Core
 		}
 
 		// Visibility Check
-		bool operator()(
+		std::optional<DeadFrame2D::Data::PointRenderData> operator()(
 			const DeadFrame2D::Data::PointRenderData& renderData,
 			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera) const
 		{
@@ -37,11 +38,14 @@ namespace DeadFrame2D::Core
 
 			// Always visible if no camera (screen space)
 			if (camera == nullptr)
-				return true;
+				return renderData;
 
 			auto pos = camera->WorldToScreen(renderData.pos);
 
-			return Collision::PointVsBox(pos, camera->GetViewBox());
+			if (Collision::PointVsBox(pos, camera->GetViewBox()))
+				return renderData;
+
+			return std::nullopt;
 		}
 	};
 }

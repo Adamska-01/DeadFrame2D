@@ -5,6 +5,7 @@
 #include "Engine/Components/Rendering/Camera.h"
 #include "Engine/Entity/ComponentHandle.h"
 #include "Utilities/Collisions/CollisionUtils.h"
+#include <optional>
 
 
 namespace DeadFrame2D::Core
@@ -19,22 +20,22 @@ namespace DeadFrame2D::Core
 			bool requiresScreenSpaceConversion) const
 		{
 			SDL_FRect destRect;
-			
+
 			if (renderData.destRect.has_value())
 			{ 
 				destRect = *renderData.destRect;
-				
+
 				if (camera != nullptr && requiresScreenSpaceConversion)
 				{
 					auto screenPos = camera->WorldToScreen(Vector2F(destRect.x, destRect.y));
-					
+
 					destRect.x = screenPos.x;
 					destRect.y = screenPos.y;
 					destRect.w *= camera->GetZoom();
 					destRect.h *= camera->GetZoom();
 				}
 			}
-			
+
 			renderBackend.DrawTexture(
 				renderData.texture,
 				renderData.srcRect.has_value() ? &*renderData.srcRect : nullptr,
@@ -46,7 +47,7 @@ namespace DeadFrame2D::Core
 		}
 
 		// Visibility Check
-		bool operator()(
+		std::optional<DeadFrame2D::Data::SpriteRenderData> operator()(
 			const DeadFrame2D::Data::SpriteRenderData& renderData,
 			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera) const
 		{
@@ -55,7 +56,7 @@ namespace DeadFrame2D::Core
 
 			// Always visible if no rect or no camera
 			if (!renderData.destRect.has_value() || camera == nullptr)
-				return true;
+				return renderData;
 
 			auto screenPos = camera->WorldToScreen(Vector2F(renderData.destRect->x, renderData.destRect->y));
 
@@ -66,8 +67,11 @@ namespace DeadFrame2D::Core
 				.w = renderData.destRect->w * camera->GetZoom(),
 				.h = renderData.destRect->h * camera->GetZoom()
 			};
-			
-			return Collision::RectVsRect(screenRect, camera->GetViewBox());
+
+			if (Collision::RectVsRect(screenRect, camera->GetViewBox()))
+				return renderData;
+
+			return std::nullopt;
 		}
 	};
 }

@@ -5,6 +5,7 @@
 #include "Engine/Components/Rendering/Camera.h"
 #include "Engine/Entity/ComponentHandle.h"
 #include "Utilities/Collisions/CollisionUtils.h"
+#include <optional>
 
 
 namespace DeadFrame2D::Core
@@ -36,7 +37,7 @@ namespace DeadFrame2D::Core
 
 
 		// Visibility Check
-		bool operator()(
+		std::optional<DeadFrame2D::Data::CircleRenderData> operator()(
 			const DeadFrame2D::Data::CircleRenderData& renderData,
 			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera) const
 		{
@@ -45,13 +46,16 @@ namespace DeadFrame2D::Core
 
 			// Always visible if no camera (screen space)
 			if (camera == nullptr)
-				return true;
+				return renderData;
 
-			Circle circle(
+			auto circle = Circle(
 				camera->WorldToScreen(renderData.center),
 				renderData.radius * camera->GetZoom());
 
-			return Collision::CircleVsRect(circle, camera->GetViewBox());
+			if (Collision::CircleVsRect(circle, camera->GetViewBox()))
+				return renderData;
+
+			return std::nullopt;
 		}
 	};
 }

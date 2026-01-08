@@ -5,6 +5,7 @@
 #include "Engine/Components/Rendering/Camera.h"
 #include "Engine/Entity/ComponentHandle.h"
 #include "Utilities/Collisions/CollisionUtils.h"
+#include <optional>
 
 
 namespace DeadFrame2D::Core
@@ -38,7 +39,7 @@ namespace DeadFrame2D::Core
 		}
 
 		// Visibility Check
-		bool operator()(
+		std::optional<DeadFrame2D::Data::RectRenderData> operator()(
 			const DeadFrame2D::Data::RectRenderData& renderData,
 			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera) const
 		{
@@ -47,7 +48,7 @@ namespace DeadFrame2D::Core
 
 			// Always visible if no camera (screen space)
 			if (camera == nullptr)
-				return true;
+				return renderData;
 
 			SDL_FRect destRect = renderData.destRect;
 
@@ -58,7 +59,10 @@ namespace DeadFrame2D::Core
 			destRect.w *= camera->GetZoom();
 			destRect.h *= camera->GetZoom();
 
-			return Collision::RectVsRect(destRect, camera->GetViewBox());
+			if (Collision::RectVsRect(destRect, camera->GetViewBox()))
+				return renderData;
+
+			return std::nullopt;
 		}
 	};
 }
