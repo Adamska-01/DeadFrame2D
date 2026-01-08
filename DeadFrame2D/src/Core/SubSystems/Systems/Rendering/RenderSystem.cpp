@@ -35,7 +35,7 @@ namespace DeadFrame2D::Core
 					static_cast<int>(bucket.size()) - 1);
 			};
 
-		auto filterAndAddRenderData = [&](const ComponentHandle<Camera>& cameraHandle)
+		auto filterAndAddRenderTask = [&](const ComponentHandle<Camera>& cameraHandle)
 			{
 				std::visit([&](auto& data)
 					{
@@ -65,13 +65,13 @@ namespace DeadFrame2D::Core
 			{
 			case RenderPhase::WORLD:
 			case RenderPhase::DEBUG_WORLD:
-				filterAndAddRenderData(cameraHandle);
+				filterAndAddRenderTask(cameraHandle);
 				break;
 
 			case RenderPhase::SCREEN_SPACE_CAMERA_UI:
 				if (renderTask.canvas->GetRenderCamera() == cameraHandle)
 				{
-					filterAndAddRenderData(cameraHandle);
+					filterAndAddRenderTask(cameraHandle);
 				}
 				break;
 
