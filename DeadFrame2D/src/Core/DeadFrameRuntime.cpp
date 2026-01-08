@@ -1,7 +1,7 @@
 #include "Core/DeadFrameRuntime.h"
 #include "Core/SubSystems/Systems/Rendering/Renderer.h"
 #include "Core/SubSystems/Systems/TextureManager.h"
-#include "Engine/Components/Rendering/Camera.h"
+#include "Data/Rendering/Pipeline/RenderTask.h"
 #include <Constants/ResourcePaths.h>
 #include <Models/Other/SplashScreenConfig.h>
 #include <Models/SystemConfig.h>
@@ -12,6 +12,7 @@ namespace DeadFrame2D::Core
 	using namespace Shared::Constants;
 	using namespace Shared::Models;
 
+	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Engine;
 	using namespace DeadFrame2D::Utilities;
 
@@ -38,19 +39,10 @@ namespace DeadFrame2D::Core
 	std::optional<int> DeadFrameRuntime::RenderSplashScreen()
 	{
 		auto splashTexture = TextureManager::LoadTexture(Paths::Files::SPLASH_SCREEN);
-		auto renderer = Renderer::GetRenderer();
 		auto renderTargetSize = Renderer::GetResolutionTarget();
 
 		auto width = 0, height = 0;
 		SDL_QueryTexture(splashTexture.get(), nullptr, nullptr, &width, &height);
-
-		auto destRect = SDL_Rect
-		{
-			static_cast<int>(renderTargetSize.x * 0.5f - width * 0.2f),
-			static_cast<int>(renderTargetSize.y * 0.5f - height * 0.2f),
-			static_cast<int>(width * 0.4f),
-			static_cast<int>(height * 0.4f)
-		};
 
 		auto splashScreenConfig = Shared::Tools::DeserializeFromFile<SplashScreenConfig>(Paths::Files::SPLASH_SCREEN_CONFIGURATION);
 
@@ -61,6 +53,22 @@ namespace DeadFrame2D::Core
 		auto totalDuration = fadeInDuration + holdDuration + fadeOutDuration;
 
 		auto elapsedTime = 0.0f;
+
+		auto renderTask = RenderTask();
+		renderTask.renderPhase = RenderPhase::SCREEN_SPACE_OVERLAY_UI;
+
+		auto renderData = SpriteRenderData
+		{
+			.texture = splashTexture.get(),
+			.destRect = SDL_FRect
+			{
+				renderTargetSize.x * 0.5f - width * 0.2f,
+				renderTargetSize.y * 0.5f - height * 0.2f,
+				width * 0.4f,
+				height * 0.4f
+			}
+		};
+
 		while (elapsedTime < totalDuration)
 		{
 			frameTimer.StartClock();
@@ -85,10 +93,13 @@ namespace DeadFrame2D::Core
 				alpha = static_cast<uint8_t>(alpha * t);
 			}
 
-			SDL_RenderClear(Renderer::GetRenderer());
-			// TODO: Fix Splash Screen
-			//TextureManager::DrawTextureScreenSpace(splashTexture, nullptr, &destRect, 0.0f, nullptr, SDL_RendererFlip::SDL_FLIP_NONE, alpha);
-			SDL_RenderPresent(Renderer::GetRenderer());
+			renderData.colorMod.a = alpha;
+
+			renderTask.renderData = renderData;
+
+			RenderSystem::Submit(renderTask);
+
+			Renderer::ClearAndPresentBuffer();
 
 			frameTimer.EndClock();
 			frameTimer.DelayByFrameTime();
@@ -110,8 +121,8 @@ namespace DeadFrame2D::Core
 
 			engineSubSystems->BeginFrame();
 
-			// Looks for messages and return optional if QUIT
-			if (const auto ecode = eventManager.ProcessEvents())
+			// Only returns in case of QUIT event
+			if (const auto& ecode = eventManager.ProcessEvents())
 				return *ecode;
 
 			engineSubSystems->PreUpdate(deltaTime);
