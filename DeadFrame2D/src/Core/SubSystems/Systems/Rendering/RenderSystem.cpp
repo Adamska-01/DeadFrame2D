@@ -54,7 +54,7 @@ namespace DeadFrame2D::Core
 			};
 
 		// Handle camera-dependent phases
-		for (auto camera : Camera::GetCameras())
+		for (const auto& camera : Camera::GetCameras())
 		{
 			if (!camera->IsActive())
 				continue;
