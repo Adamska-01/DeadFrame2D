@@ -24,7 +24,7 @@ namespace DeadFrame2D::Data
 
 
 	private:
-		RenderSortKey renderSortKey;
+		RenderSortKey renderSortKey = 0;
 
 
 	public:
@@ -39,11 +39,11 @@ namespace DeadFrame2D::Data
 		RenderTask& operator=(RenderTask&&) noexcept = default;
 
 
-		RenderPhase renderPhase;
+		RenderPhase renderPhase = RenderPhase::WORLD;
 
 		RenderData renderData;
 
-		int sortOrder;
+		int sortOrder = 0;
 
 		DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Canvas> canvas;
 
