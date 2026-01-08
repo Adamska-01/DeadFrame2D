@@ -110,7 +110,7 @@ namespace DeadFrame2D::Core
 
 	std::optional<int> DeadFrameRuntime::Run()
 	{
-		if (const auto splashCode = RenderSplashScreen())
+		if (const auto& splashCode = RenderSplashScreen())
 			return *splashCode;
 
 		while (true)
