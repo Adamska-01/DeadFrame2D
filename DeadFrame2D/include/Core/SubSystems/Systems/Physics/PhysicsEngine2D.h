@@ -14,6 +14,12 @@ class b2ContactListener;
 class b2Draw;
 
 
+namespace DeadFrame2D::Factories
+{
+	class ColliderDrawer;
+}
+
+
 namespace DeadFrame2D::Core
 {
 	class DF2D_API PhysicsEngine2D : public ISubSystem
@@ -29,7 +35,7 @@ namespace DeadFrame2D::Core
 
 		std::unique_ptr<b2ContactListener> contactListener;
 
-		std::unique_ptr<b2Draw> debugDrawer;
+		std::unique_ptr<DeadFrame2D::Factories::ColliderDrawer> debugDrawer;
 
 		Shared::Models::PhysicsConfig physicsConfig;
 

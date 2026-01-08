@@ -2,6 +2,7 @@
 #include "Core/SubSystems/Systems/Physics/ContactListener.h"
 #include "Core/SubSystems/Systems/Physics/PhysicsEngine2D.h"
 #include "Factories/Concretions/Debugging/ColliderDrawerFactory.h"
+#include "Factories/Products/Debugging/ColliderDrawer.h"
 #include <box2d/box2d.h>
 #include <cassert>
 #include <Constants/ResourcePaths.h>
@@ -29,7 +30,7 @@ namespace DeadFrame2D::Core
 
 		contactListener = std::make_unique<ContactListener>();
 
-		debugDrawer = std::unique_ptr<b2Draw>(ColliderDrawerFactory().CreateProduct());
+		debugDrawer = std::unique_ptr<ColliderDrawer>(static_cast<ColliderDrawer*>(ColliderDrawerFactory().CreateProduct()));
 
 
 		world = std::make_unique<b2World>(b2Vec2(physicsConfig.gravityX, physicsConfig.gravityY));
@@ -71,7 +72,12 @@ namespace DeadFrame2D::Core
 
 	void PhysicsEngine2D::EndDraw()
 	{
+		if (debugDrawer == nullptr)
+			return;
+
 		world->DebugDraw();
+
+		debugDrawer->Flush();
 	}
 
 	Vector2F PhysicsEngine2D::GetGravity()
