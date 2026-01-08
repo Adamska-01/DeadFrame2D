@@ -1,6 +1,9 @@
 #pragma once
+#include "Data/Rendering/Pipeline/Shapes/CircleBatchRenderData.h"
 #include "Data/Rendering/Pipeline/Shapes/CircleRenderData.h"
+#include "Data/Rendering/Pipeline/Shapes/LineBatchRenderData.h"
 #include "Data/Rendering/Pipeline/Shapes/LineRenderData.h"
+#include "Data/Rendering/Pipeline/Shapes/PointBatchRenderData.h"
 #include "Data/Rendering/Pipeline/Shapes/PointRenderData.h"
 #include "Data/Rendering/Pipeline/Shapes/RectRenderData.h"
 #include "Data/Rendering/Pipeline/Shapes/SpriteRenderData.h"
@@ -14,5 +17,8 @@ namespace DeadFrame2D::Data
 		RectRenderData,
 		LineRenderData,
 		CircleRenderData,
-		PointRenderData>;
+		PointRenderData,
+		PointBatchRenderData,
+		LineBatchRenderData,
+		CircleBatchRenderData>;
 }
