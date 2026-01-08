@@ -22,11 +22,12 @@ namespace DeadFrame2D::Core
 
 	void RenderSystem::Submit(RenderTask renderTask)
 	{
+		auto phaseIndex = static_cast<int>(renderTask.renderPhase);
+
 		auto addRenderTask = [&](int phaseIndex, Camera* camera)
 			{
 				auto& bucket = renderTasks[phaseIndex][camera];
 
-				// Copy
 				auto& taskInBucket = bucket.emplace_back(std::move(renderTask));
 
 				taskInBucket.renderSortKey = BuildRenderKey(
@@ -34,48 +35,51 @@ namespace DeadFrame2D::Core
 					static_cast<int>(bucket.size()) - 1);
 			};
 
-		auto phaseIndex = static_cast<int>(renderTask.renderPhase);
-
-		// Handle camera-dependent phases
-		switch (renderTask.renderPhase)
-		{
-		case RenderPhase::WORLD:
-		case RenderPhase::DEBUG_WORLD:
-		case RenderPhase::SCREEN_SPACE_CAMERA_UI:
-			for (auto camera : Camera::GetCameras())
+		auto filterAndAddRenderData = [&](const ComponentHandle<Camera>& cameraHandle)
 			{
-				if (!camera->IsActive())
-					continue;
-
-				auto cameraHandle = camera->GetHandleAs<Camera>();
-
-				// SCREEN_SPACE_CAMERA_UI: skip if not the correct camera
-				if (renderTask.renderPhase == RenderPhase::SCREEN_SPACE_CAMERA_UI
-					&& renderTask.canvas->GetRenderCamera() != cameraHandle)
-					continue;
-
-				std::visit([&](const auto& data)
+				std::visit([&](auto& data)
 					{
 						using T = std::decay_t<decltype(data)>;
 
-						auto isVisible = 
-							renderTask.renderPhase == RenderPhase::SCREEN_SPACE_CAMERA_UI
-							|| RenderResolver::GetRenderResolver<T>()(
-								data, 
-								cameraHandle);
+						auto filtered = RenderResolver::GetRenderResolver<T>()(data, cameraHandle);
 
-						if (!isVisible)
+						if (!filtered)
 							return;
 
-						addRenderTask(phaseIndex, camera);
+						renderTask.renderData = std::move(*filtered);
 
-					}, renderTask.renderData);
+						addRenderTask(phaseIndex, cameraHandle());
+					},
+					renderTask.renderData);
+			};
+
+		// Handle camera-dependent phases
+		for (auto camera : Camera::GetCameras())
+		{
+			if (!camera->IsActive())
+				continue;
+
+			auto cameraHandle = camera->GetHandleAs<Camera>();
+
+			switch (renderTask.renderPhase)
+			{
+			case RenderPhase::WORLD:
+			case RenderPhase::DEBUG_WORLD:
+				filterAndAddRenderData(cameraHandle);
+				break;
+
+			case RenderPhase::SCREEN_SPACE_CAMERA_UI:
+				if (renderTask.canvas->GetRenderCamera() == cameraHandle)
+				{
+					filterAndAddRenderData(cameraHandle);
+				}
+				break;
+
+			default:
+				break;
 			}
-			break;
-
-		default:
-			break;
 		}
+
 
 		// Handle non-camera-dependent phases
 		switch (renderTask.renderPhase)
