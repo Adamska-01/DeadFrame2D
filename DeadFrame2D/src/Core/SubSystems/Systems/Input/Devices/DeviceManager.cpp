@@ -1,4 +1,3 @@
-#include "Core/SubSystems/Systems/Input/Actions/InputActionResolver.h"
 #include "Core/SubSystems/Systems/Input/Devices/DeviceManager.h"
 #include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/Abstractions/InputDevice.h"
 #include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/ControllerInputDevice.h"
@@ -41,18 +40,6 @@ namespace DeadFrame2D::Core
 			{
 				std::cout << "[Info] Input subsystem successfully initialized." << std::endl;
 			}
-		}
-
-		// TODO: This might not be necessary
-		// Optionally enumerate existing controllers
-		auto n = SDL_NumJoysticks();
-
-		for (auto i = 0; i < n; ++i)
-		{
-			if (!SDL_IsGameController(i))
-				continue;
-
-			OpenController(i);
 		}
 	}
 
