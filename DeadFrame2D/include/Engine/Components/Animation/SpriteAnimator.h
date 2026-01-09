@@ -12,7 +12,7 @@
 namespace DeadFrame2D::Engine
 {
 	class Transform;
-	class Sprite;
+	class SpriteRenderer;
 
 
 	class DF2D_API SpriteAnimator : public GameComponent
@@ -23,7 +23,7 @@ namespace DeadFrame2D::Engine
 	protected:
 		ComponentHandle<Transform> transform;
 
-		ComponentHandle<Sprite> sprite;
+		ComponentHandle<SpriteRenderer> sprite;
 
 		std::unordered_map<std::string, DeadFrame2D::Data::SpriteAnimationProperties> animations;
 

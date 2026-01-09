@@ -15,10 +15,9 @@ namespace DeadFrame2D::Engine
 	class Transform;
 
 
-	// TODO: Rename this into SpriteRenderer
-	class DF2D_API Sprite : public GameComponent
+	class DF2D_API SpriteRenderer : public GameComponent
 	{
-		TYPE_INFO(Sprite, GameComponent);
+		TYPE_INFO(SpriteRenderer, GameComponent);
 
 
 	protected:
@@ -32,11 +31,11 @@ namespace DeadFrame2D::Engine
 
 
 	public:
-		Sprite(std::string_view texturePath);
+		SpriteRenderer(std::string_view texturePath);
 
-		Sprite(Sprite&& other) = default;
+		SpriteRenderer(SpriteRenderer&& other) = default;
 
-		virtual ~Sprite() override = default;
+		virtual ~SpriteRenderer() override = default;
 
 
 		virtual void Init() override;

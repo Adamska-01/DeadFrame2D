@@ -1,7 +1,7 @@
 #include "Constants/Rendering/DefaultSortOrders.h"
 #include "Core/SubSystems/Systems/Rendering/RenderSystem.h"
 #include "Core/SubSystems/Systems/TextureManager.h"
-#include "Engine/Components/Rendering/Sprite.h"
+#include "Engine/Components/Rendering/SpriteRenderer.h"
 #include "Engine/Components/Transform.h"
 #include "Engine/Entity/GameObject.h"
 #include "Utilities/Debugging/Guards.h"
@@ -15,7 +15,7 @@ namespace DeadFrame2D::Engine
 	using namespace DeadFrame2D::Utilities;
 
 
-	Sprite::Sprite(std::string_view texturePath)
+	SpriteRenderer::SpriteRenderer(std::string_view texturePath)
 	{
 		spriteSize = Vector2I::One;
 
@@ -25,12 +25,12 @@ namespace DeadFrame2D::Engine
 		renderTask.sortOrder = DefaultSortOrders::SPRITE_RENDERER;
 	}
 
-	void Sprite::Init()
+	void SpriteRenderer::Init()
 	{
 		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
 	}
 
-	void Sprite::Draw()
+	void SpriteRenderer::Draw()
 	{
 		auto worldPosition = transform->GetWorldPosition();
 		auto worldScale = transform->GetWorldScale();
@@ -55,24 +55,24 @@ namespace DeadFrame2D::Engine
 		RenderSystem::Submit(renderTask);
 	}
 
-	void Sprite::LoadSprite(std::string_view texturePath)
+	void SpriteRenderer::LoadSprite(std::string_view texturePath)
 	{
 		spriteTexture = TextureManager::LoadTexture(texturePath);
 
 		SDL_QueryTexture(spriteTexture.get(), NULL, NULL, &spriteSize.x, &spriteSize.y);
 	}
 
-	std::shared_ptr<SDL_Texture> Sprite::GetTexture()
+	std::shared_ptr<SDL_Texture> SpriteRenderer::GetTexture()
 	{
 		return spriteTexture;
 	}
 
-	int Sprite::GetSortOrder() const
+	int SpriteRenderer::GetSortOrder() const
 	{
 		return renderTask.sortOrder;
 	}
 
-	void Sprite::SetSortOrder(int sortOrder)
+	void SpriteRenderer::SetSortOrder(int sortOrder)
 	{
 		renderTask.sortOrder = sortOrder;
 	}

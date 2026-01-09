@@ -16,7 +16,7 @@ namespace DeadFrame2D::Engine
 
 
 	ImageScroller::ImageScroller(std::string_view textureSource, ScrollDirection scrollDirection, float scrollSpeed)
-		: Sprite(textureSource), scrollDirection(scrollDirection), scrollSpeed(scrollSpeed)
+		: SpriteRenderer(textureSource), scrollDirection(scrollDirection), scrollSpeed(scrollSpeed)
 	{
 		renderTargetSize = Renderer::GetResolutionTarget();
 

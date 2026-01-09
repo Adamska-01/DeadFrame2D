@@ -2,7 +2,7 @@
 #include "Core/Math/Vector2.h"
 #include "Core/SubSystems/Systems/Rendering/RenderSystem.h"
 #include "Engine/Components/Animation/SpriteAnimator.h"
-#include "Engine/Components/Rendering/Sprite.h"
+#include "Engine/Components/Rendering/SpriteRenderer.h"
 #include "Engine/Components/Transform.h"
 #include "Engine/Entity/GameObject.h"
 #include "Utilities/Debugging/Guards.h"
@@ -31,7 +31,7 @@ namespace DeadFrame2D::Engine
 		auto gameObject = GetGameObject();
 
 		transform = Guard::AgainstNullAssignment(gameObject->GetTransform(), NAME_OF(transform));
-		sprite = Guard::AgainstNullAssignment(gameObject->GetComponent<Sprite>(), NAME_OF(sprite));
+		sprite = Guard::AgainstNullAssignment(gameObject->GetComponent<SpriteRenderer>(), NAME_OF(sprite));
 
 		if (sprite == nullptr)
 			return;

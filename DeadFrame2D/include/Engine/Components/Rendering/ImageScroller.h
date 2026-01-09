@@ -2,7 +2,7 @@
 #include "Core/Math/Vector2.h"
 #include "Data/Rendering/ScrollDirection.h"
 #include "DF2D_API.h"
-#include "Engine/Components/Rendering/Sprite.h"
+#include "Engine/Components/Rendering/SpriteRenderer.h"
 #include <memory>
 
 
@@ -11,9 +11,9 @@ namespace DeadFrame2D::Engine
 	class DispatchableEvent;
 
 
-	class DF2D_API ImageScroller : public Sprite
+	class DF2D_API ImageScroller : public SpriteRenderer
 	{
-		TYPE_INFO(ImageScroller, Sprite);
+		TYPE_INFO(ImageScroller, SpriteRenderer);
 
 
 	private:
