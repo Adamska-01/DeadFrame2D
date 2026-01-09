@@ -1,6 +1,6 @@
 #include "Core/SubSystems/Systems/Rendering/Abstractions/IRenderBackend.h"
 #include "Core/SubSystems/Systems/Rendering/Pipeline/CameraRenderPass.h"
-#include "Core/SubSystems/Systems/Rendering/Resolvers/RenderResolver.h"
+#include "Core/SubSystems/Systems/Rendering/Resolvers/RenderResolvers.h"
 #include "Engine/Components/Rendering/Camera.h"
 
 
@@ -60,7 +60,7 @@ namespace DeadFrame2D::Core
 						{
 							using T = std::decay_t<decltype(data)>;
 
-							RenderResolver::GetRenderResolver<T>()(
+							RenderResolver<T>::Render(
 								renderBackend,
 								data,
 								cameraHandle,

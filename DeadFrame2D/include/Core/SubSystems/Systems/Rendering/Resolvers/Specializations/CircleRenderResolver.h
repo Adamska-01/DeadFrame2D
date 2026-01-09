@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Math/Circle.h"
 #include "Core/SubSystems/Systems/Rendering/Abstractions/IRenderBackend.h"
+#include "Core/SubSystems/Systems/Rendering/Resolvers/Abstractions/RenderResolver.h"
 #include "Data/Rendering/Pipeline/Shapes/CircleRenderData.h"
 #include "Engine/Components/Rendering/Camera.h"
 #include "Engine/Entity/ComponentHandle.h"
@@ -10,14 +11,14 @@
 
 namespace DeadFrame2D::Core
 {
-	struct CircleRenderResolver
+	template<>
+	struct RenderResolver<DeadFrame2D::Data::CircleRenderData>
 	{
-		// Render
-		void operator()(
+		static void Render(
 			IRenderBackend& renderBackend,
 			const DeadFrame2D::Data::CircleRenderData& renderData,
 			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera,
-			bool requiresScreenSpaceConversion) const
+			bool requiresScreenSpaceConversion)
 		{
 			Vector2F pos = renderData.center;
 			auto radius = renderData.radius;
@@ -36,10 +37,9 @@ namespace DeadFrame2D::Core
 		}
 
 
-		// Visibility Check
-		std::optional<DeadFrame2D::Data::CircleRenderData> operator()(
+		static std::optional<DeadFrame2D::Data::CircleRenderData> Cull(
 			const DeadFrame2D::Data::CircleRenderData& renderData,
-			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera) const
+			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera)
 		{
 			using namespace DeadFrame2D::Utilities;
 

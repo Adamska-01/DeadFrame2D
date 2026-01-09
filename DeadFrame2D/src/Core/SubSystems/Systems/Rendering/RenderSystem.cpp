@@ -1,5 +1,5 @@
 #include "Core/SubSystems/Systems/Rendering/RenderSystem.h"
-#include "Core/SubSystems/Systems/Rendering/Resolvers/RenderResolver.h"
+#include "Core/SubSystems/Systems/Rendering/Resolvers/RenderResolvers.h"
 #include "Engine/Components/Rendering/Camera.h"
 #include "Engine/Components/UI/Canvas.h"
 
@@ -35,18 +35,18 @@ namespace DeadFrame2D::Core
 					static_cast<int>(bucket.size()) - 1);
 			};
 
-		auto filterAndAddRenderTask = [&](const ComponentHandle<Camera>& cameraHandle)
+		auto cullAndAddRenderTask = [&](const ComponentHandle<Camera>& cameraHandle)
 			{
 				std::visit([&](auto& data)
 					{
 						using T = std::decay_t<decltype(data)>;
 
-						auto filtered = RenderResolver::GetRenderResolver<T>()(data, cameraHandle);
+						auto culled = RenderResolver<T>::Cull(data, cameraHandle);
 
-						if (!filtered)
+						if (!culled)
 							return;
 
-						renderTask.renderData = std::move(*filtered);
+						renderTask.renderData = std::move(*culled);
 
 						addRenderTask(phaseIndex, cameraHandle());
 					},
@@ -65,13 +65,13 @@ namespace DeadFrame2D::Core
 			{
 			case RenderPhase::WORLD:
 			case RenderPhase::DEBUG_WORLD:
-				filterAndAddRenderTask(cameraHandle);
+				cullAndAddRenderTask(cameraHandle);
 				break;
 
 			case RenderPhase::SCREEN_SPACE_CAMERA_UI:
 				if (renderTask.canvas->GetRenderCamera() == cameraHandle)
 				{
-					filterAndAddRenderTask(cameraHandle);
+					cullAndAddRenderTask(cameraHandle);
 				}
 				break;
 

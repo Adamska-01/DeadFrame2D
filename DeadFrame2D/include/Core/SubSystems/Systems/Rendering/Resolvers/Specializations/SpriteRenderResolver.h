@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Math/Vector2.h"
 #include "Core/SubSystems/Systems/Rendering/Abstractions/IRenderBackend.h"
+#include "Core/SubSystems/Systems/Rendering/Resolvers/Abstractions/RenderResolver.h"
 #include "Data/Rendering/Pipeline/Shapes/SpriteRenderData.h"
 #include "Engine/Components/Rendering/Camera.h"
 #include "Engine/Entity/ComponentHandle.h"
@@ -10,14 +11,14 @@
 
 namespace DeadFrame2D::Core
 {
-	struct SpriteRenderResolver
+	template<>
+	struct RenderResolver<DeadFrame2D::Data::SpriteRenderData>
 	{
-		// Render
-		void operator()(
+		static void Render(
 			IRenderBackend& renderBackend,
 			const DeadFrame2D::Data::SpriteRenderData& renderData,
 			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera,
-			bool requiresScreenSpaceConversion) const
+			bool requiresScreenSpaceConversion)
 		{
 			SDL_FRect destRect;
 
@@ -46,10 +47,9 @@ namespace DeadFrame2D::Core
 				renderData.colorMod);
 		}
 
-		// Visibility Check
-		std::optional<DeadFrame2D::Data::SpriteRenderData> operator()(
+		static std::optional<DeadFrame2D::Data::SpriteRenderData> Cull(
 			const DeadFrame2D::Data::SpriteRenderData& renderData,
-			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera) const
+			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera)
 		{
 			using namespace DeadFrame2D::Utilities;
 

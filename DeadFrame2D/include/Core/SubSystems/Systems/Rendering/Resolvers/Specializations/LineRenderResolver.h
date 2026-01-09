@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Math/Vector2.h"
 #include "Core/SubSystems/Systems/Rendering/Abstractions/IRenderBackend.h"
+#include "Core/SubSystems/Systems/Rendering/Resolvers/Abstractions/RenderResolver.h"
 #include "Data/Rendering/Pipeline/Shapes/LineRenderData.h"
 #include "Engine/Components/Rendering/Camera.h"
 #include "Engine/Entity/ComponentHandle.h"
@@ -10,14 +11,14 @@
 
 namespace DeadFrame2D::Core
 {
-	struct LineRenderResolver
+	template<>
+	struct RenderResolver<DeadFrame2D::Data::LineRenderData>
 	{
-		// Render
-		void operator()(
+		static void Render(
 			IRenderBackend& renderBackend,
 			const DeadFrame2D::Data::LineRenderData& renderData,
 			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera,
-			bool requiresScreenSpaceConversion) const
+			bool requiresScreenSpaceConversion)
 		{
 			Vector2F p1 = renderData.p1;
 			Vector2F p2 = renderData.p2;
@@ -31,10 +32,9 @@ namespace DeadFrame2D::Core
 			renderBackend.DrawLine(p1, p2, renderData.color);
 		}
 
-		// Visibility Check
-		std::optional<DeadFrame2D::Data::LineRenderData> operator()(
+		static std::optional<DeadFrame2D::Data::LineRenderData> Cull(
 			const DeadFrame2D::Data::LineRenderData& renderData,
-			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera) const
+			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera)
 		{
 			using namespace DeadFrame2D::Data;
 			using namespace DeadFrame2D::Utilities;

@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Math/Vector2.h"
 #include "Core/SubSystems/Systems/Rendering/Abstractions/IRenderBackend.h"
+#include "Core/SubSystems/Systems/Rendering/Resolvers/Abstractions/RenderResolver.h"
 #include "Data/Rendering/Pipeline/Shapes/RectBatchRenderData.h"
 #include "Engine/Components/Rendering/Camera.h"
 #include "Engine/Entity/ComponentHandle.h"
@@ -10,14 +11,14 @@
 
 namespace DeadFrame2D::Core
 {
-	struct RectBatchRenderResolver
+	template<>
+	struct RenderResolver<DeadFrame2D::Data::RectBatchRenderData>
 	{
-		// Render
-		void operator()(
+		static void Render(
 			IRenderBackend& renderBackend,
 			const DeadFrame2D::Data::RectBatchRenderData& renderData,
 			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera,
-			bool requiresScreenSpaceConversion) const
+			bool requiresScreenSpaceConversion)
 		{
 			for (const auto& rect : renderData.rectBatch)
 			{
@@ -41,10 +42,9 @@ namespace DeadFrame2D::Core
 			}
 		}
 
-		// Visibility Check
-		std::optional<DeadFrame2D::Data::RectBatchRenderData> operator()(
+		static std::optional<DeadFrame2D::Data::RectBatchRenderData> Cull(
 			const DeadFrame2D::Data::RectBatchRenderData& renderData,
-			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera) const
+			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera)
 		{
 			using namespace DeadFrame2D::Data;
 			using namespace DeadFrame2D::Utilities;
