@@ -1,3 +1,4 @@
+#include "Constants/Rendering/DefaultSortOrders.h"
 #include "Core/SubSystems/Systems/Rendering/RenderSystem.h"
 #include "Core/SubSystems/Systems/TextureManager.h"
 #include "Engine/Components/Rendering/Sprite.h"
@@ -8,6 +9,7 @@
 
 namespace DeadFrame2D::Engine
 {
+	using namespace DeadFrame2D::Constants;
 	using namespace DeadFrame2D::Core;
 	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Utilities;
@@ -20,7 +22,7 @@ namespace DeadFrame2D::Engine
 		LoadSprite(texturePath);
 
 		renderTask.renderPhase = RenderPhase::WORLD;
-		renderTask.sortOrder = 0;
+		renderTask.sortOrder = DefaultSortOrders::SPRITE_RENDERER;
 	}
 
 	void Sprite::Init()

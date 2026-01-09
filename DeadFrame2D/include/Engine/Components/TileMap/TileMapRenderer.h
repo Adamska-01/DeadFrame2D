@@ -1,4 +1,5 @@
 #pragma once
+#include "Constants/Rendering/DefaultSortOrders.h"
 #include "Data/Rendering/Pipeline/RenderTask.h"
 #include "Engine/Components/GameComponent.h"
 
@@ -35,8 +36,12 @@ namespace DeadFrame2D::Engine
 	template<typename TMap>
 	inline TileMapRenderer<TMap>::TileMapRenderer()
 	{
-		renderTask.renderPhase = DeadFrame2D::Data::RenderPhase::WORLD;
-		renderTask.sortOrder = -1;
+		using namespace DeadFrame2D::Constants;
+		using namespace DeadFrame2D::Data;
+
+
+		renderTask.renderPhase = RenderPhase::WORLD;
+		renderTask.sortOrder = DefaultSortOrders::TILE_RENDERER;
 	}
 
 	template<typename TMap>

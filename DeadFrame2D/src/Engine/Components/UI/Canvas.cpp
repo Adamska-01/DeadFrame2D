@@ -1,15 +1,16 @@
+#include "Constants/Rendering/DefaultSortOrders.h"
 #include "Engine/Components/Rendering/Camera.h"
 #include "Engine/Components/UI/Canvas.h"
 
 
 namespace DeadFrame2D::Engine
 {
+	using namespace DeadFrame2D::Constants;
 	using namespace DeadFrame2D::Data;
 
 
 	Canvas::Canvas()
-		// TODO: Create constants for sort orders
-		: sortOrder(2),
+		: sortOrder(DefaultSortOrders::UI_RENDERER),
 		renderMode(CanvasRenderMode::SCREEN_SPACE_OVERLAY)
 	{
 	}

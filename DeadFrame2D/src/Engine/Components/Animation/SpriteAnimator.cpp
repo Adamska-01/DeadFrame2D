@@ -1,3 +1,4 @@
+#include "Constants/Rendering/DefaultSortOrders.h"
 #include "Core/Math/Vector2.h"
 #include "Core/SubSystems/Systems/Rendering/RenderSystem.h"
 #include "Engine/Components/Animation/SpriteAnimator.h"
@@ -9,6 +10,7 @@
 
 namespace DeadFrame2D::Engine
 {
+	using namespace DeadFrame2D::Constants;
 	using namespace DeadFrame2D::Core;
 	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Utilities;
@@ -21,7 +23,7 @@ namespace DeadFrame2D::Engine
 		animations.clear();
 
 		renderTask.renderPhase = RenderPhase::WORLD;
-		renderTask.sortOrder = 0;
+		renderTask.sortOrder = DefaultSortOrders::SPRITE_RENDERER;
 	}
 
 	void SpriteAnimator::Init()

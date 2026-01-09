@@ -1,10 +1,12 @@
 #include "Core/SubSystems/Systems/Physics/PhysicsEngine2D.h"
 #include "Core/SubSystems/Systems/Rendering/RenderSystem.h"
+#include "Constants/Rendering/DefaultSortOrders.h"
 #include "Factories/Products/Debugging/ColliderDrawer.h"
 
 
 namespace DeadFrame2D::Factories
 {
+	using namespace DeadFrame2D::Constants;
 	using namespace DeadFrame2D::Core;
 	using namespace DeadFrame2D::Data;
 
@@ -12,8 +14,7 @@ namespace DeadFrame2D::Factories
 	ColliderDrawer::ColliderDrawer()
 	{
 		renderTask.renderPhase = RenderPhase::DEBUG_WORLD;
-		// TODO: Make some constants for this stuff
-		renderTask.sortOrder = 9999;
+		renderTask.sortOrder = DefaultSortOrders::DEBUG_RENDERER;
 		
 		SetFlags(
 			b2Draw::e_shapeBit |
