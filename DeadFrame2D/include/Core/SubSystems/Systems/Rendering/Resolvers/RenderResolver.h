@@ -6,6 +6,7 @@
 #include "Core/SubSystems/Systems/Rendering/Resolvers/Functors/PointBatchRenderResolver.h"
 #include "Core/SubSystems/Systems/Rendering/Resolvers/Functors/PointRenderResolver.h"
 #include "Core/SubSystems/Systems/Rendering/Resolvers/Functors/RectRenderResolver.h"
+#include "Core/SubSystems/Systems/Rendering/Resolvers/Functors/SpriteBatchRenderResolver.h"
 #include "Core/SubSystems/Systems/Rendering/Resolvers/Functors/SpriteRenderResolver.h"
 #include <type_traits>
 
@@ -26,7 +27,8 @@ namespace DeadFrame2D::Core::RenderResolver
 			|| std::is_same_v<T, PointRenderData>
 			|| std::is_same_v<T, LineBatchRenderData>
 			|| std::is_same_v<T, PointBatchRenderData>
-			|| std::is_same_v<T, CircleBatchRenderData>,
+			|| std::is_same_v<T, CircleBatchRenderData>
+			|| std::is_same_v<T, SpriteBatchRenderData>,
 			"No Render Resolver for this RenderData type");
 
 
@@ -75,6 +77,12 @@ namespace DeadFrame2D::Core::RenderResolver
 		else if constexpr (std::is_same_v<T, CircleBatchRenderData>)
 		{
 			static CircleBatchRenderResolver circleBatchInstance;
+
+			return circleBatchInstance;
+		}
+		else if constexpr (std::is_same_v<T, SpriteBatchRenderData>)
+		{
+			static SpriteBatchRenderResolver circleBatchInstance;
 
 			return circleBatchInstance;
 		}
