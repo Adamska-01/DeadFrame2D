@@ -6,6 +6,7 @@
 #include "Data/Rendering/Pipeline/Shapes/PointBatchRenderData.h"
 #include "Data/Rendering/Pipeline/Shapes/PointRenderData.h"
 #include "Data/Rendering/Pipeline/Shapes/RectRenderData.h"
+#include "Data/Rendering/Pipeline/Shapes/SpriteBatchRenderData.h"
 #include "Data/Rendering/Pipeline/Shapes/SpriteRenderData.h"
 #include <variant>
 
@@ -20,5 +21,6 @@ namespace DeadFrame2D::Data
 		PointRenderData,
 		PointBatchRenderData,
 		LineBatchRenderData,
-		CircleBatchRenderData>;
+		CircleBatchRenderData,
+		SpriteBatchRenderData>;
 }
