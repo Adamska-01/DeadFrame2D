@@ -15,7 +15,7 @@
 namespace DeadFrame2D::Core::RenderResolver
 {
 	template<typename T>
-	inline auto& GetRenderResolver()
+	inline const auto& GetRenderResolver()
 	{
 		using namespace DeadFrame2D::Data;
 
