@@ -1,6 +1,6 @@
 #pragma once
-#include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/InputDeviceID.h"
-#include "Core/SubSystems/Systems/Input/User/InputUserID.h"
+#include "Data/Input/InputDeviceID.h"
+#include "Data/Input/InputUserID.h"
 #include <string>
 #include <vector>
 
@@ -10,22 +10,22 @@ namespace DeadFrame2D::Core
 	class InputUser
 	{
 	private:
-		InputUserID id;
+		DeadFrame2D::Data::InputUserID id;
 
 		std::string name;
 
 
 	public:
-		InputUser(InputUserID id, const std::string& name = "User");
+		InputUser(DeadFrame2D::Data::InputUserID id, const std::string& name = "User");
 
 
-		InputUserID ID() const;
+		DeadFrame2D::Data::InputUserID ID() const;
 
 		const std::string& Name() const;
 
 
-		bool IsDevicePaired(InputDeviceID deviceID) const;
+		bool IsDevicePaired(DeadFrame2D::Data::InputDeviceID deviceID) const;
 
-		const std::vector<InputDeviceID>& PairedDevices() const;
+		const std::vector<DeadFrame2D::Data::InputDeviceID>& PairedDevices() const;
 	};
 }

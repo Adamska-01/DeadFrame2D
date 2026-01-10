@@ -1,13 +1,15 @@
+#include "Constants/Input/DefaultDeviceIDs.h"
+#include "Constants/Input/DefaultDeviceNames.h"
 #include "Core/SubSystems/Systems/Input/Actions/InputActionResolver.h"
 #include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/MouseInputDevice.h"
 #include "Core/SubSystems/Systems/Input/Input.h"
-#include "Data/Input/DefaultDeviceIDs.h"
-#include "Data/Input/DefaultDeviceNames.h"
 
 
 namespace DeadFrame2D::Core
 {
+	using namespace DeadFrame2D::Constants;
 	using namespace DeadFrame2D::Data;
+
 	using namespace Shared::Models;
 
 

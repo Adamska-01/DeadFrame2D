@@ -26,7 +26,7 @@ namespace DeadFrame2D::Core
 
 		Shared::Models::InputDeviceType Type() const override;
 
-		InputDeviceID ID() const override;
+		DeadFrame2D::Data::InputDeviceID ID() const override;
 
 
 		void BeginFrame() override;

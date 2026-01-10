@@ -70,24 +70,20 @@ namespace DeadFrame2D::Core
 	{
 		auto deviceAddedEvent = DispatchableEvent::SafeCast<DeviceAddedEvent>(dispatchableEvent);
 
-		if (deviceAddedEvent == nullptr || deviceAddedEvent->GetDeviceAdded() == nullptr)
+		if (deviceAddedEvent == nullptr)
 			return;
 
-		auto deviceAdded = deviceAddedEvent->GetDeviceAdded();
-
-		std::cout << "[Input] Device added: " << deviceAdded->Name() << " (ID: " << deviceAdded->ID() << ")" << std::endl;
+		std::cout << "[Input] Device added: " << deviceAddedEvent->GetDeviceName() << " (ID: " << deviceAddedEvent->GetDeviceID() << ")" << std::endl;
 	};
 
 	void Input::DeviceRemovedEventHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
 	{
 		auto deviceRemovedEvent = DispatchableEvent::SafeCast<DeviceRemovedEvent>(dispatchableEvent);
 
-		if (deviceRemovedEvent == nullptr || deviceRemovedEvent->GetDeviceRemoved() == nullptr)
+		if (deviceRemovedEvent == nullptr)
 			return;
 
-		auto deviceRemoved = deviceRemovedEvent->GetDeviceRemoved();
-
-		std::cout << "[Input] Device removed: " << deviceRemoved->Name() << " (ID: " << deviceRemoved->ID() << ")" << std::endl;
+		std::cout << "[Input] Device removed: " << deviceRemovedEvent->GetDeviceName() << " (ID: " << deviceRemovedEvent->GetDeviceID() << ")" << std::endl;
 	}
 
 	void Input::BeginFrame()

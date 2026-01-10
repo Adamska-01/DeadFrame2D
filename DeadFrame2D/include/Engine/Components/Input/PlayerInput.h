@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/SubSystems/Systems/Input/User/InputUserID.h"
+#include "Data/Input/InputUserID.h"
 #include "Data/Input/ActionListenerEntry.h"
 #include "DF2D_API.h"
 #include "Engine/Components/GameComponent.h"
@@ -22,7 +22,7 @@ namespace DeadFrame2D::Engine
 
 
 	private:
-		DeadFrame2D::Core::InputUserID userID;
+		DeadFrame2D::Data::InputUserID userID;
 
 		std::string playerName;
 

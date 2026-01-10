@@ -5,6 +5,9 @@
 
 namespace DeadFrame2D::Core
 {
+	using namespace DeadFrame2D::Data;
+
+
 	InputUser::InputUser(InputUserID id, const std::string& name)
 		: id(id), name(name)
 	{

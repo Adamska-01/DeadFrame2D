@@ -12,7 +12,7 @@ namespace DeadFrame2D::Core
 	private:
 		SDL_GameController* controller;
 
-		InputDeviceID instanceID;
+		DeadFrame2D::Data::InputDeviceID instanceID;
 
 		std::array<DeadFrame2D::Data::InputControlState, SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_MAX> buttonStates;
 
@@ -27,14 +27,14 @@ namespace DeadFrame2D::Core
 
 
 	public:
-		ControllerInputDevice(SDL_GameController* controller, InputDeviceID instanceID);
+		ControllerInputDevice(SDL_GameController* controller, DeadFrame2D::Data::InputDeviceID instanceID);
 
 		virtual ~ControllerInputDevice() override;
 
 
 		Shared::Models::InputDeviceType Type() const override;
 		
-		InputDeviceID ID() const override;
+		DeadFrame2D::Data::InputDeviceID ID() const override;
 
 
 		void BeginFrame() override;

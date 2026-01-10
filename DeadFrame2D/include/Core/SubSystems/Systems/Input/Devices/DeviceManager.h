@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/InputDeviceID.h"
+#include "Data/Input/InputDeviceID.h"
 #include "DF2D_API.h"
 #include <memory>
 #include <unordered_map>
@@ -23,7 +23,7 @@ namespace DeadFrame2D::Core
 	class DF2D_API DeviceManager
 	{
 	private:
-		std::unordered_map<InputDeviceID, std::shared_ptr<InputDevice>> otherDevices;
+		std::unordered_map<DeadFrame2D::Data::InputDeviceID, std::shared_ptr<InputDevice>> otherDevices;
 
 		std::shared_ptr<KeyboardInputDevice> keyboard;
 
@@ -32,7 +32,7 @@ namespace DeadFrame2D::Core
 
 		void OpenController(int deviceIndex);
 
-		void CloseController(InputDeviceID instanceId);
+		void CloseController(DeadFrame2D::Data::InputDeviceID instanceId);
 
 
 	public:
@@ -46,7 +46,7 @@ namespace DeadFrame2D::Core
 		void HandleEvent(const SDL_Event& event);
 
 
-		InputDevice* GetDevice(InputDeviceID id);
+		InputDevice* GetDevice(DeadFrame2D::Data::InputDeviceID id);
 
 		std::vector<InputDevice*> GetAllDevices() const;
 

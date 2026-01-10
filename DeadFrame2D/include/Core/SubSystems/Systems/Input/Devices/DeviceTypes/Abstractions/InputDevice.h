@@ -1,6 +1,6 @@
 #pragma once
-#include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/InputDeviceID.h"
 #include "Data/Input/InputControlState.h"
+#include "Data/Input/InputDeviceID.h"
 #include "DF2D_API.h"
 #include <Models/Input/InputDeviceType.h>
 #include <SDL_events.h>
@@ -32,7 +32,7 @@ namespace DeadFrame2D::Core
 
 		virtual Shared::Models::InputDeviceType Type() const = 0;
 
-		virtual InputDeviceID ID() const = 0;
+		virtual DeadFrame2D::Data::InputDeviceID ID() const = 0;
 
 
 		/**

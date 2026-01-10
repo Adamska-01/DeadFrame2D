@@ -2,7 +2,7 @@
 #include <cstdint>
 
 
-namespace DeadFrame2D::Core
+namespace DeadFrame2D::Data
 {
 	using InputUserID = uint32_t;
 }

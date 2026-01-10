@@ -11,6 +11,7 @@
 
 namespace DeadFrame2D::Core
 {
+	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Engine;
 
 	using namespace Shared::Models;
@@ -93,7 +94,7 @@ namespace DeadFrame2D::Core
 		
 		otherDevices.emplace(inst, newDevice);
 		
-		EventDispatcher::SendEvent(std::make_shared<DeviceAddedEvent>(newDevice));
+		EventDispatcher::SendEvent(std::make_shared<DeviceAddedEvent>(newDevice->ID(), newDevice->Name()));
 	}
 
 	void DeviceManager::CloseController(InputDeviceID instanceId)
@@ -105,7 +106,7 @@ namespace DeadFrame2D::Core
 
 		auto& removedDevice = it->second;
 
-		EventDispatcher::SendEvent(std::make_shared<DeviceRemovedEvent>(removedDevice));
+		EventDispatcher::SendEvent(std::make_shared<DeviceRemovedEvent>(removedDevice->ID(), removedDevice->Name()));
 
 		otherDevices.erase(it);
 	}

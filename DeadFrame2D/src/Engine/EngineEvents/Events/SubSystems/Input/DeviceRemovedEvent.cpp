@@ -1,19 +1,24 @@
-#include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/Abstractions/InputDevice.h"
 #include "Engine/EngineEvents/Events/SubSystems/Input/DeviceRemovedEvent.h"
 
 
 namespace DeadFrame2D::Engine
 {
-	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Data;
 
 
-	DeviceRemovedEvent::DeviceRemovedEvent(std::shared_ptr<InputDevice> deviceRemoved)
-		: deviceRemoved(deviceRemoved)
+	DeviceRemovedEvent::DeviceRemovedEvent(InputDeviceID deviceID, const std::string& deviceName)
+		: deviceID(deviceID),
+		deviceName(deviceName)
 	{
 	}
 
-	std::shared_ptr<const InputDevice> DeviceRemovedEvent::GetDeviceRemoved() const
+	const std::string& DeviceRemovedEvent::GetDeviceName() const
 	{
-		return deviceRemoved;
+		return deviceName;
+	}
+
+	InputDeviceID DeviceRemovedEvent::GetDeviceID() const
+	{
+		return deviceID;
 	}
 }

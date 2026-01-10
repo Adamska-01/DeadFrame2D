@@ -3,7 +3,7 @@
 #include "Core/SubSystems/Systems/Input/Actions/Abstractions/IInputActionsFrameManagement.h"
 #include "Core/SubSystems/Systems/Input/Actions/ActionBindingLink.h"
 #include "Core/SubSystems/Systems/Input/Actions/ActionPhase.h"
-#include "Core/SubSystems/Systems/Input/User/InputUserID.h"
+#include "Data/Input/InputUserID.h"
 #include "DF2D_API.h"
 #include "Utilities/Hashing/TupleHash.h"
 #include <functional>
@@ -38,16 +38,16 @@ namespace DeadFrame2D::Core
 	class DF2D_API InputActionResolver final : public IInputActions, public IInputActionsFrameManagement
 	{
 	private:
-		std::unordered_map<InputUserID, std::vector<std::shared_ptr<RuntimeActionMap>>> runtimeActionMaps;
+		std::unordered_map<DeadFrame2D::Data::InputUserID, std::vector<std::shared_ptr<RuntimeActionMap>>> runtimeActionMaps;
 
 		std::unordered_map<
-			InputUserID,
+			DeadFrame2D::Data::InputUserID,
 			std::unordered_map<
 				std::tuple<std::string, Shared::Models::InputDeviceType, int>,
 				std::vector<ActionBindingLink>,
 				DeadFrame2D::Utilities::TupleHash>> fastLookupActionMaps;
 
-		std::unordered_map<InputUserID, std::unordered_set<RuntimeInputAction*>> activeActions;
+		std::unordered_map<DeadFrame2D::Data::InputUserID, std::unordered_set<RuntimeInputAction*>> activeActions;
 
 		std::unordered_set<RuntimeInputAction*> callableActions;
 
@@ -79,30 +79,30 @@ namespace DeadFrame2D::Core
 
 
 		DeadFrame2D::Utilities::ListenerID RegisterAction(
-			InputUserID userID,
+			DeadFrame2D::Data::InputUserID userID,
 			const std::string& actionMapName,
 			const std::string& actionName,
 			const DeadFrame2D::Engine::ComponentHandleBase& listener,
 			const std::function<void(const RuntimeInputAction&)>& handler) override;
 
 		void DeregisterAction(
-			InputUserID userID,
+			DeadFrame2D::Data::InputUserID userID,
 			const std::string& actionMapName,
 			const std::string& actionName,
 			const DeadFrame2D::Engine::ComponentHandleBase& listener) override;
 
 		void DeregisterActionByID(
-			InputUserID userID,
+			DeadFrame2D::Data::InputUserID userID,
 			const std::string& actionMapName,
 			const std::string& actionName,
 			DeadFrame2D::Utilities::ListenerID listenerID) override;
 
-		bool EnableActionMap(InputUserID userID, const std::string& name) override;
+		bool EnableActionMap(DeadFrame2D::Data::InputUserID userID, const std::string& name) override;
 
-		bool DisableActionMap(InputUserID userID, const std::string& name) override;
+		bool DisableActionMap(DeadFrame2D::Data::InputUserID userID, const std::string& name) override;
 
-		bool SwitchToActionMap(InputUserID userID, const std::string& name) override;
+		bool SwitchToActionMap(DeadFrame2D::Data::InputUserID userID, const std::string& name) override;
 
-		std::optional<RuntimeInputAction> GetActionState(InputUserID userID, const std::string actionName) override;
+		std::optional<RuntimeInputAction> GetActionState(DeadFrame2D::Data::InputUserID userID, const std::string actionName) override;
 	};
 }

@@ -1,7 +1,7 @@
+#include "Constants/Input/DefaultDeviceIDs.h"
 #include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/Abstractions/InputDevice.h"
 #include "Core/SubSystems/Systems/Input/User/InputUser.h"
 #include "Core/SubSystems/Systems/Input/User/InputUserManager.h"
-#include "Data/Input/DefaultDeviceIDs.h"
 #include "Engine/EngineEvents/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/SubSystems/Input/DeviceRemovedEvent.h"
 #include "Engine/EngineEvents/Events/SubSystems/Input/InputUserCreatedEvent.h"
@@ -10,8 +10,9 @@
 
 namespace DeadFrame2D::Core
 {
-	using namespace DeadFrame2D::Engine;
+	using namespace DeadFrame2D::Constants;
 	using namespace DeadFrame2D::Data;
+	using namespace DeadFrame2D::Engine;
 
 
 	InputUserManager::InputUserManager()
@@ -33,14 +34,14 @@ namespace DeadFrame2D::Core
 	{
 		auto deviceRemovedEvent = DispatchableEvent::SafeCast<DeviceRemovedEvent>(dispatchableEvent);
 
-		if (deviceRemovedEvent == nullptr || deviceRemovedEvent->GetDeviceRemoved() == nullptr)
+		if (deviceRemovedEvent == nullptr)
 			return;
 
-		auto deviceRemoved = deviceRemovedEvent->GetDeviceRemoved();
+		auto deviceID = deviceRemovedEvent->GetDeviceID();
 
-		auto user = GetUserFromPairedDevice(deviceRemoved->ID());
+		auto user = GetUserFromPairedDevice(deviceID);
 
-		UnpairDevice(user, deviceRemoved->ID());
+		UnpairDevice(user, deviceID);
 	}
 
 	InputUser* InputUserManager::CreateUser(const std::string& name)

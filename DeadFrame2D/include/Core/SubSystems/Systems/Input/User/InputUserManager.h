@@ -1,6 +1,6 @@
 #pragma once
-#include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/InputDeviceID.h"
-#include "Core/SubSystems/Systems/Input/User/InputUserID.h"
+#include "Data/Input/InputDeviceID.h"
+#include "Data/Input/InputUserID.h"
 #include <memory>
 #include <unordered_map>
 
@@ -20,13 +20,13 @@ namespace DeadFrame2D::Core
 	class InputUserManager
 	{
 	private:
-		InputUserID nextID;
+		DeadFrame2D::Data::InputUserID nextID;
 
-		std::unordered_map<InputUserID, std::unique_ptr<InputUser>> users;
+		std::unordered_map<DeadFrame2D::Data::InputUserID, std::unique_ptr<InputUser>> users;
 
-		std::unordered_map<InputDeviceID, InputUser*> pairedDeviceToUser;
+		std::unordered_map<DeadFrame2D::Data::InputDeviceID, InputUser*> pairedDeviceToUser;
 
-		std::unordered_map<InputUserID, std::vector<InputDeviceID>> userToPairedDevices;
+		std::unordered_map<DeadFrame2D::Data::InputUserID, std::vector<DeadFrame2D::Data::InputDeviceID>> userToPairedDevices;
 
 		
 		void DeviceRemovedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
@@ -42,18 +42,18 @@ namespace DeadFrame2D::Core
 
 		InputUser* AutoCreateUserForDevice(InputDevice* device);
 
-		void DestroyUser(InputUserID id);
+		void DestroyUser(DeadFrame2D::Data::InputUserID id);
 
-		InputUser* GetUser(InputUserID id) const;
+		InputUser* GetUser(DeadFrame2D::Data::InputUserID id) const;
 
 		std::vector<InputUser*> GetAllUsers() const;
 
-		const std::vector<InputDeviceID>& GetDevicesPairedToUser(InputDeviceID userID) const;
+		const std::vector<DeadFrame2D::Data::InputDeviceID>& GetDevicesPairedToUser(DeadFrame2D::Data::InputDeviceID userID) const;
 
-		InputUser* GetUserFromPairedDevice(InputDeviceID deviceID);
+		InputUser* GetUserFromPairedDevice(DeadFrame2D::Data::InputDeviceID deviceID);
 
-		void PairDeviceToUser(InputUser* user, InputDeviceID deviceID);
+		void PairDeviceToUser(InputUser* user, DeadFrame2D::Data::InputDeviceID deviceID);
 
-		void UnpairDevice(InputUser* user, InputDeviceID deviceID);
+		void UnpairDevice(InputUser* user, DeadFrame2D::Data::InputDeviceID deviceID);
 	};
 }

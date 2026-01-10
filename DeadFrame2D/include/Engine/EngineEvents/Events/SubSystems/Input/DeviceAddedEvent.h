@@ -1,13 +1,7 @@
 #pragma once
+#include "Data/Input/InputDeviceID.h"
 #include "DF2D_API.h"
 #include "Engine/EngineEvents/DispatchableEvent.h"
-#include <memory>
-
-
-namespace DeadFrame2D::Core
-{
-	class InputDevice;
-}
 
 
 namespace DeadFrame2D::Engine
@@ -15,13 +9,17 @@ namespace DeadFrame2D::Engine
 	class DF2D_API DeviceAddedEvent : public DispatchableEvent
 	{
 	private:
-		std::shared_ptr<const DeadFrame2D::Core::InputDevice> deviceAdded;
+		std::string deviceName;
+
+		DeadFrame2D::Data::InputDeviceID deviceID;
 
 
 	public:
-		DeviceAddedEvent(std::shared_ptr<DeadFrame2D::Core::InputDevice> deviceAdded);
+		DeviceAddedEvent(DeadFrame2D::Data::InputDeviceID deviceID, const std::string& deviceName);
 
 
-		std::shared_ptr<const DeadFrame2D::Core::InputDevice> GetDeviceAdded() const;
+		const std::string& GetDeviceName() const;
+
+		DeadFrame2D::Data::InputDeviceID GetDeviceID() const;
 	};
 }
