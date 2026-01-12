@@ -67,7 +67,7 @@ namespace DeadFrame2D::Core
 		isValuePending = other.isValuePending;
 		phase = other.phase;
 		bindings = other.bindings;
-		// listeners not copied
+		// listeners are intentionally NOT copied
 
 		return *this;
 	}
@@ -84,7 +84,7 @@ namespace DeadFrame2D::Core
 		isValuePending = other.isValuePending;
 		phase = other.phase;
 		bindings = std::move(other.bindings);
-		// listeners not moved
+		// listeners are intentionally NOT moved
 
 		return *this;
 	}
