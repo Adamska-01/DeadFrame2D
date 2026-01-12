@@ -60,6 +60,7 @@ namespace DeadFrame2D::Core
 
 		void ResolveComposite2D(const InputDevice& device, RuntimeInputAction& action, const Shared::Models::Binding& binding);
 
+
 		void InputUserCreatedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
 
 		void InputUserDestroyedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
