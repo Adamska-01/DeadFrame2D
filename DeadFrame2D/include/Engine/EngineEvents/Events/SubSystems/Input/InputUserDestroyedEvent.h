@@ -1,12 +1,8 @@
 #pragma once
+#include "Data/Input/InputUserID.h"
 #include "DF2D_API.h"
 #include "Engine/EngineEvents/DispatchableEvent.h"
-
-
-namespace DeadFrame2D::Core
-{
-	class InputUser;
-}
+#include <string>
 
 
 namespace DeadFrame2D::Engine
@@ -14,13 +10,17 @@ namespace DeadFrame2D::Engine
 	class DF2D_API InputUserDestroyedEvent : public DispatchableEvent
 	{
 	private:
-		const DeadFrame2D::Core::InputUser* inputUserDestroyed;
+		std::string inputUserName;
+
+		DeadFrame2D::Data::InputUserID inputUserID;
 
 
 	public:
-		InputUserDestroyedEvent(const DeadFrame2D::Core::InputUser* inputUserDestroyed);
+		InputUserDestroyedEvent(DeadFrame2D::Data::InputUserID inputUserID, const std::string& inputUserName);
 
 
-		const DeadFrame2D::Core::InputUser* GetInputUserDestroyed() const;
+		const std::string& GetInputUserName() const;
+
+		DeadFrame2D::Data::InputUserID GetInputUserID() const;
 	};
 }

@@ -1,19 +1,25 @@
-#include "Core/SubSystems/Systems/Input/User/InputUser.h"
 #include "Engine/EngineEvents/Events/SubSystems/Input/InputUserDestroyedEvent.h"
 
 
 namespace DeadFrame2D::Engine
 {
-	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Data;
 
 
-	InputUserDestroyedEvent::InputUserDestroyedEvent(const InputUser* inputUserDestroyed)
-		: inputUserDestroyed(inputUserDestroyed)
+	InputUserDestroyedEvent::InputUserDestroyedEvent(DeadFrame2D::Data::InputUserID inputUserID, const std::string& inputUserName)
+		: inputUserID(inputUserID),
+		inputUserName(inputUserName)
+
 	{
 	}
 
-	const InputUser* InputUserDestroyedEvent::GetInputUserDestroyed() const
+	const std::string& InputUserDestroyedEvent::GetInputUserName() const
 	{
-		return inputUserDestroyed;
+		return inputUserName;
+	}
+
+	DeadFrame2D::Data::InputUserID InputUserDestroyedEvent::GetInputUserID() const
+	{
+		return inputUserID;
 	}
 }

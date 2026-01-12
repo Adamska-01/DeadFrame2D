@@ -63,7 +63,7 @@ namespace DeadFrame2D::Core
 			PairDeviceToUser(userPtr, DefaultDeviceIDs::MOUSE);
 		}
 
-		EventDispatcher::SendEvent(std::make_shared<InputUserCreatedEvent>(userPtr));
+		EventDispatcher::SendEvent(std::make_shared<InputUserCreatedEvent>(userPtr->ID(), userPtr->Name()));
 
 		return userPtr;
 	}
@@ -108,7 +108,7 @@ namespace DeadFrame2D::Core
 				return pair.second == userToDestroyPtr;
 			});
 		
-		EventDispatcher::SendEvent(std::make_shared<InputUserDestroyedEvent>(userToDestroyPtr));
+		EventDispatcher::SendEvent(std::make_shared<InputUserDestroyedEvent>(userToDestroyPtr->ID(), userToDestroyPtr->Name()));
 
 		users.erase(it);
 	}

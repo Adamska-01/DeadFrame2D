@@ -57,13 +57,27 @@ namespace DeadFrame2D::Core
 	void Input::InputUserCreatedEventHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
 	{
 		auto inputUserCreatedEvent = DispatchableEvent::SafeCast<InputUserCreatedEvent>(dispatchableEvent);
-		// TODO: do something (Log?)
+		
+		if (inputUserCreatedEvent == nullptr)
+			return;
+
+		std::cout << "[Input] User created: "
+			<< inputUserCreatedEvent->GetInputUserName()
+			<< " (ID: " << inputUserCreatedEvent->GetInputUserID() << ")"
+			<< std::endl;
 	}
 
 	void Input::InputUserDestroyedEventHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
 	{
 		auto inputUserDestroyedEvent = DispatchableEvent::SafeCast<InputUserDestroyedEvent>(dispatchableEvent);
-		// TODO: do something (Log?)
+		
+		if (inputUserDestroyedEvent == nullptr)
+			return;
+
+		std::cout << "[Input] User destroyed: "
+			<< inputUserDestroyedEvent->GetInputUserName()
+			<< " (ID: " << inputUserDestroyedEvent->GetInputUserID() << ")"
+			<< std::endl;
 	}
 
 	void Input::DeviceAddedEventHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)

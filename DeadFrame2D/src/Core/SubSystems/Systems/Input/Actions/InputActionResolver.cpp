@@ -120,10 +120,10 @@ namespace DeadFrame2D::Core
 	{
 		auto inputUserCreatedEvent = DispatchableEvent::SafeCast<InputUserCreatedEvent>(dispatchableEvent);
 
-		if (inputUserCreatedEvent == nullptr || inputUserCreatedEvent->GetInputUserCreated() == nullptr)
+		if (inputUserCreatedEvent == nullptr)
 			return;
 
-		auto userID = inputUserCreatedEvent->GetInputUserCreated()->ID();
+		auto userID = inputUserCreatedEvent->GetInputUserID();
 
 		if (!Shared::Tools::IsSerializable<InputActionMapBucket>())
 		{
@@ -198,10 +198,10 @@ namespace DeadFrame2D::Core
 	{
 		auto inputUserDestroyedEvent = DispatchableEvent::SafeCast<InputUserDestroyedEvent>(dispatchableEvent);
 
-		if (inputUserDestroyedEvent == nullptr || inputUserDestroyedEvent->GetInputUserDestroyed() == nullptr)
+		if (inputUserDestroyedEvent == nullptr)
 			return;
 
-		auto userID = inputUserDestroyedEvent->GetInputUserDestroyed()->ID();
+		auto userID = inputUserDestroyedEvent->GetInputUserID();
 
 		runtimeActionMaps.erase(userID);
 		fastLookupActionMaps.erase(userID);

@@ -1,19 +1,25 @@
-#include "Core/SubSystems/Systems/Input/User/InputUser.h"
 #include "Engine/EngineEvents/Events/SubSystems/Input/InputUserCreatedEvent.h"
 
 
 namespace DeadFrame2D::Engine
 {
-	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Data;
 
 
-	InputUserCreatedEvent::InputUserCreatedEvent(const InputUser* inputUserCreated)
-		: inputUserCreated(inputUserCreated)
+	InputUserCreatedEvent::InputUserCreatedEvent(DeadFrame2D::Data::InputUserID inputUserID, const std::string& inputUserName)
+		: inputUserID(inputUserID),
+		inputUserName(inputUserName)
+
 	{
 	}
 
-	const InputUser* InputUserCreatedEvent::GetInputUserCreated() const
+	const std::string& InputUserCreatedEvent::GetInputUserName() const
 	{
-		return inputUserCreated;
+		return inputUserName;
+	}
+
+	DeadFrame2D::Data::InputUserID InputUserCreatedEvent::GetInputUserID() const
+	{
+		return inputUserID;
 	}
 }
