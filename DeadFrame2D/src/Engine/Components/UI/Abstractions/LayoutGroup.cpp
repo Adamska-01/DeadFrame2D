@@ -1,13 +1,11 @@
 #include "Engine/Components/UI/Abstractions/LayoutGroup.h"
-#include "Engine/Components/UI/Abstractions/UIComponent.h"
 #include "Engine/EngineEvents/DispatchableEvent.h"
-#include "Engine/EngineEvents/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
-#include "Utilities/Helpers/Events/EventHelpers.h"
 
 
 namespace DeadFrame2D::Engine
 {
+	using namespace DeadFrame2D::Core;
 	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Utilities;
 
@@ -15,13 +13,6 @@ namespace DeadFrame2D::Engine
 	LayoutGroup::LayoutGroup(float layoutSpacing, LayoutPadding layoutPadding)
 		: layoutSpacing(layoutSpacing), layoutPadding(layoutPadding)
 	{
-		// TODO: Fucking remove this! Add proper events to the GameObjectNotifier
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), this, &LayoutGroup::GameObjectDestroyedHandler);
-	}
-
-	LayoutGroup::~LayoutGroup()
-	{
-		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), this);
 	}
 
 	void LayoutGroup::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
@@ -47,6 +38,11 @@ namespace DeadFrame2D::Engine
 	}
 
 	void LayoutGroup::OnChildGameObjectAddedHandler(const ObjectHandle<GameObject>& obj)
+	{
+		MarkDirty();
+	}
+
+	void LayoutGroup::OnChildDestroyedHandler(const ObjectHandle<GameObject>& destroyedObj)
 	{
 		MarkDirty();
 	}

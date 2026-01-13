@@ -28,13 +28,15 @@ namespace DeadFrame2D::Engine
 
 		virtual void OnChildActiveStateChangedHandler(const ObjectHandle<GameObject>& child, bool activeState) override;
 
+		virtual void OnChildDestroyedHandler(const ObjectHandle<GameObject>& destroyedObj) override;
+
 		virtual void OnChildGameObjectAddedHandler(const ObjectHandle<GameObject>& obj) override;
 
 
 	public:
 		LayoutGroup(float layoutSpacing, DeadFrame2D::Data::LayoutPadding layoutPadding);
 
-		virtual ~LayoutGroup() override;
+		virtual ~LayoutGroup() override = default;
 
 
 		virtual void Start() override;
