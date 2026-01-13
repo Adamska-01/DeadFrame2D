@@ -263,6 +263,14 @@ namespace DeadFrame2D::Engine
 			}
 		}
 
+		ObjectHandle<GameObject> current = thisGameObject->parent;
+		while (current != nullptr)
+		{
+			current->OnChildDestroyed.Broadcast(thisGameObject);
+
+			current = current->parent;
+		}
+
 		for (auto& child : children)
 		{
 			if (child == nullptr)

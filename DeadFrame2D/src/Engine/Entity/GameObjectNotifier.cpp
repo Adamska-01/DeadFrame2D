@@ -29,6 +29,11 @@ namespace DeadFrame2D::Engine
 		OnChildActiveStateChanged.AddHandle(listener, handler);
 	}
 
+	void GameObjectNotifier::RegisterOnChildDestroyedHandler(const ComponentHandleBase& listener, std::function<void(ObjectHandle<GameObject>)> handler)
+	{
+		OnChildDestroyed.AddHandle(listener, handler);
+	}
+
 	void GameObjectNotifier::RegisterOnNewComponentAddedHandler(const ComponentHandleBase& listener, std::function<void(const ComponentHandle<GameComponent>&)> handler)
 	{
 		OnNewComponentAdded.AddHandle(listener, handler);
@@ -57,6 +62,11 @@ namespace DeadFrame2D::Engine
 	void GameObjectNotifier::DeregisterOnChildActiveStateChangedHandler(const ComponentHandleBase& listener)
 	{
 		OnChildActiveStateChanged.RemoveByListener(&listener);
+	}
+
+	void GameObjectNotifier::DeregisterOnChildDestroyedHandler(const ComponentHandleBase& listener)
+	{
+		OnChildDestroyed.RemoveByListener(&listener);
 	}
 
 	void GameObjectNotifier::DeregisterOnNewComponentAddedHandler(const ComponentHandleBase& listener)

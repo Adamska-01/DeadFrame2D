@@ -48,6 +48,7 @@ namespace DeadFrame2D::Engine
 
 		typedHandle->RegisterOnGameObjectActiveStateChangedHandler(GetHandle(), EventHelpers::BindFunction(this, &GameObjectObserver::OnGameObjectActiveStateChangedHandler));
 		typedHandle->RegisterOnChildActiveStateChangedHandler(GetHandle(), EventHelpers::BindFunction(this, &GameObjectObserver::OnChildActiveStateChangedHandler));
+		typedHandle->RegisterOnChildDestroyedHandler(GetHandle(), EventHelpers::BindFunction(this, &GameObjectObserver::OnChildDestroyedHandler));
 		typedHandle->RegisterOnNewComponentAddedHandler(GetHandle(), EventHelpers::BindFunction(this, &GameObjectObserver::OnNewComponentAddedHandler));
 		typedHandle->RegisterOnComponentRemovedHandler(GetHandle(), EventHelpers::BindFunction(this, &GameObjectObserver::OnComponentRemovedHandler));
 		typedHandle->RegisterOnChildGameObjectAdded(GetHandle(), EventHelpers::BindFunction(this, &GameObjectObserver::OnChildGameObjectAddedHandler));
@@ -63,6 +64,7 @@ namespace DeadFrame2D::Engine
 
 		typedHandle->DeregisterOnGameObjectActiveStateChangedHandler(GetHandle());
 		typedHandle->DeregisterOnChildActiveStateChangedHandler(GetHandle());
+		typedHandle->DeregisterOnChildDestroyedHandler(GetHandle());
 		typedHandle->DeregisterOnNewComponentAddedHandler(GetHandle());
 		typedHandle->DeregisterOnComponentRemovedHandler(GetHandle());
 		typedHandle->DeregisterOnChildGameObjectAdded(GetHandle());
@@ -75,6 +77,10 @@ namespace DeadFrame2D::Engine
 	}
 
 	void GameObjectObserver::OnChildActiveStateChangedHandler(const ObjectHandle<GameObject>& child, bool isActive)
+	{
+	}
+
+	void GameObjectObserver::OnChildDestroyedHandler(const ObjectHandle<GameObject>& destroyedObj)
 	{
 	}
 

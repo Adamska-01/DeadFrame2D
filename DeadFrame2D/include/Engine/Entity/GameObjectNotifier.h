@@ -30,6 +30,8 @@ namespace DeadFrame2D::Engine
 
 		DeadFrame2D::Utilities::MulticastDelegate<ObjectHandle<GameObject>, bool> OnChildActiveStateChanged;
 
+		DeadFrame2D::Utilities::MulticastDelegate<ObjectHandle<GameObject>> OnChildDestroyed;
+
 		DeadFrame2D::Utilities::MulticastDelegate<const ComponentHandle<GameComponent>&> OnNewComponentAdded;
 
 		DeadFrame2D::Utilities::MulticastDelegate<const ComponentHandle<GameComponent>&> OnComponentRemoved;
@@ -44,6 +46,8 @@ namespace DeadFrame2D::Engine
 
 		void RegisterOnChildActiveStateChangedHandler(const ComponentHandleBase& listener, std::function<void(ObjectHandle<GameObject>, bool)> handler);
 
+		void RegisterOnChildDestroyedHandler(const ComponentHandleBase& listener, std::function<void(ObjectHandle<GameObject>)> handler);
+
 		void RegisterOnNewComponentAddedHandler(const ComponentHandleBase& listener, std::function<void(const ComponentHandle<GameComponent>&)> handler);
 
 		void RegisterOnComponentRemovedHandler(const ComponentHandleBase& listener, std::function<void(const ComponentHandle<GameComponent>&)> handler);
@@ -56,6 +60,8 @@ namespace DeadFrame2D::Engine
 		void DeregisterOnGameObjectActiveStateChangedHandler(const ComponentHandleBase& listener);
 
 		void DeregisterOnChildActiveStateChangedHandler(const ComponentHandleBase& listener);
+
+		void DeregisterOnChildDestroyedHandler(const ComponentHandleBase& listener);
 
 		void DeregisterOnNewComponentAddedHandler(const ComponentHandleBase& listener);
 
