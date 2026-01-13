@@ -155,45 +155,34 @@ namespace DeadFrame2D::Engine
 		// However, we want to ensure that only the game objects in the current
 		// initialization queue are considered part of this initial phase. 
 		// All the game objects created after this step are initalised at creation-time.
-		auto currentToInitialize = gameObjectsToInitialize;
-		gameObjectsToInitialize.clear();
+		std::vector<ObjectHandle<GameObject>> initialized;
+		initialized.reserve(gameObjectsToInitialize.size());
 
-		for (const auto& toInitialize : currentToInitialize)
+		while (!gameObjectsToInitialize.empty())
 		{
-			if (toInitialize == nullptr)
-				continue;
+			auto batch = std::move(gameObjectsToInitialize);
+			gameObjectsToInitialize.clear();
 
-			toInitialize->Init();
-		}
+			for (const auto& obj : batch)
+			{
+				if (!obj)
+					continue;
 
-		for (const auto& toInitialize : currentToInitialize)
-		{
-			if (toInitialize == nullptr)
-				continue;
+				obj->Init();
 
-			toInitialize->Start();
+				initialized.push_back(obj);
+			}
 		}
 
 		isRunning = true;
 
-		for (const auto& toInitialize : gameObjectsToInitialize)
+		for (const auto& obj : initialized)
 		{
-			if (toInitialize == nullptr)
+			if (!obj) 
 				continue;
 
-			toInitialize->Init();
+			obj->Start();
 		}
-
-		for (const auto& toInitialize : gameObjectsToInitialize)
-		{
-			if (toInitialize == nullptr)
-				continue;
-
-			toInitialize->Start();
-		}
-
-		currentToInitialize.clear();
-		gameObjectsToInitialize.clear();
 	}
 
 	void Scene::Update(float deltaTime)
@@ -208,14 +197,6 @@ namespace DeadFrame2D::Engine
 
 				gameObjectParents.push_back(obj);
 			}
-
-			std::stable_partition(
-				gameObjectParents.begin(),
-				gameObjectParents.end(),
-				[](const auto& obj)
-				{
-					return obj->GetComponent<Canvas>() == nullptr;
-				});
 
 			objectsPendingCreation.clear();
 		}
@@ -238,14 +219,6 @@ namespace DeadFrame2D::Engine
 						}),
 					gameObjectParents.end());
 			}
-
-			std::stable_partition(
-				gameObjectParents.begin(),
-				gameObjectParents.end(),
-				[](const auto& obj)
-				{
-					return obj->GetComponent<Canvas>() == nullptr;
-				});
 
 			childAddedPendingAction.clear();
 		}
