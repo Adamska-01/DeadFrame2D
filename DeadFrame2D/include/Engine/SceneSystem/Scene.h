@@ -53,7 +53,7 @@ namespace DeadFrame2D::Engine
 
 		std::vector<ObjectHandle<GameObject>> gameObjects;
 
-		std::vector<ObjectHandle<GameObject>> gameObjectParents;
+		std::vector<ObjectHandle<GameObject>> gameObjectRoots;
 
 
 		void GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);

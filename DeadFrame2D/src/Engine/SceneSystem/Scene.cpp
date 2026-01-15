@@ -111,12 +111,12 @@ namespace DeadFrame2D::Engine
 			if (target->GetParent() != nullptr)
 				continue;
 
-			gameObjectParents.erase(
+			gameObjectRoots.erase(
 				std::remove_if(
-					gameObjectParents.begin(), 
-					gameObjectParents.end(), 
+					gameObjectRoots.begin(), 
+					gameObjectRoots.end(), 
 					matchesTarget),
-				gameObjectParents.end());
+				gameObjectRoots.end());
 		}
 
 		for (const auto& target : objectsPendingDestroy)
@@ -142,7 +142,7 @@ namespace DeadFrame2D::Engine
 
 		entries.clear();
 		gameObjects.clear();
-		gameObjectParents.clear();
+		gameObjectRoots.clear();
 		gameObjectsToInitialize.clear();
 		objectsPendingCreation.clear();
 		objectsPendingDestroy.clear();
@@ -161,6 +161,7 @@ namespace DeadFrame2D::Engine
 		while (!gameObjectsToInitialize.empty())
 		{
 			auto batch = std::move(gameObjectsToInitialize);
+
 			gameObjectsToInitialize.clear();
 
 			for (const auto& obj : batch)
@@ -195,7 +196,7 @@ namespace DeadFrame2D::Engine
 			{
 				auto& obj = objectsPendingCreation[i];
 
-				gameObjectParents.push_back(obj);
+				gameObjectRoots.push_back(obj);
 			}
 
 			objectsPendingCreation.clear();
@@ -209,26 +210,22 @@ namespace DeadFrame2D::Engine
 			{
 				const auto& childObj = childAddedPendingAction[i];
 
-				gameObjectParents.erase(
+				gameObjectRoots.erase(
 					std::remove_if(
-						gameObjectParents.begin(),
-						gameObjectParents.end(),
+						gameObjectRoots.begin(),
+						gameObjectRoots.end(),
 						[&childObj](const auto& obj)
 						{
 							return obj == childObj;
 						}),
-					gameObjectParents.end());
+					gameObjectRoots.end());
 			}
 
 			childAddedPendingAction.clear();
 		}
 
-		auto parentsSize = gameObjectParents.size();
-
-		for (size_t i = 0; i < parentsSize; ++i)
+		for (const auto& obj : gameObjectRoots)
 		{
-			auto& obj = gameObjectParents[i];
-		
 			if (!obj->IsActive())
 				continue;
 
@@ -238,24 +235,20 @@ namespace DeadFrame2D::Engine
 
 	void Scene::LateUpdate(float deltaTime)
 	{
-		auto parentsSize = gameObjectParents.size();
-
-		for (size_t i = 0; i < parentsSize; ++i)
+		for (const auto& obj : gameObjectRoots)
 		{
-			auto& obj = gameObjectParents[i];
-		
 			if (!obj->IsActive())
 				continue;
 
 			obj->LateUpdate(deltaTime);
 		}
-
-		CleanupDestroyedObjects();
 	}
 
 	void Scene::Draw()
 	{
-		for (const auto& obj : gameObjectParents)
+		CleanupDestroyedObjects();
+		
+		for (const auto& obj : gameObjectRoots)
 		{
 			if (!obj->IsActive())
 				continue;
