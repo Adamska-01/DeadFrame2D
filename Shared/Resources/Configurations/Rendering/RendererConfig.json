@@ -1,5 +1,5 @@
 {
 	"width": 1280,
 	"height": 720,
-	"targetFramerate": 140
+	"targetFramerate": 60 // Delete this line to unlock framerate
 }

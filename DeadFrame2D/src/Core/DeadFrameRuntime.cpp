@@ -26,7 +26,15 @@ namespace DeadFrame2D::Core
 
 		sceneManager = std::make_unique<SceneManager>();
 
-		frameTimer.SetTargetFramerate(systemConfig.rendering.targetFramerate);
+		auto targetFramerate = systemConfig.rendering.targetFramerate;
+		if (targetFramerate.has_value())
+		{
+			frameTimer.SetTargetFramerate(*targetFramerate);
+		}
+		else
+		{
+			frameTimer.UnlockFramerate();
+		}
 	}
 
 	DeadFrameRuntime::~DeadFrameRuntime()
