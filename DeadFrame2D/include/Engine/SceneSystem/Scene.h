@@ -1,7 +1,7 @@
 #pragma once
+#include "Data/Entity/ObjectEntry.h"
 #include "DF2D_API.h"
 #include "Engine/Entity/ComponentHandle.h"
-#include "Engine/Entity/Handles/GameObject/ObjectEntry.h"
 #include "Engine/Entity/Handles/GameObject/ObjectHandle.h"
 #include "Engine/SceneSystem/ISceneHandleProvider.h"
 #include <type_traits>
@@ -11,7 +11,7 @@
 namespace DeadFrame2D::Engine
 {
 	class GameObject;
-
+	class ComponentBucket;
 	class DispatchableEvent;
 
 
@@ -25,16 +25,15 @@ namespace DeadFrame2D::Engine
 	private:
 		bool isRunning;
 
-		std::vector<ObjectHandle<GameObject>> gameObjectsToInitialize;
+		std::vector<uint32_t> gameObjectsToInitialize;
 
-		std::vector<ObjectHandle<GameObject>> objectsPendingCreation;
+		std::vector<uint32_t> objectsPendingDestruction;
 
-		std::vector<ObjectHandle<GameObject>> childAddedPendingAction;
-
-		std::vector<ObjectHandle<GameObject>> objectsPendingDestroy;
+		std::vector<uint32_t> freeSlots;
 
 
 		uint32_t FindFreeSlot();
+
 
 		GameObject* GetAt(uint32_t index) const override;
 
@@ -43,25 +42,30 @@ namespace DeadFrame2D::Engine
 
 		void SendGameObjectCreatedEvent(const ObjectHandle<GameObject>& obj);
 
+		void BuildSnapshotRecursive();
+
 
 		template<typename T, typename... Args>
 		ObjectHandle<T> Instantiate(Args&&... args);
 
+		template<typename Fn>
+		void TraverseRoots(bool includeInactive, Fn&& fn);
+
 
 	protected:
-		std::vector<ObjectEntry> entries;
+		std::vector<DeadFrame2D::Data::ObjectEntry> entries;
 
-		std::vector<ObjectHandle<GameObject>> gameObjects;
+		std::vector<uint32_t> gameObjectRoots;
 
-		std::vector<ObjectHandle<GameObject>> gameObjectRoots;
+		std::vector<uint32_t> frameSnapshot;
 
 
 		void GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
 
-		void ChildGameObjectAddedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
+		void GameObjectHierarchyChangeHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
 
 
-		void CleanupDestroyedObjects();
+		void ProcessPendingDestructions();
 
 		void Exit();
 
@@ -94,10 +98,10 @@ namespace DeadFrame2D::Engine
 
 
 		template <typename T>
-		ComponentHandle<T> FindObjectOfType();
+		ComponentHandle<T> FindObjectOfType(bool includeInactive = false);
 
 		template <typename T>
-		std::vector<ComponentHandle<T>> FindObjectsOfType();
+		std::vector<ComponentHandle<T>> FindObjectsOfType(bool includeInactive = false);
 	};
 }
 
@@ -111,11 +115,14 @@ namespace DeadFrame2D::Engine
 	template<typename T, typename ...Args>
 	inline ObjectHandle<T> Scene::Instantiate(Args && ...args)
 	{
+		using namespace DeadFrame2D::Data;
+
+
 		auto index = FindFreeSlot();
 
 		auto& entry = entries[index];
 		entry.object = std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-		entry.alive = true;
+		entry.state = ObjectEntryState::ALIVE;
 
 		auto handle = ObjectHandle<T>(shared_from_this(), index, entry.generation);
 
@@ -129,57 +136,112 @@ namespace DeadFrame2D::Engine
 
 		handle->ConstructGameObject();
 
-		gameObjects.push_back(handle);
-		objectsPendingCreation.push_back(handle);
+		gameObjectRoots.push_back(index);
 
 		if (isRunning)
 		{
-			handle->Init();
-			handle->Start();
+			entry.object->componentBucket->ForEach([](auto& comp)
+			{
+				comp.Init();
+				comp.Start();
+			});
 		}
-
-		gameObjectsToInitialize.push_back(handle);
+		else
+		{
+			gameObjectsToInitialize.push_back(index);
+		}
 
 		SendGameObjectCreatedEvent(handle);
 
 		return handle;
 	}
 
+	template<typename Fn>
+	inline void Scene::TraverseRoots(bool includeInactive, Fn&& fn)
+	{
+		std::vector<uint32_t> stack;
+		stack.reserve(gameObjectRoots.size());
+
+		for (auto root : gameObjectRoots)
+		{
+			stack.push_back(root);
+		}
+
+		while (!stack.empty())
+		{
+			auto index = stack.back();
+
+			stack.pop_back();
+
+			const auto& entry = entries[index];
+			auto* obj = entry.object.get();
+
+			if (!obj)
+				continue;
+
+			if (!includeInactive && !obj->IsActive())
+				continue;
+
+			if (!IsValid(index, entry.generation))
+				continue;
+
+			if (!fn(index, *obj))
+				return;
+
+			const auto& children = obj->GetChildren();
+			for (auto it = children.rbegin(); it != children.rend(); ++it)
+			{
+				if (*it)
+				{
+					stack.push_back((*it).index);
+				}
+			}
+		}
+	}
+
 
 	template<typename T>
-	inline ComponentHandle<T> Scene::FindObjectOfType()
+	inline ComponentHandle<T> Scene::FindObjectOfType(bool includeInactive)
 	{
 		static_assert(std::is_base_of_v<GameComponent, T>, "T must derive from GameComponent");
 
-		for (const auto& object : gameObjects)
+		ComponentHandle<T> result;
+
+		TraverseRoots(includeInactive, [&](uint32_t, GameObject& obj)
 		{
-			auto component = object->GetComponent<T>();
+			auto component = obj.GetComponent<T>();
 
-			if (component == nullptr)
-				continue;
+			if (component)
+			{
+				result = component;
 
-			return component;
-		}
+				return false; // stop traversal
+			}
 
-		return ComponentHandle<T>();
+			return true; // keep going
+		});
+
+		return result;
 	}
 
 	template <typename T>
-	inline std::vector<ComponentHandle<T>> Scene::FindObjectsOfType()
+	inline std::vector<ComponentHandle<T>> Scene::FindObjectsOfType(bool includeInactive)
 	{
 		static_assert(std::is_base_of_v<GameComponent, T>, "T must derive from GameComponent");
 
 		std::vector<ComponentHandle<T>> results;
 
-		for (const auto& object : gameObjects)
+		TraverseScene(includeInactive, [&](uint32_t, GameObject& obj)
 		{
-			auto component = object->GetComponent<T>();
-			
-			if (component == nullptr)
-				continue;
+			auto component = obj.GetComponent<T>();
 
-			results.push_back(component);
-		}
+			if (component)
+			{
+				results.push_back(component);
+			}
+
+			return true; // keep traversing
+		});
 
 		return results;
 	}

@@ -1,8 +1,7 @@
-#include "Engine/Components/UI/Canvas.h"
 #include "Engine/EngineEvents/EventDispatcher.h"
-#include "Engine/EngineEvents/Events/GameObjectEvents/ChildGameObjectAddedEvent.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectCreatedEvent.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
+#include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectHierarchyChangeEvent.h"
 #include "Engine/SceneSystem/Scene.h"
 #include <algorithm>
 #include <cassert>
@@ -10,6 +9,9 @@
 
 namespace DeadFrame2D::Engine
 {
+	using namespace DeadFrame2D::Data;
+
+
 	Scene::Scene()
 	{
 		isRunning = false;
@@ -17,7 +19,7 @@ namespace DeadFrame2D::Engine
 		Exit();
 
 		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), this, &Scene::GameObjectDestroyedHandler);
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(ChildGameObjectAddedEvent)), this, &Scene::ChildGameObjectAddedHandler);
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectHierarchyChangeEvent)), this, &Scene::GameObjectHierarchyChangeHandler);
 	}
 
 	Scene::~Scene()
@@ -25,15 +27,18 @@ namespace DeadFrame2D::Engine
 		Exit();
 
 		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), this);
-		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(ChildGameObjectAddedEvent)), this);
+		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectHierarchyChangeEvent)), this);
 	}
 
 	uint32_t Scene::FindFreeSlot()
 	{
-		for (size_t i = 0; i < entries.size(); ++i)
+		if (!freeSlots.empty())
 		{
-			if (!entries[i].alive)
-				return static_cast<uint32_t>(i);
+			auto index = freeSlots.back();
+
+			freeSlots.pop_back();
+
+			return index;
 		}
 
 		entries.emplace_back();
@@ -55,12 +60,24 @@ namespace DeadFrame2D::Engine
 		
 		const auto& e = entries[index];
 		
-		return e.alive && e.generation == generation;
+		return e.state == ObjectEntryState::ALIVE && e.generation == generation;
 	}
 
 	void Scene::SendGameObjectCreatedEvent(const ObjectHandle<GameObject>& obj)
 	{
 		EventDispatcher::SendEvent(std::make_shared<GameObjectCreatedEvent>(obj));
+	}
+
+	void Scene::BuildSnapshotRecursive()
+	{
+		frameSnapshot.clear();
+
+		TraverseRoots(false, [&](uint32_t index, GameObject&)
+		{
+			frameSnapshot.push_back(index);
+
+			return true; // continue traversal
+		});
 	}
 
 	void Scene::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
@@ -70,91 +87,107 @@ namespace DeadFrame2D::Engine
 		if (!gameObjEvent || gameObjEvent->gameObjectDestroyed == nullptr)
 			return;
 
-		auto toDestroyPtr = gameObjEvent->gameObjectDestroyed;
+		auto entryIndex = gameObjEvent->gameObjectDestroyed.index;
 
-		// Mark for destruction
-		objectsPendingDestroy.push_back(toDestroyPtr);
-	}
-
-	void Scene::ChildGameObjectAddedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
-	{
-		auto gameObjEvent = DispatchableEvent::SafeCast<ChildGameObjectAddedEvent>(dispatchableEvent);
-
-		if (!gameObjEvent || gameObjEvent->childGameObject == nullptr)
+		// Assert the index
+		if (GetAt(entryIndex) == nullptr)
 			return;
 
-		childAddedPendingAction.push_back(gameObjEvent->childGameObject);
+		objectsPendingDestruction.push_back(entryIndex);
+
+		// Mark for destruction immediately (invalidate handle)
+		auto& entry = entries[entryIndex];
+		entry.state = ObjectEntryState::DESTRUCTION_PENDING;
 	}
 
-	void Scene::CleanupDestroyedObjects()
+	void Scene::GameObjectHierarchyChangeHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
 	{
-		if (objectsPendingDestroy.empty())
+		auto hierarchyChangeEvent = DispatchableEvent::SafeCast<GameObjectHierarchyChangeEvent>(dispatchableEvent);
+
+		if (hierarchyChangeEvent == nullptr)
 			return;
 
-		for (const auto& target : objectsPendingDestroy)
+		auto& targetObj = hierarchyChangeEvent->GetObject();
+		auto& oldParent = hierarchyChangeEvent->GetOldParent();
+		auto& newParent = hierarchyChangeEvent->GetNewParent();
+
+		if (!targetObj)
+			return;
+
+		// was root -> now child
+		if (oldParent == nullptr && newParent != nullptr)
 		{
-			if (target == nullptr)
-				continue;
-
-			const auto matchesTarget = [&target](const ObjectHandle<GameObject>& obj)
-				{
-					return obj == target;
-				};
-
-			gameObjects.erase(
-				std::remove_if(
-					gameObjects.begin(), 
-					gameObjects.end(), 
-					matchesTarget),
-				gameObjects.end());
-
-			if (target->GetParent() != nullptr)
-				continue;
-
 			gameObjectRoots.erase(
-				std::remove_if(
-					gameObjectRoots.begin(), 
-					gameObjectRoots.end(), 
-					matchesTarget),
+				std::remove(
+					gameObjectRoots.begin(),
+					gameObjectRoots.end(),
+					targetObj.index),
 				gameObjectRoots.end());
 		}
-
-		for (const auto& target : objectsPendingDestroy)
+		// was child -> now root
+		else if (oldParent != nullptr && newParent == nullptr)
 		{
-			auto& entry = entries[target.index];
+			auto findIT = std::find(
+				gameObjectRoots.begin(),
+				gameObjectRoots.end(),
+				targetObj.index);
 
-			entry.alive = false;
+			if (findIT == gameObjectRoots.end())
+			{
+				gameObjectRoots.push_back(targetObj.index);
+			}
+		}
+	}
+
+	void Scene::ProcessPendingDestructions()
+	{
+		for (const auto& toDestroyIndex : objectsPendingDestruction)
+		{
+			auto& entry = entries[toDestroyIndex];
+			auto* obj = entry.object.get();
+
+			if (obj == nullptr)
+				continue;
+
+			// Remove from roots
+			if (obj->GetParent() == nullptr)
+			{
+				gameObjectRoots.erase(
+					std::remove(
+						gameObjectRoots.begin(),
+						gameObjectRoots.end(),
+						toDestroyIndex),
+					gameObjectRoots.end());
+			}
+
+			// Final destruction
+			entry.state = ObjectEntryState::DEAD;
 			entry.generation++;
 			entry.object.reset();
+
+			freeSlots.push_back(toDestroyIndex);
 		}
 
-		objectsPendingDestroy.clear();
+		objectsPendingDestruction.clear();
 	}
 
 	void Scene::Exit()
 	{
 		for (auto& entry : entries)
 		{
-			entry.alive = false;
+			entry.state = ObjectEntryState::DEAD;
 			entry.generation++;
 			entry.object.reset();
 		}
 
 		entries.clear();
-		gameObjects.clear();
+		freeSlots.clear();
 		gameObjectRoots.clear();
 		gameObjectsToInitialize.clear();
-		objectsPendingCreation.clear();
-		objectsPendingDestroy.clear();
 	}
 
 	void Scene::Init()
 	{
-		// TODO: The way Init and Start are called feels wrong. Fix it (All the Inits must be called before all the Starts, and must follow instantiation-order)
-		// Some game objects might create other game objects in their Init function.
-		// However, we want to ensure that only the game objects in the current
-		// initialization queue are considered part of this initial phase. 
-		// All the game objects created after this step are initalised at creation-time.
 		std::vector<ObjectHandle<GameObject>> initialized;
 		initialized.reserve(gameObjectsToInitialize.size());
 
@@ -164,14 +197,20 @@ namespace DeadFrame2D::Engine
 
 			gameObjectsToInitialize.clear();
 
-			for (const auto& obj : batch)
+			for (const auto& index : batch)
 			{
+				auto& entry = entries[index];
+				auto* obj = entry.object.get();
+
 				if (!obj)
 					continue;
 
-				obj->Init();
+				obj->componentBucket->ForEach([](auto& comp)
+				{
+					comp.Init();
+				});
 
-				initialized.push_back(obj);
+				initialized.push_back(obj->GetObjectHandle());
 			}
 		}
 
@@ -182,78 +221,83 @@ namespace DeadFrame2D::Engine
 			if (!obj) 
 				continue;
 
-			obj->Start();
+			obj->componentBucket->ForEach([](auto& comp)
+			{
+				comp.Start();
+			});
 		}
 	}
 
 	void Scene::Update(float deltaTime)
 	{
-		auto creationPendingSize = objectsPendingCreation.size();
+		// The order here matters!
+		ProcessPendingDestructions();
+		BuildSnapshotRecursive();
 
-		if (creationPendingSize > 0)
+		for (const auto& entryIndex : frameSnapshot)
 		{
-			for (size_t i = 0; i < creationPendingSize; ++i)
-			{
-				auto& obj = objectsPendingCreation[i];
+			auto& entry = entries[entryIndex];
+			auto* obj = entry.object.get();
 
-				gameObjectRoots.push_back(obj);
-			}
-
-			objectsPendingCreation.clear();
-		}
-	
-		auto childAddedPendingActionSize = childAddedPendingAction.size();
-
-		if (childAddedPendingActionSize > 0)
-		{
-			for (size_t i = 0; i < childAddedPendingActionSize; ++i)
-			{
-				const auto& childObj = childAddedPendingAction[i];
-
-				gameObjectRoots.erase(
-					std::remove_if(
-						gameObjectRoots.begin(),
-						gameObjectRoots.end(),
-						[&childObj](const auto& obj)
-						{
-							return obj == childObj;
-						}),
-					gameObjectRoots.end());
-			}
-
-			childAddedPendingAction.clear();
-		}
-
-		for (const auto& obj : gameObjectRoots)
-		{
-			if (!obj->IsActive())
+			if (obj->componentBucket == nullptr)
 				continue;
 
-			obj->Update(deltaTime);
+			obj->componentBucket->ForEach([&entry, entryIndex, deltaTime, this](auto& comp)
+			{
+				if (!IsValid(entryIndex, entry.generation))
+					return;
+
+				if (!comp.IsActive())
+					return;
+
+				comp.Update(deltaTime);
+			});
 		}
 	}
 
 	void Scene::LateUpdate(float deltaTime)
 	{
-		for (const auto& obj : gameObjectRoots)
+		for (const auto& entryIndex : frameSnapshot)
 		{
-			if (!obj->IsActive())
+			auto& entry = entries[entryIndex];
+			auto* obj = entry.object.get();
+
+			if (obj->componentBucket == nullptr)
 				continue;
 
-			obj->LateUpdate(deltaTime);
+			obj->componentBucket->ForEach([&entry, entryIndex, deltaTime, this](auto& comp)
+			{
+				if (!IsValid(entryIndex, entry.generation))
+					return;
+
+				if (!comp.IsActive())
+					return;
+
+				comp.LateUpdate(deltaTime);
+			});
 		}
 	}
 
 	void Scene::Draw()
 	{
-		CleanupDestroyedObjects();
-		
-		for (const auto& obj : gameObjectRoots)
+		for (const auto& entryIndex : frameSnapshot)
 		{
-			if (!obj->IsActive())
+			auto& entry = entries[entryIndex];
+			auto* obj = entry.object.get();
+
+			if (obj->componentBucket == nullptr)
 				continue;
 
-			obj->Draw();
+			obj->componentBucket->ForEach([&entry, entryIndex, this](auto& comp)
+			{
+				if (!IsValid(entryIndex, entry.generation))
+					return;
+
+				if (!comp.IsActive())
+					return;
+
+				comp.Draw();
+			});
 		}
 	}
 }
