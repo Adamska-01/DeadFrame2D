@@ -24,7 +24,7 @@ namespace DeadFrame2D::Engine
 
 		auto comp = textMeshObject->AddComponent<TextMesh>(buttonBlueprintConfiguration.textMeshComponentModel);
 
-		AddChildGameObject(textMeshObject);
+		textMeshObject->SetParent(thisGameObject);
 
 		textMeshObject->GetTransform()->SetLocalPosition(Vector2F::Zero);
 	}
