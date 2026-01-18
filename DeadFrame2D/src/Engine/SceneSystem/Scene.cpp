@@ -87,7 +87,7 @@ namespace DeadFrame2D::Engine
 		if (!gameObjEvent || gameObjEvent->gameObjectDestroyed == nullptr)
 			return;
 
-		auto entryIndex = gameObjEvent->gameObjectDestroyed.index;
+		auto entryIndex = gameObjEvent->gameObjectDestroyed.GetIndex();
 
 		// Assert the index
 		if (GetAt(entryIndex) == nullptr)
@@ -121,7 +121,7 @@ namespace DeadFrame2D::Engine
 				std::remove(
 					gameObjectRoots.begin(),
 					gameObjectRoots.end(),
-					targetObj.index),
+					targetObj.GetIndex()),
 				gameObjectRoots.end());
 		}
 		// was child -> now root
@@ -130,11 +130,11 @@ namespace DeadFrame2D::Engine
 			auto findIT = std::find(
 				gameObjectRoots.begin(),
 				gameObjectRoots.end(),
-				targetObj.index);
+				targetObj.GetIndex());
 
 			if (findIT == gameObjectRoots.end())
 			{
-				gameObjectRoots.push_back(targetObj.index);
+				gameObjectRoots.push_back(targetObj.GetIndex());
 			}
 		}
 	}

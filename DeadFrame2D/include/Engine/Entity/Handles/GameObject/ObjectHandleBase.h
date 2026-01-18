@@ -11,10 +11,6 @@ namespace DeadFrame2D::Engine
 
 	class DF2D_API ObjectHandleBase
 	{
-		template<typename T>
-		friend class ObjectHandle;
-
-
 	protected:
 		std::weak_ptr<ISceneHandleProvider> scene;
 
@@ -45,5 +41,12 @@ namespace DeadFrame2D::Engine
 		explicit operator bool() const noexcept;
 
 		ObjectHandleBase& operator=(std::nullptr_t);
+
+
+		const ISceneHandleProvider* GetSceneHandleProvider() const noexcept;
+
+		uint32_t GetIndex() const noexcept;
+
+		uint32_t GetGeneration() const noexcept;
 	};
 }

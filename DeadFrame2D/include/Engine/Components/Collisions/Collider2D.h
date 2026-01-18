@@ -1,12 +1,8 @@
 #pragma once
-#include "Core/Coroutines/Task.h"
-#include "Data/Collision/CollisionInfo.h"
 #include "Data/Collision/PhysicsMaterial.h"
 #include "DF2D_API.h"
 #include "Engine/Components/Collisions/Abstractions/ContactEventProvider.h"
-#include "Engine/EngineEvents/DispatchableEvent.h"
 #include "Engine/Entity/ComponentHandle.h"
-#include "Utilities/Delegates/MulticastDelegate.h"
 
 
 class b2Fixture;
@@ -21,9 +17,6 @@ namespace DeadFrame2D::Engine
 	class DF2D_API Collider2D : public ContactEventProvider
 	{
 		TYPE_INFO(Collider2D, ContactEventProvider);
-		
-		
-		friend class ContactListener;
 
 
 	protected:

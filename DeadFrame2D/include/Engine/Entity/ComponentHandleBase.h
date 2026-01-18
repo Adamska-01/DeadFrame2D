@@ -16,10 +16,6 @@ namespace DeadFrame2D::Engine
 	 */
 	class DF2D_API ComponentHandleBase
 	{
-		template<typename T>
-		friend class ComponentHandle;
-
-
 	protected:
 		std::weak_ptr<ComponentBucket> bucket;
 
@@ -50,5 +46,12 @@ namespace DeadFrame2D::Engine
 		explicit operator bool() const;
 
 		ComponentHandleBase& operator=(std::nullptr_t);
+
+
+		const ComponentBucket* GetBucket() const noexcept;
+
+		uint32_t GetIndex() const noexcept;
+
+		uint32_t GetGeneration() const noexcept;
 	};
 }

@@ -62,4 +62,19 @@ namespace DeadFrame2D::Engine
 
 		return *this;
 	}
+
+	const ComponentBucket* ComponentHandleBase::GetBucket() const noexcept
+	{
+		return bucket.expired() ? nullptr : bucket.lock().get();
+	}
+
+	uint32_t ComponentHandleBase::GetIndex() const noexcept
+	{
+		return index;
+	}
+
+	uint32_t ComponentHandleBase::GetGeneration() const noexcept
+	{
+		return generation;
+	}
 }

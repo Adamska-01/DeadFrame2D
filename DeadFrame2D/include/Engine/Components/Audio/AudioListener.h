@@ -18,9 +18,6 @@ namespace DeadFrame2D::Engine
 		TYPE_INFO(AudioListener, ContactEventProvider);
 
 
-		friend class ContactListener;
-
-
 	protected:
 		ComponentHandle<Transform> transform;
 

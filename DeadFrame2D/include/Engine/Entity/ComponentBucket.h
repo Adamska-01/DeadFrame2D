@@ -23,17 +23,10 @@ namespace DeadFrame2D::Engine
 	{
 		friend class Scene;
 
-		friend class GameObject;
-
-		friend class GameComponent;
-
 		template<typename T>
 		friend class ComponentHandle;
-		
-		friend class ComponentHandleBase;
 
-		template<typename T>
-		friend class ObjectHandle;
+		friend class ComponentHandleBase;
 
 
 	private:
@@ -164,7 +157,7 @@ namespace DeadFrame2D::Engine
 	template<typename T>
 	inline void ComponentBucket::RemoveComponent(const ComponentHandle<T>& handle)
 	{
-		auto locked = handle.bucket.lock();
+		auto locked = handle.GetBucket().lock();
 
 		if (locked == nullptr)
 			return;

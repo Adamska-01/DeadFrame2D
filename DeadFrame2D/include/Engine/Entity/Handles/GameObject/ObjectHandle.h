@@ -10,9 +10,6 @@ namespace DeadFrame2D::Engine
 	template<typename T>
 	class ObjectHandle : public ObjectHandleBase
 	{
-		friend class Scene;
-
-
 	private:
 		T* Get() const;
 
@@ -85,12 +82,12 @@ namespace DeadFrame2D::Engine
 	template<typename T>
 	inline ObjectHandle<T> ObjectHandle<T>::ValidateAndReturnHandle(const ObjectHandleBase& base)
 	{
-		auto locked = base.scene.lock();
+		auto baseScene = base.GetSceneHandleProvider();
 
-		if (!locked || !locked->IsValid(base.index, base.generation))
+		if (baseScene == nullptr || !baseScene->IsValid(base.GetIndex(), base.GetGeneration()))
 			return {};
 
-		auto obj = locked->GetAt(base.index);
+		auto obj = baseScene->GetAt(base.GetIndex());
 
 		return obj != nullptr ? ObjectHandle<T>(base) : ObjectHandle<T>();
 	}

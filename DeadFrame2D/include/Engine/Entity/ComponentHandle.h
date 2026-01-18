@@ -13,9 +13,6 @@ namespace DeadFrame2D::Engine
 	template<typename T>
 	class ComponentHandle : public ComponentHandleBase
 	{
-		friend class ComponentBucket;
-
-
 	private:
 		T* Get() const;
 
@@ -74,12 +71,12 @@ namespace DeadFrame2D::Engine
 	template<typename T>
 	inline ComponentHandle<T> ComponentHandle<T>::ValidateAndReturnHandle(const ComponentHandleBase& base)
 	{
-		auto locked = base.bucket.lock();
+		auto baseBucket = base.GetBucket();
 
-		if (!locked || !locked->IsValid(base.index, base.generation))
+		if (baseBucket == nullptr || !baseBucket->IsValid(base.GetIndex(), base.GetGeneration()))
 			return {};
 
-		auto comp = locked->GetAt(base.index);
+		auto comp = baseBucket->GetAt(base.GetIndex());
 
 		if (!comp || !comp->IsA(&T::StaticTypeInfo))
 			return {};

@@ -17,8 +17,6 @@ namespace DeadFrame2D::Engine
 
 	class DF2D_API Scene : public std::enable_shared_from_this<Scene>, public ISceneHandleProvider
 	{
-		friend class ObjectHandleBase;
-
 		friend class GameObject;
 
 
@@ -193,7 +191,7 @@ namespace DeadFrame2D::Engine
 			{
 				if (*it)
 				{
-					stack.push_back((*it).index);
+					stack.push_back((*it).GetIndex());
 				}
 			}
 		}

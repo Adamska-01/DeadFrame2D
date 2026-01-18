@@ -9,6 +9,12 @@ namespace DeadFrame2D::Engine
 {
 	class GameObject;
 
+	template<typename T>
+	class ComponentHandle;
+
+	template<typename T>
+	class ObjectHandle;
+
 
 	/**
 	 * @brief Backend container that stores component metadata such as its handles,

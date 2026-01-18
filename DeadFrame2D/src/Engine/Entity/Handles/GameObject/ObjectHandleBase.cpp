@@ -60,4 +60,19 @@ namespace DeadFrame2D::Engine
 
 		return *this;
 	}
+
+	const ISceneHandleProvider* ObjectHandleBase::GetSceneHandleProvider() const noexcept
+	{
+		return scene.expired() ? nullptr : scene.lock().get();
+	}
+
+	uint32_t ObjectHandleBase::GetIndex() const noexcept
+	{
+		return index;
+	}
+
+	uint32_t ObjectHandleBase::GetGeneration() const noexcept
+	{
+		return generation;
+	}
 }
