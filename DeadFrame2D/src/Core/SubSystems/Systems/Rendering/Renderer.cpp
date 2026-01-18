@@ -1,4 +1,5 @@
 #include "Constants/MathConstants.h"
+#include "Constants/Rendering/DrawConstants.h"
 #include "Core/Debugging/Debug.h"
 #include "Core/SubSystems/Systems/Rendering/Renderer.h"
 #include "Core/SubSystems/Systems/Rendering/RenderPipeline.h"
@@ -189,8 +190,7 @@ namespace DeadFrame2D::Core
 			return;
 
 		// Increase segments for smoother circles
-		// TODO: Make this a constant somewhere
-		const auto segments = 64;
+		const auto segments = DrawConstants::CIRCLE_SEGMENTS;
 
 		if (filled)
 		{
