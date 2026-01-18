@@ -5,7 +5,7 @@
 namespace DeadFrame2D::Engine
 {
 	using namespace DeadFrame2D::Core;
-	using namespace DeadFrame2D::Converters;
+	using namespace DeadFrame2D::Internal;
 	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Utilities;
 
