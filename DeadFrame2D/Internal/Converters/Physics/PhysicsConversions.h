@@ -6,7 +6,7 @@
 #include <cassert>
 
 
-namespace DeadFrame2D::Converters::Physics
+namespace DeadFrame2D::Internal::Physics
 {
 	/**
 	 * @brief Converts a custom BodyType2D to Box2D's b2BodyType.
