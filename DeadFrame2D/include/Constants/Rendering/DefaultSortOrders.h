@@ -1,5 +1,4 @@
 #pragma once
-#include <SDL_pixels.h>
 
 
 namespace DeadFrame2D::Constants::DefaultSortOrders
