@@ -37,6 +37,9 @@ namespace DeadFrame2D::Engine
 
 		T& operator*() const;
 
+		T* operator()() const;
+
+
 		template<typename U, std::enable_if_t<std::is_base_of_v<U, T>, int> = 0>
 		operator ObjectHandle<U>() const;
 
@@ -120,6 +123,13 @@ namespace DeadFrame2D::Engine
 	{
 		return *Get();
 	}
+
+	template<typename T>
+	inline T* ObjectHandle<T>::operator()() const
+	{
+		return Get();
+	}
+
 
 	template<typename T>
 	template<typename U, std::enable_if_t<std::is_base_of_v<U, T>, int>>
