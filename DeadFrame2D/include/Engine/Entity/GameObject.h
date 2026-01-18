@@ -1,7 +1,6 @@
 #pragma once
 #include "Core/Coroutines/Task.h"
 #include "DF2D_API.h"
-#include "Engine/Entity/Abstractions/IObject.h"
 #include "Engine/Entity/ComponentHandle.h"
 #include "Engine/Entity/GameObjectNotifier.h"
 #include <memory>
@@ -16,7 +15,7 @@ namespace DeadFrame2D::Engine
 	class ComponentBucket;
 
 
-	class DF2D_API GameObject : public IObject, public GameObjectNotifier
+	class DF2D_API GameObject : public GameObjectNotifier
 	{
 		friend class Scene;
 
@@ -53,17 +52,6 @@ namespace DeadFrame2D::Engine
 		virtual ~GameObject() override = default;
 
 
-		virtual void Init() override;
-
-		virtual void Start() override;
-
-		virtual void Update(float deltaTime) override;
-
-		virtual void LateUpdate(float deltaTime) override;
-
-		virtual void Draw() override;
-
-
 		template<typename T, typename ...Args>
 		static ObjectHandle<T> Instantiate(Args&&... args);
 
@@ -89,8 +77,6 @@ namespace DeadFrame2D::Engine
 		template<typename T>
 		void RemoveComponent(const ComponentHandle<T>& handle);
 
-		void AddChildGameObject(ObjectHandle<GameObject> child);
-
 		bool IsChildOf(ObjectHandle<GameObject> potentialChild, bool recursive = false) const;
 
 		void Destroy();
@@ -103,6 +89,8 @@ namespace DeadFrame2D::Engine
 		bool IsActive() const;
 
 		void SetActive(bool value);
+
+		void SetParent(ObjectHandle<GameObject> child);
 	};
 }
 

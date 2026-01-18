@@ -1,7 +1,7 @@
 #include "Engine/Components/Transform.h"
 #include "Engine/EngineEvents/EventDispatcher.h"
-#include "Engine/EngineEvents/Events/GameObjectEvents/ChildGameObjectAddedEvent.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
+#include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectHierarchyChangeEvent.h"
 #include "Engine/Entity/GameObject.h"
 #include "Engine/SceneSystem/Scene.h"
 #include "Engine/SceneSystem/SceneManager.h"
@@ -68,159 +68,6 @@ namespace DeadFrame2D::Engine
 		// Meant for prefabs/blueprints
 	}
 
-	void GameObject::Init()
-	{
-		if (isInitialized)
-			return;
-
-		componentBucket->ForEach([](GameComponent& comp) 
-		{
-			comp.Init();
-		});
-
-		isInitialized = true;
-	}
-
-	void GameObject::Start()
-	{
-		componentBucket->ForEach([](GameComponent& comp)
-		{
-			comp.Start();
-		});
-	}
-
-	void GameObject::Update(float deltaTime)
-	{
-		componentBucket->ForEach([deltaTime](GameComponent& comp)
-		{
-			if (!comp.IsActive())
-				return;
-
-			comp.Update(deltaTime);
-		});
-
-		for (const auto& child : children)
-		{
-			if (child == nullptr || !child->IsActive())
-				continue;
-
-			child->Update(deltaTime);
-		}
-	}
-
-	void GameObject::LateUpdate(float deltaTime)
-	{
-		componentBucket->ForEach([deltaTime](GameComponent& comp)
-		{
-			if (!comp.IsActive())
-				return;
-
-			comp.LateUpdate(deltaTime);
-		});
-
-		for (const auto& child : children)
-		{
-			if (child == nullptr || !child->IsActive())
-				continue;
-
-			child->LateUpdate(deltaTime);
-		}
-	}
-
-	void GameObject::Draw()
-	{
-		componentBucket->ForEach([](GameComponent& comp)
-		{
-			if (!comp.IsActive())
-				return;
-
-			comp.Draw();
-		});
-
-		for (const auto& child : children)
-		{
-			if (child == nullptr || !child->IsActive())
-				continue;
-
-			child->Draw();
-		}
-	}
-
-	void GameObject::AddChildGameObject(ObjectHandle<GameObject> child)
-	{
-		if (child == nullptr)
-			return;
-
-		// Step 1: Cache world transform before parenting
-		auto transform = child->GetTransform();
-	
-		auto worldPos = transform->GetWorldPosition();
-		auto worldScale = transform->GetWorldScale();
-		auto worldRot = transform->GetWorldRotation();
-
-		// Step 2: Remove from previous parent
-		auto parentPtr = child->parent;
-		if (parentPtr != nullptr)
-		{
-			auto& siblings = parentPtr->children;
-
-			siblings.erase(
-				std::remove_if(siblings.begin(), siblings.end(),
-					[&](const ObjectHandle<GameObject>& sibling)
-					{
-						return sibling != nullptr && sibling == child;
-					}),
-				siblings.end());
-		}
-
-		// Step 3: Reparent
-		child->parent = thisGameObject;
-		children.push_back(child);
-
-		// Step 4: Convert world transform back to local under new parent
-		transform->SetWorldPosition(worldPos);
-		transform->SetWorldScale(worldScale);
-		transform->SetWorldRotation(worldRot);
-
-		// Propagate active state
-		child->hasActiveParent = IsActive();
-		PropagateActiveStateToChildren();
-
-		EventDispatcher::SendEvent(std::make_shared<ChildGameObjectAddedEvent>(child));
-
-		ObjectHandle<GameObject> current = thisGameObject;
-		while (current != nullptr)
-		{
-			current->OnChildGameObjectAdded.Broadcast(child);
-
-			current = current->parent;
-		}
-
-		std::stack<ObjectHandle<GameObject>> stack;
-
-		// Push all direct children initially
-		for (auto& child : thisGameObject->children)
-		{
-			stack.push(child);
-		}
-
-		while (!stack.empty())
-		{
-			ObjectHandle<GameObject> current = stack.top();
-			
-			stack.pop();
-
-			// Notify the current child
-			current->OnParentGameObjectChanged.Broadcast(thisGameObject);
-
-			// Push this child's children onto the stack
-			for (auto& child : current->children)
-			{
-				stack.push(child);
-			}
-		}
-	}
-
 	bool GameObject::IsChildOf(ObjectHandle<GameObject> potentialChild, bool recursive) const
 	{
 		if (potentialChild == nullptr)
@@ -243,19 +90,12 @@ namespace DeadFrame2D::Engine
 		if (isDestroyed)
 			return;
 
-		isDestroyed = true;
-
-		EventDispatcher::SendEvent(std::make_shared<GameObjectDestroyedEvent>(thisGameObject));
-
 		if (parent != nullptr)
 		{
-			auto it = std::find_if(
+			auto it = std::find(
 				parent->children.begin(),
 				parent->children.end(),
-				[this](const ObjectHandle<GameObject>& child)
-				{
-					return child == thisGameObject;
-				});
+				thisGameObject);
 
 			if (it != parent->children.end())
 			{
@@ -263,7 +103,8 @@ namespace DeadFrame2D::Engine
 			}
 		}
 
-		ObjectHandle<GameObject> current = thisGameObject->parent;
+		ObjectHandle<GameObject> current = parent;
+
 		while (current != nullptr)
 		{
 			current->OnChildDestroyed.Broadcast(thisGameObject);
@@ -278,6 +119,10 @@ namespace DeadFrame2D::Engine
 
 			child->Destroy();
 		}
+
+		EventDispatcher::SendEvent(std::make_shared<GameObjectDestroyedEvent>(thisGameObject));
+
+		isDestroyed = true;
 	}
 
 	Task GameObject::Destroy(float delaySeconds)
@@ -330,5 +175,79 @@ namespace DeadFrame2D::Engine
 			child->hasActiveParent = newState;
 			child->PropagateActiveStateToChildren();
 		}
+	}
+
+	void GameObject::SetParent(ObjectHandle<GameObject> newParent)
+	{
+		if (parent == newParent)
+			return;
+
+		// Cache transform before reparenting
+		auto transform = GetTransform()();
+
+		const auto worldPos = transform->GetWorldPosition();
+		const auto worldScale = transform->GetWorldScale();
+		const auto worldRot = transform->GetWorldRotation();
+
+		// Detach from old parent
+		if (parent != nullptr)
+		{
+			auto& siblings = parent->children;
+
+			siblings.erase(
+				std::remove_if(
+					siblings.begin(),
+					siblings.end(),
+					[&](const auto& obj)
+					{
+						return obj == thisGameObject;
+					}),
+				siblings.end());
+		}
+
+		auto oldParent = parent;
+
+		// Attach to new parent
+		parent = newParent;
+		newParent->children.push_back(thisGameObject);
+
+		// Restore world transform
+		transform->SetWorldPosition(worldPos);
+		transform->SetWorldScale(worldScale);
+		transform->SetWorldRotation(worldRot);
+
+		// Active state propagation
+		hasActiveParent = newParent->IsActive();
+		PropagateActiveStateToChildren();
+
+		// Notify parents up the chain
+		for (auto current = newParent; current != nullptr; current = current->parent)
+		{
+			current->OnChildGameObjectAdded.Broadcast(thisGameObject);
+		}
+
+		// Notify children of parent change
+		std::stack<ObjectHandle<GameObject>> stack;
+		for (auto& child : children)
+		{
+			stack.push(child);
+		}
+
+		while (!stack.empty())
+		{
+			ObjectHandle<GameObject> current = stack.top();
+			
+			stack.pop();
+
+			current->OnParentGameObjectChanged.Broadcast(newParent);
+
+			for (auto& c : current->children)
+			{
+				stack.push(c);
+			}
+		}
+
+		// Event
+		EventDispatcher::SendEvent(std::make_shared<GameObjectHierarchyChangeEvent>(thisGameObject, oldParent, newParent));
 	}
 }
