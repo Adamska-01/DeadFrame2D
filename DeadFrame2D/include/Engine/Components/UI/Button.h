@@ -39,18 +39,18 @@ namespace DeadFrame2D::Engine
 		SDL_Color pressedFillColor;
 
 
+		std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
+
+
 	public:
 		Button(const DeadFrame2D::Data::ButtonComponentModel& buttonConfiguration);
 
 		virtual ~Button() override = default;
 
 
-		virtual std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
+		void Init() override;
 
-
-		virtual void Init() override;
-
-		virtual void Draw() override;
+		void Draw() override;
 
 
 		virtual void OnPointerEnter() override;

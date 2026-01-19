@@ -42,10 +42,10 @@ namespace DeadFrame2D::Core
 		void EndDraw() override;
 
 
-	public:
 		std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
 
 
+	public:
 		static SDL_Window* GetWindow();
 
 		static Vector2I GetResolution();

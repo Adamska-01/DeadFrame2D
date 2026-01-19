@@ -64,10 +64,10 @@ namespace DeadFrame2D::Core
 		void EndDraw() override;
 
 
-	public:
 		std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
 
 
+	public:
 		// TODO: Create a wrapper around all these managers that exposes only the client API
 		static DeviceManager* Devices();
 
