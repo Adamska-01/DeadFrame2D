@@ -2,6 +2,7 @@
 #include "Core/SubSystems/Systems/Rendering/Renderer.h"
 #include "Core/SubSystems/Systems/TextureManager.h"
 #include "Data/Rendering/Pipeline/RenderTask.h"
+#include <algorithm>
 #include <Constants/ResourcePaths.h>
 #include <Models/Other/SplashScreenConfig.h>
 #include <Models/SystemConfig.h>
@@ -55,6 +56,7 @@ namespace DeadFrame2D::Core
 		auto splashScreenConfig = Shared::Tools::DeserializeFromFile<SplashScreenConfig>(Paths::Files::SPLASH_SCREEN_CONFIGURATION);
 
 		constexpr uint8_t MaxAlpha = 255;
+
 		auto fadeInDuration = splashScreenConfig.fadeInDurationSeconds;
 		auto holdDuration = splashScreenConfig.holdVisibleDurationSeconds;
 		auto fadeOutDuration = splashScreenConfig.fadeOutDurationSeconds;
@@ -84,24 +86,21 @@ namespace DeadFrame2D::Core
 			if (const auto ecode = eventManager.ProcessEvents())
 				return *ecode;
 
-			auto deltaTime = frameTimer.DeltaTime();
+			elapsedTime += frameTimer.DeltaTime();
 
-			elapsedTime += deltaTime;
-
-			auto alpha = MaxAlpha;
+			auto alpha = static_cast<float>(MaxAlpha);
 
 			if (elapsedTime < fadeInDuration)
 			{
-				auto t = elapsedTime / fadeInDuration;
-				alpha = static_cast<uint8_t>(alpha * t);
+				alpha *= elapsedTime / fadeInDuration;
 			}
 			else if (elapsedTime > totalDuration - fadeOutDuration)
 			{
-				auto t = 1.0f - ((elapsedTime - (totalDuration - fadeOutDuration)) / fadeOutDuration);
-				alpha = static_cast<uint8_t>(alpha * t);
+				alpha *= 1.0f - ((elapsedTime - (totalDuration - fadeOutDuration)) / fadeOutDuration);
 			}
 
-			renderData.colorMod.a = alpha;
+			alpha = std::clamp(alpha, 0.0f, 255.0f);
+			renderData.colorMod.a = static_cast<uint8_t>(alpha);
 
 			renderTask.renderData = renderData;
 
