@@ -1,5 +1,4 @@
 #pragma once
-#include "Models/Input/ActionMap/Properties/InputInteraction.h"
 #include "Models/Input/ActionMap/Properties/InputProcessor.h"
 #include "Models/Input/ActionMap/Types/ActionType.h"
 #include "Models/Input/ActionMap/Types/ValueType.h"
@@ -20,8 +19,6 @@ namespace Shared::Models
 
 
 		std::vector<InputProcessor> processors;
-
-		std::vector<InputInteraction> interactions;
 	};
 
 
@@ -35,10 +32,6 @@ namespace Shared::Models
 		{
 			j["processors"] = a.processors;
 		}
-		if (!a.interactions.empty())
-		{
-			j["interactions"] = a.interactions;
-		}
 	}
 
 	inline void from_json(const nlohmann::json& j, InputAction& a)
@@ -50,10 +43,6 @@ namespace Shared::Models
 		if (j.contains("processors"))
 		{
 			a.processors = j.at("processors").get<std::vector<InputProcessor>>();
-		}
-		if (j.contains("interactions"))
-		{
-			a.interactions = j.at("interactions").get<std::vector<InputInteraction>>();
 		}
 	}
 }
