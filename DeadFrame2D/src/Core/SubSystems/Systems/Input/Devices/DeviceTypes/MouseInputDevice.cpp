@@ -1,39 +1,31 @@
 #include "Constants/Input/DefaultDeviceIDs.h"
 #include "Constants/Input/DefaultDeviceNames.h"
-#include "Core/SubSystems/Systems/Input/Actions/InputActionResolver.h"
+#include "Converters/Input/MouseButtonConversions.h"
+#include "Core/SubSystems/Systems/Input/Actions/Abstractions/IInputActionHandler.h"
 #include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/MouseInputDevice.h"
-#include "Core/SubSystems/Systems/Input/Input.h"
+#include <SDL_events.h>
 
 
 namespace DeadFrame2D::Core
 {
 	using namespace DeadFrame2D::Constants;
 	using namespace DeadFrame2D::Data;
+	using namespace DeadFrame2D::Internal;
 
 	using namespace Shared::Models;
 
 
-	MouseInputDevice::MouseInputDevice()
-		: InputDevice(DefaultDeviceNames::MOUSE)
+	MouseInputDevice::MouseInputDevice(IInputActionHandler* actionHandler)
+		: InputDevice(DefaultDeviceNames::MOUSE, actionHandler)
 	{
 		buttonStates.fill({});
+		axisStates.fill({});
 	}
 
-	InputDeviceType MouseInputDevice::Type() const
-	{
-		return InputDeviceType::MOUSE;
-	}
-
-	InputDeviceID MouseInputDevice::ID() const
-	{
-		return DefaultDeviceIDs::MOUSE;
-	}
 
 	void MouseInputDevice::BeginFrame()
 	{
-		auto actionsFrameManagement = static_cast<IInputActionsFrameManagement*>(Input::Actions());
-
-		for (auto& controlID : activeControlIDs)
+		for (auto& controlID : activeButtonIDs)
 		{
 			auto& state = buttonStates[controlID];
 
@@ -43,7 +35,7 @@ namespace DeadFrame2D::Core
 				state.pressed = false;
 				state.held = true;
 
-				actionsFrameManagement->ProcessBinding(*this, controlID);
+				actionHandler->ProcessBinding(*this, InputControlType::DIGITAL, controlID);
 			}
 
 			// released is true only the frame the key was released
@@ -51,26 +43,60 @@ namespace DeadFrame2D::Core
 			{
 				state.released = false;
 
-				actionsFrameManagement->ProcessBinding(*this, controlID);
+				actionHandler->ProcessBinding(*this, InputControlType::DIGITAL, controlID);
 			}
 		}
 
-		activeControlIDs.clear();
+		activeButtonIDs.clear();
 
+		// Axes
+		for (auto i = 0; i < static_cast<int>(MouseAxisCode::COUNT_MAX); i++)
+		{
+			auto& state = axisStates[i];
 
-		mouseDelta.x = 0.0f;
-		mouseDelta.y = 0.0f;
+			if (state.value != 0.0f)
+			{
+				if (!state.held && !state.pressed)
+				{
+					// first frame of movement
+					state.pressed = true;
+					state.held = false;
+					state.released = false;
+				}
+				else
+				{
+					// subsequent frames
+					state.pressed = false;
+					state.held = true;
+					state.released = false;
+				}
 
-		wheelDelta.x = 0.0f;
-		wheelDelta.y = 0.0f;
+				actionHandler->ProcessBinding(*this, InputControlType::ANALOG, static_cast<int>(i));
+			}
+			else
+			{
+				if (state.held || state.pressed)
+				{
+					// first frame of stopping
+					state.released = true;
+					state.pressed = false;
+					state.held = false;
 
-		wasMotionThisFrame = false;
+					actionHandler->ProcessBinding(*this, InputControlType::ANALOG, static_cast<int>(i));
+				}
+				else
+				{
+					state.released = false;
+				}
+			}
+
+			// Reset delta for next frame
+			state.value = 0.0f;
+		}
 	}
 
 	void MouseInputDevice::ProcessEvent(const SDL_Event& event)
 	{
-		auto actionsFrameManagement = static_cast<IInputActionsFrameManagement*>(Input::Actions());
-
 		switch (event.type)
 		{
 			case SDL_EventType::SDL_MOUSEBUTTONDOWN:
@@ -86,9 +112,9 @@ namespace DeadFrame2D::Core
 					state.held = false;
 					state.released = false;
 
-					activeControlIDs.insert(controlID);
+					activeButtonIDs.insert(controlID);
 
-					actionsFrameManagement->ProcessBinding(*this, controlID);
+					actionHandler->ProcessBinding(*this, InputControlType::DIGITAL, controlID);
 				}
 
 				break;
@@ -104,44 +130,123 @@ namespace DeadFrame2D::Core
 				state.held = false;
 				state.released = true;
 
-				activeControlIDs.insert(controlID);
+				activeButtonIDs.insert(controlID);
 
-				actionsFrameManagement->ProcessBinding(*this, controlID);
-				
+				actionHandler->ProcessBinding(*this, InputControlType::DIGITAL, controlID);
+
 				break;
 			}
 
 			case SDL_EventType::SDL_MOUSEMOTION:
-				mouseDelta.x += event.motion.xrel;
-				mouseDelta.y += event.motion.yrel;
+			{
+				auto& motionX = axisStates[static_cast<int>(MouseAxisCode::MOTION_X)];
+				auto& motionY = axisStates[static_cast<int>(MouseAxisCode::MOTION_Y)];
 
-				wasMotionThisFrame = true;
+				motionX.value += event.motion.xrel;
+				motionY.value += event.motion.yrel;
+
+				// pressed/held detection for X
+				if (motionX.value != 0.0f)
+				{
+					if (!motionX.held && !motionX.pressed)
+					{
+						motionX.pressed = true;
+						motionX.held = false;
+						motionX.released = false;
+
+						actionHandler->ProcessBinding(*this, InputControlType::ANALOG, static_cast<int>(MouseAxisCode::MOTION_Y));
+					}
+					else
+					{
+						motionX.pressed = false;
+						motionX.held = true;
+					}
+				}
+
+				// pressed/held detection for Y
+				if (motionY.value != 0.0f)
+				{
+					if (!motionY.held && !motionY.pressed)
+					{
+						motionY.pressed = true;
+						motionY.held = false;
+						motionY.released = false;
+
+						actionHandler->ProcessBinding(*this, InputControlType::ANALOG, static_cast<int>(MouseAxisCode::MOTION_Y));
+					}
+					else
+					{
+						motionY.pressed = false;
+						motionY.held = true;
+					}
+				}
 
 				break;
+			}
 
 			case SDL_EventType::SDL_MOUSEWHEEL:
-				wheelDelta.x += (float)event.wheel.x;
-				wheelDelta.y += (float)event.wheel.y;
+			{
+				auto& wheelX = axisStates[static_cast<int>(MouseAxisCode::WHEEL_X)];
+				auto& wheelY = axisStates[static_cast<int>(MouseAxisCode::WHEEL_Y)];
+
+				wheelX.value += event.wheel.x;
+				wheelY.value += event.wheel.y;
 
 				break;
+			}
 		}
 	}
 
-	InputControlState MouseInputDevice::GetKeyState(int controlId) const
+	InputControlState MouseInputDevice::GetButtonState(int buttonID) const
 	{
-		if (controlId >= 1 && controlId < (int)buttonStates.size()) 
-			return buttonStates[controlId];
+		if (buttonID >= 0 && buttonID < (int)buttonStates.size())
+			return buttonStates[buttonID];
 
 		return {};
 	}
 
+	InputControlState MouseInputDevice::GetAxisState(int axisID) const
+	{
+		if (axisID >= 0 && axisID < (int)axisStates.size())
+			return axisStates[axisID];
+
+		return {};
+	}
+
+
+	InputDeviceType MouseInputDevice::Type() const
+	{
+		return InputDeviceType::MOUSE;
+	}
+
+	InputDeviceID MouseInputDevice::ID() const
+	{
+		return DefaultDeviceIDs::MOUSE;
+	}
+
+	InputControlState MouseInputDevice::GetButtonState(MouseButtonCode code) const
+	{
+		auto sdlCode = static_cast<int>(MouseButtonConversions::ToSDLMouseButton(code));
+
+		return GetButtonState(sdlCode);
+	}
+
+	InputControlState MouseInputDevice::GetAxisState(Shared::Models::MouseAxisCode code) const
+	{
+		return GetAxisState(static_cast<int>(code));
+	}
+
 	Vector2F MouseInputDevice::GetMouseDelta() const
 	{
-		return mouseDelta;
+		return Vector2F(
+			axisStates[static_cast<int>(MouseAxisCode::MOTION_X)].value,
+			axisStates[static_cast<int>(MouseAxisCode::MOTION_Y)].value);
 	}
 
 	Vector2F MouseInputDevice::GetWheelDelta() const
 	{
-		return wheelDelta;
+		return Vector2F(
+			axisStates[static_cast<int>(MouseAxisCode::WHEEL_X)].value,
+			axisStates[static_cast<int>(MouseAxisCode::WHEEL_Y)].value);
 	}
 }

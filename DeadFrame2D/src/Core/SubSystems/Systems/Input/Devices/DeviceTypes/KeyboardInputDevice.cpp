@@ -1,38 +1,29 @@
 #include "Constants/Input/DefaultDeviceIDs.h"
 #include "Constants/Input/DefaultDeviceNames.h"
-#include "Core/SubSystems/Systems/Input/Actions/InputActionResolver.h"
+#include "Converters/Input/KeyboardKeyCodeConversions.h"
+#include "Core/SubSystems/Systems/Input/Actions/Abstractions/IInputActionHandler.h"
 #include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/KeyboardInputDevice.h"
-#include "Core/SubSystems/Systems/Input/Input.h"
+#include <SDL_events.h>
 
 
 namespace DeadFrame2D::Core
 {
 	using namespace DeadFrame2D::Constants;
 	using namespace DeadFrame2D::Data;
+	using namespace DeadFrame2D::Internal;
 
 	using namespace Shared::Models;
 
 
-	KeyboardInputDevice::KeyboardInputDevice()
-		: InputDevice(DefaultDeviceNames::KEYBOARD)
+	KeyboardInputDevice::KeyboardInputDevice(IInputActionHandler* actionHandler)
+		: InputDevice(DefaultDeviceNames::KEYBOARD, actionHandler)
 	{
-		states.fill({});
+		states = std::vector<DeadFrame2D::Data::InputControlState>(SDL_NUM_SCANCODES);
 	}
 
-	InputDeviceType KeyboardInputDevice::Type() const
-	{
-		return InputDeviceType::KEYBOARD;
-	}
-
-	InputDeviceID KeyboardInputDevice::ID() const
-	{
-		return DefaultDeviceIDs::KEYBOARD;
-	}
 
 	void KeyboardInputDevice::BeginFrame()
 	{
-		auto actionsFrameManagement = static_cast<IInputActionsFrameManagement*>(Input::Actions());
-
 		for (auto& controlID : activeControlIDs)
 		{
 			auto& state = states[controlID];
@@ -43,7 +34,7 @@ namespace DeadFrame2D::Core
 				state.pressed = false;
 				state.held = true;
 
-				actionsFrameManagement->ProcessBinding(*this, controlID);
+				actionHandler->ProcessBinding(*this, InputControlType::DIGITAL, controlID);
 			}
 
 			// released is true only the frame the key was released
@@ -51,7 +42,7 @@ namespace DeadFrame2D::Core
 			{
 				state.released = false;
 			
-				actionsFrameManagement->ProcessBinding(*this, controlID);
+				actionHandler->ProcessBinding(*this, InputControlType::DIGITAL, controlID);
 			}
 		}
 
@@ -60,8 +51,6 @@ namespace DeadFrame2D::Core
 
 	void KeyboardInputDevice::ProcessEvent(const SDL_Event& event)
 	{
-		auto actionsFrameManagement = static_cast<IInputActionsFrameManagement*>(Input::Actions());
-		
 		auto eventType = event.type;
 
 		switch (eventType)
@@ -81,7 +70,7 @@ namespace DeadFrame2D::Core
 
 					activeControlIDs.insert(controlID);
 
-					actionsFrameManagement->ProcessBinding(*this, controlID);
+					actionHandler->ProcessBinding(*this, InputControlType::DIGITAL, controlID);
 				}
 
 				break;
@@ -98,7 +87,7 @@ namespace DeadFrame2D::Core
 
 				activeControlIDs.insert(controlID);
 				
-				actionsFrameManagement->ProcessBinding(*this, controlID);
+				actionHandler->ProcessBinding(*this, InputControlType::DIGITAL, controlID);
 
 				break;
 			}
@@ -108,11 +97,35 @@ namespace DeadFrame2D::Core
 		}
 	}
 
-	InputControlState KeyboardInputDevice::GetKeyState(int controlID) const
+	InputControlState KeyboardInputDevice::GetButtonState(int buttonID) const
 	{
-		if (controlID < 0 || controlID >= SDL_Scancode::SDL_NUM_SCANCODES)
+		if (buttonID < 0 || buttonID >= SDL_Scancode::SDL_NUM_SCANCODES)
 			return {};
 
-		return states[controlID];
+		return states[buttonID];
+	}
+
+	InputControlState KeyboardInputDevice::GetAxisState(int axisID) const
+	{
+		// Axes are user-defined on keyboard (actions)
+		return {};
+	}
+
+
+	InputDeviceType KeyboardInputDevice::Type() const
+	{
+		return InputDeviceType::KEYBOARD;
+	}
+
+	InputDeviceID KeyboardInputDevice::ID() const
+	{
+		return DefaultDeviceIDs::KEYBOARD;
+	}
+
+	InputControlState KeyboardInputDevice::GetButtonState(KeyboardKeyCode code) const
+	{
+		auto sdlCode = static_cast<int>(KeyboardKeyCodeConversions::ToSDLScancode(code));
+
+		return GetButtonState(sdlCode);
 	}
 }

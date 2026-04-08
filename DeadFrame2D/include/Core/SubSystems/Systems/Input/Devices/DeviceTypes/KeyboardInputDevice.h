@@ -1,7 +1,8 @@
 #pragma once
 #include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/Abstractions/InputDevice.h"
 #include "DF2D_API.h"
-#include <array>
+#include <vector>
+#include <Models/Input/Controls/KeyboardKeyCode.h>
 #include <unordered_set>
 
 
@@ -13,15 +14,24 @@ namespace DeadFrame2D::Core
 	class DF2D_API KeyboardInputDevice : public InputDevice
 	{
 	private:
-		std::array<DeadFrame2D::Data::InputControlState, SDL_Scancode::SDL_NUM_SCANCODES> states;
+		std::vector<DeadFrame2D::Data::InputControlState> states;
 
-		std::unordered_set<SDL_Scancode> activeControlIDs;
+		std::unordered_set<uint16_t> activeControlIDs;
+
+
+		void BeginFrame() override;
+
+		void ProcessEvent(const SDL_Event& event) override;
+
+		DeadFrame2D::Data::InputControlState GetButtonState(int buttonID) const override;
+
+		DeadFrame2D::Data::InputControlState GetAxisState(int axisID) const override;
 
 
 	public:
-		KeyboardInputDevice();
+		KeyboardInputDevice(IInputActionHandler* actionHandler);
 
-		virtual ~KeyboardInputDevice() override = default;
+		~KeyboardInputDevice() override = default;
 
 
 		Shared::Models::InputDeviceType Type() const override;
@@ -29,10 +39,6 @@ namespace DeadFrame2D::Core
 		DeadFrame2D::Data::InputDeviceID ID() const override;
 
 
-		void BeginFrame() override;
-
-		void ProcessEvent(const SDL_Event& event) override;
-
-		DeadFrame2D::Data::InputControlState GetKeyState(int controlID) const override;
+		DeadFrame2D::Data::InputControlState GetButtonState(Shared::Models::KeyboardKeyCode code) const;
 	};
 }

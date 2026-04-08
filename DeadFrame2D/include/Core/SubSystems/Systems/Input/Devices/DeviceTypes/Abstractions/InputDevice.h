@@ -3,12 +3,16 @@
 #include "Data/Input/InputDeviceID.h"
 #include "DF2D_API.h"
 #include <Models/Input/InputDeviceType.h>
-#include <SDL_events.h>
 #include <string>
+
+
+union SDL_Event;
 
 
 namespace DeadFrame2D::Core
 {
+	class IInputActionHandler;
+
 	/**
 	 * @brief Base for all input devices (keyboard, mouse, controller).
 	 *
@@ -20,9 +24,11 @@ namespace DeadFrame2D::Core
 	protected: 
 		std::string name;
 
+		IInputActionHandler* actionHandler;
+
 
 	public:
-		InputDevice(const char* name);
+		InputDevice(const char* name, IInputActionHandler* actionHandler);
 
 		virtual ~InputDevice() = default;
 
@@ -47,8 +53,13 @@ namespace DeadFrame2D::Core
 		virtual void ProcessEvent(const SDL_Event& event) = 0;
 
 		/**
-		 * Query key state by the integer key id (platform-defined). 
+		 * Digital input (keyboard keys, controller buttons).
 		 */
-		virtual DeadFrame2D::Data::InputControlState GetKeyState(int controlID) const = 0;
+		virtual DeadFrame2D::Data::InputControlState GetButtonState(int buttonID) const = 0;
+
+		/**
+		 * Analog input (controller sticks, triggers, mouse delta, etc.).
+		 */
+		virtual DeadFrame2D::Data::InputControlState GetAxisState(int axisID) const = 0;
 	};
 }
