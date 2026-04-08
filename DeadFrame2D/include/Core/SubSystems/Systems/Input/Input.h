@@ -1,5 +1,4 @@
 #pragma once
-#include "Core/CoreEvents/Abstractions/IEventProcessor.h"
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
 #include "DF2D_API.h"
 #include <memory>
@@ -13,12 +12,14 @@ namespace DeadFrame2D::Engine
 
 namespace DeadFrame2D::Core
 {
-	class InputActionResolver;
+	class IInputFrameLifecycle;
+	class IInputActions;
+	class IInputActionHandler;
+	class IInputDeviceProvider;
 	class InputUserManager;
-	class DeviceManager;
 
 
-	class DF2D_API Input : public IEventProcessor, public ISubSystem
+	class DF2D_API Input : public ISubSystem
 	{
 		friend class SubSystemManager;
 
@@ -39,9 +40,15 @@ namespace DeadFrame2D::Core
 		Input& operator=(Input&&) = delete;
 
 
-		std::shared_ptr<InputActionResolver> inputActionResolver;
+		std::shared_ptr<IInputFrameLifecycle> actionsFrameLifecycle;
 
-		std::shared_ptr<DeviceManager> deviceManager;
+		std::shared_ptr<IInputActions> actions;
+
+		std::shared_ptr<IInputActionHandler> actionsHandler;
+
+		std::shared_ptr<IInputFrameLifecycle> deviceFrameLifecycle;
+
+		std::shared_ptr<IInputDeviceProvider> deviceProvider;
 
 		std::shared_ptr<InputUserManager> userManager;
 
@@ -64,15 +71,11 @@ namespace DeadFrame2D::Core
 		void EndDraw() override;
 
 
-		std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
-
-
 	public:
-		// TODO: Create a wrapper around all these managers that exposes only the client API
-		static DeviceManager* Devices();
+		static IInputDeviceProvider* Devices();
 
 		static InputUserManager* Users();
 
-		static InputActionResolver* Actions();
+		static IInputActions* Actions();
 	};
 }

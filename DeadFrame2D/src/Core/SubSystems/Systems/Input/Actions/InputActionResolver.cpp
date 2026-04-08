@@ -1,3 +1,6 @@
+#include "Converters/Input/ControllerButtonConversions.h"
+#include "Converters/Input/KeyboardKeyCodeConversions.h"
+#include "Converters/Input/MouseButtonConversions.h"
 #include "Core/SubSystems/Systems/Input/Actions/InputActionResolver.h"
 #include "Core/SubSystems/Systems/Input/Actions/RuntimeActionMap.h"
 #include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/Abstractions/InputDevice.h"
@@ -19,6 +22,7 @@ namespace DeadFrame2D::Core
 	using namespace DeadFrame2D::Engine;
 	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Utilities;
+	using namespace DeadFrame2D::Internal;
 
 	using namespace Shared::Constants;
 	using namespace Shared::Models;
@@ -50,38 +54,50 @@ namespace DeadFrame2D::Core
 
 	void InputActionResolver::ResolveSimple(const InputDevice& device, RuntimeInputAction& action, const Binding& binding)
 	{
-		auto keyState = device.GetKeyState(binding.control.value());
+		auto simpleID = std::get<int>(binding.input.value);
+		auto controlType = binding.input.controlType;
+
+		auto state = binding.input.controlType == InputControlType::DIGITAL
+			? device.GetButtonState(ToSDLCode(device, controlType, simpleID))
+			: device.GetAxisState(ToSDLCode(device, controlType, simpleID));
 
 		if (std::holds_alternative<bool>(action.value))
 		{
 			if (!action.isValuePending)
 			{
-				action.pendingValue = keyState.value > 0.5f;
+				action.pendingValue = state.value > 0.5f;
 				action.isValuePending = true;
 			}
 			else
 			{
-				action.pendingValue = std::get<bool>(action.pendingValue) || (keyState.value > 0.5f);
+				action.pendingValue = std::get<bool>(action.pendingValue) || (state.value > 0.5f);
 			}
 		}
 		else if (std::holds_alternative<float>(action.value))
 		{
 			if (!action.isValuePending)
 			{
-				action.pendingValue = keyState.value;
+				action.pendingValue = state.value;
 				action.isValuePending = true;
 			}
 			else
 			{
-				action.pendingValue = std::max(std::get<float>(action.pendingValue), keyState.value);
+				action.pendingValue = std::max(std::get<float>(action.pendingValue), state.value);
 			}
 		}
 	}
 
 	void InputActionResolver::ResolveComposite1D(const InputDevice& device, RuntimeInputAction& action, const Binding& binding)
 	{
-		auto neg = device.GetKeyState(binding.composite1D->negative);
-		auto pos = device.GetKeyState(binding.composite1D->positive);
+		const auto& comp = std::get<Composite1D>(binding.input.value);
+		auto controlType = binding.input.controlType;
+
+		auto neg = binding.input.controlType == InputControlType::DIGITAL
+			? device.GetButtonState(ToSDLCode(device, controlType, comp.negative))
+			: device.GetAxisState(ToSDLCode(device, controlType, comp.negative));
+		auto pos = binding.input.controlType == InputControlType::DIGITAL
+			? device.GetButtonState(ToSDLCode(device, controlType, comp.positive))
+			: device.GetAxisState(ToSDLCode(device, controlType, comp.positive));
 
 		auto value = pos.value - neg.value;
 
@@ -98,10 +114,21 @@ namespace DeadFrame2D::Core
 
 	void InputActionResolver::ResolveComposite2D(const InputDevice& device, RuntimeInputAction& action, const Binding& binding)
 	{
-		auto up = device.GetKeyState(binding.composite2D->up);
-		auto down = device.GetKeyState(binding.composite2D->down);
-		auto left = device.GetKeyState(binding.composite2D->left);
-		auto right = device.GetKeyState(binding.composite2D->right);
+		const auto& comp = std::get<Composite2D>(binding.input.value);
+		auto controlType = binding.input.controlType;
+
+		auto up = binding.input.controlType == InputControlType::DIGITAL 
+			? device.GetButtonState(ToSDLCode(device, controlType, comp.up))
+			: device.GetAxisState(ToSDLCode(device, controlType, comp.up));
+		auto down = binding.input.controlType == InputControlType::DIGITAL 
+			? device.GetButtonState(ToSDLCode(device, controlType, comp.down))
+			: device.GetAxisState(ToSDLCode(device, controlType, comp.down));
+		auto left = binding.input.controlType == InputControlType::DIGITAL
+			? device.GetButtonState(ToSDLCode(device, controlType, comp.left))
+			: device.GetAxisState(ToSDLCode(device, controlType, comp.left));
+		auto right = binding.input.controlType == InputControlType::DIGITAL
+			? device.GetButtonState(ToSDLCode(device, controlType, comp.right))
+			: device.GetAxisState(ToSDLCode(device, controlType, comp.right));
 
 		auto bindingValue = Vector2F(right.value - left.value, up.value - down.value);
 
@@ -113,6 +140,90 @@ namespace DeadFrame2D::Core
 		else if (bindingValue.Magnitude() > std::get<Vector2F>(action.pendingValue).Magnitude())
 		{
 			action.pendingValue = bindingValue;
+		}
+	}
+
+	int InputActionResolver::ToCustomCode(const InputDevice& device, InputControlType inputControlType, int sdlCode)
+	{
+		switch (device.Type())
+		{
+		case InputDeviceType::KEYBOARD:
+		{
+			auto scancode = static_cast<SDL_Scancode>(sdlCode);
+
+			return static_cast<int>(KeyboardKeyCodeConversions::ToKeyboardKeyCode(scancode));
+		}
+
+		case InputDeviceType::MOUSE:
+		{
+			if (inputControlType == InputControlType::DIGITAL)
+				return static_cast<int>(MouseButtonConversions::ToMouseButtonCode(sdlCode));
+
+			return sdlCode;
+		}
+
+		case InputDeviceType::CONTROLLER:
+		{
+			if (inputControlType == InputControlType::DIGITAL)
+			{
+				auto sdlButtonCode = static_cast<SDL_GameControllerButton>(sdlCode);
+
+				return static_cast<int>(ControllerButtonConversions::ToControllerButtonCode(sdlButtonCode));
+			}
+			else
+			{
+				auto sdlAxisCode = static_cast<SDL_GameControllerAxis>(sdlCode);
+
+				return static_cast<int>(ControllerButtonConversions::ToControllerAxisCode(sdlAxisCode));
+			}
+		}
+
+		default:
+			return sdlCode;
+		}
+	}
+
+	int InputActionResolver::ToSDLCode(const InputDevice& device, InputControlType inputControlType, int customCode)
+	{
+		switch (device.Type())
+		{
+		case InputDeviceType::KEYBOARD:
+		{
+			auto keyCode = static_cast<KeyboardKeyCode>(customCode);
+
+			return static_cast<int>(KeyboardKeyCodeConversions::ToSDLScancode(keyCode));
+		}
+
+		case InputDeviceType::MOUSE:
+		{
+			if (inputControlType == InputControlType::DIGITAL)
+			{
+				auto buttonCode = static_cast<MouseButtonCode>(customCode);
+
+				return static_cast<int>(MouseButtonConversions::ToSDLMouseButton(buttonCode));
+			}
+
+			return customCode;
+		}
+
+		case InputDeviceType::CONTROLLER:
+		{
+			if (inputControlType == InputControlType::DIGITAL)
+			{
+				auto buttonCode = static_cast<ControllerButtonCode>(customCode);
+
+				return static_cast<int>(ControllerButtonConversions::ToSDLControllerButton(buttonCode));
+			}
+			else
+			{
+				auto axisCode = static_cast<ControllerAxisCode>(customCode);
+
+				return static_cast<int>(ControllerButtonConversions::ToSDLControllerAxis(axisCode));
+			}
+		}
+
+		default:
+			return customCode;
 		}
 	}
 
@@ -154,21 +265,27 @@ namespace DeadFrame2D::Core
 				for (auto& binding : action.bindings)
 				{
 					const auto& mapName = map->Name();
-					const auto device = binding.device;
+					const auto deviceType = binding.input.inputDeviceType;
+					const auto controlType = binding.input.controlType;
 
-					switch (binding.type)
+					switch (binding.input.bindingType)
 					{
 						case BindingType::SIMPLE:
 						{
-							auto key = std::make_tuple(mapName, device, binding.control.value());
+							auto controlID = std::get<int>(binding.input.value);
+
+							auto key = std::make_tuple(mapName, deviceType, controlType, controlID);
+
 							fastLookupForBucket[key].push_back({ &action, &binding });
 							break;
 						}
 
 						case BindingType::COMPOSITE_1D:
 						{
-							auto keyNeg = std::make_tuple(mapName, device, binding.composite1D->negative);
-							auto keyPos = std::make_tuple(mapName, device, binding.composite1D->positive);
+							auto comp = std::get<Composite1D>(binding.input.value);
+							
+							auto keyNeg = std::make_tuple(mapName, deviceType, controlType, comp.negative);
+							auto keyPos = std::make_tuple(mapName, deviceType, controlType, comp.positive);
 
 							fastLookupForBucket[keyNeg].push_back({ &action, &binding });
 							fastLookupForBucket[keyPos].push_back({ &action, &binding });
@@ -177,10 +294,12 @@ namespace DeadFrame2D::Core
 
 						case BindingType::COMPOSITE_2D:
 						{
-							auto keyUp = std::make_tuple(mapName, device, binding.composite2D->up);
-							auto keyDown = std::make_tuple(mapName, device, binding.composite2D->down);
-							auto keyLeft = std::make_tuple(mapName, device, binding.composite2D->left);
-							auto keyRight = std::make_tuple(mapName, device, binding.composite2D->right);
+							auto comp = std::get<Composite2D>(binding.input.value);
+							
+							auto keyUp = std::make_tuple(mapName, deviceType, controlType, comp.up);
+							auto keyDown = std::make_tuple(mapName, deviceType, controlType, comp.down);
+							auto keyLeft = std::make_tuple(mapName, deviceType, controlType, comp.left);
+							auto keyRight = std::make_tuple(mapName, deviceType, controlType, comp.right);
 
 							fastLookupForBucket[keyUp].push_back({ &action, &binding });
 							fastLookupForBucket[keyDown].push_back({ &action, &binding });
@@ -221,59 +340,7 @@ namespace DeadFrame2D::Core
 		activeActions.clear();
 	}
 
-	void InputActionResolver::ProcessBinding(const InputDevice& device, int controlID)
-	{
-		auto inputUser = Input::Users()->GetUserFromPairedDevice(device.ID());
-
-		if (inputUser == nullptr)
-			return;
-
-		const auto userID = inputUser->ID();
-
-		auto mapsIt = runtimeActionMaps.find(userID);
-		auto lookupIt = fastLookupActionMaps.find(userID);
-
-		if (mapsIt == runtimeActionMaps.end() || lookupIt == fastLookupActionMaps.end())
-			return;
-
-		auto& userMaps = mapsIt->second;
-		auto& userLookup = lookupIt->second;
-		auto& userActiveActions = activeActions[userID];
-
-		for (auto& map : userMaps)
-		{
-			if (!map->IsEnabled())
-				continue;
-
-			auto key = std::make_tuple(map->Name(), device.Type(), controlID);
-			auto it = userLookup.find(key);
-
-			if (it == userLookup.end())
-				continue;
-
-			for (auto& record : it->second)
-			{
-				userActiveActions.insert(record.action);
-
-				switch (record.binding->type)
-				{
-				case BindingType::SIMPLE:
-					ResolveSimple(device, *record.action, *record.binding);
-					break;
-
-				case BindingType::COMPOSITE_1D:
-					ResolveComposite1D(device, *record.action, *record.binding);
-					break;
-
-				case BindingType::COMPOSITE_2D:
-					ResolveComposite2D(device, *record.action, *record.binding);
-					break;
-				}
-			}
-		}
-	}
-
-	void InputActionResolver::FinalizeActions()
+	void InputActionResolver::PreUpdate()
 	{
 		for (auto& [userID, userActions] : activeActions)
 		{
@@ -285,12 +352,13 @@ namespace DeadFrame2D::Core
 					action->value = action->pendingValue;
 				}
 
-				std::visit([&](auto& val) 
+				std::visit(
+					[&](auto& val)
 					{
 						using T = std::decay_t<decltype(val)>;
 
 						T prev = std::get<T>(action->previousValue);
-						
+
 						auto started = false, held = false, cancelled = false;
 
 						// --- FLOAT ---
@@ -316,7 +384,7 @@ namespace DeadFrame2D::Core
 						}
 
 						action->phase = ResolvePhase(started, held, cancelled);
-					}, 
+					},
 					action->value);
 
 				if (action->phase == ActionPhase::STARTED)
@@ -339,6 +407,58 @@ namespace DeadFrame2D::Core
 			else
 			{
 				++it;
+			}
+		}
+	}
+
+	void InputActionResolver::ProcessBinding(const InputDevice& device, InputControlType inputControlType, int controlID)
+	{
+		auto inputUser = Input::Users()->GetUserFromPairedDevice(device.ID());
+
+		if (inputUser == nullptr)
+			return;
+
+		const auto userID = inputUser->ID();
+
+		auto mapsIt = runtimeActionMaps.find(userID);
+		auto lookupIt = fastLookupActionMaps.find(userID);
+
+		if (mapsIt == runtimeActionMaps.end() || lookupIt == fastLookupActionMaps.end())
+			return;
+
+		auto& userMaps = mapsIt->second;
+		auto& userLookup = lookupIt->second;
+		auto& userActiveActions = activeActions[userID];
+
+		for (auto& map : userMaps)
+		{
+			if (!map->IsEnabled())
+				continue;
+
+			auto key = std::make_tuple(map->Name(), device.Type(), inputControlType, ToCustomCode(device, inputControlType, controlID));
+			auto it = userLookup.find(key);
+
+			if (it == userLookup.end())
+				continue;
+
+			for (auto& record : it->second)
+			{
+				userActiveActions.insert(record.action);
+
+				switch (record.binding->input.bindingType)
+				{
+				case BindingType::SIMPLE:
+					ResolveSimple(device, *record.action, *record.binding);
+					break;
+
+				case BindingType::COMPOSITE_1D:
+					ResolveComposite1D(device, *record.action, *record.binding);
+					break;
+
+				case BindingType::COMPOSITE_2D:
+					ResolveComposite2D(device, *record.action, *record.binding);
+					break;
+				}
 			}
 		}
 	}

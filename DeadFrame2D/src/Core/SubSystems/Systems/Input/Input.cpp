@@ -1,6 +1,5 @@
 #include "Core/SubSystems/Systems/Input/Actions/InputActionResolver.h"
 #include "Core/SubSystems/Systems/Input/Devices/DeviceManager.h"
-#include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/Abstractions/InputDevice.h"
 #include "Core/SubSystems/Systems/Input/Input.h"
 #include "Core/SubSystems/Systems/Input/User/InputUserManager.h"
 #include "Engine/EngineEvents/EventDispatcher.h"
@@ -30,8 +29,15 @@ namespace DeadFrame2D::Core
 
 		instance = this;
 
-		inputActionResolver = std::make_shared<InputActionResolver>();
-		deviceManager = std::make_shared<DeviceManager>();
+		auto inputActionResolver = std::make_shared<InputActionResolver>();
+		actionsFrameLifecycle = std::static_pointer_cast<IInputFrameLifecycle>(inputActionResolver);
+		actions = std::static_pointer_cast<IInputActions>(inputActionResolver);
+		actionsHandler = std::static_pointer_cast<IInputActionHandler>(inputActionResolver);
+
+		auto deviceManager = std::make_shared<DeviceManager>(actionsHandler.get());
+		deviceFrameLifecycle = std::static_pointer_cast<IInputFrameLifecycle>(deviceManager);
+		deviceProvider = std::static_pointer_cast<IInputDeviceProvider>(deviceManager);
+
 		userManager = std::make_shared<InputUserManager>();
 	
 		EventDispatcher::RegisterEventHandler(std::type_index(typeid(InputUserCreatedEvent)), this, &Input::InputUserCreatedEventHandler);
@@ -47,8 +53,10 @@ namespace DeadFrame2D::Core
 		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(DeviceAddedEvent)), this);
 		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(DeviceRemovedEvent)), this);
 
-		inputActionResolver.reset();
-		deviceManager.reset();
+		actionsFrameLifecycle.reset();
+		actions.reset();
+		actionsHandler.reset();
+		deviceFrameLifecycle.reset();
 		userManager.reset();
 
 		instance = nullptr;
@@ -103,13 +111,14 @@ namespace DeadFrame2D::Core
 	void Input::BeginFrame()
 	{
 		// The call order here matters!
-		static_cast<IInputActionsFrameManagement*>(inputActionResolver.get())->BeginFrame();
-		deviceManager->BeginFrame();
+		actionsFrameLifecycle->BeginFrame();
+		deviceFrameLifecycle->BeginFrame();
 	}
 
 	void Input::PreUpdate(float deltaTime)
 	{
-		static_cast<IInputActionsFrameManagement*>(inputActionResolver.get())->FinalizeActions();
+		actionsFrameLifecycle->PreUpdate();
+		deviceFrameLifecycle->PreUpdate();
 	}
 
 	void Input::EndUpdate(float deltaTime)
@@ -120,17 +129,9 @@ namespace DeadFrame2D::Core
 	{
 	}
 
-
-	std::optional<int> Input::ProcessEvents(const SDL_Event& sdlEvent)
+	IInputDeviceProvider* Input::Devices()
 	{
-		deviceManager->HandleEvent(sdlEvent);
-		
-		return std::nullopt;
-	}
-
-	DeviceManager* Input::Devices()
-	{
-		return instance->deviceManager.get();
+		return instance->deviceProvider.get();
 	}
 
 	InputUserManager* Input::Users()
@@ -138,8 +139,8 @@ namespace DeadFrame2D::Core
 		return instance->userManager.get();
 	}
 
-	InputActionResolver* Input::Actions()
+	IInputActions* Input::Actions()
 	{
-		return instance->inputActionResolver.get();
+		return instance->actions.get();
 	}
 }

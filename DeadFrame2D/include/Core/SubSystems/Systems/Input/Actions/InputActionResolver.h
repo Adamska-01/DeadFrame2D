@@ -1,10 +1,12 @@
 #pragma once
+#include "Core/SubSystems/Systems/Input/Abstractions/IInputFrameLifecycle.h"
+#include "Core/SubSystems/Systems/Input/Actions/Abstractions/IInputActionHandler.h"
 #include "Core/SubSystems/Systems/Input/Actions/Abstractions/IInputActions.h"
-#include "Core/SubSystems/Systems/Input/Actions/Abstractions/IInputActionsFrameManagement.h"
 #include "Core/SubSystems/Systems/Input/Actions/ActionBindingLink.h"
 #include "Core/SubSystems/Systems/Input/Actions/ActionPhase.h"
 #include "Data/Input/InputUserID.h"
 #include "DF2D_API.h"
+#include "Models/Input/InputDeviceType.h"
 #include "Utilities/Hashing/TupleHash.h"
 #include <functional>
 #include <memory>
@@ -35,7 +37,7 @@ namespace DeadFrame2D::Core
 	class InputDevice;
 
 
-	class DF2D_API InputActionResolver final : public IInputActions, public IInputActionsFrameManagement
+	class DF2D_API InputActionResolver final : public IInputActions, public IInputFrameLifecycle, public IInputActionHandler
 	{
 	private:
 		std::unordered_map<DeadFrame2D::Data::InputUserID, std::vector<std::shared_ptr<RuntimeActionMap>>> runtimeActionMaps;
@@ -43,7 +45,7 @@ namespace DeadFrame2D::Core
 		std::unordered_map<
 			DeadFrame2D::Data::InputUserID,
 			std::unordered_map<
-				std::tuple<std::string, Shared::Models::InputDeviceType, int>,
+				std::tuple<std::string, Shared::Models::InputDeviceType, Shared::Models::InputControlType, int>,
 				std::vector<ActionBindingLink>,
 				DeadFrame2D::Utilities::TupleHash>> fastLookupActionMaps;
 
@@ -61,6 +63,11 @@ namespace DeadFrame2D::Core
 		void ResolveComposite2D(const InputDevice& device, RuntimeInputAction& action, const Shared::Models::Binding& binding);
 
 
+		int ToCustomCode(const InputDevice& device, Shared::Models::InputControlType inputControlType, int sdlCode);
+
+		int ToSDLCode(const InputDevice& device, Shared::Models::InputControlType inputControlType, int customCode);
+
+
 		void InputUserCreatedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
 
 		void InputUserDestroyedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
@@ -68,9 +75,10 @@ namespace DeadFrame2D::Core
 
 		void BeginFrame() override;
 
-		void ProcessBinding(const InputDevice& device, int controlID) override;
+		void PreUpdate() override;
 
-		void FinalizeActions() override;
+
+		void ProcessBinding(const InputDevice& device, Shared::Models::InputControlType inputControlType, int controlID) override;
 
 
 	public:

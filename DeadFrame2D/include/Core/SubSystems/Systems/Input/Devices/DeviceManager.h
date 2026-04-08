@@ -1,4 +1,7 @@
 #pragma once
+#include "Core/CoreEvents/Abstractions/IEventProcessor.h"
+#include "Core/SubSystems/Systems/Input/Abstractions/IInputFrameLifecycle.h"
+#include "Core/SubSystems/Systems/Input/Devices/Abstractions/IInputDeviceProvider.h"
 #include "Data/Input/InputDeviceID.h"
 #include "DF2D_API.h"
 #include <memory>
@@ -11,23 +14,21 @@ union SDL_Event;
 
 namespace DeadFrame2D::Core
 {
-	class InputDevice;
-	class KeyboardInputDevice;
-	class MouseInputDevice;
+	class IInputActionHandler;
 
 
 	/**
 	 * @brief Responsible for opening/closing SDL controllers and keeping devices
 	 * keyed by instance id. Also holds keyboard and mouse singletons.
 	 */
-	class DF2D_API DeviceManager
+	class DF2D_API DeviceManager : public IEventProcessor, public IInputFrameLifecycle, public IInputDeviceProvider
 	{
 	private:
-		std::unordered_map<DeadFrame2D::Data::InputDeviceID, std::shared_ptr<InputDevice>> otherDevices;
+		std::unordered_map<DeadFrame2D::Data::InputDeviceID, std::shared_ptr<InputDevice>> devices;
 
-		std::shared_ptr<KeyboardInputDevice> keyboard;
+		InputDevice* currentController;
 
-		std::shared_ptr<MouseInputDevice> mouse;
+		IInputActionHandler* actionHandler;
 
 
 		void OpenController(int deviceIndex);
@@ -35,23 +36,30 @@ namespace DeadFrame2D::Core
 		void CloseController(DeadFrame2D::Data::InputDeviceID instanceId);
 
 
+		std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
+
+
+		void BeginFrame() override;
+
+		void PreUpdate() override;
+
+
 	public:
-		DeviceManager();
+		DeviceManager(IInputActionHandler* actionHandler);
 
-		~DeviceManager();
-
-
-		void BeginFrame();
-
-		void HandleEvent(const SDL_Event& event);
+		~DeviceManager() override;
 
 
-		InputDevice* GetDevice(DeadFrame2D::Data::InputDeviceID id);
+		InputDevice* GetDevice(DeadFrame2D::Data::InputDeviceID id) override;
 
-		std::vector<InputDevice*> GetAllDevices() const;
+		std::vector<InputDevice*> GetAllDevices() const override;
 
-		KeyboardInputDevice* Keyboard();
+		KeyboardInputDevice* Keyboard() override;
 
-		MouseInputDevice* Mouse();
+		MouseInputDevice* Mouse() override;
+
+		ControllerInputDevice* Controller(DeadFrame2D::Data::InputDeviceID id) override;
+
+		ControllerInputDevice* CurrentController() override;
 	};
 }
