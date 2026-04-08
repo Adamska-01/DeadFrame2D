@@ -19,7 +19,7 @@ namespace Shared::Models
 	};
 
 
-	NLOHMANN_JSON_SERIALIZE_ENUM(ControllerAxisCode,
+	NLOHMANN_JSON_SERIALIZE_ENUM(MouseAxisCode,
 	{
 		{ MouseAxisCode::MOTION_X, "MotionX"},
 		{ MouseAxisCode::MOTION_Y, "MotionY" },

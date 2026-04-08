@@ -54,7 +54,7 @@ namespace Shared::Models
 	};
 
 
-	NLOHMANN_JSON_SERIALIZE_ENUM(ControllerAxisCode,
+	NLOHMANN_JSON_SERIALIZE_ENUM(ControllerButtonCode,
 	{
 		{ ControllerButtonCode::A, "A"},
 		{ ControllerButtonCode::B, "B" },

@@ -115,7 +115,7 @@ namespace Shared::Models
 	};
 
 
-	NLOHMANN_JSON_SERIALIZE_ENUM(ControllerAxisCode,
+	NLOHMANN_JSON_SERIALIZE_ENUM(KeyboardKeyCode,
 	{
 		{ KeyboardKeyCode::A, "A"},
 		{ KeyboardKeyCode::B, "B"},
