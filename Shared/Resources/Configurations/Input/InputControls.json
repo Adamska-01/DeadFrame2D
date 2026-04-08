@@ -39,37 +39,46 @@
 				{
 					"name": "Move_Keyboard",
 					"action": "Move",
-					"device": "Keyboard",
-					"type": "Composite2D",
-					"composite2D": {
-						"up": 26,
-						"down": 22,
-						"left": 4,
-						"right": 7 
+					"input": {
+						"inputDeviceType": "Keyboard",
+						"bindingType": "Composite2D",
+						"controlType": "Digital",
+						"value": {
+							"up": "W",
+							"down": "S",
+							"left": "A",
+							"right": "D"
+						}
 					}
 				},
 				{
 					"name": "Move_Controller",
 					"action": "Move",
-					"device": "Controller",
-					"type": "Composite2D",
-					"composite2D": {
-						"up": 11,
-						"down": 12,
-						"left": 13,
-						"right": 14
+					"input": {
+						"inputDeviceType": "Controller",
+						"bindingType": "Composite2D",
+						"controlType": "Digital",
+						"value": {
+							"up": "DpadUp",
+							"down": "DpadDown",
+							"left": "DpadLeft",
+							"right": "DpadRight"
+						}
 					}
 				},
 				{
 					"name": "Move_Keyboard2",
 					"action": "Move",
-					"device": "Keyboard",
-					"type": "Composite2D",
-					"composite2D": {
-						"up": 82,
-						"down": 81,
-						"left": 80,
-						"right": 79
+					"input": {
+						"inputDeviceType": "Keyboard",
+						"bindingType": "Composite2D",
+						"controlType": "Digital",
+						"value": {
+							"up": "Up",
+							"down": "Down",
+							"left": "Left",
+							"right": "Right"
+						}
 					}
 				},
 
@@ -77,64 +86,88 @@
 				{
 					"name": "Jump_Keyboard",
 					"action": "Jump",
-					"device": "Keyboard",
-					"type": "Simple",
-					"control": 44
+					"input": {
+						"inputDeviceType": "Keyboard",
+						"bindingType": "Simple",
+						"controlType": "Digital",
+						"value": "Space"
+					}
 				},
 				{
 					"name": "Jump_Controller",
 					"action": "Jump",
-					"device": "Controller",
-					"type": "Simple",
-					"control": 0
+					"input": {
+						"inputDeviceType": "Controller",
+						"bindingType": "Simple",
+						"controlType": "Digital",
+						"value": "A"
+					}
 				},
 
 				/* PAUSE */
 				{
 					"name": "Pause_Keyboard",
 					"action": "Pause",
-					"device": "Keyboard",
-					"type": "Simple",
-					"control": 41
+					"input": {
+						"inputDeviceType": "Keyboard",
+						"bindingType": "Simple",
+						"controlType": "Digital",
+						"value": "Escape"
+					}
 				},
 				{
 					"name": "Pause_Controller",
 					"action": "Pause",
-					"device": "Controller",
-					"type": "Simple",
-					"control": 6
+					"input": {
+						"inputDeviceType": "Controller",
+						"bindingType": "Simple",
+						"controlType": "Digital",
+						"value": "Start"
+					}
 				},
 
 				/* CONFIRM */
 				{
 					"name": "Confirm_Keyboard",
 					"action": "Confirm",
-					"device": "Keyboard",
-					"type": "Simple",
-					"control": 40
+					"input": {
+						"inputDeviceType": "Keyboard",
+						"bindingType": "Simple",
+						"controlType": "Digital",
+						"value": "Enter"
+					}
 				},
 				{
 					"name": "Confirm_Controller",
 					"action": "Confirm",
-					"device": "Controller",
-					"type": "Simple",
-					"control": 0
+					"input": {
+						"inputDeviceType": "Controller",
+						"bindingType": "Simple",
+						"controlType": "Digital",
+						"value": "A"
+					}
 				},
 
 				/* BACK */
 				{
 					"name": "Back_Keyboard",
 					"action": "Back",
-					"device": "Keyboard",
-					"type": "Simple",
-					"control": 41
+					"input": {
+						"inputDeviceType": "Keyboard",
+						"bindingType": "Simple",
+						"controlType": "Digital",
+						"value": "Escape"
+					}
 				},
 				{
 					"name": "Back_Controller",
 					"action": "Back",
-					"device": "Controller",
-					"type": "Simple",
-					"control": 1
+					"input": {
+						"inputDeviceType": "Controller",
+						"bindingType": "Simple",
+						"controlType": "Digital",
+						"value": "B"
+					}
 				}
 			]
 		}
