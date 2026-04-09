@@ -14,9 +14,7 @@ namespace Shared::Models
 
 		NORMALIZE,
 
-		CLAMP,
-
-		CUSTOM
+		CLAMP
 	};
 
 
@@ -26,7 +24,6 @@ namespace Shared::Models
 		{ ProcessorType::SCALE, "Scale" },
 		{ ProcessorType::INVERT, "Invert" },
 		{ ProcessorType::NORMALIZE, "Normalize" },
-		{ ProcessorType::CLAMP, "Clamp" },
-		{ ProcessorType::CUSTOM, "Custom" }
+		{ ProcessorType::CLAMP, "Clamp" }
 	});
 }
