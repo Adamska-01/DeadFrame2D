@@ -20,9 +20,7 @@ namespace DeadFrame2D::Core
 		for (auto& action : actionMap.actions)
 		{
 			if (!seenActionNames.insert(action.name).second) 
-			{
 				throw std::runtime_error("Duplicate action name in InputActionMap: " + action.name);
-			}
 		}
 
 		// Build map: action name -> bindings
