@@ -40,6 +40,7 @@ namespace DeadFrame2D::Core
 		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(InputUserDestroyedEvent)), this);
 	}
 
+
 	ActionPhase InputActionResolver::ResolvePhase(bool started, bool held, bool cancelled)
 	{
 		if (started && !cancelled)
@@ -57,9 +58,10 @@ namespace DeadFrame2D::Core
 		auto simpleID = std::get<int>(binding.input.value);
 		auto controlType = binding.input.controlType;
 
-		auto state = binding.input.controlType == InputControlType::DIGITAL
-			? device.GetButtonState(ToSDLCode(device, controlType, simpleID))
-			: device.GetAxisState(ToSDLCode(device, controlType, simpleID));
+		auto sdlCode = ToSDLCode(device, controlType, simpleID);
+		auto state = controlType == InputControlType::DIGITAL
+			? device.GetButtonState(sdlCode)
+			: device.GetAxisState(sdlCode);
 
 		if (std::holds_alternative<bool>(action.value))
 		{
@@ -237,79 +239,26 @@ namespace DeadFrame2D::Core
 		auto userID = inputUserCreatedEvent->GetInputUserID();
 
 		if (!Shared::Tools::IsSerializable<InputActionMapBucket>())
-		{
 			throw std::runtime_error("[Input] InputActionMapBucket is not serializable. Cannot load input configuration...");
-		}
 
 		auto actionMapBucket = Shared::Tools::DeserializeFromFile<InputActionMapBucket>(Paths::Files::INPUT_CONTROLS);
 
 		// Create empty slots
 		runtimeActionMaps[userID] = {};
-		fastLookupActionMaps[userID] = {};
 		activeActions[userID] = {};
 
 		auto& runtimeMapsForBucket = runtimeActionMaps[userID];
-		auto& fastLookupForBucket = fastLookupActionMaps[userID];
 
 		// --- Construct runtime action maps ---
 		for (auto& actionMap : actionMapBucket.actionMaps)
 		{
-			runtimeMapsForBucket.push_back(std::make_shared<RuntimeActionMap>(actionMap));
+			runtimeMapsForBucket.maps.push_back(std::make_shared<RuntimeActionMap>(actionMap));
 		}
 
-		// --- Construct fast lookup map ---
-		for (auto& map : runtimeMapsForBucket)
+		// --- Build name-to-index lookup ---
+		for (size_t i = 0; i < runtimeMapsForBucket.maps.size(); ++i)
 		{
-			for (auto& action : map->GetActions())
-			{
-				for (auto& binding : action.bindings)
-				{
-					const auto& mapName = map->Name();
-					const auto deviceType = binding.input.inputDeviceType;
-					const auto controlType = binding.input.controlType;
-
-					switch (binding.input.bindingType)
-					{
-						case BindingType::SIMPLE:
-						{
-							auto controlID = std::get<int>(binding.input.value);
-
-							auto key = std::make_tuple(mapName, deviceType, controlType, controlID);
-
-							fastLookupForBucket[key].push_back({ &action, &binding });
-							break;
-						}
-
-						case BindingType::COMPOSITE_1D:
-						{
-							auto comp = std::get<Composite1D>(binding.input.value);
-							
-							auto keyNeg = std::make_tuple(mapName, deviceType, controlType, comp.negative);
-							auto keyPos = std::make_tuple(mapName, deviceType, controlType, comp.positive);
-
-							fastLookupForBucket[keyNeg].push_back({ &action, &binding });
-							fastLookupForBucket[keyPos].push_back({ &action, &binding });
-							break;
-						}
-
-						case BindingType::COMPOSITE_2D:
-						{
-							auto comp = std::get<Composite2D>(binding.input.value);
-							
-							auto keyUp = std::make_tuple(mapName, deviceType, controlType, comp.up);
-							auto keyDown = std::make_tuple(mapName, deviceType, controlType, comp.down);
-							auto keyLeft = std::make_tuple(mapName, deviceType, controlType, comp.left);
-							auto keyRight = std::make_tuple(mapName, deviceType, controlType, comp.right);
-
-							fastLookupForBucket[keyUp].push_back({ &action, &binding });
-							fastLookupForBucket[keyDown].push_back({ &action, &binding });
-							fastLookupForBucket[keyLeft].push_back({ &action, &binding });
-							fastLookupForBucket[keyRight].push_back({ &action, &binding });
-							break;
-						}
-					}
-				}
-			}
+			runtimeMapsForBucket.nameToIndex[runtimeMapsForBucket.maps[i]->Name()] = i;
 		}
 	}
 
@@ -323,7 +272,6 @@ namespace DeadFrame2D::Core
 		auto userID = inputUserDestroyedEvent->GetInputUserID();
 
 		runtimeActionMaps.erase(userID);
-		fastLookupActionMaps.erase(userID);
 		activeActions.erase(userID);
 	}
 
@@ -378,9 +326,12 @@ namespace DeadFrame2D::Core
 						// --- VECTOR2 ---
 						else if constexpr (std::is_same_v<T, Vector2F>)
 						{
-							started = val.Magnitude() > 0.001f && !(prev.Magnitude() > 0.001f);
-							held = val.Magnitude() > 0.001f && (prev.Magnitude() > 0.001f);
-							cancelled = !(val.Magnitude() > 0.001f) && (prev.Magnitude() > 0.001f);
+							auto mag = val.Magnitude();
+							auto prevMag = prev.Magnitude();
+
+							started = mag > 0.001f && !(prevMag > 0.001f);
+							held = mag > 0.001f && (prevMag > 0.001f);
+							cancelled = !(mag > 0.001f) && (prevMag > 0.001f);
 						}
 
 						action->phase = ResolvePhase(started, held, cancelled);
@@ -414,50 +365,71 @@ namespace DeadFrame2D::Core
 	void InputActionResolver::ProcessBinding(const InputDevice& device, InputControlType inputControlType, int controlID)
 	{
 		auto inputUser = Input::Users()->GetUserFromPairedDevice(device.ID());
-
 		if (inputUser == nullptr)
 			return;
 
 		const auto userID = inputUser->ID();
-
 		auto mapsIt = runtimeActionMaps.find(userID);
-		auto lookupIt = fastLookupActionMaps.find(userID);
-
-		if (mapsIt == runtimeActionMaps.end() || lookupIt == fastLookupActionMaps.end())
+		if (mapsIt == runtimeActionMaps.end())
 			return;
 
-		auto& userMaps = mapsIt->second;
-		auto& userLookup = lookupIt->second;
 		auto& userActiveActions = activeActions[userID];
+		const auto customCode = ToCustomCode(device, inputControlType, controlID);
 
-		for (auto& map : userMaps)
+		for (auto& map : mapsIt->second.maps)
 		{
 			if (!map->IsEnabled())
 				continue;
 
-			auto key = std::make_tuple(map->Name(), device.Type(), inputControlType, ToCustomCode(device, inputControlType, controlID));
-			auto it = userLookup.find(key);
-
-			if (it == userLookup.end())
-				continue;
-
-			for (auto& record : it->second)
+			for (auto& action : map->GetActions())
 			{
-				userActiveActions.insert(record.action);
-
-				switch (record.binding->input.bindingType)
+				for (auto& binding : action.bindings)
 				{
-				case BindingType::SIMPLE:
-					ResolveSimple(device, *record.action, *record.binding);
-					break;
+					if (binding.input.inputDeviceType != device.Type()
+						|| binding.input.controlType != inputControlType)
+						continue;
 
-				case BindingType::COMPOSITE_1D:
-					ResolveComposite1D(device, *record.action, *record.binding);
-					break;
+					auto matches = false;
 
-				case BindingType::COMPOSITE_2D:
-					ResolveComposite2D(device, *record.action, *record.binding);
-					break;
+					switch (binding.input.bindingType)
+					{
+					case BindingType::SIMPLE:
+						matches = std::get<int>(binding.input.value) == customCode;
+						break;
+
+					case BindingType::COMPOSITE_1D:
+					{
+						auto& comp = std::get<Composite1D>(binding.input.value);
+						matches = comp.negative == customCode || comp.positive == customCode;
+						break;
+					}
+
+					case BindingType::COMPOSITE_2D:
+					{
+						auto& comp = std::get<Composite2D>(binding.input.value);
+						matches = comp.up == customCode || comp.down == customCode ||
+								  comp.left == customCode || comp.right == customCode;
+						break;
+					}
+					}
+
+					if (matches)
+					{
+						userActiveActions.insert(&action);
+
+						switch (binding.input.bindingType)
+						{
+						case BindingType::SIMPLE:
+							ResolveSimple(device, action, binding);
+							break;
+						case BindingType::COMPOSITE_1D:
+							ResolveComposite1D(device, action, binding);
+							break;
+						case BindingType::COMPOSITE_2D:
+							ResolveComposite2D(device, action, binding);
+							break;
+						}
+					}
 				}
 			}
 		}
@@ -469,22 +441,20 @@ namespace DeadFrame2D::Core
 			return -1;
 
 		auto mapsIt = runtimeActionMaps.find(userID);
-
 		if (mapsIt == runtimeActionMaps.end())
 			return -1;
 
-		for (const auto& map : mapsIt->second)
+		auto nameIt = mapsIt->second.nameToIndex.find(actionMapName);
+		if (nameIt == mapsIt->second.nameToIndex.end())
+			return -1;
+
+		auto& map = mapsIt->second.maps[nameIt->second];
+		for (auto& action : map->GetActions())
 		{
-			if (map->Name() != actionMapName)
+			if (action.name != actionName)
 				continue;
 
-			for (auto& action : map->GetActions())
-			{
-				if (action.name != actionName)
-					continue;
-
-				return action.listeners.AddHandle(listener, handler);
-			}
+			return action.listeners.AddHandle(listener, handler);
 		}
 
 		return -1;
@@ -496,111 +466,91 @@ namespace DeadFrame2D::Core
 			return;
 
 		auto mapsIt = runtimeActionMaps.find(userID);
-
 		if (mapsIt == runtimeActionMaps.end())
 			return;
 
-		for (const auto& map : mapsIt->second)
+		auto nameIt = mapsIt->second.nameToIndex.find(actionMapName);
+		if (nameIt == mapsIt->second.nameToIndex.end())
+			return;
+
+		auto& map = mapsIt->second.maps[nameIt->second];
+		for (auto& action : map->GetActions())
 		{
-			if (map->Name() != actionMapName)
+			if (action.name != actionName)
 				continue;
 
-			for (auto& action : map->GetActions())
-			{
-				if (action.name != actionName)
-					continue;
-
-				action.listeners.RemoveByListener(&listener);
-			}
+			action.listeners.RemoveByListener(&listener);
 		}
 	}
 
 	void InputActionResolver::DeregisterActionByID(InputUserID userID, const std::string& actionMapName, const std::string& actionName, DeadFrame2D::Utilities::ListenerID listenerID)
 	{
 		auto mapsIt = runtimeActionMaps.find(userID);
-
 		if (mapsIt == runtimeActionMaps.end())
 			return;
 
-		for (const auto& map : mapsIt->second)
+		auto nameIt = mapsIt->second.nameToIndex.find(actionMapName);
+		if (nameIt == mapsIt->second.nameToIndex.end())
+			return;
+
+		auto& map = mapsIt->second.maps[nameIt->second];
+		for (auto& action : map->GetActions())
 		{
-			if (map->Name() != actionMapName)
+			if (action.name != actionName)
 				continue;
 
-			for (auto& action : map->GetActions())
-			{
-				if (action.name != actionName)
-					continue;
-
-				action.listeners.RemoveByID(listenerID);
-			}
+			action.listeners.RemoveByID(listenerID);
 		}
 	}
 
 	bool InputActionResolver::EnableActionMap(InputUserID userID, const std::string& name)
 	{
 		auto it = runtimeActionMaps.find(userID);
-
 		if (it == runtimeActionMaps.end())
 			return false;
 
-		for (auto& map : it->second)
-		{
-			if (map->Name() != name)
-				continue;
+		auto nameIt = it->second.nameToIndex.find(name);
+		if (nameIt == it->second.nameToIndex.end())
+			return false;
 
-			map->Enable();
+		it->second.maps[nameIt->second]->Enable();
 
-			return true;
-		}
-
-		return false;
+		return true;
 	}
 
 	bool InputActionResolver::DisableActionMap(InputUserID userID, const std::string& name)
 	{
 		auto it = runtimeActionMaps.find(userID);
-
 		if (it == runtimeActionMaps.end())
 			return false;
 
-		for (auto& map : it->second)
-		{
-			if (map->Name() != name)
-				continue;
+		auto nameIt = it->second.nameToIndex.find(name);
+		if (nameIt == it->second.nameToIndex.end())
+			return false;
 
-			map->Disable();
+		it->second.maps[nameIt->second]->Disable();
 
-			return true;
-		}
-
-		return false;
+		return true;
 	}
 
 	bool InputActionResolver::SwitchToActionMap(InputUserID userID, const std::string& name)
 	{
 		auto it = runtimeActionMaps.find(userID);
-
 		if (it == runtimeActionMaps.end())
 			return false;
 
-		auto switched = false;
+		auto nameIt = it->second.nameToIndex.find(name);
+		if (nameIt == it->second.nameToIndex.end())
+			return false;
 
-		for (auto& map : it->second)
+		for (auto& map : it->second.maps)
 		{
-			if (map->Name() == name)
-			{
-				map->Enable();
-
-				switched = true;
-			}
-			else
-			{
-				map->Disable();
-			}
+			map->Disable();
 		}
 
-		return switched;
+		it->second.maps[nameIt->second]->Enable();
+
+		return true;
 	}
 
 	std::optional<RuntimeInputAction> InputActionResolver::GetActionState(InputUserID userID, const std::string actionName)
@@ -610,7 +560,7 @@ namespace DeadFrame2D::Core
 		if (mapsIt == runtimeActionMaps.end())
 			return std::nullopt;
 
-		for (const auto& map : mapsIt->second)
+		for (const auto& map : mapsIt->second.maps)
 		{
 			for (const auto& action : map->GetActions())
 			{
