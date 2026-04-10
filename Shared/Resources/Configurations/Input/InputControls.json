@@ -11,7 +11,12 @@
 				{
 					"name": "Move",
 					"type": "Value",
-					"valueType": "Vector2"
+					"valueType": "Vector2",
+					"processors": [
+						{
+							"kind": "Normalize"
+						}
+					]
 				},
 				{
 					"name": "Jump",
@@ -49,12 +54,7 @@
 							"left": "A",
 							"right": "D"
 						}
-					},
-					"processors": [
-						{
-							"kind": "Normalize"
-						}
-					]
+					}
 				},
 				{
 					"name": "Move_Controller",
