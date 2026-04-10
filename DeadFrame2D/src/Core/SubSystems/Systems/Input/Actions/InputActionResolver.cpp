@@ -298,6 +298,7 @@ namespace DeadFrame2D::Core
 				if (action->isValuePending)
 				{
 					action->value = action->pendingValue;
+					action->ApplyProcessors();
 				}
 
 				std::visit(
