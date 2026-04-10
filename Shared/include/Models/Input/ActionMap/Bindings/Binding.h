@@ -14,9 +14,6 @@ namespace Shared::Models
 		std::string action;
 
 		InputBinding input;
-
-
-		std::vector<InputProcessor> processors;
 	};
 
 
@@ -25,11 +22,6 @@ namespace Shared::Models
 		j["name"] = b.name;
 		j["action"] = b.action;
 		j["input"] = b.input;
-
-		if (!b.processors.empty())
-		{
-			j["processors"] = b.processors;
-		}
 	}
 
 	inline void from_json(const nlohmann::json& j, Binding& b)
@@ -37,10 +29,5 @@ namespace Shared::Models
 		j.at("name").get_to(b.name);
 		j.at("action").get_to(b.action);
 		j.at("input").get_to(b.input);
-
-		if (j.contains("processors"))
-		{
-			b.processors = j.at("processors").get<std::vector<InputProcessor>>();
-		}
 	}
 }
