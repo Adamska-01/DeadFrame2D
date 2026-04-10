@@ -1,5 +1,5 @@
 #pragma once
-#include "Models/Input/ActionMap/Properties/InputProcessor.h"
+#include "Models/Input/ActionMap/Processors/InputProcessor.h"
 #include "Models/Input/ActionMap/Types/ActionType.h"
 #include "Models/Input/ActionMap/Types/ValueType.h"
 #include <nlohmann/json.hpp>
