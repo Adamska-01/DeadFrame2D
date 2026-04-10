@@ -49,7 +49,12 @@
 							"left": "A",
 							"right": "D"
 						}
-					}
+					},
+					"processors": [
+						{
+							"kind": "Normalize"
+						}
+					]
 				},
 				{
 					"name": "Move_Controller",
