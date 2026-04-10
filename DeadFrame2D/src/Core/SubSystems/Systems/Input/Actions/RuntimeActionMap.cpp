@@ -44,7 +44,8 @@ namespace DeadFrame2D::Core
 			actions.emplace_back(
 				action.name,
 				action.valueType,
-				it->second);
+				it->second,
+				action.processors);
 		}
 	}
 

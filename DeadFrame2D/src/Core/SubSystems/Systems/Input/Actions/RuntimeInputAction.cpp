@@ -1,12 +1,19 @@
 #include "Core/SubSystems/Systems/Input/Actions/RuntimeInputAction.h"
+#include "Factories/Concretions/Input/Processors/InputProcessorFactory.h"
 
 
 namespace DeadFrame2D::Core
 {
+	using namespace DeadFrame2D::Factories;
+
 	using namespace Shared::Models;
 
 
-	RuntimeInputAction::RuntimeInputAction(const std::string& name, ValueType valueType, std::vector<Shared::Models::Binding> bindings)
+	RuntimeInputAction::RuntimeInputAction(
+		const std::string& name,
+		ValueType valueType,
+		std::vector<Binding> bindings,
+		std::vector<InputProcessor> inputProcessors)
 		: name(name),
 		bindings(bindings),
 		isValuePending(false),
@@ -29,6 +36,13 @@ namespace DeadFrame2D::Core
 			default:
 				break;
 		}
+
+		auto inputProcessorFactory = InputProcessorFactory();
+
+		for (const auto& processor : inputProcessors)
+		{
+			processors.push_back(inputProcessorFactory.CreateProduct(processor));
+		}
 	}
 
 	RuntimeInputAction::RuntimeInputAction(const RuntimeInputAction& other)
@@ -38,9 +52,13 @@ namespace DeadFrame2D::Core
 		pendingValue(other.pendingValue),
 		isValuePending(other.isValuePending),
 		phase(other.phase),
-		bindings(other.bindings)
+		bindings(other.bindings),
+		processors()
 	{
-		// listeners are intentionally NOT copied
+		for (const auto& processor : other.processors)
+		{
+			processors.push_back(processor->Clone());
+		}
 	}
 
 	RuntimeInputAction::RuntimeInputAction(RuntimeInputAction&& other) noexcept
@@ -50,9 +68,9 @@ namespace DeadFrame2D::Core
 		pendingValue(std::move(other.pendingValue)),
 		isValuePending(other.isValuePending),
 		phase(other.phase),
-		bindings(std::move(other.bindings))
+		bindings(std::move(other.bindings)),
+		processors(std::move(other.processors))
 	{
-		// listeners are intentionally NOT moved
 	}
 
 	RuntimeInputAction& RuntimeInputAction::operator=(const RuntimeInputAction& other)
@@ -67,7 +85,12 @@ namespace DeadFrame2D::Core
 		isValuePending = other.isValuePending;
 		phase = other.phase;
 		bindings = other.bindings;
-		// listeners are intentionally NOT copied
+		processors.clear();
+
+		for (const auto& processor : other.processors)
+		{
+			processors.push_back(processor->Clone());
+		}
 
 		return *this;
 	}
@@ -84,7 +107,7 @@ namespace DeadFrame2D::Core
 		isValuePending = other.isValuePending;
 		phase = other.phase;
 		bindings = std::move(other.bindings);
-		// listeners are intentionally NOT moved
+		processors = std::move(other.processors);
 
 		return *this;
 	}
@@ -115,6 +138,30 @@ namespace DeadFrame2D::Core
 		phase = isHeld ? phase : ActionPhase::WAITING;
 
 		isValuePending = false;
+	}
+
+	void RuntimeInputAction::ApplyProcessors()
+	{
+		if (processors.empty())
+			return;
+
+		if (std::holds_alternative<bool>(value))
+			return;
+
+		std::visit(
+			[this](auto& v)
+			{
+				using T = std::decay_t<decltype(v)>;
+
+				if constexpr (std::is_same_v<T, float> || std::is_same_v<T, Vector2F>)
+				{
+					for (const auto& processor : processors)
+					{
+						processor->Process(v);
+					}
+				}
+			},
+			value);
 	}
 
 	bool RuntimeInputAction::IsWaiting() const

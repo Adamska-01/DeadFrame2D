@@ -2,8 +2,10 @@
 #include "Core/Math/Vector2.h"
 #include "Core/SubSystems/Systems/Input/Actions/ActionPhase.h"
 #include "DF2D_API.h"
+#include "Factories/Products/Input/Processors/Abstractions/IInputProcessor.h"
 #include "Models/Input/ActionMap/Bindings/Binding.h"
 #include "Utilities/Delegates/MulticastDelegate.h"
+#include <memory>
 #include <Models/Input/ActionMap/Types/ValueType.h>
 #include <string>
 #include <variant>
@@ -32,14 +34,23 @@ namespace DeadFrame2D::Core
 
 		std::vector<Shared::Models::Binding> bindings;
 
+		std::vector<std::unique_ptr<DeadFrame2D::Factories::IInputProcessor>> processors;
+
+		// TODO: Return a more light-weight class/struct
 		DeadFrame2D::Utilities::MulticastDelegate<const RuntimeInputAction&> listeners;
 
 
 		void ResetFrame();
 
+		void ApplyProcessors();
+
 
 	public:
-		RuntimeInputAction(const std::string& name, Shared::Models::ValueType valueType, std::vector<Shared::Models::Binding> bindings);
+		RuntimeInputAction(
+			const std::string& name,
+			Shared::Models::ValueType valueType,
+			std::vector<Shared::Models::Binding> bindings,
+			std::vector<Shared::Models::InputProcessor> inputProcessors);
 
 		RuntimeInputAction(const RuntimeInputAction& other);
 
@@ -61,11 +72,8 @@ namespace DeadFrame2D::Core
 
 		bool IsCancelled() const;
 	};
-}
 
 
-namespace DeadFrame2D::Core
-{
 	template<typename T>
 	inline T RuntimeInputAction::ReadValue() const
 	{
