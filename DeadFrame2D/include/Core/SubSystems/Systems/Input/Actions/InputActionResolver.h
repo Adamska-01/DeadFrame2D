@@ -2,17 +2,16 @@
 #include "Core/SubSystems/Systems/Input/Abstractions/IInputFrameLifecycle.h"
 #include "Core/SubSystems/Systems/Input/Actions/Abstractions/IInputActionHandler.h"
 #include "Core/SubSystems/Systems/Input/Actions/Abstractions/IInputActions.h"
+#include "Core/SubSystems/Systems/Input/Actions/ActionMapIndex.h"
 #include "Core/SubSystems/Systems/Input/Actions/ActionPhase.h"
 #include "Data/Input/InputUserID.h"
 #include "DF2D_API.h"
-#include "Models/Input/InputDeviceType.h"
 #include <functional>
 #include <memory>
 #include <optional>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include <vector>
 
 
 namespace Shared::Models
@@ -31,19 +30,12 @@ namespace DeadFrame2D::Engine
 namespace DeadFrame2D::Core
 {
 	class RuntimeInputAction;
-	class RuntimeActionMap;
 	class InputDevice;
 
 
 	class DF2D_API InputActionResolver final : public IInputActions, public IInputFrameLifecycle, public IInputActionHandler
 	{
 	private:
-		struct ActionMapIndex
-		{
-			std::vector<std::shared_ptr<RuntimeActionMap>> maps;
-			std::unordered_map<std::string, size_t> nameToIndex;
-		};
-
 		std::unordered_map<DeadFrame2D::Data::InputUserID, ActionMapIndex> runtimeActionMaps;
 
 		std::unordered_map<DeadFrame2D::Data::InputUserID, std::unordered_set<RuntimeInputAction*>> activeActions;
