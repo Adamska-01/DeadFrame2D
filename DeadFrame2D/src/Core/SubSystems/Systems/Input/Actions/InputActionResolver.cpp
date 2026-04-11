@@ -279,7 +279,7 @@ namespace DeadFrame2D::Core
 	{
 		for (auto& [userID, actionSet] : activeActions)
 		{
-			for (auto* action : actionSet)
+			for (auto action : actionSet)
 			{
 				action->ResetFrame();
 			}
@@ -350,7 +350,7 @@ namespace DeadFrame2D::Core
 		{
 			auto* action = *it;
 
-			action->listeners.Broadcast(*action);
+			action->listeners.Broadcast(InputActionView(action->phase, action->value));
 
 			if (action->phase == ActionPhase::CANCELED)
 			{
@@ -436,7 +436,12 @@ namespace DeadFrame2D::Core
 		}
 	}
 
-	ListenerID InputActionResolver::RegisterAction(InputUserID userID, const std::string& actionMapName, const std::string& actionName, const ComponentHandleBase& listener, const std::function<void(const RuntimeInputAction&)>& handler)
+	ListenerID InputActionResolver::RegisterAction(
+		InputUserID userID,
+		const std::string& actionMapName,
+		const std::string& actionName,
+		const ComponentHandleBase& listener,
+		const std::function<void(const InputActionView&)>& handler)
 	{
 		if (!listener.IsValid())
 			return -1;
@@ -554,7 +559,7 @@ namespace DeadFrame2D::Core
 		return true;
 	}
 
-	std::optional<RuntimeInputAction> InputActionResolver::GetActionState(InputUserID userID, const std::string actionName)
+	std::optional<InputActionView> InputActionResolver::GetActionState(InputUserID userID, const std::string actionName)
 	{
 		auto mapsIt = runtimeActionMaps.find(userID);
 
@@ -566,7 +571,7 @@ namespace DeadFrame2D::Core
 			for (const auto& action : map->GetActions())
 			{
 				if (action.name == actionName)
-					return action;
+					return InputActionView(action.phase, action.value);
 			}
 		}
 

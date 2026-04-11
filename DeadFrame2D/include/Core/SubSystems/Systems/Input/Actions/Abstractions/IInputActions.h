@@ -1,4 +1,5 @@
 #pragma once
+#include "Core/SubSystems/Systems/Input/Actions/InputActionView.h"
 #include "Data/Input/InputUserID.h"
 #include "DF2D_API.h"
 #include "Utilities/Delegates/Listeners/ListenerID.h"
@@ -15,9 +16,6 @@ namespace DeadFrame2D::Engine
 
 namespace DeadFrame2D::Core
 {
-	class RuntimeInputAction;
-
-
 	class DF2D_API IInputActions
 	{
 	public:
@@ -29,7 +27,7 @@ namespace DeadFrame2D::Core
 			const std::string& actionMapName,
 			const std::string& actionName,
 			const DeadFrame2D::Engine::ComponentHandleBase& listener,
-			const std::function<void(const RuntimeInputAction&)>& handler) = 0;
+			const std::function<void(const InputActionView&)>& handler) = 0;
 
 		virtual void DeregisterAction(
 			DeadFrame2D::Data::InputUserID userID,
@@ -50,6 +48,6 @@ namespace DeadFrame2D::Core
 
 		virtual bool SwitchToActionMap(DeadFrame2D::Data::InputUserID userID, const std::string& name) = 0;
 
-		virtual std::optional<RuntimeInputAction> GetActionState(DeadFrame2D::Data::InputUserID userID, const std::string actionName) = 0;
+		virtual std::optional<InputActionView> GetActionState(DeadFrame2D::Data::InputUserID userID, const std::string actionName) = 0;
 	};
 }

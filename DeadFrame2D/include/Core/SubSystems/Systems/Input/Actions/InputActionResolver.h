@@ -81,7 +81,7 @@ namespace DeadFrame2D::Core
 			const std::string& actionMapName,
 			const std::string& actionName,
 			const DeadFrame2D::Engine::ComponentHandleBase& listener,
-			const std::function<void(const RuntimeInputAction&)>& handler) override;
+			const std::function<void(const InputActionView&)>& handler) override;
 
 		void DeregisterAction(
 			DeadFrame2D::Data::InputUserID userID,
@@ -101,6 +101,6 @@ namespace DeadFrame2D::Core
 
 		bool SwitchToActionMap(DeadFrame2D::Data::InputUserID userID, const std::string& name) override;
 
-		std::optional<RuntimeInputAction> GetActionState(DeadFrame2D::Data::InputUserID userID, const std::string actionName) override;
+		std::optional<InputActionView> GetActionState(DeadFrame2D::Data::InputUserID userID, const std::string actionName) override;
 	};
 }

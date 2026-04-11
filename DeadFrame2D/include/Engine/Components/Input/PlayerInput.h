@@ -1,17 +1,12 @@
 #pragma once
-#include "Data/Input/InputUserID.h"
+#include "Core/SubSystems/Systems/Input/Actions/InputActionView.h"
 #include "Data/Input/ActionListenerEntry.h"
+#include "Data/Input/InputUserID.h"
 #include "DF2D_API.h"
 #include "Engine/Components/GameComponent.h"
 #include "Utilities/Delegates/Listeners/ListenerID.h"
 #include <functional>
 #include <string>
-
-
-namespace DeadFrame2D::Core
-{
-	class RuntimeInputAction;
-}
 
 
 namespace DeadFrame2D::Engine
@@ -35,7 +30,11 @@ namespace DeadFrame2D::Engine
 		virtual ~PlayerInput() override;
 
 
-		DeadFrame2D::Utilities::ListenerID RegisterAction(const std::string& actionMapName, const std::string& actionName, const ComponentHandleBase& listener, const std::function<void(const DeadFrame2D::Core::RuntimeInputAction&)>& handler);
+		DeadFrame2D::Utilities::ListenerID RegisterAction(
+			const std::string& actionMapName,
+			const std::string& actionName,
+			const ComponentHandleBase& listener,
+			const std::function<void(const DeadFrame2D::Core::InputActionView&)>& handler);
 
 		void DeregisterAction(const std::string& actionMapName, const std::string& actionName, const ComponentHandleBase& listener);
 

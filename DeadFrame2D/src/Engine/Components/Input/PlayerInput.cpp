@@ -30,7 +30,11 @@ namespace DeadFrame2D::Engine
 		Input::Users()->DestroyUser(userID);
 	}
 
-	ListenerID PlayerInput::RegisterAction(const std::string& actionMapName, const std::string& actionName, const ComponentHandleBase& listener, const std::function<void(const DeadFrame2D::Core::RuntimeInputAction&)>& handler)
+	ListenerID PlayerInput::RegisterAction(
+		const std::string& actionMapName,
+		const std::string& actionName,
+		const ComponentHandleBase& listener,
+		const std::function<void(const InputActionView&)>& handler)
 	{
 		auto id = Input::Actions()->RegisterAction(userID, actionMapName, actionName, listener, handler);
 
