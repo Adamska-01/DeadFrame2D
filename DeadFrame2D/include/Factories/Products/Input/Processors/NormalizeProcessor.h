@@ -15,7 +15,5 @@ namespace DeadFrame2D::Factories
 		void Process(float& value) const override;
 
 		void Process(DeadFrame2D::Core::Vector2F& value) const override;
-
-		std::unique_ptr<IInputProcessor> Clone() const override;
 	};
 }

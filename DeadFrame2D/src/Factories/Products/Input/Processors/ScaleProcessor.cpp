@@ -29,11 +29,6 @@ namespace DeadFrame2D::Factories
 		value.y *= factor;
 	}
 
-	std::unique_ptr<IInputProcessor> ScaleProcessor::Clone() const
-	{
-		return std::make_unique<ScaleProcessor>(factor);
-	}
-
 	float ScaleProcessor::GetFactor() const
 	{
 		return factor;

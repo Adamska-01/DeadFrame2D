@@ -20,9 +20,6 @@ namespace DeadFrame2D::Factories
 
 		void Process(DeadFrame2D::Core::Vector2F& value) const override;
 
-		std::unique_ptr<IInputProcessor> Clone() const override;
-
-
 		float GetThreshold() const;
 
 		void SetThreshold(float threshold);

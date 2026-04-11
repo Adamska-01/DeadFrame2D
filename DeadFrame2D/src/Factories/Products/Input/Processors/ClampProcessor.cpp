@@ -28,11 +28,6 @@ namespace DeadFrame2D::Factories
 		value.y = std::clamp(value.y, min, max);
 	}
 
-	std::unique_ptr<IInputProcessor> ClampProcessor::Clone() const
-	{
-		return std::make_unique<ClampProcessor>(min, max);
-	}
-
 	float ClampProcessor::GetMin() const
 	{
 		return min;

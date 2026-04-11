@@ -23,8 +23,4 @@ namespace DeadFrame2D::Factories
 		value = value.Normalize();
 	}
 
-	std::unique_ptr<IInputProcessor> NormalizeProcessor::Clone() const
-	{
-		return std::make_unique<NormalizeProcessor>();
 	}
-}

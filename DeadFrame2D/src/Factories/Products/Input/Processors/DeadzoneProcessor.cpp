@@ -57,11 +57,6 @@ namespace DeadFrame2D::Factories
 		}
 	}
 
-	std::unique_ptr<IInputProcessor> DeadzoneProcessor::Clone() const
-	{
-		return std::make_unique<DeadzoneProcessor>(threshold);
-	}
-
 	float DeadzoneProcessor::GetThreshold() const
 	{
 		return threshold;

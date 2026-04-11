@@ -24,8 +24,4 @@ namespace DeadFrame2D::Factories
 		value.y = -value.y;
 	}
 
-	std::unique_ptr<IInputProcessor> InvertProcessor::Clone() const
-	{
-		return std::make_unique<InvertProcessor>();
 	}
-}
