@@ -1,5 +1,4 @@
 #include "Core/SubSystems/Systems/Input/Actions/RuntimeActionMap.h"
-#include <unordered_map>
 #include <unordered_set>
 
 
@@ -19,7 +18,7 @@ namespace DeadFrame2D::Core
 
 		for (auto& action : actionMap.actions)
 		{
-			if (!seenActionNames.insert(action.name).second) 
+			if (!seenActionNames.insert(action.name).second)
 				throw std::runtime_error("Duplicate action name in InputActionMap: " + action.name);
 		}
 

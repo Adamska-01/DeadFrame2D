@@ -14,6 +14,9 @@
 
 namespace DeadFrame2D::Core
 {
+	class InputActionView;
+
+
 	class DF2D_API RuntimeInputAction
 	{
 		friend class InputActionResolver;
@@ -36,8 +39,7 @@ namespace DeadFrame2D::Core
 
 		std::vector<std::unique_ptr<DeadFrame2D::Factories::IInputProcessor>> processors;
 
-		// TODO: Return a more light-weight class/struct
-		DeadFrame2D::Utilities::MulticastDelegate<const RuntimeInputAction&> listeners;
+		DeadFrame2D::Utilities::MulticastDelegate<const InputActionView&> listeners;
 
 
 		void ResetFrame();
@@ -51,35 +53,5 @@ namespace DeadFrame2D::Core
 			Shared::Models::ValueType valueType,
 			std::vector<Shared::Models::Binding> bindings,
 			std::vector<Shared::Models::InputProcessor> inputProcessors);
-
-		RuntimeInputAction(const RuntimeInputAction& other);
-
-		RuntimeInputAction(RuntimeInputAction&& other) noexcept;
-
-		RuntimeInputAction& operator=(const RuntimeInputAction& other);
-
-		RuntimeInputAction& operator=(RuntimeInputAction&& other) noexcept;
-
-
-		template<typename T>
-		T ReadValue() const;
-
-		bool IsWaiting() const;
-
-		bool IsStarted() const;
-
-		bool IsPerformed() const;
-
-		bool IsCancelled() const;
 	};
-
-
-	template<typename T>
-	inline T RuntimeInputAction::ReadValue() const
-	{
-		if (!std::holds_alternative<T>(value))
-			return T{};
-
-		return std::get<T>(value);
-	}
 }

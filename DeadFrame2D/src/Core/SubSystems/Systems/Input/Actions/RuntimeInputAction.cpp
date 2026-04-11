@@ -45,73 +45,6 @@ namespace DeadFrame2D::Core
 		}
 	}
 
-	RuntimeInputAction::RuntimeInputAction(const RuntimeInputAction& other)
-		: name(other.name),
-		value(other.value),
-		previousValue(other.previousValue),
-		pendingValue(other.pendingValue),
-		isValuePending(other.isValuePending),
-		phase(other.phase),
-		bindings(other.bindings),
-		processors()
-	{
-		for (const auto& processor : other.processors)
-		{
-			processors.push_back(processor->Clone());
-		}
-	}
-
-	RuntimeInputAction::RuntimeInputAction(RuntimeInputAction&& other) noexcept
-		: name(std::move(other.name)), 
-		value(std::move(other.value)),
-		previousValue(std::move(other.previousValue)),
-		pendingValue(std::move(other.pendingValue)),
-		isValuePending(other.isValuePending),
-		phase(other.phase),
-		bindings(std::move(other.bindings)),
-		processors(std::move(other.processors))
-	{
-	}
-
-	RuntimeInputAction& RuntimeInputAction::operator=(const RuntimeInputAction& other)
-	{
-		if (this == &other)
-			return *this;
-
-		name = other.name;
-		value = other.value;
-		previousValue = other.previousValue;
-		pendingValue = other.pendingValue;
-		isValuePending = other.isValuePending;
-		phase = other.phase;
-		bindings = other.bindings;
-		processors.clear();
-
-		for (const auto& processor : other.processors)
-		{
-			processors.push_back(processor->Clone());
-		}
-
-		return *this;
-	}
-
-	RuntimeInputAction& RuntimeInputAction::operator=(RuntimeInputAction&& other) noexcept
-	{
-		if (this == &other)
-			return *this;
-
-		name = std::move(other.name);
-		value = std::move(other.value);
-		previousValue = std::move(other.previousValue);
-		pendingValue = std::move(other.pendingValue);
-		isValuePending = other.isValuePending;
-		phase = other.phase;
-		bindings = std::move(other.bindings);
-		processors = std::move(other.processors);
-
-		return *this;
-	}
-
 
 	void RuntimeInputAction::ResetFrame()
 	{
@@ -162,25 +95,5 @@ namespace DeadFrame2D::Core
 				}
 			},
 			value);
-	}
-
-	bool RuntimeInputAction::IsWaiting() const
-	{
-		return phase == ActionPhase::WAITING;
-	}
-
-	bool RuntimeInputAction::IsStarted() const
-	{
-		return phase == ActionPhase::STARTED;
-	}
-
-	bool RuntimeInputAction::IsPerformed() const
-	{
-		return phase == ActionPhase::PERFORMED;
-	}
-
-	bool RuntimeInputAction::IsCancelled() const
-	{
-		return phase == ActionPhase::CANCELED;
 	}
 }
