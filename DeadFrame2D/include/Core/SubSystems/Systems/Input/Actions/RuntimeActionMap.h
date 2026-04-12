@@ -19,6 +19,11 @@ namespace DeadFrame2D::Core
 	public:
 		RuntimeActionMap(Shared::Models::InputActionMap actionMap);
 
+		/// No copy allowed (Just enforcing copy restriction from RuntimeInputAction)
+		RuntimeActionMap(const RuntimeActionMap&) = delete;
+
+		RuntimeActionMap& operator=(const RuntimeActionMap&) = delete;
+
 
 		void Enable();
 

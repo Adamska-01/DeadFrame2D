@@ -53,5 +53,14 @@ namespace DeadFrame2D::Core
 			Shared::Models::ValueType valueType,
 			std::vector<Shared::Models::Binding> bindings,
 			std::vector<Shared::Models::InputProcessor> inputProcessors);
+
+		/// No copy allowed (Just enforcing copy restriction from MulticastDelegate)
+		RuntimeInputAction(const RuntimeInputAction&) = delete;
+		
+		RuntimeInputAction& operator=(const RuntimeInputAction&) = delete;
+
+		RuntimeInputAction(RuntimeInputAction&&) noexcept = default;
+		
+		RuntimeInputAction& operator=(RuntimeInputAction&&) noexcept = default;
 	};
 }
