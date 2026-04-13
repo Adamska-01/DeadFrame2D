@@ -14,7 +14,7 @@ namespace DeadFrame2D::Core
 		actions.clear();
 
 		// Detect duplicate action names
-		std::unordered_set<std::string> seenActionNames;
+		auto seenActionNames = std::unordered_set<std::string>();
 
 		for (auto& action : actionMap.actions)
 		{
@@ -23,7 +23,7 @@ namespace DeadFrame2D::Core
 		}
 
 		// Build map: action name -> bindings
-		std::unordered_map<std::string, std::vector<Binding>> nameToBindings;
+		auto nameToBindings = std::unordered_map<std::string, std::vector<Binding>>();
 
 		for (auto& binding : actionMap.bindings)
 		{
