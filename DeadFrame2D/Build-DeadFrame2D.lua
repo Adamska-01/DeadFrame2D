@@ -7,20 +7,20 @@ project "DeadFrame2D"
 	targetdir ("./Binaries/" .. OutputDir) -- .dll
 	objdir ("./Binaries/Intermediates/" .. OutputDir)
 	debugdir "../" -- Set working directory to the root of the solution
-	
-	defines { "DF2D_DYNAMIC", "DF2D_DYNAMIC_BUILD", "SHARED_DYNAMIC" }
 
-	dependson { "Box2D", "tinyxml2", "Shared" }
+	defines { "DF2D_DYNAMIC", "DF2D_DYNAMIC_BUILD" }
+
+	dependson { "Box2D", "tinyxml2" }
 
 	files { 
 		"include/**.h", 
-		"src/**.cpp"
+		"src/**.cpp",
+		"Resources/**.*"
 	}
 
 	includedirs { 
 		"include",
 		"Internal",
-		"../Shared/include", 
 		"../Vendor/nlohmann-3.11.3", 
 		"../Vendor/tinyxml2-10.0.0", 
 		"../Vendor/Box2D/Module/include",
@@ -30,14 +30,13 @@ project "DeadFrame2D"
 		"../Vendor/SDL/SDL2_mixer-2.8.0/include" 
 	}
 
-	links { "SDL2", "SDL2_image", "SDL2_ttf", "SDL2_mixer", "Shared", "Box2D", "tinyxml2" }
+	links { "SDL2", "SDL2_image", "SDL2_ttf", "SDL2_mixer", "Box2D", "tinyxml2" }
 
 
 	-- Utility to configure platform + arch libdirs in a single call
 	function configure_platform_libs(osName, arch)
 		libdirs(table.join(
 			get_sdl_libdirs("../Vendor/SDL/", osName, arch),
-			get_libdir("../Shared/Binaries/"),
 			get_libdir("../Vendor/Box2D/Binaries/"),
 			get_libdir("../Vendor/tinyxml2-10.0.0/Binaries/")
 		))
