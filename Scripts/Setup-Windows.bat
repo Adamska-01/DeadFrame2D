@@ -23,8 +23,4 @@ echo Installing Git post-checkout hook...
 ) > %HOOK_PATH%
 echo Hook installed at %HOOK_PATH%
 
-
-:: Update submodules
-git submodule update --init --recursive
-
 pause
