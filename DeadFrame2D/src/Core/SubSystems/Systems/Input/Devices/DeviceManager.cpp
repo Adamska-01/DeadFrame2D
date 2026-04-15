@@ -18,8 +18,7 @@ namespace DeadFrame2D::Core
 	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Engine;
 	using namespace DeadFrame2D::Utilities;
-
-	using namespace Shared::Models;
+	using namespace DeadFrame2D::Models;
 
 
 	DeviceManager::DeviceManager(IInputActionHandler* actionHandler)
@@ -222,7 +221,7 @@ namespace DeadFrame2D::Core
 		return static_cast<MouseInputDevice*>(devices[DefaultDeviceIDs::MOUSE].get());
 	}
 
-	ControllerInputDevice* DeviceManager::Controller(DeadFrame2D::Data::InputDeviceID id)
+	ControllerInputDevice* DeviceManager::Controller(Data::InputDeviceID id)
 	{
 		auto it = devices.find(id);
 

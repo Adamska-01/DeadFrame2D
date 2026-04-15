@@ -5,8 +5,8 @@
 #include "Core/SubSystems/Systems/Rendering/Abstractions/IRenderBackend.h"
 #include "Core/SubSystems/Systems/Rendering/RenderSystem.h"
 #include "DF2D_API.h"
+#include "Models/Rendering/RendererConfig.h"
 #include <cstdint>
-#include <Models/Rendering/RendererConfig.h>
 #include <SDL.h>
 
 
@@ -36,7 +36,7 @@ namespace DeadFrame2D::Core
 		std::unique_ptr<RenderPipeline> renderPipeline;
 
 
-		Renderer(SDL_Window* window, const Shared::Models::RendererConfig& config);
+		Renderer(SDL_Window* window, const Models::RendererConfig& config);
 
 		~Renderer() override;
 
@@ -58,11 +58,11 @@ namespace DeadFrame2D::Core
 		void EndDraw() override;
 
 
-		void DrawPixel(const Vector2F& pixelPos, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE) override;
+		void DrawPixel(const Vector2F& pixelPos, SDL_Color color = Constants::CommonColors::WHITE) override;
 		
-		void DrawLine(const Vector2F& p1, const Vector2F& p2, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE) override;
+		void DrawLine(const Vector2F& p1, const Vector2F& p2, SDL_Color color = Constants::CommonColors::WHITE) override;
 
-		void DrawRect(SDL_FRect rect, float angleDegrees, SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE, bool filled = false) override;
+		void DrawRect(SDL_FRect rect, float angleDegrees, SDL_Color color = Constants::CommonColors::WHITE, bool filled = false) override;
 
 		void DrawCircle(const Vector2F& center, float radius, SDL_Color color, bool filled) override;
 
@@ -73,7 +73,7 @@ namespace DeadFrame2D::Core
 			const SDL_FPoint* rotationOrigin = NULL,
 			float angle = 0.0f,
 			SDL_RendererFlip flip = SDL_FLIP_NONE,
-			SDL_Color colorMod = DeadFrame2D::Constants::CommonColors::WHITE) override;
+			SDL_Color colorMod = Constants::CommonColors::WHITE) override;
 
 		void SetRenderTarget(SDL_Texture* renderTarget) override;
 

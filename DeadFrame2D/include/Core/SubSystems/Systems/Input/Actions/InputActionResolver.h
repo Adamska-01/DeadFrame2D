@@ -14,7 +14,7 @@
 #include <unordered_set>
 
 
-namespace Shared::Models
+namespace DeadFrame2D::Models
 {
 	struct Binding;
 }
@@ -36,30 +36,30 @@ namespace DeadFrame2D::Core
 	class DF2D_API InputActionResolver final : public IInputActions, public IInputFrameLifecycle, public IInputActionHandler
 	{
 	private:
-		std::unordered_map<DeadFrame2D::Data::InputUserID, ActionMapIndex> runtimeActionMaps;
+		std::unordered_map<Data::InputUserID, ActionMapIndex> runtimeActionMaps;
 
-		std::unordered_map<DeadFrame2D::Data::InputUserID, std::unordered_set<RuntimeInputAction*>> activeActions;
+		std::unordered_map<Data::InputUserID, std::unordered_set<RuntimeInputAction*>> activeActions;
 
 		std::unordered_set<RuntimeInputAction*> callableActions;
 
 
 		ActionPhase ResolvePhase(bool started, bool held, bool cancelled);
 
-		void ResolveSimple(const InputDevice& device, RuntimeInputAction& action, const Shared::Models::Binding& binding);
+		void ResolveSimple(const InputDevice& device, RuntimeInputAction& action, const Models::Binding& binding);
 
-		void ResolveComposite1D(const InputDevice& device, RuntimeInputAction& action, const Shared::Models::Binding& binding);
+		void ResolveComposite1D(const InputDevice& device, RuntimeInputAction& action, const Models::Binding& binding);
 
-		void ResolveComposite2D(const InputDevice& device, RuntimeInputAction& action, const Shared::Models::Binding& binding);
-
-
-		int ToCustomCode(const InputDevice& device, Shared::Models::InputControlType inputControlType, int sdlCode);
-
-		int ToSDLCode(const InputDevice& device, Shared::Models::InputControlType inputControlType, int customCode);
+		void ResolveComposite2D(const InputDevice& device, RuntimeInputAction& action, const Models::Binding& binding);
 
 
-		void InputUserCreatedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
+		int ToCustomCode(const InputDevice& device, Models::InputControlType inputControlType, int sdlCode);
 
-		void InputUserDestroyedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
+		int ToSDLCode(const InputDevice& device, Models::InputControlType inputControlType, int customCode);
+
+
+		void InputUserCreatedEventHandler(std::shared_ptr<Engine::DispatchableEvent> dispatchableEvent);
+
+		void InputUserDestroyedEventHandler(std::shared_ptr<Engine::DispatchableEvent> dispatchableEvent);
 
 
 		void BeginFrame() override;
@@ -67,7 +67,7 @@ namespace DeadFrame2D::Core
 		void PreUpdate() override;
 
 
-		void ProcessBinding(const InputDevice& device, Shared::Models::InputControlType inputControlType, int controlID) override;
+		void ProcessBinding(const InputDevice& device, Models::InputControlType inputControlType, int controlID) override;
 
 
 	public:
@@ -76,31 +76,31 @@ namespace DeadFrame2D::Core
 		~InputActionResolver() override;
 
 
-		DeadFrame2D::Utilities::ListenerID RegisterAction(
-			DeadFrame2D::Data::InputUserID userID,
+		Utilities::ListenerID RegisterAction(
+			Data::InputUserID userID,
 			const std::string& actionMapName,
 			const std::string& actionName,
-			const DeadFrame2D::Engine::ComponentHandleBase& listener,
+			const Engine::ComponentHandleBase& listener,
 			const std::function<void(const InputActionView&)>& handler) override;
 
 		void DeregisterAction(
-			DeadFrame2D::Data::InputUserID userID,
+			Data::InputUserID userID,
 			const std::string& actionMapName,
 			const std::string& actionName,
-			const DeadFrame2D::Engine::ComponentHandleBase& listener) override;
+			const Engine::ComponentHandleBase& listener) override;
 
 		void DeregisterActionByID(
-			DeadFrame2D::Data::InputUserID userID,
+			Data::InputUserID userID,
 			const std::string& actionMapName,
 			const std::string& actionName,
-			DeadFrame2D::Utilities::ListenerID listenerID) override;
+			Utilities::ListenerID listenerID) override;
 
-		bool EnableActionMap(DeadFrame2D::Data::InputUserID userID, const std::string& name) override;
+		bool EnableActionMap(Data::InputUserID userID, const std::string& name) override;
 
-		bool DisableActionMap(DeadFrame2D::Data::InputUserID userID, const std::string& name) override;
+		bool DisableActionMap(Data::InputUserID userID, const std::string& name) override;
 
-		bool SwitchToActionMap(DeadFrame2D::Data::InputUserID userID, const std::string& name) override;
+		bool SwitchToActionMap(Data::InputUserID userID, const std::string& name) override;
 
-		std::optional<InputActionView> GetActionState(DeadFrame2D::Data::InputUserID userID, const std::string actionName) override;
+		std::optional<InputActionView> GetActionState(Data::InputUserID userID, const std::string actionName) override;
 	};
 }

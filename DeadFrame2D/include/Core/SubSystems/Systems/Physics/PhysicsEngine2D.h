@@ -35,14 +35,14 @@ namespace DeadFrame2D::Core
 
 		std::unique_ptr<b2ContactListener> contactListener;
 
-		std::unique_ptr<DeadFrame2D::Factories::ColliderDrawer> debugDrawer;
+		std::unique_ptr<Factories::ColliderDrawer> debugDrawer;
 
-		Shared::Models::PhysicsConfig physicsConfig;
+		Models::PhysicsConfig physicsConfig;
 
-		Shared::Models::CollisionMasks collisionMasks;
+		Models::CollisionMasks collisionMasks;
 
 
-		PhysicsEngine2D(const Shared::Models::PhysicsConfig& physicsConfig);
+		PhysicsEngine2D(const Models::PhysicsConfig& physicsConfig);
 
 		~PhysicsEngine2D() override;
 
@@ -69,8 +69,8 @@ namespace DeadFrame2D::Core
 
 		static void DestroyBody(b2Body* bodyToDestroy);
 
-		static const Shared::Models::PhysicsConfig& GetPhysicsConfig();
+		static const Models::PhysicsConfig& GetPhysicsConfig();
 
-		static const Shared::Models::CollisionMasks& GetCollisionMasks();
+		static const Models::CollisionMasks& GetCollisionMasks();
 	};
 }

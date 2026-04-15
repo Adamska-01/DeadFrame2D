@@ -1,20 +1,19 @@
+#include "Constants/Paths/ResourcePaths.h"
 #include "Core/Framerate/FrameTimer.h"
 #include "Core/SubSystems/Systems/Physics/ContactListener.h"
 #include "Core/SubSystems/Systems/Physics/PhysicsEngine2D.h"
 #include "Factories/Concretions/Debugging/ColliderDrawerFactory.h"
 #include "Factories/Products/Debugging/ColliderDrawer.h"
+#include "Utilities/IO/Serialization/JsonSerializer.h"
 #include <box2d/box2d.h>
 #include <cassert>
-#include <Constants/ResourcePaths.h>
-#include <Tools/Serialization/JsonSerializer.h>
 
 
 namespace DeadFrame2D::Core
 {
-	using namespace Shared::Constants;
-	using namespace Shared::Models;
-	using namespace Shared::Tools;
-
+	using namespace DeadFrame2D::Constants;
+	using namespace DeadFrame2D::Models;
+	using namespace DeadFrame2D::Utilities;
 	using namespace DeadFrame2D::Factories;
 
 
@@ -40,7 +39,7 @@ namespace DeadFrame2D::Core
 		world->SetDebugDraw(debugDrawer.get());
 
 
-		collisionMasks = DeserializeFromFile<CollisionMasks>(Paths::Files::COLLISION_MASKS);
+		collisionMasks = JsonSerializer::DeserializeFromFile<CollisionMasks>(Paths::Files::COLLISION_MASKS);
 
 
 		std::cout << "[Info] PhysicsEngine2D successfully initialized." << std::endl;
@@ -103,7 +102,7 @@ namespace DeadFrame2D::Core
 		return instance->world->DestroyBody(bodyToDestroy);
 	}
 
-	const Shared::Models::PhysicsConfig& PhysicsEngine2D::GetPhysicsConfig()
+	const PhysicsConfig& PhysicsEngine2D::GetPhysicsConfig()
 	{
 		return instance->physicsConfig;
 	}

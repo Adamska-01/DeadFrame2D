@@ -2,7 +2,7 @@
 #include "Data/Input/InputControlState.h"
 #include "Data/Input/InputDeviceID.h"
 #include "DF2D_API.h"
-#include <Models/Input/InputDeviceType.h>
+#include "Models/Input/InputDeviceType.h"
 #include <string>
 
 
@@ -36,9 +36,9 @@ namespace DeadFrame2D::Core
 		const std::string& Name() const;
 
 
-		virtual Shared::Models::InputDeviceType Type() const = 0;
+		virtual Models::InputDeviceType Type() const = 0;
 
-		virtual DeadFrame2D::Data::InputDeviceID ID() const = 0;
+		virtual Data::InputDeviceID ID() const = 0;
 
 
 		/**
@@ -55,11 +55,11 @@ namespace DeadFrame2D::Core
 		/**
 		 * Digital input (keyboard keys, controller buttons).
 		 */
-		virtual DeadFrame2D::Data::InputControlState GetButtonState(int buttonID) const = 0;
+		virtual Data::InputControlState GetButtonState(int buttonID) const = 0;
 
 		/**
 		 * Analog input (controller sticks, triggers, mouse delta, etc.).
 		 */
-		virtual DeadFrame2D::Data::InputControlState GetAxisState(int axisID) const = 0;
+		virtual Data::InputControlState GetAxisState(int axisID) const = 0;
 	};
 }

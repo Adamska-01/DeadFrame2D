@@ -11,8 +11,8 @@
 
 namespace DeadFrame2D::Core
 {
-	using namespace Shared::Constants;
-	using namespace Shared::Models;
+	using namespace DeadFrame2D::Constants;
+	using namespace DeadFrame2D::Models;
 
 
 	SubSystemManager::SubSystemManager()

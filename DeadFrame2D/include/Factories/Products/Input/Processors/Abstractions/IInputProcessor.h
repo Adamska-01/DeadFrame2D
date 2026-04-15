@@ -1,10 +1,7 @@
 #pragma once
 #include "Core/Math/Vector2.h"
 #include "DF2D_API.h"
-#include <memory>
-#include <Models/Input/ActionMap/Types/ProcessorType.h>
-#include <variant>
-#include <vector>
+#include "Models/Input/ActionMap/Types/ProcessorType.h"
 
 
 namespace DeadFrame2D::Factories
@@ -15,10 +12,10 @@ namespace DeadFrame2D::Factories
 		virtual ~IInputProcessor() = default;
 
 
-		virtual Shared::Models::ProcessorType GetType() const = 0;
+		virtual Models::ProcessorType GetType() const = 0;
 
 		virtual void Process(float& value) const = 0;
 
-		virtual void Process(DeadFrame2D::Core::Vector2F& value) const = 0;
+		virtual void Process(Core::Vector2F& value) const = 0;
 	};
 }

@@ -1,6 +1,6 @@
 #pragma once
-#include <Models/Input/Controls/ControllerAxisCode.h>
-#include <Models/Input/Controls/ControllerButtonCode.h>
+#include "Models/Input/Controls/ControllerAxisCode.h"
+#include "Models/Input/Controls/ControllerButtonCode.h"
 #include <SDL_gamecontroller.h>
 
 
@@ -11,9 +11,9 @@ namespace DeadFrame2D::Internal::ControllerButtonConversions
 	 * @param code The custom controller button code.
 	 * @return Corresponding SDL_GameControllerButton.
 	 */
-	inline SDL_GameControllerButton ToSDLControllerButton(Shared::Models::ControllerButtonCode controllerButtonCode)
+	inline SDL_GameControllerButton ToSDLControllerButton(Models::ControllerButtonCode controllerButtonCode)
 	{
-		using namespace Shared::Models;
+		using namespace Models;
 
 
 		switch (controllerButtonCode)
@@ -53,9 +53,9 @@ namespace DeadFrame2D::Internal::ControllerButtonConversions
 	 * @param code The custom controller button code.
 	 * @return Corresponding SDL_GameControllerButton.
 	 */
-	inline SDL_GameControllerAxis ToSDLControllerAxis(Shared::Models::ControllerAxisCode axis)
+	inline SDL_GameControllerAxis ToSDLControllerAxis(Models::ControllerAxisCode axis)
 	{
-		using namespace Shared::Models;
+		using namespace Models;
 
 
 		switch (axis)
@@ -81,9 +81,9 @@ namespace DeadFrame2D::Internal::ControllerButtonConversions
 	 * @param sdlButtonCode The SDL controller button code.
 	 * @return Corresponding ControllerButtonCode.
 	 */
-	inline Shared::Models::ControllerButtonCode ToControllerButtonCode(SDL_GameControllerButton sdlButtonCode)
+	inline Models::ControllerButtonCode ToControllerButtonCode(SDL_GameControllerButton sdlButtonCode)
 	{
-		using namespace Shared::Models;
+		using namespace Models;
 
 
 		switch (sdlButtonCode)
@@ -123,9 +123,9 @@ namespace DeadFrame2D::Internal::ControllerButtonConversions
 	 * @param sdlAxisCode The SDL controller axis code.
 	 * @return Corresponding ControllerAxisCode.
 	 */
-	inline Shared::Models::ControllerAxisCode ToControllerAxisCode(SDL_GameControllerAxis sdlAxisCode)
+	inline Models::ControllerAxisCode ToControllerAxisCode(SDL_GameControllerAxis sdlAxisCode)
 	{
-		using namespace Shared::Models;
+		using namespace Models;
 
 
 		switch (sdlAxisCode)

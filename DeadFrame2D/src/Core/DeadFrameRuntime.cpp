@@ -1,18 +1,17 @@
+#include "Constants/Paths/ResourcePaths.h"
 #include "Core/DeadFrameRuntime.h"
 #include "Core/SubSystems/Systems/Rendering/Renderer.h"
 #include "Core/SubSystems/Systems/TextureManager.h"
 #include "Data/Rendering/Pipeline/RenderTask.h"
+#include "Models/Other/SplashScreenConfig.h"
+#include "Models/SystemConfig.h"
 #include <algorithm>
-#include <Constants/ResourcePaths.h>
-#include <Models/Other/SplashScreenConfig.h>
-#include <Models/SystemConfig.h>
 
 
 namespace DeadFrame2D::Core
 {
-	using namespace Shared::Constants;
-	using namespace Shared::Models;
-
+	using namespace DeadFrame2D::Constants;
+	using namespace DeadFrame2D::Models;
 	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Engine;
 	using namespace DeadFrame2D::Utilities;
@@ -53,7 +52,7 @@ namespace DeadFrame2D::Core
 		auto width = 0, height = 0;
 		SDL_QueryTexture(splashTexture.get(), nullptr, nullptr, &width, &height);
 
-		auto splashScreenConfig = Shared::Tools::DeserializeFromFile<SplashScreenConfig>(Paths::Files::SPLASH_SCREEN_CONFIGURATION);
+		auto splashScreenConfig = JsonSerializer::DeserializeFromFile<SplashScreenConfig>(Paths::Files::SPLASH_SCREEN_CONFIGURATION);
 
 		constexpr uint8_t MaxAlpha = 255;
 

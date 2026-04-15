@@ -1,5 +1,5 @@
 #pragma once
-#include <Models/Input/Controls/KeyboardKeyCode.h>
+#include "Models/Input/Controls/KeyboardKeyCode.h"
 #include <SDL_scancode.h>
 
 
@@ -10,9 +10,10 @@ namespace DeadFrame2D::Internal::KeyboardKeyCodeConversions
 	 * @param code The custom keyboard key code.
 	 * @return Corresponding SDL_Scancode.
 	 */
-	inline SDL_Scancode ToSDLScancode(Shared::Models::KeyboardKeyCode keyCode)
+	inline SDL_Scancode ToSDLScancode(Models::KeyboardKeyCode keyCode)
 	{
-		using namespace Shared::Models;
+		using namespace Models;
+
 
 		switch (keyCode)
 		{
@@ -162,9 +163,11 @@ namespace DeadFrame2D::Internal::KeyboardKeyCodeConversions
 	 * @param scancode The SDL scancode.
 	 * @return Corresponding KeyboardKeyCode.
 	 */
-	inline Shared::Models::KeyboardKeyCode ToKeyboardKeyCode(SDL_Scancode scancode)
+	inline Models::KeyboardKeyCode ToKeyboardKeyCode(SDL_Scancode scancode)
 	{
-		using namespace Shared::Models;
+		using namespace Models;
+
+
 		switch (scancode)
 		{
 		case SDL_SCANCODE_A: return KeyboardKeyCode::A;

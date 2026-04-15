@@ -22,32 +22,32 @@ namespace DeadFrame2D::Core
 		virtual ~IInputActions() = default;
 
 
-		virtual DeadFrame2D::Utilities::ListenerID RegisterAction(
-			DeadFrame2D::Data::InputUserID userID,
+		virtual Utilities::ListenerID RegisterAction(
+			Data::InputUserID userID,
 			const std::string& actionMapName,
 			const std::string& actionName,
-			const DeadFrame2D::Engine::ComponentHandleBase& listener,
+			const Engine::ComponentHandleBase& listener,
 			const std::function<void(const InputActionView&)>& handler) = 0;
 
 		virtual void DeregisterAction(
-			DeadFrame2D::Data::InputUserID userID,
+			Data::InputUserID userID,
 			const std::string& actionMapName,
 			const std::string& actionName,
-			const DeadFrame2D::Engine::ComponentHandleBase& listener) = 0;
+			const Engine::ComponentHandleBase& listener) = 0;
 
 		virtual void DeregisterActionByID(
-			DeadFrame2D::Data::InputUserID userID,
+			Data::InputUserID userID,
 			const std::string& actionMapName,
 			const std::string& actionName,
-			DeadFrame2D::Utilities::ListenerID listenerID) = 0;
+			Utilities::ListenerID listenerID) = 0;
 
 
-		virtual bool EnableActionMap(DeadFrame2D::Data::InputUserID userID, const std::string& name) = 0;
+		virtual bool EnableActionMap(Data::InputUserID userID, const std::string& name) = 0;
 
-		virtual bool DisableActionMap(DeadFrame2D::Data::InputUserID userID, const std::string& name) = 0;
+		virtual bool DisableActionMap(Data::InputUserID userID, const std::string& name) = 0;
 
-		virtual bool SwitchToActionMap(DeadFrame2D::Data::InputUserID userID, const std::string& name) = 0;
+		virtual bool SwitchToActionMap(Data::InputUserID userID, const std::string& name) = 0;
 
-		virtual std::optional<InputActionView> GetActionState(DeadFrame2D::Data::InputUserID userID, const std::string actionName) = 0;
+		virtual std::optional<InputActionView> GetActionState(Data::InputUserID userID, const std::string actionName) = 0;
 	};
 }

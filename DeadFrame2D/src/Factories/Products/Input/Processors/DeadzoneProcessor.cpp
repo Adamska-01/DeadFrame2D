@@ -4,8 +4,7 @@
 namespace DeadFrame2D::Factories
 {
 	using namespace DeadFrame2D::Core;
-
-	using namespace Shared::Models;
+	using namespace DeadFrame2D::Models;
 
 
 	DeadzoneProcessor::DeadzoneProcessor(const float threshold)

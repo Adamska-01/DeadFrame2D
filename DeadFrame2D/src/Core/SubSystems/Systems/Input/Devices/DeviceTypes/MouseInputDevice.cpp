@@ -11,8 +11,7 @@ namespace DeadFrame2D::Core
 	using namespace DeadFrame2D::Constants;
 	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Internal;
-
-	using namespace Shared::Models;
+	using namespace DeadFrame2D::Models;
 
 
 	MouseInputDevice::MouseInputDevice(IInputActionHandler* actionHandler)
@@ -231,7 +230,7 @@ namespace DeadFrame2D::Core
 		return GetButtonState(sdlCode);
 	}
 
-	InputControlState MouseInputDevice::GetAxisState(Shared::Models::MouseAxisCode code) const
+	InputControlState MouseInputDevice::GetAxisState(Models::MouseAxisCode code) const
 	{
 		return GetAxisState(static_cast<int>(code));
 	}

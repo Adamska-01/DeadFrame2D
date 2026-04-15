@@ -1,3 +1,4 @@
+#include "Constants/Paths/ResourcePaths.h"
 #include "Converters/Input/ControllerButtonConversions.h"
 #include "Converters/Input/KeyboardKeyCodeConversions.h"
 #include "Converters/Input/MouseButtonConversions.h"
@@ -12,9 +13,8 @@
 #include "Engine/EngineEvents/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/SubSystems/Input/InputUserCreatedEvent.h"
 #include "Engine/EngineEvents/Events/SubSystems/Input/InputUserDestroyedEvent.h"
-#include <Constants/ResourcePaths.h>
-#include <Models/Input/ActionMap/InputActionMapBucket.h>
-#include <Tools/Serialization/JsonSerializer.h>
+#include "Models/Input/ActionMap/InputActionMapBucket.h"
+#include "Utilities/IO/Serialization/JsonSerializer.h"
 
 
 namespace DeadFrame2D::Core
@@ -23,9 +23,8 @@ namespace DeadFrame2D::Core
 	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Utilities;
 	using namespace DeadFrame2D::Internal;
-
-	using namespace Shared::Constants;
-	using namespace Shared::Models;
+	using namespace DeadFrame2D::Constants;
+	using namespace DeadFrame2D::Models;
 
 
 	InputActionResolver::InputActionResolver()
@@ -229,7 +228,7 @@ namespace DeadFrame2D::Core
 		}
 	}
 
-	void InputActionResolver::InputUserCreatedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent)
+	void InputActionResolver::InputUserCreatedEventHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
 	{
 		auto inputUserCreatedEvent = DispatchableEvent::SafeCast<InputUserCreatedEvent>(dispatchableEvent);
 
@@ -238,10 +237,10 @@ namespace DeadFrame2D::Core
 
 		auto userID = inputUserCreatedEvent->GetInputUserID();
 
-		if (!Shared::Tools::IsSerializable<InputActionMapBucket>())
+		if (!JsonSerializer::IsSerializable<InputActionMapBucket>())
 			throw std::runtime_error("[Input] InputActionMapBucket is not serializable. Cannot load input configuration...");
 
-		auto actionMapBucket = Shared::Tools::DeserializeFromFile<InputActionMapBucket>(Paths::Files::INPUT_CONTROLS);
+		auto actionMapBucket = JsonSerializer::DeserializeFromFile<InputActionMapBucket>(Paths::Files::INPUT_CONTROLS);
 
 		// Create empty slots
 		runtimeActionMaps[userID] = {};
@@ -262,7 +261,7 @@ namespace DeadFrame2D::Core
 		}
 	}
 
-	void InputActionResolver::InputUserDestroyedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent)
+	void InputActionResolver::InputUserDestroyedEventHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
 	{
 		auto inputUserDestroyedEvent = DispatchableEvent::SafeCast<InputUserDestroyedEvent>(dispatchableEvent);
 
@@ -466,7 +465,7 @@ namespace DeadFrame2D::Core
 		return -1;
 	}
 
-	void InputActionResolver::DeregisterAction(InputUserID userID, const std::string& actionMapName, const std::string& actionName, const DeadFrame2D::Engine::ComponentHandleBase& listener)
+	void InputActionResolver::DeregisterAction(InputUserID userID, const std::string& actionMapName, const std::string& actionName, const ComponentHandleBase& listener)
 	{
 		if (!listener.IsValid())
 			return;
@@ -489,7 +488,7 @@ namespace DeadFrame2D::Core
 		}
 	}
 
-	void InputActionResolver::DeregisterActionByID(InputUserID userID, const std::string& actionMapName, const std::string& actionName, DeadFrame2D::Utilities::ListenerID listenerID)
+	void InputActionResolver::DeregisterActionByID(InputUserID userID, const std::string& actionMapName, const std::string& actionName, ListenerID listenerID)
 	{
 		auto mapsIt = runtimeActionMaps.find(userID);
 		if (mapsIt == runtimeActionMaps.end())

@@ -16,11 +16,11 @@ namespace DeadFrame2D::Factories
 		ClampProcessor(float min = 0.0f, float max = 1.0f);
 
 
-		Shared::Models::ProcessorType GetType() const override;
+		Models::ProcessorType GetType() const override;
 
 		void Process(float& value) const override;
 
-		void Process(DeadFrame2D::Core::Vector2F& value) const override;
+		void Process(Core::Vector2F& value) const override;
 
 		float GetMin() const;
 

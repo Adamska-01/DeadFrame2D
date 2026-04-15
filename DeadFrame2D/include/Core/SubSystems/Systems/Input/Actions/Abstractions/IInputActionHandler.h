@@ -1,6 +1,6 @@
 #pragma once
 #include "DF2D_API.h"
-#include <Models/Input/ActionMap/Types/InputControlType.h>
+#include "Models/Input/ActionMap/Types/InputControlType.h"
 
 
 namespace DeadFrame2D::Core
@@ -14,6 +14,6 @@ namespace DeadFrame2D::Core
 		virtual ~IInputActionHandler() = default;
 
 
-		virtual void ProcessBinding(const InputDevice& device, Shared::Models::InputControlType inputControlType, int controlID) = 0;
+		virtual void ProcessBinding(const InputDevice& device, Models::InputControlType inputControlType, int controlID) = 0;
 	};
 }

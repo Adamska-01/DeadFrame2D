@@ -1,7 +1,7 @@
 #pragma once
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
 #include "DF2D_API.h"
-#include <Models/SystemConfig.h>
+#include "Models/SystemConfig.h"
 
 
 namespace DeadFrame2D::Core
@@ -18,7 +18,7 @@ namespace DeadFrame2D::Core
 		~SubSystemManager();
 
 
-		void InitializeSubSystems(Shared::Models::SystemConfig config);
+		void InitializeSubSystems(Models::SystemConfig config);
 
 
 		void BeginFrame();

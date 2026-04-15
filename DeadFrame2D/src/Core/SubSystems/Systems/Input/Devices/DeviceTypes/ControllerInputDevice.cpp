@@ -11,8 +11,7 @@ namespace DeadFrame2D::Core
 	using namespace DeadFrame2D::Constants;
 	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Internal;
-
-	using namespace Shared::Models;
+	using namespace DeadFrame2D::Models;
 
 
 	ControllerInputDevice::ControllerInputDevice(SDL_GameController* controller, InputDeviceID instanceID, IInputActionHandler* actionHandler)
@@ -199,7 +198,7 @@ namespace DeadFrame2D::Core
 		return GetButtonState(sdlCode);
 	}
 
-	InputControlState ControllerInputDevice::GetAxisState(Shared::Models::ControllerAxisCode code) const
+	InputControlState ControllerInputDevice::GetAxisState(Models::ControllerAxisCode code) const
 	{
 		auto sdlCode = static_cast<int>(ControllerButtonConversions::ToSDLControllerAxis(code));
 

@@ -14,11 +14,11 @@ namespace DeadFrame2D::Factories
 		ScaleProcessor(float factor = 1.0f);
 
 
-		Shared::Models::ProcessorType GetType() const override;
+		Models::ProcessorType GetType() const override;
 
 		void Process(float& value) const override;
 
-		void Process(DeadFrame2D::Core::Vector2F& value) const override;
+		void Process(Core::Vector2F& value) const override;
 
 		float GetFactor() const;
 

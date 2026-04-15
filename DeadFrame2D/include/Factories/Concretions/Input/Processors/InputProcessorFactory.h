@@ -7,9 +7,9 @@
 
 namespace DeadFrame2D::Factories
 {
-	class InputProcessorFactory : public IFactoryWithInitialiser<std::unique_ptr<DeadFrame2D::Factories::IInputProcessor>, const Shared::Models::InputProcessor&>
+	class InputProcessorFactory : public IFactoryWithInitialiser<std::unique_ptr<IInputProcessor>, const Models::InputProcessor&>
 	{
 	public:
-		std::unique_ptr<DeadFrame2D::Factories::IInputProcessor> CreateProduct(const Shared::Models::InputProcessor& inputProcessorModel) override;
+		std::unique_ptr<IInputProcessor> CreateProduct(const Models::InputProcessor& inputProcessorModel) override;
 	};
 }

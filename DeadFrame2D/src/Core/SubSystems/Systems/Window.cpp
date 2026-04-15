@@ -1,7 +1,7 @@
+#include "Constants/Paths/ResourcePaths.h"
 #include "Core/Debugging/Debug.h"
 #include "Core/SubSystems/Systems/Window.h"
 #include <algorithm>
-#include <Constants/ResourcePaths.h>
 #include <iostream>
 #include <SDL_image.h>
 #include <set>
@@ -9,9 +9,8 @@
 
 namespace DeadFrame2D::Core
 {
-	using namespace Shared::Constants;
-	using namespace Shared::Models;
-
+	using namespace DeadFrame2D::Constants;
+	using namespace DeadFrame2D::Models;
 	using namespace DeadFrame2D::Data;
 
 

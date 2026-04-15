@@ -5,8 +5,7 @@
 namespace DeadFrame2D::Core
 {
 	using namespace DeadFrame2D::Factories;
-
-	using namespace Shared::Models;
+	using namespace DeadFrame2D::Models;
 
 
 	RuntimeInputAction::RuntimeInputAction(

@@ -4,8 +4,7 @@
 namespace DeadFrame2D::Factories
 {
 	using namespace DeadFrame2D::Core;
-
-	using namespace Shared::Models;
+	using namespace DeadFrame2D::Models;
 
 
 	ProcessorType InvertProcessor::GetType() const
@@ -23,5 +22,4 @@ namespace DeadFrame2D::Factories
 		value.x = -value.x;
 		value.y = -value.y;
 	}
-
-	}
+}

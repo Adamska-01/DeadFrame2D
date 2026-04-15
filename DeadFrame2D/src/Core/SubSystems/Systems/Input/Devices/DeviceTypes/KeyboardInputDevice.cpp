@@ -11,8 +11,7 @@ namespace DeadFrame2D::Core
 	using namespace DeadFrame2D::Constants;
 	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Internal;
-
-	using namespace Shared::Models;
+	using namespace DeadFrame2D::Models;
 
 
 	KeyboardInputDevice::KeyboardInputDevice(IInputActionHandler* actionHandler)

@@ -9,8 +9,7 @@
 
 namespace DeadFrame2D::Core
 {
-	using namespace Shared::Models;
-
+	using namespace DeadFrame2D::Models;
 	using namespace DeadFrame2D::Engine;
 	using namespace DeadFrame2D::Constants;
 	using namespace DeadFrame2D::Data;

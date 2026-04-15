@@ -14,8 +14,7 @@
 namespace DeadFrame2D::Factories
 {
 	using namespace DeadFrame2D::Factories;
-
-	using namespace Shared::Models;
+	using namespace DeadFrame2D::Models;
 
 
 	std::unique_ptr<IInputProcessor> InputProcessorFactory::CreateProduct(const InputProcessor& inputProcessorModel)

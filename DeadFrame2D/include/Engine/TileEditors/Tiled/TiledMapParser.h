@@ -1,7 +1,7 @@
 #pragma once
 #include "DF2D_API.h"
-#include "Models/TileEditors/Tiled/TiledMap.h"
-#include "Tools/Serialization/XML_Parser.h"
+#include "Models/Rendering/TileEditors/Tiled/TiledMap.h"
+#include "Utilities/IO/Serialization/XML_Parser.h"
 #include <memory>
 #include <tinyxml2.h>
 
@@ -33,14 +33,14 @@ Example XML map structure:
 
 namespace DeadFrame2D::Engine
 {
-	class DF2D_API TiledMapParser : public Shared::Tools::XML_Parser<std::shared_ptr<DeadFrame2D::Models::TiledMap>>
+	class DF2D_API TiledMapParser : public Utilities::XML_Parser<std::shared_ptr<Models::TiledMap>>
 	{
 	private:
-		DeadFrame2D::Models::TiledTileSet ParseTileSet(tinyxml2::XMLElement* xmlTileset);
+		Models::TiledTileSet ParseTileSet(tinyxml2::XMLElement* xmlTileset);
 
-		DeadFrame2D::Models::TiledLayer ParseLayers(tinyxml2::XMLElement* xmlLayer, int rowcount, int colcount);
+		Models::TiledLayer ParseLayers(tinyxml2::XMLElement* xmlLayer, int rowcount, int colcount);
 
-		DeadFrame2D::Models::TiledObjectGroup ParseObjectGroup(tinyxml2::XMLElement* xmlObjectGroup);
+		Models::TiledObjectGroup ParseObjectGroup(tinyxml2::XMLElement* xmlObjectGroup);
 
 
 	public:
@@ -49,6 +49,6 @@ namespace DeadFrame2D::Engine
 		~TiledMapParser() = default;
 
 
-		virtual std::shared_ptr<DeadFrame2D::Models::TiledMap> Parse(std::string_view source) override;
+		virtual std::shared_ptr<Models::TiledMap> Parse(std::string_view source) override;
 	};
 }

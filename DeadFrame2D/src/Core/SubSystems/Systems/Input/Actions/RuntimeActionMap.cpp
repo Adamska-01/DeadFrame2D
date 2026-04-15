@@ -4,7 +4,7 @@
 
 namespace DeadFrame2D::Core
 {
-	using namespace Shared::Models;
+	using namespace DeadFrame2D::Models;
 
 
 	RuntimeActionMap::RuntimeActionMap(InputActionMap actionMap)

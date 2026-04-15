@@ -3,9 +3,9 @@
 #include "Core/Math/Vector2.h"
 #include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/Abstractions/InputDevice.h"
 #include "DF2D_API.h"
+#include "Models/Input/Controls/MouseAxisCode.h"
+#include "Models/Input/Controls/MouseButtonCode.h"
 #include <array>
-#include <Models/Input/Controls/MouseButtonCode.h>
-#include <Models/Input/Controls/MouseAxisCode.h>
 #include <unordered_set>
 
 
@@ -17,9 +17,9 @@ namespace DeadFrame2D::Core
 	class DF2D_API MouseInputDevice : public InputDevice
 	{
 	private:
-		std::array<DeadFrame2D::Data::InputControlState, (int)Shared::Models::MouseButtonCode::COUNT_MAX> buttonStates;
+		std::array<Data::InputControlState, (int)Models::MouseButtonCode::COUNT_MAX> buttonStates;
 
-		std::array<DeadFrame2D::Data::InputControlState, (int)Shared::Models::MouseAxisCode::COUNT_MAX> axisStates;
+		std::array<Data::InputControlState, (int)Models::MouseAxisCode::COUNT_MAX> axisStates;
 
 		std::unordered_set<uint8_t> activeButtonIDs;
 
@@ -28,9 +28,9 @@ namespace DeadFrame2D::Core
 
 		void ProcessEvent(const SDL_Event& event) override;
 
-		DeadFrame2D::Data::InputControlState GetButtonState(int buttonID) const override;
+		Data::InputControlState GetButtonState(int buttonID) const override;
 
-		DeadFrame2D::Data::InputControlState GetAxisState(int axisID) const override;
+		Data::InputControlState GetAxisState(int axisID) const override;
 
 
 	public:
@@ -39,14 +39,14 @@ namespace DeadFrame2D::Core
 		~MouseInputDevice() override = default;
 
 
-		Shared::Models::InputDeviceType Type() const override;
+		Models::InputDeviceType Type() const override;
 
-		DeadFrame2D::Data::InputDeviceID ID() const override;
+		Data::InputDeviceID ID() const override;
 
 
-		DeadFrame2D::Data::InputControlState GetButtonState(Shared::Models::MouseButtonCode code) const;
+		Data::InputControlState GetButtonState(Models::MouseButtonCode code) const;
 
-		DeadFrame2D::Data::InputControlState GetAxisState(Shared::Models::MouseAxisCode code) const;
+		Data::InputControlState GetAxisState(Models::MouseAxisCode code) const;
 
 		Vector2F GetMouseDelta() const;
 

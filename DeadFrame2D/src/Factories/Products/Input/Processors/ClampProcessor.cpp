@@ -4,6 +4,7 @@
 namespace DeadFrame2D::Factories
 {
 	using namespace DeadFrame2D::Core;
+	using namespace DeadFrame2D::Models;
 
 
 	ClampProcessor::ClampProcessor(const float min, const float max)
@@ -12,9 +13,9 @@ namespace DeadFrame2D::Factories
 	{
 	}
 
-	Shared::Models::ProcessorType ClampProcessor::GetType() const
+	ProcessorType ClampProcessor::GetType() const
 	{
-		return Shared::Models::ProcessorType::CLAMP;
+		return ProcessorType::CLAMP;
 	}
 
 	void ClampProcessor::Process(float& value) const

@@ -1,9 +1,9 @@
 #pragma once
 #include "Core/SubSystems/Systems/Input/Devices/DeviceTypes/Abstractions/InputDevice.h"
 #include "DF2D_API.h"
-#include <vector>
-#include <Models/Input/Controls/KeyboardKeyCode.h>
+#include "Models/Input/Controls/KeyboardKeyCode.h"
 #include <unordered_set>
+#include <vector>
 
 
 namespace DeadFrame2D::Core
@@ -34,11 +34,11 @@ namespace DeadFrame2D::Core
 		~KeyboardInputDevice() override = default;
 
 
-		Shared::Models::InputDeviceType Type() const override;
+		Models::InputDeviceType Type() const override;
 
-		DeadFrame2D::Data::InputDeviceID ID() const override;
+		Data::InputDeviceID ID() const override;
 
 
-		DeadFrame2D::Data::InputControlState GetButtonState(Shared::Models::KeyboardKeyCode code) const;
+		Data::InputControlState GetButtonState(Models::KeyboardKeyCode code) const;
 	};
 }

@@ -4,9 +4,9 @@
 #include "DF2D_API.h"
 #include "Factories/Products/Input/Processors/Abstractions/IInputProcessor.h"
 #include "Models/Input/ActionMap/Bindings/Binding.h"
+#include "Models/Input/ActionMap/Types/ValueType.h"
 #include "Utilities/Delegates/MulticastDelegate.h"
 #include <memory>
-#include <Models/Input/ActionMap/Types/ValueType.h>
 #include <string>
 #include <variant>
 #include <vector>
@@ -35,11 +35,11 @@ namespace DeadFrame2D::Core
 
 		ActionPhase phase;
 
-		std::vector<Shared::Models::Binding> bindings;
+		std::vector<Models::Binding> bindings;
 
-		std::vector<std::unique_ptr<DeadFrame2D::Factories::IInputProcessor>> processors;
+		std::vector<std::unique_ptr<Factories::IInputProcessor>> processors;
 
-		DeadFrame2D::Utilities::MulticastDelegate<const InputActionView&> listeners;
+		Utilities::MulticastDelegate<const InputActionView&> listeners;
 
 
 		void ResetFrame();
@@ -50,9 +50,9 @@ namespace DeadFrame2D::Core
 	public:
 		RuntimeInputAction(
 			const std::string& name,
-			Shared::Models::ValueType valueType,
-			std::vector<Shared::Models::Binding> bindings,
-			std::vector<Shared::Models::InputProcessor> inputProcessors);
+			Models::ValueType valueType,
+			std::vector<Models::Binding> bindings,
+			std::vector<Models::InputProcessor> inputProcessors);
 
 		/// No copy allowed (Just enforcing copy restriction from MulticastDelegate)
 		RuntimeInputAction(const RuntimeInputAction&) = delete;

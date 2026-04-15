@@ -1,5 +1,5 @@
 #pragma once
-#include <Models/Input/Controls/MouseButtonCode.h>
+#include "Models/Input/Controls/MouseButtonCode.h"
 #include <SDL_mouse.h>
 
 
@@ -10,9 +10,9 @@ namespace DeadFrame2D::Internal::MouseButtonConversions
 	 * @param code The custom mouse button code.
 	 * @return Corresponding SDL's internal mouse code.
 	 */
-	inline uint32_t ToSDLMouseButton(Shared::Models::MouseButtonCode mouseButtonCode)
+	inline uint32_t ToSDLMouseButton(Models::MouseButtonCode mouseButtonCode)
 	{
-		using namespace Shared::Models;
+		using namespace Models;
 
 
 		switch (mouseButtonCode)
@@ -33,9 +33,10 @@ namespace DeadFrame2D::Internal::MouseButtonConversions
 	 * @param sdlCode The SDL code.
 	 * @return Corresponding MouseButtonCode.
 	 */
-	inline Shared::Models::MouseButtonCode ToMouseButtonCode(uint32_t sdlCode)
+	inline Models::MouseButtonCode ToMouseButtonCode(uint32_t sdlCode)
 	{
-		using namespace Shared::Models;
+		using namespace Models;
+
 
 		switch (sdlCode)
 		{

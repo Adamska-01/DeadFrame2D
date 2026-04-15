@@ -1,7 +1,7 @@
 #pragma once
+#include "Constants/Paths/ResourcePaths.h"
 #include "Core/Math/Vector2.h"
 #include "Data/UI/FontStyle.h"
-#include <Constants/ResourcePaths.h>
 #include <string>
 #include <string_view>
 
@@ -10,7 +10,7 @@ namespace DeadFrame2D::Data
 {
 	struct TextMeshComponentModel
 	{
-		std::string_view fontSource = Shared::Constants::Paths::Files::CONSOLAS_FONT;
+		std::string_view fontSource = Constants::Paths::Files::CONSOLAS_FONT;
 
 		FontStyle fontStyle = FontStyle::NORMAL;
 
@@ -20,7 +20,7 @@ namespace DeadFrame2D::Data
 	
 		unsigned int fontSize = 30;
 
-		DeadFrame2D::Core::Vector2F textObjectInitialScale = DeadFrame2D::Core::Vector2F::One;
+		Core::Vector2F textObjectInitialScale = Core::Vector2F::One;
 
 		bool isCentered = false;
 	};

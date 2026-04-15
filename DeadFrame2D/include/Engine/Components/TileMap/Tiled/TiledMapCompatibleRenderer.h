@@ -1,14 +1,14 @@
 #pragma once
 #include "DF2D_API.h"
 #include "Engine/Components/TileMap/TileMapRenderer.h"
-#include "Models/TileEditors/Tiled/TiledMap.h"
+#include "Models/Rendering/TileEditors/Tiled/TiledMap.h"
 
 
 namespace DeadFrame2D::Engine
 {
-	class DF2D_API TiledMapCompatibleRenderer : public TileMapRenderer<std::shared_ptr<DeadFrame2D::Models::TiledMap>>
+	class DF2D_API TiledMapCompatibleRenderer : public TileMapRenderer<std::shared_ptr<Models::TiledMap>>
 	{
-		TYPE_INFO(TiledMapCompatibleRenderer, TileMapRenderer<std::shared_ptr<DeadFrame2D::Models::TiledMap>>);
+		TYPE_INFO(TiledMapCompatibleRenderer, TileMapRenderer<std::shared_ptr<Models::TiledMap>>);
 
 
 	private:
@@ -16,7 +16,7 @@ namespace DeadFrame2D::Engine
 
 
 	public:
-		TiledMapCompatibleRenderer(std::shared_ptr<DeadFrame2D::Models::TiledMap> tileMap, bool extendMapToRenderTarget = false);
+		TiledMapCompatibleRenderer(std::shared_ptr<Models::TiledMap> tileMap, bool extendMapToRenderTarget = false);
 
 
 		virtual void Init() override;

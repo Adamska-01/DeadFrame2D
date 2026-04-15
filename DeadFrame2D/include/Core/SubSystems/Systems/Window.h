@@ -4,7 +4,7 @@
 #include "Core/SubSystems/Abstractions/ISubSystem.h"
 #include "Data/Window/WindowMode.h"
 #include "DF2D_API.h"
-#include <Models/Window/WindowConfig.h>
+#include "Models/Window/WindowConfig.h"
 #include <vector>
 
 
@@ -19,7 +19,7 @@ namespace DeadFrame2D::Core
 		static SDL_Window* window;
 
 
-		Window(Shared::Models::WindowConfig windowConfig);
+		Window(Models::WindowConfig windowConfig);
 
 		~Window() override;
 
@@ -56,7 +56,7 @@ namespace DeadFrame2D::Core
 
 		static void SetWindowIcon(std::string_view iconSource);
 
-		static void SetWindowMode(DeadFrame2D::Data::WindowMode mode);
+		static void SetWindowMode(Data::WindowMode mode);
 
 		static bool SetResolution(Vector2I resolution);
 	};
