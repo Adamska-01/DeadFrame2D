@@ -1,7 +1,7 @@
-#include "Core/SubSystems/Systems/Input/Actions/InputActionResolver.h"
-#include "Core/SubSystems/Systems/Input/Input.h"
-#include "Core/SubSystems/Systems/Input/User/InputUser.h"
-#include "Core/SubSystems/Systems/Input/User/InputUserManager.h"
+#include "Core/Context/Systems/Input/Actions/InputActionResolver.h"
+#include "Core/Context/Systems/Input/Input.h"
+#include "Core/Context/Systems/Input/User/InputUser.h"
+#include "Core/Context/Systems/Input/User/InputUserManager.h"
 #include "Engine/Components/Input/PlayerInput.h"
 
 

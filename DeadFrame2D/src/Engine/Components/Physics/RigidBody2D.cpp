@@ -1,6 +1,6 @@
 #include "Converters/Physics/PhysicsConversions.h"
-#include "Core/SubSystems/Systems/CoroutineScheduler.h"
-#include "Core/SubSystems/Systems/Physics/PhysicsEngine2D.h"
+#include "Core/Context/Systems/CoroutineScheduler.h"
+#include "Core/Context/Systems/Physics/PhysicsEngine2D.h"
 #include "Data/Physics/BodyDefinition2D.h"
 #include "Engine/Components/Physics/RigidBody2D.h"
 #include "Engine/Components/Transform.h"

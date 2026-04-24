@@ -1,0 +1,11 @@
+#pragma once
+#include "Core/Context/Systems/Rendering/Resolvers/Specializations/CircleBatchRenderResolver.h"
+#include "Core/Context/Systems/Rendering/Resolvers/Specializations/CircleRenderResolver.h"
+#include "Core/Context/Systems/Rendering/Resolvers/Specializations/LineBatchRenderResolver.h"
+#include "Core/Context/Systems/Rendering/Resolvers/Specializations/LineRenderResolver.h"
+#include "Core/Context/Systems/Rendering/Resolvers/Specializations/PointBatchRenderResolver.h"
+#include "Core/Context/Systems/Rendering/Resolvers/Specializations/PointRenderResolver.h"
+#include "Core/Context/Systems/Rendering/Resolvers/Specializations/RectBatchRenderResolver.h"
+#include "Core/Context/Systems/Rendering/Resolvers/Specializations/RectRenderResolver.h"
+#include "Core/Context/Systems/Rendering/Resolvers/Specializations/SpriteBatchRenderResolver.h"
+#include "Core/Context/Systems/Rendering/Resolvers/Specializations/SpriteRenderResolver.h"

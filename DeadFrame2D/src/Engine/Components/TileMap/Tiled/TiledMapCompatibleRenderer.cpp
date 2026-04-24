@@ -1,6 +1,6 @@
-#include "Core/SubSystems/Systems/Rendering/Renderer.h"
-#include "Core/SubSystems/Systems/Rendering/RenderSystem.h"
-#include "Core/SubSystems/Systems/TextureManager.h"
+#include "Core/Context/Systems/Rendering/Renderer.h"
+#include "Core/Context/Systems/Rendering/RenderSystem.h"
+#include "Core/Context/Systems/TextureManager.h"
 #include "Engine/Components/TileMap/Tiled/TiledMapCompatibleRenderer.h"
 
 

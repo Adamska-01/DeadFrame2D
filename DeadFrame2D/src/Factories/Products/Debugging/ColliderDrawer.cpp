@@ -1,5 +1,5 @@
-#include "Core/SubSystems/Systems/Physics/PhysicsEngine2D.h"
-#include "Core/SubSystems/Systems/Rendering/RenderSystem.h"
+#include "Core/Context/Systems/Physics/PhysicsEngine2D.h"
+#include "Core/Context/Systems/Rendering/RenderSystem.h"
 #include "Constants/Rendering/DefaultSortOrders.h"
 #include "Factories/Products/Debugging/ColliderDrawer.h"
 

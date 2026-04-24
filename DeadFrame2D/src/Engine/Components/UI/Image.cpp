@@ -1,6 +1,6 @@
 #include "Constants/CommonColors.h"
-#include "Core/SubSystems/Systems/Rendering/RenderSystem.h"
-#include "Core/SubSystems/Systems/TextureManager.h"
+#include "Core/Context/Systems/Rendering/RenderSystem.h"
+#include "Core/Context/Systems/TextureManager.h"
 #include "Engine/Components/Transform.h"
 #include "Engine/Components/UI/Canvas.h"
 #include "Engine/Components/UI/Image.h"
