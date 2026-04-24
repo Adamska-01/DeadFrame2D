@@ -7,6 +7,7 @@
 #include "Engine/Components/UI/Canvas.h"
 #include "Engine/Entity/GameObject.h"
 #include "Utilities/Collisions/CollisionUtils.h"
+#include <SDL_events.h>
 
 
 namespace DeadFrame2D::Engine

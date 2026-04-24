@@ -1,7 +1,9 @@
 #pragma once
 #include "DF2D_API.h"
 #include <optional>
-#include <SDL.h>
+
+
+union SDL_Event;
 
 
 namespace DeadFrame2D::Core

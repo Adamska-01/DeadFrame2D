@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/CoreEvents/Abstractions/IEventProcessor.h"
 #include "DF2D_API.h"
+#include <SDL_events.h>
 #include <vector>
 
 

@@ -5,6 +5,7 @@
 #include "Data/Window/WindowMode.h"
 #include "DF2D_API.h"
 #include "Models/Window/WindowConfig.h"
+#include <SDL_video.h>
 #include <vector>
 
 
