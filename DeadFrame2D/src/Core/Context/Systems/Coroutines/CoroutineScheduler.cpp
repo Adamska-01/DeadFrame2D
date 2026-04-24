@@ -1,6 +1,6 @@
-#include "Core/Context/Systems/CoroutineScheduler.h"
-#include "Core/Coroutines/Abstractions/ICoroutineAwaitable.h"
-#include "Core/Coroutines/Task.h"
+#include "Core/Context/Systems/Coroutines/Abstractions/ICoroutineAwaitable.h"
+#include "Core/Context/Systems/Coroutines/CoroutineScheduler.h"
+#include "Core/Context/Systems/Coroutines/Task.h"
 #include "Utilities/Debugging/Guards.h"
 #include <algorithm>
 #include <cassert>

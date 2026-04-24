@@ -1,20 +1,21 @@
 #pragma once
-#include "Core/Coroutines/Abstractions/ICoroutineAwaitable.h"
-#include "Core/Coroutines/Task.h"
+#include "Core/Context/Systems/Coroutines/Abstractions/ICoroutineAwaitable.h"
 #include "DF2D_API.h"
 #include <coroutine>
 
 
 namespace DeadFrame2D::Core
 {
-	class DF2D_API WaitOneFrame : public ICoroutineAwaitable
+	class DF2D_API WaitForSeconds : public ICoroutineAwaitable
 	{
 	private:
+		float timeRemaining;
+
 		std::coroutine_handle<> continuation;
 
 
 	public:
-		WaitOneFrame() = default;
+		explicit WaitForSeconds(float seconds);
 
 
 		bool await_ready() const noexcept override;
@@ -24,6 +25,6 @@ namespace DeadFrame2D::Core
 		void await_resume() const noexcept override;
 
 
-		bool Tick(float) override;	
+		bool Tick(float deltaTime) override;
 	};
 }

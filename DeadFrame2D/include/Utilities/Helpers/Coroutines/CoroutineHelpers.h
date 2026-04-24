@@ -1,7 +1,7 @@
 #pragma once
-#include "Core/Coroutines/WaitForSeconds.h"
-#include "Core/Coroutines/WaitForSecondsUnscaled.h"
-#include "Core/Coroutines/WaitOneFrame.h"
+#include "Core/Context/Systems/Coroutines/Awaitables/WaitForSeconds.h"
+#include "Core/Context/Systems/Coroutines/Awaitables/WaitForSecondsUnscaled.h"
+#include "Core/Context/Systems/Coroutines/Awaitables/WaitOneFrame.h"
 
 
 namespace DeadFrame2D::Utilities

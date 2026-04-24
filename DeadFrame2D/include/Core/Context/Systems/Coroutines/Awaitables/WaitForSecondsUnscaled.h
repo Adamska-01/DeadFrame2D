@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/Coroutines/Abstractions/ICoroutineAwaitable.h"
+#include "Core/Context/Systems/Coroutines/Abstractions/ICoroutineAwaitable.h"
 #include "DF2D_API.h"
 #include <coroutine>
 

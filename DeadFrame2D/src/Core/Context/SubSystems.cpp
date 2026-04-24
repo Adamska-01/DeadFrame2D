@@ -1,6 +1,6 @@
 #include "Core/Context/SubSystemManager.h"
 #include "Core/Context/Systems/AudioManager.h"
-#include "Core/Context/Systems/CoroutineScheduler.h"
+#include "Core/Context/Systems/Coroutines/CoroutineScheduler.h"
 #include "Core/Context/Systems/Input/Input.h"
 #include "Core/Context/Systems/Physics/PhysicsEngine2D.h"
 #include "Core/Context/Systems/Rendering/Renderer.h"

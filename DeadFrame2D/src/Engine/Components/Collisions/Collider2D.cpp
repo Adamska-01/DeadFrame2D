@@ -1,5 +1,5 @@
 #include "Converters/Physics/PhysicsConversions.h"
-#include "Core/Context/Systems/CoroutineScheduler.h"
+#include "Core/Context/Systems/Coroutines/CoroutineScheduler.h"
 #include "Engine/Components/Collisions/Collider2D.h"
 #include "Engine/Components/Physics/RigidBody2D.h"
 #include "Engine/Components/Transform.h"

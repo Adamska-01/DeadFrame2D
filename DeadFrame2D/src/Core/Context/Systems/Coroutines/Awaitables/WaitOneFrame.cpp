@@ -1,5 +1,5 @@
-#include "Core/Context/Systems/CoroutineScheduler.h"
-#include "Core/Coroutines/WaitOneFrame.h"
+#include "Core/Context/Systems/Coroutines/CoroutineScheduler.h"
+#include "Core/Context/Systems/Coroutines/Awaitables/WaitOneFrame.h"
 
 
 namespace DeadFrame2D::Core
