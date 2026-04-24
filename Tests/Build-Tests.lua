@@ -27,7 +27,7 @@ project "Tests"
 		"../Vendor/SDL/SDL2_image-2.8.2/include", 
 		"../Vendor/SDL/SDL2_ttf-2.22.0/include", 
 		"../Vendor/SDL/SDL2_mixer-2.8.0/include",
-		"../Vendor/Doctest/Module"
+		"../Vendor/Doctest/Module/doctest"
 	}
 
 	links { "DeadFrame2D", "SDL2", "SDL2_image", "SDL2_ttf", "SDL2_mixer", "Box2D", "tinyxml2" }
