@@ -1,4 +1,4 @@
-#include "Core/CoreEvents/EventManager.h"
+#include "Core/Services/Events/EventManager.h"
 #include <algorithm>
 #include <SDL.h>
 

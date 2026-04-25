@@ -1,5 +1,5 @@
-#include "Core/CoreEvents/EventManager.h"
-#include "Core/CoreEvents/Abstractions/IEventProcessor.h"
+#include "Core/Services/Events/Abstractions/IEventProcessor.h"
+#include "Core/Services/Events/EventManager.h"
 
 
 namespace DeadFrame2D::Core
