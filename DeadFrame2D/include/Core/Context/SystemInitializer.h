@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/Context/Abstractions/ISubSystem.h"
+#include "Core/Context/Abstractions/ICoreSystem.h"
 #include "DF2D_API.h"
 #include "Models/SystemConfig.h"
 
@@ -9,7 +9,7 @@ namespace DeadFrame2D::Core
 	class DF2D_API SystemInitializer
 	{
 	private:
-		std::array<ISubSystem*, 8> subSystems;
+		std::array<ICoreSystem*, 8> subSystems;
 
 
 	public:

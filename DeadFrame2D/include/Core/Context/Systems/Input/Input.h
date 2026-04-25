@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/Context/Abstractions/ISubSystem.h"
+#include "Core/Context/Abstractions/ICoreSystem.h"
 #include "DF2D_API.h"
 #include <memory>
 
@@ -19,7 +19,7 @@ namespace DeadFrame2D::Core
 	class InputUserManager;
 
 
-	class DF2D_API Input : public ISubSystem
+	class DF2D_API Input : public ICoreSystem
 	{
 		friend class SystemInitializer;
 

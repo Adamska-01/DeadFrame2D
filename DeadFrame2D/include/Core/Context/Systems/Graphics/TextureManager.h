@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/Context/Abstractions/ISubSystem.h"
+#include "Core/Context/Abstractions/ICoreSystem.h"
 #include "DF2D_API.h"
 #include <memory>
 #include <string>
@@ -11,7 +11,7 @@ struct SDL_Texture;
 
 namespace DeadFrame2D::Core
 {
-	class DF2D_API TextureManager : public ISubSystem
+	class DF2D_API TextureManager : public ICoreSystem
 	{
 		friend class SystemInitializer;
 

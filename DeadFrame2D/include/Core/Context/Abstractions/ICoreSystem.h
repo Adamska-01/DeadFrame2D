@@ -4,10 +4,10 @@
 
 namespace DeadFrame2D::Core
 {
-	class DF2D_API ISubSystem
+	class DF2D_API ICoreSystem
 	{
 	public:
-		virtual ~ISubSystem() = default;
+		virtual ~ICoreSystem() = default;
 
 
 		virtual void BeginFrame() = 0;

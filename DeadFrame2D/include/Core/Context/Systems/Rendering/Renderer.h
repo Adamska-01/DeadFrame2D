@@ -1,6 +1,6 @@
 #pragma once
 #include "Constants/CommonColors.h"
-#include "Core/Context/Abstractions/ISubSystem.h"
+#include "Core/Context/Abstractions/ICoreSystem.h"
 #include "Core/Context/Systems/Rendering/Abstractions/IRenderBackend.h"
 #include "Core/Context/Systems/Rendering/RenderSystem.h"
 #include "Core/Math/Vector2.h"
@@ -21,7 +21,7 @@ namespace DeadFrame2D::Core
 	class RenderPipeline;
 
 
-	class DF2D_API Renderer : public ISubSystem, protected RenderSystem, private IRenderBackend
+	class DF2D_API Renderer : public ICoreSystem, protected RenderSystem, private IRenderBackend
 	{
 		friend class DeadFrameRuntime;
 		friend class SystemInitializer;

@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/Context/Abstractions/ISubSystem.h"
+#include "Core/Context/Abstractions/ICoreSystem.h"
 #include "Core/CoreEvents/Abstractions/IEventProcessor.h"
 #include "Core/Math/Vector2.h"
 #include "Data/Window/WindowMode.h"
@@ -11,7 +11,7 @@
 
 namespace DeadFrame2D::Core
 {
-	class DF2D_API Window : public IEventProcessor, public ISubSystem
+	class DF2D_API Window : public IEventProcessor, public ICoreSystem
 	{
 		friend class SystemInitializer;
 

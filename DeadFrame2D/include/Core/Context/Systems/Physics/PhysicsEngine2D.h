@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/Context/Abstractions/ISubSystem.h"
+#include "Core/Context/Abstractions/ICoreSystem.h"
 #include "Core/Math/Vector2.h"
 #include "DF2D_API.h"
 #include "Models/Physics/Masks/CollisionMasks.h"
@@ -22,7 +22,7 @@ namespace DeadFrame2D::Factories
 
 namespace DeadFrame2D::Core
 {
-	class DF2D_API PhysicsEngine2D : public ISubSystem
+	class DF2D_API PhysicsEngine2D : public ICoreSystem
 	{
 		friend class SystemInitializer;
 
