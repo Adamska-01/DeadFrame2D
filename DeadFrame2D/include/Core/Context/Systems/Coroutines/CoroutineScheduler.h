@@ -12,7 +12,7 @@ namespace DeadFrame2D::Core
 
 	class DF2D_API CoroutineScheduler : public ISubSystem
 	{
-		friend class SubSystemManager;
+		friend class SystemInitializer;
 
 
 	private:

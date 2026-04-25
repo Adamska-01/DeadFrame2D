@@ -21,7 +21,7 @@ namespace DeadFrame2D::Core
 
 	class DF2D_API Input : public ISubSystem
 	{
-		friend class SubSystemManager;
+		friend class SystemInitializer;
 
 
 	private:

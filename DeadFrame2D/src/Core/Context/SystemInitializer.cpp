@@ -1,4 +1,4 @@
-#include "Core/Context/SubSystemManager.h"
+#include "Core/Context/SystemInitializer.h"
 #include "Core/Context/Systems/Audio/AudioManager.h"
 #include "Core/Context/Systems/Coroutines/CoroutineScheduler.h"
 #include "Core/Context/Systems/Graphics/TextureManager.h"
@@ -15,12 +15,12 @@ namespace DeadFrame2D::Core
 	using namespace DeadFrame2D::Models;
 
 
-	SubSystemManager::SubSystemManager()
+	SystemInitializer::SystemInitializer()
 	{
 		subSystems.fill(nullptr);
 	}
 
-	SubSystemManager::~SubSystemManager()
+	SystemInitializer::~SystemInitializer()
 	{
 		// Delete in reverse order to respect dependencies
 		for (int i = static_cast<int>(subSystems.size()) - 1; i >= 0; --i)
@@ -39,7 +39,7 @@ namespace DeadFrame2D::Core
 		}
 	}
 
-	void SubSystemManager::InitializeSubSystems(SystemConfig config)
+	void SystemInitializer::InitializeSubSystems(SystemConfig config)
 	{
 		auto window = new Window(config.window);
 
@@ -60,7 +60,7 @@ namespace DeadFrame2D::Core
 		subSystems[7] = new CoroutineScheduler();
 	}
 
-	void SubSystemManager::BeginFrame()
+	void SystemInitializer::BeginFrame()
 	{
 		for (const auto& subSystem : subSystems)
 		{
@@ -68,7 +68,7 @@ namespace DeadFrame2D::Core
 		}
 	}
 
-	void SubSystemManager::PreUpdate(float deltaTime)
+	void SystemInitializer::PreUpdate(float deltaTime)
 	{
 		for (const auto& subSystem : subSystems)
 		{
@@ -76,7 +76,7 @@ namespace DeadFrame2D::Core
 		}
 	}
 
-	void SubSystemManager::EndUpdate(float deltaTime)
+	void SystemInitializer::EndUpdate(float deltaTime)
 	{
 		for (const auto& subSystem : subSystems)
 		{
@@ -84,7 +84,7 @@ namespace DeadFrame2D::Core
 		}
 	}
 
-	void SubSystemManager::EndDraw()
+	void SystemInitializer::EndDraw()
 	{
 		for (const auto& subSystem : subSystems)
 		{

@@ -13,7 +13,7 @@ namespace DeadFrame2D::Core
 {
 	class DF2D_API Window : public IEventProcessor, public ISubSystem
 	{
-		friend class SubSystemManager;
+		friend class SystemInitializer;
 
 
 	private:

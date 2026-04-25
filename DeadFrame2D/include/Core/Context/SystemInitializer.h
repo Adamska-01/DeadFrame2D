@@ -6,16 +6,16 @@
 
 namespace DeadFrame2D::Core
 {
-	class DF2D_API SubSystemManager
+	class DF2D_API SystemInitializer
 	{
 	private:
 		std::array<ISubSystem*, 8> subSystems;
 
 
 	public:
-		SubSystemManager();
+		SystemInitializer();
 
-		~SubSystemManager();
+		~SystemInitializer();
 
 
 		void InitializeSubSystems(Models::SystemConfig config);

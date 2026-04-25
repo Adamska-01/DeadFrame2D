@@ -21,7 +21,7 @@ namespace DeadFrame2D::Core
 	{
 		auto systemConfig = SystemConfig::LoadFromFiles();
 
-		engineSubSystems = std::make_unique<SubSystemManager>();
+		engineSubSystems = std::make_unique<SystemInitializer>();
 		engineSubSystems->InitializeSubSystems(systemConfig);
 
 		sceneManager = std::make_unique<SceneManager>();

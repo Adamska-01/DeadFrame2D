@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/Context/SubSystemManager.h"
+#include "Core/Context/SystemInitializer.h"
 #include "CoreEvents/EventManager.h"
 #include "DF2D_API.h"
 #include "Engine/SceneSystem/SceneManager.h"
@@ -15,9 +15,9 @@ namespace DeadFrame2D::Core
 
 
 	protected:
-		std::unique_ptr<SubSystemManager> engineSubSystems;
+		std::unique_ptr<SystemInitializer> engineSubSystems;
 
-		std::unique_ptr<DeadFrame2D::Engine::SceneManager> sceneManager;
+		std::unique_ptr<Engine::SceneManager> sceneManager;
 
 		EventManager eventManager;
 

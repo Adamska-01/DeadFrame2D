@@ -24,7 +24,7 @@ namespace DeadFrame2D::Core
 	class DF2D_API Renderer : public ISubSystem, protected RenderSystem, private IRenderBackend
 	{
 		friend class DeadFrameRuntime;
-		friend class SubSystemManager;
+		friend class SystemInitializer;
 
 
 	private:

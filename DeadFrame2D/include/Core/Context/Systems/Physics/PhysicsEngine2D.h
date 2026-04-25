@@ -24,7 +24,7 @@ namespace DeadFrame2D::Core
 {
 	class DF2D_API PhysicsEngine2D : public ISubSystem
 	{
-		friend class SubSystemManager;
+		friend class SystemInitializer;
 
 
 	private:
