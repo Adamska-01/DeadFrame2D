@@ -1,7 +1,9 @@
+#include "Core/Context/Systems/Graphics/TextureManager.h"
 #include "Core/Context/Systems/Rendering/Renderer.h"
 #include "Core/Context/Systems/Rendering/RenderSystem.h"
-#include "Core/Context/Systems/TextureManager.h"
 #include "Engine/Components/TileMap/Tiled/TiledMapCompatibleRenderer.h"
+#include "Engine/Components/Transform.h"
+#include "Utilities/Debugging/Guards.h"
 
 
 namespace DeadFrame2D::Engine
@@ -9,6 +11,7 @@ namespace DeadFrame2D::Engine
 	using namespace DeadFrame2D::Core;
 	using namespace DeadFrame2D::Data;
 	using namespace DeadFrame2D::Models;
+	using namespace DeadFrame2D::Utilities;
 
 
 	TiledMapCompatibleRenderer::TiledMapCompatibleRenderer(std::shared_ptr<TiledMap> tileMap, bool extendMapToRenderTarget)
@@ -23,6 +26,8 @@ namespace DeadFrame2D::Engine
 
 	void TiledMapCompatibleRenderer::Init()
 	{
+		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
+
 		auto size = static_cast<int>(tileMap->tileSets.size());
 
 		for (auto i = 0; i < size; i++)
@@ -34,10 +39,18 @@ namespace DeadFrame2D::Engine
 		}
 	}
 
+	// TODO: Should perform pre-culling here (Culling is performed during the rendering pipeline,
+	// but iterating through every single tile every frame is not ideal. Use the camera to 
+	// calculate which tiles need to be renderered (Take multiple-camera scenarios into account)
 	void TiledMapCompatibleRenderer::Draw()
 	{
 		const auto& tileSets = tileMap->tileSets;
-	
+		
+		auto rotation = transform->GetWorldRotation();
+
+		auto batchData = SpriteBatchRenderData();
+		batchData.spriteBatch.reserve(tileMap->width * tileMap->height);
+
 		for (const auto& layer : tileMap->layers)
 		{
 			for (auto i = 0; i < tileMap->height; ++i)
@@ -77,16 +90,21 @@ namespace DeadFrame2D::Engine
 						.h = static_cast<float>(tileSetSize) 
 					};
 
-					renderTask.renderData = SpriteRenderData
+					auto renderData = SpriteRenderData
 					{
 						.texture = tileSet.tileSetTexture.get(),
 						.srcRect = src,
-						.destRect = dest
+						.destRect = dest,
+						.rotation = rotation
 					};
 
-					RenderSystem::Submit(renderTask);
+					batchData.spriteBatch.push_back(renderData);
 				}
 			}
 		}
+
+		renderTask.renderData = std::move(batchData);
+
+		RenderSystem::Submit(renderTask);
 	}
 }

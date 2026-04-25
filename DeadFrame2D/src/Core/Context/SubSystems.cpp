@@ -1,12 +1,12 @@
 #include "Core/Context/SubSystemManager.h"
-#include "Core/Context/Systems/AudioManager.h"
+#include "Core/Context/Systems/Audio/AudioManager.h"
 #include "Core/Context/Systems/Coroutines/CoroutineScheduler.h"
+#include "Core/Context/Systems/Graphics/TextureManager.h"
 #include "Core/Context/Systems/Input/Input.h"
 #include "Core/Context/Systems/Physics/PhysicsEngine2D.h"
 #include "Core/Context/Systems/Rendering/Renderer.h"
-#include "Core/Context/Systems/TextureManager.h"
-#include "Core/Context/Systems/UIManager.h"
-#include "Core/Context/Systems/Window.h"
+#include "Core/Context/Systems/UI/UIManager.h"
+#include "Core/Context/Systems/Window/Window.h"
 
 
 namespace DeadFrame2D::Core

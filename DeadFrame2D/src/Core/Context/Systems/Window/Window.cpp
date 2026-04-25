@@ -1,5 +1,5 @@
 #include "Constants/Paths/ResourcePaths.h"
-#include "Core/Context/Systems/Window.h"
+#include "Core/Context/Systems/Window/Window.h"
 #include "Core/Debugging/Debug.h"
 #include <algorithm>
 #include <iostream>

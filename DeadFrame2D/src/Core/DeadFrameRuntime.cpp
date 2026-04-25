@@ -1,6 +1,6 @@
 #include "Constants/Paths/ResourcePaths.h"
+#include "Core/Context/Systems/Graphics/TextureManager.h"
 #include "Core/Context/Systems/Rendering/Renderer.h"
-#include "Core/Context/Systems/TextureManager.h"
 #include "Core/DeadFrameRuntime.h"
 #include "Data/Rendering/Pipeline/RenderTask.h"
 #include "Models/Other/SplashScreenConfig.h"

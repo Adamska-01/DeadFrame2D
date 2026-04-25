@@ -1,6 +1,6 @@
 #include "Constants/Rendering/DefaultSortOrders.h"
+#include "Core/Context/Systems/Graphics/TextureManager.h"
 #include "Core/Context/Systems/Rendering/RenderSystem.h"
-#include "Core/Context/Systems/TextureManager.h"
 #include "Engine/Components/Rendering/SpriteRenderer.h"
 #include "Engine/Components/Transform.h"
 #include "Engine/Entity/GameObject.h"

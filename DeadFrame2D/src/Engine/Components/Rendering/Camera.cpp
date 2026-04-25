@@ -1,5 +1,5 @@
+#include "Core/Context/Systems/Graphics/TextureManager.h"
 #include "Core/Context/Systems/Rendering/Renderer.h"
-#include "Core/Context/Systems/TextureManager.h"
 #include "Engine/Components/Rendering/Camera.h"
 #include "Engine/Components/Transform.h"
 #include "Engine/EngineEvents/EventDispatcher.h"

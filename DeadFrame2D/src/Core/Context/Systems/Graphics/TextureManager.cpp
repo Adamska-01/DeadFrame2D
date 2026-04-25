@@ -1,5 +1,5 @@
+#include "Core/Context/Systems/Graphics/TextureManager.h"
 #include "Core/Context/Systems/Rendering/Renderer.h"
-#include "Core/Context/Systems/TextureManager.h"
 #include "Core/Debugging/Debug.h"
 #include <memory>
 #include <SDL_image.h>
