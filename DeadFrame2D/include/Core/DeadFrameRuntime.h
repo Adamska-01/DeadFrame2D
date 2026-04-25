@@ -3,7 +3,7 @@
 #include "Core/Services/Events/EventManager.h"
 #include "DF2D_API.h"
 #include "Engine/SceneSystem/SceneManager.h"
-#include "Framerate/FrameTimer.h"
+#include "Services/Time/FrameTimer.h"
 
 
 namespace DeadFrame2D::Core
