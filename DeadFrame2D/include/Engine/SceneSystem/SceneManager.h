@@ -83,12 +83,16 @@ namespace DeadFrame2D::Engine
 	template<typename T>
 	inline ComponentHandle<T> SceneManager::FindObjectOfType()
 	{
-		return currentScene ? currentScene->template FindObjectOfType<T>() : ComponentHandle<T>();
+		return currentScene
+			? currentScene->template FindObjectOfType<T>()
+			: ComponentHandle<T>();
 	}
 
 	template<typename T>
 	inline std::vector<ComponentHandle<T>> SceneManager::FindObjectsOfType()
 	{
-		return currentScene ? currentScene->template FindObjectsOfType<T>() : std::vector<ComponentHandle<T>>();
+		return currentScene
+			? currentScene->template FindObjectsOfType<T>()
+			: std::vector<ComponentHandle<T>>();
 	}
 }
