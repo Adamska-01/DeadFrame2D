@@ -1,8 +1,10 @@
+#if DEBUG
+#include <cassert>
+#endif
 #include "Constants/MathConstants.h"
 #include "Constants/Rendering/DrawConstants.h"
 #include "Core/Context/Systems/Rendering/Renderer.h"
 #include "Core/Context/Systems/Rendering/RenderPipeline.h"
-#include "Core/Debugging/Debug.h"
 #include "Engine/EngineEvents/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/SubSystems/Renderer/RenderTargetSizeChangedEvent.h"
 
@@ -24,8 +26,8 @@ namespace DeadFrame2D::Core
 
 		instance = this;
 
-#if _DEBUG
-		DBG_ASSERT_MSG(window, "Window initialisation failed: %s\n", SDL_GetError());
+#if DEBUG
+		assert(window && SDL_GetError());
 #endif
 
 		//startup
@@ -39,8 +41,8 @@ namespace DeadFrame2D::Core
 			-1,
 			SDL_RENDERER_ACCELERATED);
 
-#if _DEBUG
-		DBG_ASSERT_MSG(renderer, "Renderer initialisation failed: %s\n", SDL_GetError());
+#if DEBUG
+		assert(renderer && SDL_GetError());
 #endif
 
 		SetResolutionTarget({ config.width, config.height });
@@ -363,7 +365,7 @@ namespace DeadFrame2D::Core
 			a);
 
 	#if _DEBUG
-		DBG_ASSERT_MSG(!result, "Background color initialisation failed: %s\n", SDL_GetError());
+		assert((result == 0) && SDL_GetError());
 	#endif
 	}
 

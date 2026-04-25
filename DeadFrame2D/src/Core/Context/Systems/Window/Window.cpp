@@ -1,6 +1,8 @@
+#if DEBUG
+#include <cassert>
+#endif
 #include "Constants/Paths/ResourcePaths.h"
 #include "Core/Context/Systems/Window/Window.h"
-#include "Core/Debugging/Debug.h"
 #include <algorithm>
 #include <iostream>
 #include <SDL_image.h>
@@ -28,8 +30,8 @@ namespace DeadFrame2D::Core
 			// Window behaviour flag (not used "0")
 			0);
 
-	#if _DEBUG
-		DBG_ASSERT_MSG(window, "Window initialisation failed: %s\n", SDL_GetError());
+	#if DEBUG
+		assert(window && SDL_GetError());
 	#endif
 
 		SetWindowIcon(Paths::Files::WINDOW_ICON);

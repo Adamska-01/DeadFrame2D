@@ -1,6 +1,8 @@
+#if DEBUG
+#include <cassert>
+#endif
 #include "Core/Context/Systems/Rendering/Renderer.h"
 #include "Core/Context/Systems/UI/UIManager.h"
-#include "Core/Debugging/Debug.h"
 #include <iostream>
 #include <sstream>
 
@@ -70,7 +72,7 @@ namespace DeadFrame2D::Core
 
 		// Check if the font loaded successfully
 	#if _DEBUG
-		DBG_ASSERT_MSG(font, "Failed to load the font: %s\n", TTF_GetError());
+		assert(font && TTF_GetError());
 	#endif
 
 		// Store the font in the cache (shared_ptr automatically manages the memory)

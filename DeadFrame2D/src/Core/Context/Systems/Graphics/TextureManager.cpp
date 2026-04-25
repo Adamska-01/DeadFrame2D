@@ -1,6 +1,8 @@
+#if DEBUG
+#include <cassert>
+#endif
 #include "Core/Context/Systems/Graphics/TextureManager.h"
 #include "Core/Context/Systems/Rendering/Renderer.h"
-#include "Core/Debugging/Debug.h"
 #include <memory>
 #include <SDL_image.h>
 
@@ -70,14 +72,14 @@ namespace DeadFrame2D::Core
 
 		auto tempSurface = IMG_Load(filenameString.c_str());
 
-	#if _DEBUG
-		DBG_ASSERT_MSG(tempSurface, "Failed to load the surface: % s\n", SDL_GetError());
+	#if DEBUG
+		assert(tempSurface && SDL_GetError());
 	#endif
 
 		auto texture = SDL_CreateTextureFromSurface(Renderer::GetRenderer(), tempSurface);
 
-	#if _DEBUG
-		DBG_ASSERT_MSG(texture, "Failed to create the texture: %s\n", SDL_GetError());
+	#if DEBUG
+		assert(texture && SDL_GetError());
 	#endif
 
 		SDL_FreeSurface(tempSurface);
