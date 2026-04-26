@@ -1,5 +1,5 @@
 #include "Engine/ECS/Component/GameComponent.h"
-#include "Engine/Entity/ComponentEntry.h"
+#include "Engine/ECS/Entity/Component/Storage/ComponentEntry.h"
 
 
 namespace DeadFrame2D::Engine

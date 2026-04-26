@@ -1,6 +1,6 @@
 #pragma once
 #include "DF2D_API.h"
-#include "Engine/Entity/ComponentHandle.h"
+#include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include <functional>
 #include <memory>
 #include <tuple>

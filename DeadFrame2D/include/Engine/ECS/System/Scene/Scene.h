@@ -1,9 +1,9 @@
 #pragma once
 #include "Data/Entity/ObjectEntry.h"
 #include "DF2D_API.h"
+#include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
+#include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
 #include "Engine/ECS/System/Scene/Abstractions/ISceneHandleProvider.h"
-#include "Engine/Entity/ComponentHandle.h"
-#include "Engine/Entity/Handles/GameObject/ObjectHandle.h"
 #include <type_traits>
 #include <vector>
 
@@ -104,7 +104,7 @@ namespace DeadFrame2D::Engine
 }
 
 
-#include "Engine/Entity/GameObject.h"
+#include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include "Engine/ECS/Component/GameComponent.h"
 
 

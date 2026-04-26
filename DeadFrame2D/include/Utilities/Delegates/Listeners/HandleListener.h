@@ -1,6 +1,6 @@
 #pragma once
-#include "Engine/Entity/Handles/GameObject/ObjectHandleBase.h"
-#include "Engine/Entity/ComponentHandleBase.h"
+#include "Engine/ECS/Entity/Component/Handle/ComponentHandleBase.h"
+#include "Engine/ECS/Entity/Object/Handle/ObjectHandleBase.h"
 #include "Utilities/Delegates/Listeners/Abstractions/IListener.h"
 #include <functional>
 #include <variant>

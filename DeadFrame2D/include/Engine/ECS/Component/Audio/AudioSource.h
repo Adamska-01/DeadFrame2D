@@ -3,7 +3,7 @@
 #include "Data/Collision/CollisionInfo.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Component/Collisions/Abstractions/ContactEventProvider.h"
-#include "Engine/Entity/ComponentHandle.h"
+#include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include <memory>
 #include <string_view>
 

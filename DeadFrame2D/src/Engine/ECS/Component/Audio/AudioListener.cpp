@@ -3,7 +3,7 @@
 #include "Data/Collision/PhysicsMaterial.h"
 #include "Engine/ECS/Component/Audio/AudioListener.h"
 #include "Engine/ECS/Component/Transform.h"
-#include "Engine/Entity/GameObject.h"
+#include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include "Utilities/Debugging/Guards.h"
 
 

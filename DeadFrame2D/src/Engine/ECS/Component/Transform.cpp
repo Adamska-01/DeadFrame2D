@@ -1,7 +1,7 @@
 #include "Constants/MathConstants.h"
 #include "Engine/ECS/Component/Transform.h"
-#include "Engine/Entity/ComponentHandle.h"
-#include "Engine/Entity/GameObject.h"
+#include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
+#include "Engine/ECS/Entity/Object/Core/GameObject.h"
 
 
 namespace DeadFrame2D::Engine

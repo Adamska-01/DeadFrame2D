@@ -1,7 +1,7 @@
 #pragma once
 #include "DF2D_API.h"
 #include "Engine/ECS/Component/ComponentContext.h"
-#include "Engine/Entity/Handles/GameObject/ObjectHandleBase.h"
+#include "Engine/ECS/Entity/Object/Handle/ObjectHandleBase.h"
 #include <vector>
 
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "Core/Reflection/TypeInfoCheck.h"
 #include "DF2D_API.h"
-#include "Engine/Entity/ComponentEntry.h"
+#include "Engine/ECS/Entity/Component/Storage/ComponentEntry.h"
 #include <memory>
 #include <vector>
 
@@ -75,8 +75,8 @@ namespace DeadFrame2D::Engine
 
 
 #include "Engine/ECS/Component/GameComponent.h"
-#include "Engine/Entity/Handles/GameObject/ObjectHandle.h"
-#include "Engine/Entity/ComponentHandle.h"
+#include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
+#include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 
 
 namespace DeadFrame2D::Engine

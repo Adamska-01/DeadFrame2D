@@ -1,7 +1,7 @@
 #include "Engine/ECS/Component/Transform.h"
 #include "Engine/ECS/Component/UI/Abstractions/UIComponent.h"
 #include "Engine/ECS/Component/UI/Layout/VerticalLayoutGroup.h"
-#include "Engine/Entity/GameObject.h"
+#include "Engine/ECS/Entity/Object/Core/GameObject.h"
 
 
 namespace DeadFrame2D::Engine

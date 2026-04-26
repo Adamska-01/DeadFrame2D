@@ -1,6 +1,6 @@
 #include "Engine/ECS/Component/GameComponent.h"
-#include "Engine/Entity/GameObject.h"
-#include "Engine/Entity/Handles/GameObject/ObjectHandle.h"
+#include "Engine/ECS/Entity/Object/Core/GameObject.h"
+#include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
 
 
 namespace DeadFrame2D::Engine

@@ -1,5 +1,5 @@
-#include "Engine/Entity/GameObject.h"
-#include "Engine/Entity/Handles/GameObject/IGameEntityHandle.h"
+#include "Engine/ECS/Entity/Object/Core/GameObject.h"
+#include "Engine/ECS/Entity/Object/Core/IGameEntityHandle.h"
 
 
 namespace DeadFrame2D::Engine

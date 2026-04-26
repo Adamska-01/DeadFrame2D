@@ -1,8 +1,8 @@
 #pragma once
 #include "Core/Context/Systems/Coroutines/Task.h"
 #include "DF2D_API.h"
-#include "Engine/Entity/ComponentHandle.h"
-#include "Engine/Entity/GameObjectNotifier.h"
+#include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
+#include "Engine/ECS/Entity/Object/Core/GameObjectNotifier.h"
 #include <memory>
 
 
@@ -94,7 +94,7 @@ namespace DeadFrame2D::Engine
 
 
 #include "Engine/ECS/Component/GameComponent.h"
-#include "Engine/Entity/ComponentBucket.h"
+#include "Engine/ECS/Entity/Component/Storage/ComponentBucket.h"
 #include "Engine/ECS/System/Scene/Scene.h"
 
 

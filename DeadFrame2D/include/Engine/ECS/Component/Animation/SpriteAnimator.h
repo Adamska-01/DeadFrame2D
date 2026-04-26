@@ -4,7 +4,7 @@
 #include "Data/Rendering/Pipeline/RenderTask.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Component/GameComponent.h"
-#include "Engine/Entity/ComponentHandle.h"
+#include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include <string>
 #include <unordered_map>
 

@@ -1,5 +1,5 @@
 #include "Data/Entity/ObjectEntry.h"
-#include "Engine/Entity/GameObject.h"
+#include "Engine/ECS/Entity/Object/Core/GameObject.h"
 
 
 namespace DeadFrame2D::Data

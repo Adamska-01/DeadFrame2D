@@ -3,7 +3,7 @@
 #include "Engine/ECS/Component/Collisions/Tile/Tiled/TiledMapCompatibleCollider2D.h"
 #include "Engine/ECS/Component/Physics/RigidBody2D.h"
 #include "Engine/ECS/Component/Transform.h"
-#include "Engine/Entity/GameObject.h"
+#include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include "Utilities/Debugging/Guards.h"
 
 

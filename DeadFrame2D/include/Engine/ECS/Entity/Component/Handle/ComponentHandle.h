@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Entity/ComponentHandleBase.h"
+#include "Engine/ECS/Entity/Component/Handle/ComponentHandleBase.h"
 #include <cstdint>
 #include <memory>
 #include <type_traits>
@@ -48,8 +48,8 @@ namespace DeadFrame2D::Engine
 }
 
 
-#include "Engine/Entity/ComponentBucket.h"
 #include "Engine/ECS/Component/GameComponent.h"
+#include "Engine/ECS/Entity/Component/Storage/ComponentBucket.h"
 
 
 namespace DeadFrame2D::Engine

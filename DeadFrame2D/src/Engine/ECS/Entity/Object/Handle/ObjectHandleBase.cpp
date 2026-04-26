@@ -1,5 +1,5 @@
+#include "Engine/ECS/Entity/Object/Handle/ObjectHandleBase.h"
 #include "Engine/ECS/System/Scene/Abstractions/ISceneHandleProvider.h"
-#include "Engine/Entity/Handles/GameObject/ObjectHandleBase.h"
 
 
 namespace DeadFrame2D::Engine

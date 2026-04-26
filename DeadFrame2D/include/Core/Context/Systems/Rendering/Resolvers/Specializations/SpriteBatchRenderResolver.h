@@ -4,7 +4,7 @@
 #include "Core/Math/Vector2.h"
 #include "Data/Rendering/Pipeline/Shapes/SpriteBatchRenderData.h"
 #include "Engine/ECS/Component/Rendering/Camera.h"
-#include "Engine/Entity/ComponentHandle.h"
+#include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Utilities/Collisions/CollisionUtils.h"
 #include <optional>
 

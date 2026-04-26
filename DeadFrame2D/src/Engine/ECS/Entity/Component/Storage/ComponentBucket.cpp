@@ -1,8 +1,8 @@
 #include "Engine/ECS/Component/GameComponent.h"
+#include "Engine/ECS/Entity/Component/Storage/ComponentBucket.h"
+#include "Engine/ECS/Entity/Object/Core/GameObject.h"
+#include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
 #include "Engine/ECS/System/Events/EventDispatcher.h"
-#include "Engine/Entity/ComponentBucket.h"
-#include "Engine/Entity/GameObject.h"
-#include "Engine/Entity/Handles/GameObject/ObjectHandle.h"
 #include "Engine/Events/GameComponent/GameComponentAddedEvent.h"
 #include <cassert>
 

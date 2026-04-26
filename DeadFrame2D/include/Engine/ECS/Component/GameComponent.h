@@ -1,7 +1,7 @@
 #pragma once
 #include "Core/Reflection/TypeInfo.h"
 #include "DF2D_API.h"
-#include "Engine/Entity/GameObjectObserver.h"
+#include "Engine/ECS/Entity/Component/Core/GameObjectObserver.h"
 
 
 namespace DeadFrame2D::Engine

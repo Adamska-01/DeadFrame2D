@@ -2,8 +2,8 @@
 #include "Core/Math/Vector2.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Component/GameComponent.h"
+#include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Engine/ECS/System/Events/DispatchableEvent.h"
-#include "Engine/Entity/ComponentHandle.h"
 #include <memory>
 #include <SDL.h>
 #include <vector>

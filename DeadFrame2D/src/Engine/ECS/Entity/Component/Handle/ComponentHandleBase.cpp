@@ -1,5 +1,5 @@
-#include "Engine/Entity/ComponentBucket.h"
-#include "Engine/Entity/ComponentHandleBase.h"
+#include "Engine/ECS/Entity/Component/Handle/ComponentHandleBase.h"
+#include "Engine/ECS/Entity/Component/Storage/ComponentBucket.h"
 
 
 namespace DeadFrame2D::Engine

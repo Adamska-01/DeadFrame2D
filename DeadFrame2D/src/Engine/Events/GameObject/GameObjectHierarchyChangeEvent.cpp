@@ -1,4 +1,4 @@
-#include "Engine/Entity/GameObject.h"
+#include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include "Engine/Events/GameObject/GameObjectHierarchyChangeEvent.h"
 
 

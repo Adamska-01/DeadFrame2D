@@ -1,7 +1,7 @@
 #pragma once
 #include "Data/Blueprints/UI/ButtonBlueprintModel.h"
 #include "DF2D_API.h"
-#include "Engine/Entity/GameObject.h"
+#include "Engine/ECS/Entity/Object/Core/GameObject.h"
 
 
 namespace DeadFrame2D::Engine

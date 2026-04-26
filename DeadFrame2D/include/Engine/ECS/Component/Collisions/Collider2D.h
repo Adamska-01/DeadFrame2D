@@ -2,7 +2,7 @@
 #include "Data/Collision/PhysicsMaterial.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Component/Collisions/Abstractions/ContactEventProvider.h"
-#include "Engine/Entity/ComponentHandle.h"
+#include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 
 
 class b2Fixture;

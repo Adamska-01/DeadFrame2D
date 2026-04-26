@@ -4,7 +4,7 @@
 #include "Core/Math/Circle.h"
 #include "Data/Rendering/Pipeline/Shapes/CircleRenderData.h"
 #include "Engine/ECS/Component/Rendering/Camera.h"
-#include "Engine/Entity/ComponentHandle.h"
+#include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Utilities/Collisions/CollisionUtils.h"
 #include <optional>
 

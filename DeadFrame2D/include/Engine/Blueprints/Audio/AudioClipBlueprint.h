@@ -1,8 +1,8 @@
 #pragma once
 #include "Core/Math/Vector2.h"
 #include "DF2D_API.h"
-#include "Engine/Entity/ComponentHandle.h"
-#include "Engine/Entity/GameObject.h"
+#include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
+#include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include <string_view>
 
 

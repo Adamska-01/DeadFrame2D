@@ -5,7 +5,7 @@
 #include "Engine/ECS/Component/Transform.h"
 #include "Engine/ECS/Component/UI/Button.h"
 #include "Engine/ECS/Component/UI/Canvas.h"
-#include "Engine/Entity/GameObject.h"
+#include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include "Utilities/Collisions/CollisionUtils.h"
 #include <SDL_events.h>
 

@@ -4,7 +4,7 @@
 #include "Engine/ECS/Component/Animation/SpriteAnimator.h"
 #include "Engine/ECS/Component/Rendering/SpriteRenderer.h"
 #include "Engine/ECS/Component/Transform.h"
-#include "Engine/Entity/GameObject.h"
+#include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include "Utilities/Debugging/Guards.h"
 
 

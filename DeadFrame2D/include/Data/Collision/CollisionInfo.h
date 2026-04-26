@@ -1,6 +1,6 @@
 #pragma once
 #include "Core/Math/Vector2.h"
-#include "Engine/Entity/Handles/GameObject/ObjectHandle.h"
+#include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
 
 
 namespace DeadFrame2D::Data

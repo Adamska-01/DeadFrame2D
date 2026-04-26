@@ -4,7 +4,7 @@
 #include "Data/Physics/BodyDefinition2D.h"
 #include "Engine/ECS/Component/Physics/RigidBody2D.h"
 #include "Engine/ECS/Component/Transform.h"
-#include "Engine/Entity/GameObject.h"
+#include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include "Utilities/Debugging/Guards.h"
 #include "Utilities/Helpers/Coroutines/CoroutineHelpers.h"
 #include <box2d/b2_body.h>

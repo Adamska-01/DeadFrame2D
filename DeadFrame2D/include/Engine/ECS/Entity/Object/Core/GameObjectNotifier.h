@@ -1,6 +1,6 @@
 #pragma once
 #include "DF2D_API.h"
-#include "Engine/Entity/Handles/GameObject/IGameEntityHandle.h"
+#include "Engine/ECS/Entity/Object/Core/IGameEntityHandle.h"
 #include "Utilities/Delegates/MulticastDelegate.h"
 #include <functional>
 

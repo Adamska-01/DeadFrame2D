@@ -2,9 +2,9 @@
 #include "Core/Context/Systems/Rendering/Renderer.h"
 #include "Engine/ECS/Component/Rendering/ImageScroller.h"
 #include "Engine/ECS/Component/Transform.h"
+#include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Engine/ECS/System/Events/EventDispatcher.h"
-#include "Engine/EngineEvents/Events/SubSystems/Renderer/RenderTargetSizeChangedEvent.h"
-#include "Engine/Entity/ComponentHandle.h"
+#include "Engine/Events/Context/Renderer/RenderTargetSizeChangedEvent.h"
 #include "Utilities/Helpers/Events/EventHelpers.h"
 
 

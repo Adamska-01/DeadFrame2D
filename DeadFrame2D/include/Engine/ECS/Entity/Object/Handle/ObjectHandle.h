@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Entity/Handles/GameObject/ObjectHandleBase.h"
+#include "Engine/ECS/Entity/Object/Handle/ObjectHandleBase.h"
 
 
 namespace DeadFrame2D::Engine
@@ -47,7 +47,7 @@ namespace DeadFrame2D::Engine
 
 
 #include "Engine/ECS/System/Scene/Abstractions/ISceneHandleProvider.h"
-#include "Engine/Entity/GameObject.h"
+#include "Engine/ECS/Entity/Object/Core/GameObject.h"
 
 
 namespace DeadFrame2D::Engine
