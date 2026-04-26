@@ -1,5 +1,5 @@
 #include "Engine/Entity/GameObject.h"
-#include "Engine/Events/GameObjectEvents/GameObjectHierarchyChangeEvent.h"
+#include "Engine/Events/GameObject/GameObjectHierarchyChangeEvent.h"
 
 
 namespace DeadFrame2D::Engine

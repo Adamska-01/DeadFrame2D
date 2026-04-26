@@ -1,5 +1,5 @@
 #include "Engine/Entity/GameObject.h"
-#include "Engine/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
+#include "Engine/Events/GameObject/GameObjectDestroyedEvent.h"
 
 
 namespace DeadFrame2D::Engine

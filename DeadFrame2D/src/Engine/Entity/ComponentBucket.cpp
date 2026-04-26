@@ -3,7 +3,7 @@
 #include "Engine/Entity/ComponentBucket.h"
 #include "Engine/Entity/GameObject.h"
 #include "Engine/Entity/Handles/GameObject/ObjectHandle.h"
-#include "Engine/Events/GameComponentEvents/GameComponentAddedEvent.h"
+#include "Engine/Events/GameComponent/GameComponentAddedEvent.h"
 #include <cassert>
 
 

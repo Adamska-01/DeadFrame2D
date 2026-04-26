@@ -3,8 +3,8 @@
 #include "Engine/ECS/System/Scene/Scene.h"
 #include "Engine/ECS/System/Scene/SceneManager.h"
 #include "Engine/Entity/GameObject.h"
-#include "Engine/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
-#include "Engine/Events/GameObjectEvents/GameObjectHierarchyChangeEvent.h"
+#include "Engine/Events/GameObject/GameObjectDestroyedEvent.h"
+#include "Engine/Events/GameObject/GameObjectHierarchyChangeEvent.h"
 #include "Utilities/Helpers/Coroutines/CoroutineHelpers.h"
 #include <stack>
 

@@ -4,8 +4,8 @@
 #include "Engine/ECS/Component/Physics/RigidBody2D.h"
 #include "Engine/ECS/Component/Transform.h"
 #include "Engine/Entity/GameObject.h"
-#include "Engine/Events/GameObjectEvents/GameObjectCreatedEvent.h"
-#include "Engine/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
+#include "Engine/Events/GameObject/GameObjectCreatedEvent.h"
+#include "Engine/Events/GameObject/GameObjectDestroyedEvent.h"
 #include "Utilities/Helpers/Coroutines/CoroutineHelpers.h"
 #include <Utilities/Debugging/Guards.h>
 

@@ -1,5 +1,5 @@
 #include "Engine/ECS/Component/GameComponent.h"
-#include "Engine/Events/GameComponentEvents/GameComponentAddedEvent.h"
+#include "Engine/Events/GameComponent/GameComponentAddedEvent.h"
 
 
 namespace DeadFrame2D::Engine
