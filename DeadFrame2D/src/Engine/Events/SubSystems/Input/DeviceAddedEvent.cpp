@@ -1,4 +1,4 @@
-#include "Engine/EngineEvents/Events/SubSystems/Input/DeviceAddedEvent.h"
+#include "Engine/Events/SubSystems/Input/DeviceAddedEvent.h"
 
 
 namespace DeadFrame2D::Engine

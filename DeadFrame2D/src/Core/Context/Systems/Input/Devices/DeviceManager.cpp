@@ -6,8 +6,8 @@
 #include "Core/Context/Systems/Input/Devices/DeviceTypes/KeyboardInputDevice.h"
 #include "Core/Context/Systems/Input/Devices/DeviceTypes/MouseInputDevice.h"
 #include "Engine/ECS/System/Events/EventDispatcher.h"
-#include "Engine/EngineEvents/Events/SubSystems/Input/DeviceAddedEvent.h"
-#include "Engine/EngineEvents/Events/SubSystems/Input/DeviceRemovedEvent.h"
+#include "Engine/Events/SubSystems/Input/DeviceAddedEvent.h"
+#include "Engine/Events/SubSystems/Input/DeviceRemovedEvent.h"
 #include "Utilities/Debugging/Guards.h"
 #include <SDL.h>
 

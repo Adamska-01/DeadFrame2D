@@ -3,8 +3,8 @@
 #include "Engine/ECS/Component/Rendering/Camera/CameraFollow.h"
 #include "Engine/ECS/Component/Transform.h"
 #include "Engine/ECS/System/Events/EventDispatcher.h"
-#include "Engine/EngineEvents/Events/SubSystems/Renderer/RenderTargetSizeChangedEvent.h"
 #include "Engine/Entity/GameObject.h"
+#include "Engine/Events/SubSystems/Renderer/RenderTargetSizeChangedEvent.h"
 #include "Utilities/Helpers/Events/EventHelpers.h"
 #include <algorithm>
 #include <limits>

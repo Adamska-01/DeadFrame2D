@@ -6,7 +6,7 @@
 #include "Core/Context/Systems/Rendering/Renderer.h"
 #include "Core/Context/Systems/Rendering/RenderPipeline.h"
 #include "Engine/ECS/System/Events/EventDispatcher.h"
-#include "Engine/EngineEvents/Events/SubSystems/Renderer/RenderTargetSizeChangedEvent.h"
+#include "Engine/Events/SubSystems/Renderer/RenderTargetSizeChangedEvent.h"
 
 
 namespace DeadFrame2D::Core

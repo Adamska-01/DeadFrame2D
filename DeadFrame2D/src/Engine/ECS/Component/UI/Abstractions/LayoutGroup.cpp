@@ -1,6 +1,6 @@
 #include "Engine/ECS/Component/UI/Abstractions/LayoutGroup.h"
 #include "Engine/ECS/System/Events/DispatchableEvent.h"
-#include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
+#include "Engine/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
 
 
 namespace DeadFrame2D::Engine
