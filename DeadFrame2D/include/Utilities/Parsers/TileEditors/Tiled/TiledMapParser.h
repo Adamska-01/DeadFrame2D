@@ -31,7 +31,7 @@ Example XML map structure:
 </map>
 */
 
-namespace DeadFrame2D::Engine
+namespace DeadFrame2D::Utilities
 {
 	class DF2D_API TiledMapParser : public Utilities::XML_Parser<std::shared_ptr<Models::TiledMap>>
 	{
