@@ -74,7 +74,7 @@ namespace DeadFrame2D::Engine
 }
 
 
-#include "Engine/ECS/Component/GameComponent.h"
+#include "Engine/ECS/Entity/Component/Core/GameComponent.h"
 #include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 

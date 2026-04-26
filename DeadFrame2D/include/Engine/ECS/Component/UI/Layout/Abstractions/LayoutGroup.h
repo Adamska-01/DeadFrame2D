@@ -1,7 +1,7 @@
 #pragma once
 #include "Data/UI/LayoutPadding.h"
 #include "DF2D_API.h"
-#include "Engine/ECS/Component/GameComponent.h"
+#include "Engine/ECS/Entity/Component/Core/GameComponent.h"
 #include <memory>
 
 
@@ -11,6 +11,7 @@ namespace DeadFrame2D::Engine
 	class UIComponent;
 
 
+	// TODO: Shouldn't this be a UIComponent?
 	class DF2D_API LayoutGroup : public GameComponent
 	{
 		TYPE_INFO(LayoutGroup, GameComponent);

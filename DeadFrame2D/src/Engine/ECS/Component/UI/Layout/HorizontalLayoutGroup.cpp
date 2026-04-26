@@ -1,6 +1,6 @@
 #include "Engine/ECS/Component/Transform.h"
-#include "Engine/ECS/Component/UI/Abstractions/UIComponent.h"
 #include "Engine/ECS/Component/UI/Layout/HorizontalLayoutGroup.h"
+#include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
 

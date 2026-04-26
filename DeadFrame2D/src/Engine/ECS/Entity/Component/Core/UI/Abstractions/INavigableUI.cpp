@@ -1,5 +1,5 @@
-#include "Engine/ECS/Component/UI/Abstractions/IInteractableUI.h"
-#include "Engine/ECS/Component/UI/Abstractions/INavigableUI.h"
+#include "Engine/ECS/Entity/Component/Core/UI/Abstractions/IInteractableUI.h"
+#include "Engine/ECS/Entity/Component/Core/UI/Abstractions/INavigableUI.h"
 
 
 namespace DeadFrame2D::Engine

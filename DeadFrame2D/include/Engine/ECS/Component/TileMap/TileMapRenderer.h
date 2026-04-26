@@ -1,7 +1,7 @@
 #pragma once
 #include "Constants/Rendering/DefaultSortOrders.h"
 #include "Data/Rendering/Pipeline/RenderTask.h"
-#include "Engine/ECS/Component/GameComponent.h"
+#include "Engine/ECS/Entity/Component/Core/GameComponent.h"
 
 
 namespace DeadFrame2D::Engine

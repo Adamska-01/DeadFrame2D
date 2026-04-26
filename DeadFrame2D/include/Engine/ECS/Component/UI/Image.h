@@ -1,6 +1,6 @@
 #pragma once
 #include "DF2D_API.h"
-#include "Engine/ECS/Component/UI/Abstractions/UIComponent.h"
+#include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
 #include <memory>
 #include <SDL.h>
 #include <string_view>

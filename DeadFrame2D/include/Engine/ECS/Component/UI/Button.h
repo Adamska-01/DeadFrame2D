@@ -1,7 +1,7 @@
 #pragma once
 #include "Core/Services/Events/Abstractions/IEventProcessor.h"
 #include "DF2D_API.h"
-#include "Engine/ECS/Component/UI/Abstractions/IInteractableUI.h"
+#include "Engine/ECS/Entity/Component/Core/UI/Abstractions/IInteractableUI.h"
 #include "Utilities/Delegates/MulticastDelegate.h"
 #include <functional>
 

@@ -3,7 +3,7 @@
 #include "Data/Input/ActionListenerEntry.h"
 #include "Data/Input/InputUserID.h"
 #include "DF2D_API.h"
-#include "Engine/ECS/Component/GameComponent.h"
+#include "Engine/ECS/Entity/Component/Core/GameComponent.h"
 #include "Utilities/Delegates/Listeners/ListenerID.h"
 #include <functional>
 #include <string>

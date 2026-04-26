@@ -1,7 +1,7 @@
 #pragma once
 #include "Core/Math/Vector2.h"
 #include "DF2D_API.h"
-#include "Engine/ECS/Component/GameComponent.h"
+#include "Engine/ECS/Entity/Component/Core/GameComponent.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Engine/ECS/System/Events/DispatchableEvent.h"
 #include <memory>

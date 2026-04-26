@@ -1,4 +1,4 @@
-#include "Engine/ECS/Component/ComponentContext.h"
+#include "Engine/ECS/Entity/Component/Core/ComponentContext.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
 

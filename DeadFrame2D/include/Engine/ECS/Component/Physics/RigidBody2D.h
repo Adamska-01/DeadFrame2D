@@ -4,7 +4,7 @@
 #include "Data/Physics/BodyDefinition2D.h"
 #include "Data/Physics/BodyType2D.h"
 #include "DF2D_API.h"
-#include "Engine/ECS/Component/GameComponent.h"
+#include "Engine/ECS/Entity/Component/Core/GameComponent.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Utilities/Delegates/MulticastDelegate.h"
 

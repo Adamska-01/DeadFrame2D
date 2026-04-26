@@ -1,7 +1,7 @@
 #pragma once
 #include "DF2D_API.h"
-#include "Engine/ECS/Component/UI/Abstractions/INavigableUI.h"
-#include "Engine/ECS/Component/UI/Abstractions/UIComponent.h"
+#include "Engine/ECS/Entity/Component/Core/UI/Abstractions/INavigableUI.h"
+#include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
 
 
 namespace DeadFrame2D::Engine
