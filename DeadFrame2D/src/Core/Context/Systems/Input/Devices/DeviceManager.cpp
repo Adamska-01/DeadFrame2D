@@ -5,7 +5,7 @@
 #include "Core/Context/Systems/Input/Devices/DeviceTypes/ControllerInputDevice.h"
 #include "Core/Context/Systems/Input/Devices/DeviceTypes/KeyboardInputDevice.h"
 #include "Core/Context/Systems/Input/Devices/DeviceTypes/MouseInputDevice.h"
-#include "Engine/EngineEvents/EventDispatcher.h"
+#include "Engine/ECS/System/Events/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/SubSystems/Input/DeviceAddedEvent.h"
 #include "Engine/EngineEvents/Events/SubSystems/Input/DeviceRemovedEvent.h"
 #include "Utilities/Debugging/Guards.h"

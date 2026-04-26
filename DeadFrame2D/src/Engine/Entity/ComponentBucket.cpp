@@ -1,5 +1,5 @@
 #include "Engine/ECS/Component/GameComponent.h"
-#include "Engine/EngineEvents/EventDispatcher.h"
+#include "Engine/ECS/System/Events/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/GameComponentEvents/GameComponentAddedEvent.h"
 #include "Engine/Entity/ComponentBucket.h"
 #include "Engine/Entity/GameObject.h"

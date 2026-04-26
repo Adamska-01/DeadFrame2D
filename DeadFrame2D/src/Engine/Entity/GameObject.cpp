@@ -1,7 +1,7 @@
 #include "Engine/ECS/Component/Transform.h"
+#include "Engine/ECS/System/Events/EventDispatcher.h"
 #include "Engine/ECS/System/Scene/Scene.h"
 #include "Engine/ECS/System/Scene/SceneManager.h"
-#include "Engine/EngineEvents/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectHierarchyChangeEvent.h"
 #include "Engine/Entity/GameObject.h"
