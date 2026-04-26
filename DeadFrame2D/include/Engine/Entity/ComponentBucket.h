@@ -41,6 +41,8 @@ namespace DeadFrame2D::Engine
 
 		DF2D_API bool IsValid(uint32_t index, uint32_t generation) const;
 
+		DF2D_API void SendGameComponentAddedEvent(ComponentHandle<GameComponent> newComponent) const;
+
 
 		template<typename F> // Forward rvalue or lvalue without allocation
 		void ForEach(F&& func);
@@ -64,7 +66,7 @@ namespace DeadFrame2D::Engine
 		ComponentHandle<T> GetComponent();
 
 		template<typename T, typename... Args>
-		ComponentHandle<T> AddComponent(const ObjectHandle<GameObject>& owner, bool canInitialize, Args&&... args);
+		ComponentHandle<T> AddComponent(const ObjectHandle<GameObject>& owner, Args&&... args);
 
 		template<typename T>
 		void RemoveComponent(const ComponentHandle<T>& handle);
@@ -120,8 +122,8 @@ namespace DeadFrame2D::Engine
 		return {};
 	}
 
-	template<typename T, typename ...Args>
-	inline ComponentHandle<T> ComponentBucket::AddComponent(const ObjectHandle<GameObject>& owner, bool canInitialize, Args && ...args)
+	template<typename T, typename... Args>
+	inline ComponentHandle<T> ComponentBucket::AddComponent(const ObjectHandle<GameObject>& owner, Args && ...args)
 	{
 		static_assert(std::is_base_of<GameComponent, T>::value, "GameComponent T must derive from GameComponent");
 		static_assert(DeadFrame2D::Core::HasTypeInfo<T>::value, "GameComponent T must declare TYPE_INFO");
@@ -137,19 +139,12 @@ namespace DeadFrame2D::Engine
 
 		entry.instance.get()->selfHandle = handle;
 
-		// This is necessary due to smart pointer/C++ limitations
 		if (owner != nullptr)
 		{
 			LinkComponentToOwner(owner, entry.instance.get());
 		}
 
-		if (canInitialize)
-		{
-			LinkComponentToOwner(owner, entry.instance.get());
-			
-			entry.instance->Init();
-			entry.instance->Start();
-		}
+		SendGameComponentAddedEvent(ComponentHandle<GameComponent>::From(handle));
 
 		return handle;
 	}

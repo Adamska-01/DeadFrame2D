@@ -1,4 +1,5 @@
 #include "Engine/EngineEvents/EventDispatcher.h"
+#include "Engine/EngineEvents/Events/GameComponentEvents/GameComponentAddedEvent.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectCreatedEvent.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectHierarchyChangeEvent.h"
@@ -20,6 +21,7 @@ namespace DeadFrame2D::Engine
 
 		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), this, &Scene::GameObjectDestroyedHandler);
 		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectHierarchyChangeEvent)), this, &Scene::GameObjectHierarchyChangeHandler);
+		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameComponentAddedEvent)), this, &Scene::GameComponentAddedHandler);
 	}
 
 	Scene::~Scene()
@@ -28,6 +30,7 @@ namespace DeadFrame2D::Engine
 
 		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), this);
 		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectHierarchyChangeEvent)), this);
+		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameComponentAddedEvent)), this);
 	}
 
 	uint32_t Scene::FindFreeSlot()
@@ -61,23 +64,6 @@ namespace DeadFrame2D::Engine
 		const auto& e = entries[index];
 		
 		return e.state == ObjectEntryState::ALIVE && e.generation == generation;
-	}
-
-	void Scene::SendGameObjectCreatedEvent(const ObjectHandle<GameObject>& obj)
-	{
-		EventDispatcher::SendEvent(std::make_shared<GameObjectCreatedEvent>(obj));
-	}
-
-	void Scene::BuildSnapshotRecursive()
-	{
-		frameSnapshot.clear();
-
-		TraverseRoots(false, [&](uint32_t index, GameObject&)
-		{
-			frameSnapshot.push_back(index);
-
-			return true; // continue traversal
-		});
 	}
 
 	void Scene::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
@@ -139,6 +125,27 @@ namespace DeadFrame2D::Engine
 		}
 	}
 
+	void Scene::GameComponentAddedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
+	{
+		auto gameComponentAddedEvent = DispatchableEvent::SafeCast<GameComponentAddedEvent>(dispatchableEvent);
+
+		if (gameComponentAddedEvent == nullptr)
+			return;
+
+		auto newComponent = gameComponentAddedEvent->GetGameComponentHandle();
+
+		if (newComponent && isRunning)
+		{
+			newComponent->Init();
+			newComponent->Start();
+		}
+	}
+
+	void Scene::SendGameObjectCreatedEvent(const ObjectHandle<GameObject>& obj)
+	{
+		EventDispatcher::SendEvent(std::make_shared<GameObjectCreatedEvent>(obj));
+	}
+
 	void Scene::ProcessPendingDestructions()
 	{
 		for (const auto& toDestroyIndex : objectsPendingDestruction)
@@ -169,6 +176,18 @@ namespace DeadFrame2D::Engine
 		}
 
 		objectsPendingDestruction.clear();
+	}
+
+	void Scene::BuildSnapshotRecursive()
+	{
+		frameSnapshot.clear();
+
+		TraverseRoots(false, [&](uint32_t index, GameObject&)
+			{
+				frameSnapshot.push_back(index);
+
+				return true; // continue traversal
+			});
 	}
 
 	void Scene::Exit()

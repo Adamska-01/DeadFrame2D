@@ -17,7 +17,6 @@ namespace DeadFrame2D::Engine
 
 	GameObject::GameObject()
 		: isDestroyed(false),
-		isInitialized(false),
 		isActive(true),
 		hasActiveParent(true)
 	{

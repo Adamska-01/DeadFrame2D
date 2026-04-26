@@ -1,4 +1,6 @@
 #include "Engine/Components/GameComponent.h"
+#include "Engine/EngineEvents/EventDispatcher.h"
+#include "Engine/EngineEvents/Events/GameComponentEvents/GameComponentAddedEvent.h"
 #include "Engine/Entity/ComponentBucket.h"
 #include "Engine/Entity/GameObject.h"
 #include "Engine/Entity/Handles/GameObject/ObjectHandle.h"
@@ -59,5 +61,10 @@ namespace DeadFrame2D::Engine
 		const auto& entry = components[index];
 
 		return entry.alive && entry.generation == generation;
+	}
+
+	void ComponentBucket::SendGameComponentAddedEvent(ComponentHandle<GameComponent> newComponent) const
+	{
+		EventDispatcher::SendEvent(std::make_shared<GameComponentAddedEvent>(newComponent));
 	}
 }

@@ -13,6 +13,7 @@ namespace DeadFrame2D::Engine
 	class GameObject;
 	class ComponentBucket;
 	class DispatchableEvent;
+	class GameComponent;
 
 
 	class DF2D_API Scene : public std::enable_shared_from_this<Scene>, public ISceneHandleProvider
@@ -29,6 +30,12 @@ namespace DeadFrame2D::Engine
 
 		std::vector<uint32_t> freeSlots;
 
+		std::vector<uint32_t> gameObjectRoots;
+
+		std::vector<uint32_t> frameSnapshot;
+
+		std::vector<DeadFrame2D::Data::ObjectEntry> entries;
+
 
 		uint32_t FindFreeSlot();
 
@@ -38,11 +45,6 @@ namespace DeadFrame2D::Engine
 		bool IsValid(uint32_t index, uint32_t generation) const override;
 
 
-		void SendGameObjectCreatedEvent(const ObjectHandle<GameObject>& obj);
-
-		void BuildSnapshotRecursive();
-
-
 		template<typename T, typename... Args>
 		ObjectHandle<T> Instantiate(Args&&... args);
 
@@ -50,20 +52,18 @@ namespace DeadFrame2D::Engine
 		void TraverseRoots(bool includeInactive, Fn&& fn);
 
 
-	protected:
-		std::vector<DeadFrame2D::Data::ObjectEntry> entries;
-
-		std::vector<uint32_t> gameObjectRoots;
-
-		std::vector<uint32_t> frameSnapshot;
-
-
 		void GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
 
 		void GameObjectHierarchyChangeHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
 
+		void GameComponentAddedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
+
+
+		void SendGameObjectCreatedEvent(const ObjectHandle<GameObject>& obj);
 
 		void ProcessPendingDestructions();
+
+		void BuildSnapshotRecursive();
 
 		void Exit();
 
@@ -136,15 +136,7 @@ namespace DeadFrame2D::Engine
 
 		gameObjectRoots.push_back(index);
 
-		if (isRunning)
-		{
-			entry.object->componentBucket->ForEach([](auto& comp)
-			{
-				comp.Init();
-				comp.Start();
-			});
-		}
-		else
+		if (!isRunning)
 		{
 			gameObjectsToInitialize.push_back(index);
 		}

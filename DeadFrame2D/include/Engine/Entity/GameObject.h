@@ -21,8 +21,6 @@ namespace DeadFrame2D::Engine
 
 
 	private:
-		bool isInitialized;
-
 		bool isDestroyed;
 
 
@@ -206,7 +204,7 @@ namespace DeadFrame2D::Engine
 	{
 		static_assert(std::is_base_of_v<GameComponent, T>, "T must derive from GameComponent");
 
-		auto newComponent = componentBucket->AddComponent<T>(thisGameObject, isInitialized, std::forward<TArgs>(args)...);
+		auto newComponent = componentBucket->AddComponent<T>(thisGameObject, std::forward<TArgs>(args)...);
 
 		OnNewComponentAdded.Broadcast(ComponentHandle<GameComponent>::From(newComponent));
 
