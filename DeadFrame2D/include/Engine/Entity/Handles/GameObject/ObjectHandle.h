@@ -46,7 +46,7 @@ namespace DeadFrame2D::Engine
 }
 
 
-#include "Engine/SceneSystem/ISceneHandleProvider.h"
+#include "Engine/ECS/System/Scene/Abstractions/ISceneHandleProvider.h"
 #include "Engine/Entity/GameObject.h"
 
 

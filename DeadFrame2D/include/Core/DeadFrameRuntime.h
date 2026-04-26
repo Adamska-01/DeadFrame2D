@@ -2,7 +2,7 @@
 #include "Core/Context/SystemInitializer.h"
 #include "Core/Services/Events/EventManager.h"
 #include "DF2D_API.h"
-#include "Engine/SceneSystem/SceneManager.h"
+#include "Engine/ECS/System/Scene/SceneManager.h"
 #include "Services/Time/FrameTimer.h"
 
 

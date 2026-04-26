@@ -1,9 +1,9 @@
 #pragma once
 #include "Data/Entity/ObjectEntry.h"
 #include "DF2D_API.h"
+#include "Engine/ECS/System/Scene/Abstractions/ISceneHandleProvider.h"
 #include "Engine/Entity/ComponentHandle.h"
 #include "Engine/Entity/Handles/GameObject/ObjectHandle.h"
-#include "Engine/SceneSystem/ISceneHandleProvider.h"
 #include <type_traits>
 #include <vector>
 

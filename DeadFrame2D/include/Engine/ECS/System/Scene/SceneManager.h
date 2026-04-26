@@ -60,7 +60,7 @@ namespace DeadFrame2D::Engine
 }
 
 
-#include "Engine/SceneSystem/Scene.h"
+#include "Engine/ECS/System/Scene/Scene.h"
 
 
 namespace DeadFrame2D::Engine

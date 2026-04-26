@@ -1,7 +1,7 @@
 #include "Core/Context/Systems/Coroutines/CoroutineScheduler.h"
 #include "Core/Services/Time/FrameTimer.h"
-#include "Engine/SceneSystem/Scene.h"
-#include "Engine/SceneSystem/SceneManager.h"
+#include "Engine/ECS/System/Scene/Scene.h"
+#include "Engine/ECS/System/Scene/SceneManager.h"
 
 
 

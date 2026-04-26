@@ -95,7 +95,7 @@ namespace DeadFrame2D::Engine
 
 #include "Engine/ECS/Component/GameComponent.h"
 #include "Engine/Entity/ComponentBucket.h"
-#include "Engine/SceneSystem/Scene.h"
+#include "Engine/ECS/System/Scene/Scene.h"
 
 
 namespace DeadFrame2D::Engine

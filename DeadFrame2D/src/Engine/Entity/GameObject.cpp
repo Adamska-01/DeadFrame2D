@@ -1,10 +1,10 @@
 #include "Engine/ECS/Component/Transform.h"
+#include "Engine/ECS/System/Scene/Scene.h"
+#include "Engine/ECS/System/Scene/SceneManager.h"
 #include "Engine/EngineEvents/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectHierarchyChangeEvent.h"
 #include "Engine/Entity/GameObject.h"
-#include "Engine/SceneSystem/Scene.h"
-#include "Engine/SceneSystem/SceneManager.h"
 #include "Utilities/Helpers/Coroutines/CoroutineHelpers.h"
 #include <stack>
 

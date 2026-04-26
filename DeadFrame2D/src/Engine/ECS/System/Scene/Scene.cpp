@@ -1,9 +1,9 @@
+#include "Engine/ECS/System/Scene/Scene.h"
 #include "Engine/EngineEvents/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/GameComponentEvents/GameComponentAddedEvent.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectCreatedEvent.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectDestroyedEvent.h"
 #include "Engine/EngineEvents/Events/GameObjectEvents/GameObjectHierarchyChangeEvent.h"
-#include "Engine/SceneSystem/Scene.h"
 #include <algorithm>
 #include <cassert>
 
