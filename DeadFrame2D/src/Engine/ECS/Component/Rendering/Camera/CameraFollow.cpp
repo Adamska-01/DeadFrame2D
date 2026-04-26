@@ -4,7 +4,7 @@
 #include "Engine/ECS/Component/Transform.h"
 #include "Engine/ECS/System/Events/EventDispatcher.h"
 #include "Engine/Entity/GameObject.h"
-#include "Engine/Events/SubSystems/Renderer/RenderTargetSizeChangedEvent.h"
+#include "Engine/Events/Context/Renderer/RenderTargetSizeChangedEvent.h"
 #include "Utilities/Helpers/Events/EventHelpers.h"
 #include <algorithm>
 #include <limits>

@@ -3,9 +3,9 @@
 #include "Core/Context/Systems/Input/User/InputUser.h"
 #include "Core/Context/Systems/Input/User/InputUserManager.h"
 #include "Engine/ECS/System/Events/EventDispatcher.h"
-#include "Engine/Events/SubSystems/Input/DeviceRemovedEvent.h"
-#include "Engine/Events/SubSystems/Input/InputUserCreatedEvent.h"
-#include "Engine/Events/SubSystems/Input/InputUserDestroyedEvent.h"
+#include "Engine/Events/Context/Input/DeviceRemovedEvent.h"
+#include "Engine/Events/Context/Input/InputUserCreatedEvent.h"
+#include "Engine/Events/Context/Input/InputUserDestroyedEvent.h"
 
 
 namespace DeadFrame2D::Core

@@ -11,8 +11,8 @@
 #include "Data/Input/InputControlState.h"
 #include "Engine/ECS/System/Events/DispatchableEvent.h"
 #include "Engine/ECS/System/Events/EventDispatcher.h"
-#include "Engine/Events/SubSystems/Input/InputUserCreatedEvent.h"
-#include "Engine/Events/SubSystems/Input/InputUserDestroyedEvent.h"
+#include "Engine/Events/Context/Input/InputUserCreatedEvent.h"
+#include "Engine/Events/Context/Input/InputUserDestroyedEvent.h"
 #include "Models/Input/ActionMap/InputActionMapBucket.h"
 #include "Utilities/IO/Serialization/JsonSerializer.h"
 
