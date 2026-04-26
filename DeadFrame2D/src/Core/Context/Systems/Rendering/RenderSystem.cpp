@@ -1,7 +1,7 @@
 #include "Core/Context/Systems/Rendering/RenderSystem.h"
 #include "Core/Context/Systems/Rendering/Resolvers/RenderResolvers.h"
-#include "Engine/Components/Rendering/Camera.h"
-#include "Engine/Components/UI/Canvas.h"
+#include "Engine/ECS/Component/Rendering/Camera.h"
+#include "Engine/ECS/Component/UI/Canvas.h"
 
 
 namespace DeadFrame2D::Core

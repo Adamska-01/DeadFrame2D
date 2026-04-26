@@ -1,4 +1,4 @@
-#include "Engine/Components/GameComponent.h"
+#include "Engine/ECS/Component/GameComponent.h"
 #include "Engine/Entity/ComponentHandle.h"
 #include "Engine/Entity/GameObject.h"
 #include "Engine/Entity/GameObjectNotifier.h"

@@ -1,7 +1,7 @@
 #include "Engine/Blueprints/UI/ButtonBlueprint.h"
-#include "Engine/Components/Transform.h"
-#include "Engine/Components/UI/Button.h"
-#include "Engine/Components/UI/TextMesh.h"
+#include "Engine/ECS/Component/Transform.h"
+#include "Engine/ECS/Component/UI/Button.h"
+#include "Engine/ECS/Component/UI/TextMesh.h"
 
 
 namespace DeadFrame2D::Engine

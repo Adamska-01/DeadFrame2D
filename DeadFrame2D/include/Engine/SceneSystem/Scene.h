@@ -105,7 +105,7 @@ namespace DeadFrame2D::Engine
 
 
 #include "Engine/Entity/GameObject.h"
-#include "Engine/Components/GameComponent.h"
+#include "Engine/ECS/Component/GameComponent.h"
 
 
 namespace DeadFrame2D::Engine

@@ -1,6 +1,6 @@
 #include "Core/Context/Systems/Physics/ContactListener.h"
 #include "Data/Collision/CollisionInfo.h"
-#include "Engine/Components/Collisions/Collider2D.h"
+#include "Engine/ECS/Component/Collisions/Collider2D.h"
 #include "Engine/Entity/GameObject.h"
 
 

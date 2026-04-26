@@ -1,6 +1,6 @@
 #include "Engine/Blueprints/Audio/AudioClipBlueprint.h"
-#include "Engine/Components/Audio/AudioSource.h"
-#include "Engine/Components/Transform.h"
+#include "Engine/ECS/Component/Audio/AudioSource.h"
+#include "Engine/ECS/Component/Transform.h"
 
 
 namespace DeadFrame2D::Engine

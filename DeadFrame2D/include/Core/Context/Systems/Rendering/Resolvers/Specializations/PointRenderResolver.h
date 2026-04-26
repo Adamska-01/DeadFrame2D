@@ -2,7 +2,7 @@
 #include "Core/Context/Systems/Rendering/Abstractions/IRenderBackend.h"
 #include "Core/Context/Systems/Rendering/Resolvers/Abstractions/RenderResolver.h"
 #include "Data/Rendering/Pipeline/Shapes/PointRenderData.h"
-#include "Engine/Components/Rendering/Camera.h"
+#include "Engine/ECS/Component/Rendering/Camera.h"
 #include "Engine/Entity/ComponentHandle.h"
 #include "Utilities/Collisions/CollisionUtils.h"
 #include <optional>

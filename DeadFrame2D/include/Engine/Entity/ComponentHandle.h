@@ -49,7 +49,7 @@ namespace DeadFrame2D::Engine
 
 
 #include "Engine/Entity/ComponentBucket.h"
-#include "Engine/Components/GameComponent.h"
+#include "Engine/ECS/Component/GameComponent.h"
 
 
 namespace DeadFrame2D::Engine

@@ -1,6 +1,6 @@
 #pragma once
 #include "DF2D_API.h"
-#include "Engine/Components/UI/Abstractions/IInteractableUI.h"
+#include "Engine/ECS/Component/UI/Abstractions/IInteractableUI.h"
 #include "Engine/EngineEvents//DispatchableEvent.h"
 
 

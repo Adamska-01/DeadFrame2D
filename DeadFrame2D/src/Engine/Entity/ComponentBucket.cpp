@@ -1,4 +1,4 @@
-#include "Engine/Components/GameComponent.h"
+#include "Engine/ECS/Component/GameComponent.h"
 #include "Engine/EngineEvents/EventDispatcher.h"
 #include "Engine/EngineEvents/Events/GameComponentEvents/GameComponentAddedEvent.h"
 #include "Engine/Entity/ComponentBucket.h"
