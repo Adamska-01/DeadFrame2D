@@ -1,7 +1,7 @@
 #include "Core/Context/Systems/Graphics/TextureManager.h"
 #include "Core/Context/Systems/Rendering/Renderer.h"
 #include "Core/Context/Systems/Rendering/RenderSystem.h"
-#include "Engine/ECS/Component/TileMap/Tiled/TiledMapCompatibleRenderer.h"
+#include "Engine/ECS/Component/Rendering/TileMap/Tiled/TiledMapCompatibleRenderer.h"
 #include "Engine/ECS/Component/Transform.h"
 #include "Utilities/Debugging/Guards.h"
 

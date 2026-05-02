@@ -1,6 +1,6 @@
 #include "Core/Context/Systems/Rendering/RenderSystem.h"
 #include "Core/Context/Systems/Rendering/Resolvers/RenderResolvers.h"
-#include "Engine/ECS/Component/Rendering/Camera.h"
+#include "Engine/ECS/Component/Rendering/Camera/Camera.h"
 #include "Engine/ECS/Component/UI/Canvas.h"
 
 

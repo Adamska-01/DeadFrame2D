@@ -2,7 +2,7 @@
 #include "Core/Context/Systems/Rendering/Pipeline/CompositeRenderPass.h"
 #include "Core/Context/Systems/Rendering/Pipeline/OverlayRenderPass.h"
 #include "Core/Context/Systems/Rendering/RenderPipeline.h"
-#include "Engine/ECS/Component/Rendering/Camera.h"
+#include "Engine/ECS/Component/Rendering/Camera/Camera.h"
 
 
 namespace DeadFrame2D::Core

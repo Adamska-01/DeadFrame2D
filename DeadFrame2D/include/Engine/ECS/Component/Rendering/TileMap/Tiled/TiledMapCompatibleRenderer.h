@@ -1,6 +1,6 @@
 #pragma once
 #include "DF2D_API.h"
-#include "Engine/ECS/Component/TileMap/TileMapRenderer.h"
+#include "Engine/ECS/Component/Rendering/TileMap/Abstractions/TileMapRenderer.h"
 #include "Models/Rendering/TileEditors/Tiled/TiledMap.h"
 
 

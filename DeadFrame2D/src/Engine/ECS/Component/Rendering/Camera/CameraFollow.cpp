@@ -1,5 +1,5 @@
 #include "Core/Context/Systems/Rendering/Renderer.h"
-#include "Engine/ECS/Component/Rendering/Camera.h"
+#include "Engine/ECS/Component/Rendering/Camera/Camera.h"
 #include "Engine/ECS/Component/Rendering/Camera/CameraFollow.h"
 #include "Engine/ECS/Component/Transform.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"

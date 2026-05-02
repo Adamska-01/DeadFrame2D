@@ -1,5 +1,5 @@
 #include "Constants/Rendering/DefaultSortOrders.h"
-#include "Engine/ECS/Component/Rendering/Camera.h"
+#include "Engine/ECS/Component/Rendering/Camera/Camera.h"
 #include "Engine/ECS/Component/UI/Canvas.h"
 
 

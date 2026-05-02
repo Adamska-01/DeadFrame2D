@@ -2,7 +2,7 @@
 #include "Core/Math/Vector2.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Component/Collisions/Tile/TileCollider2D.h"
-#include "Engine/ECS/Component/TileMap/Tiled/TiledMapCompatibleRenderer.h"
+#include "Engine/ECS/Component/Rendering/TileMap/Tiled/TiledMapCompatibleRenderer.h"
 
 
 class b2Fixture;

@@ -1,6 +1,6 @@
 #include "Core/Context/Systems/Rendering/Pipeline/CompositeRenderPass.h"
 #include "Core/Context/Systems/Rendering/Renderer.h"
-#include "Engine/ECS/Component/Rendering/Camera.h"
+#include "Engine/ECS/Component/Rendering/Camera/Camera.h"
 
 
 namespace DeadFrame2D::Core

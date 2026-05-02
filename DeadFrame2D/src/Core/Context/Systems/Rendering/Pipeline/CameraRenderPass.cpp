@@ -1,7 +1,8 @@
 #include "Core/Context/Systems/Rendering/Abstractions/IRenderBackend.h"
+#include "Core/Context/Systems/Rendering/Resolvers/Abstractions/RenderResolver.h"
 #include "Core/Context/Systems/Rendering/Pipeline/CameraRenderPass.h"
 #include "Core/Context/Systems/Rendering/Resolvers/RenderResolvers.h"
-#include "Engine/ECS/Component/Rendering/Camera.h"
+#include "Engine/ECS/Component/Rendering/Camera/Camera.h"
 
 
 namespace DeadFrame2D::Core
