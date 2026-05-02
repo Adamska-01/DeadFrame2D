@@ -8,11 +8,11 @@
 #include "Utilities/Helpers/Events/EventHelpers.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
-	using namespace DeadFrame2D::Core;
-	using namespace DeadFrame2D::Data;
-	using namespace DeadFrame2D::Utilities;
+	using namespace DF2D::Core;
+	using namespace DF2D::Data;
+	using namespace DF2D::Utilities;
 
 
 	ImageScroller::ImageScroller(std::string_view textureSource, ScrollDirection scrollDirection, float scrollSpeed)

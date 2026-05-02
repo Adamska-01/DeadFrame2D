@@ -3,11 +3,11 @@
 #include <functional>
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	struct ButtonCallback
 	{
-		DeadFrame2D::Engine::ComponentHandleBase handle;
+		Engine::ComponentHandleBase handle;
 
 		std::function<void()> callback = []() {};
 	};

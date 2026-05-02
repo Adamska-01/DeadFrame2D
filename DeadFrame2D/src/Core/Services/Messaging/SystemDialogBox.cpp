@@ -1,9 +1,9 @@
 #include "Core/Services/Messaging/SystemDialogBox.h"
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
-	using namespace DeadFrame2D::Data;
+	using namespace DF2D::Data;
 
 
 	int SystemDialogBox::ShowBasicBox(const std::string& title, const std::string& message, SDL_MessageBoxFlags type, const std::vector<SDL_MessageBoxButtonData>& buttons)

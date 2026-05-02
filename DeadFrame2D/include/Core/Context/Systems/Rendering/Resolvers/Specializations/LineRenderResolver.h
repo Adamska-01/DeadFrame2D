@@ -9,15 +9,15 @@
 #include <optional>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	template<>
-	struct RenderResolver<DeadFrame2D::Data::LineRenderData>
+	struct RenderResolver<Data::LineRenderData>
 	{
 		static void Render(
 			IRenderBackend& renderBackend,
-			const DeadFrame2D::Data::LineRenderData& renderData,
-			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera,
+			const Data::LineRenderData& renderData,
+			Engine::ComponentHandle<Engine::Camera> camera,
 			bool requiresScreenSpaceConversion)
 		{
 			Vector2F p1 = renderData.p1;
@@ -32,12 +32,12 @@ namespace DeadFrame2D::Core
 			renderBackend.DrawLine(p1, p2, renderData.color);
 		}
 
-		static std::optional<DeadFrame2D::Data::LineRenderData> Cull(
-			const DeadFrame2D::Data::LineRenderData& renderData,
-			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera)
+		static std::optional<Data::LineRenderData> Cull(
+			const Data::LineRenderData& renderData,
+			Engine::ComponentHandle<Engine::Camera> camera)
 		{
-			using namespace DeadFrame2D::Data;
-			using namespace DeadFrame2D::Utilities;
+			using namespace DF2D::Data;
+			using namespace DF2D::Utilities;
 
 
 			// Always visible if no camera (screen space)

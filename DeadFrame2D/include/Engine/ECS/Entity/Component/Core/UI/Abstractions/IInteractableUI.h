@@ -4,7 +4,7 @@
 #include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	/**
 	 * @brief Represents the interactable status of a UI element.

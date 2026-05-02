@@ -6,7 +6,7 @@
 #include <memory>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class DispatchableEvent;
 
@@ -17,20 +17,20 @@ namespace DeadFrame2D::Engine
 
 
 	private:
-		DeadFrame2D::Data::ScrollDirection scrollDirection;
+		Data::ScrollDirection scrollDirection;
 
 		float scrollSpeed;
 
 		float scrollOffset;
 
-		DeadFrame2D::Core::Vector2I renderTargetSize;
+		Core::Vector2I renderTargetSize;
 
 
 		void RenderTargetSizeChangedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
 
 
 	public:
-		ImageScroller(std::string_view textureSource, DeadFrame2D::Data::ScrollDirection scrollDirection, float scrollSpeed);
+		ImageScroller(std::string_view textureSource, Data::ScrollDirection scrollDirection, float scrollSpeed);
 
 		virtual ~ImageScroller() override;
 

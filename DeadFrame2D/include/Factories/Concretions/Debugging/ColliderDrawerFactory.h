@@ -5,7 +5,7 @@
 class b2Draw;
 
 
-namespace DeadFrame2D::Factories
+namespace DF2D::Factories
 {
 	class ColliderDrawerFactory : public IFactory<b2Draw*>
 	{

@@ -3,7 +3,7 @@
 #include <memory>
 
 
-namespace DeadFrame2D::Utilities
+namespace DF2D::Utilities
 {
 	template<typename T, typename... Args>
 	struct SharedPtrListener : IListener<Args...>
@@ -25,7 +25,7 @@ namespace DeadFrame2D::Utilities
 }
 
 
-namespace DeadFrame2D::Utilities
+namespace DF2D::Utilities
 {
 	template<typename T, typename... Args>
 	inline SharedPtrListener<T, Args...>::SharedPtrListener(std::weak_ptr<T> w, void(T::* m)(Args...))

@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace DeadFrame2D::Constants::DrawConstants
+namespace DF2D::Constants::DrawConstants
 {
 	constexpr int CIRCLE_SEGMENTS = 64;
 }

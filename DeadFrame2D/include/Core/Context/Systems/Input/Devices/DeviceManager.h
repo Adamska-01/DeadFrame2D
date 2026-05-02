@@ -12,7 +12,7 @@
 union SDL_Event;
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	class IInputActionHandler;
 
@@ -24,7 +24,7 @@ namespace DeadFrame2D::Core
 	class DF2D_API DeviceManager : public IEventProcessor, public IInputFrameLifecycle, public IInputDeviceProvider
 	{
 	private:
-		std::unordered_map<DeadFrame2D::Data::InputDeviceID, std::shared_ptr<InputDevice>> devices;
+		std::unordered_map<Data::InputDeviceID, std::shared_ptr<InputDevice>> devices;
 
 		InputDevice* currentController;
 
@@ -33,7 +33,7 @@ namespace DeadFrame2D::Core
 
 		void OpenController(int deviceIndex);
 
-		void CloseController(DeadFrame2D::Data::InputDeviceID instanceId);
+		void CloseController(Data::InputDeviceID instanceId);
 
 
 		std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
@@ -50,7 +50,7 @@ namespace DeadFrame2D::Core
 		~DeviceManager() override;
 
 
-		InputDevice* GetDevice(DeadFrame2D::Data::InputDeviceID id) override;
+		InputDevice* GetDevice(Data::InputDeviceID id) override;
 
 		std::vector<InputDevice*> GetAllDevices() const override;
 
@@ -58,7 +58,7 @@ namespace DeadFrame2D::Core
 
 		MouseInputDevice* Mouse() override;
 
-		ControllerInputDevice* Controller(DeadFrame2D::Data::InputDeviceID id) override;
+		ControllerInputDevice* Controller(Data::InputDeviceID id) override;
 
 		ControllerInputDevice* CurrentController() override;
 	};

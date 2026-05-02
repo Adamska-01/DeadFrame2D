@@ -7,7 +7,7 @@
 #include "Utilities/IO/Serialization/JsonSerializer.h"
 
 
-namespace DeadFrame2D::Models
+namespace DF2D::Models
 {
 	struct SystemConfig
 	{
@@ -23,8 +23,8 @@ namespace DeadFrame2D::Models
 
 		static SystemConfig LoadFromFiles()
 		{
-			using namespace DeadFrame2D::Constants;
-			using namespace DeadFrame2D::Utilities;
+			using namespace DF2D::Constants;
+			using namespace DF2D::Utilities;
 
 
 			return SystemConfig

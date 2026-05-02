@@ -6,24 +6,24 @@
 #include <cassert>
 
 
-namespace DeadFrame2D::Internal::Physics
+namespace DF2D::Internal::Physics
 {
 	/**
 	 * @brief Converts a custom BodyType2D to Box2D's b2BodyType.
 	 * @param type The custom BodyType2D value.
 	 * @return Corresponding b2BodyType.
 	 */
-	inline b2BodyType ToB2BodyType(DeadFrame2D::Data::BodyType2D type)
+	inline b2BodyType ToB2BodyType(Data::BodyType2D type)
 	{
 		switch (type)
 		{
-		case DeadFrame2D::Data::BodyType2D::Static:
+		case Data::BodyType2D::Static:
 			return b2_staticBody;
 
-		case DeadFrame2D::Data::BodyType2D::Kinematic:
+		case Data::BodyType2D::Kinematic:
 			return b2_kinematicBody;
 
-		case DeadFrame2D::Data::BodyType2D::Dynamic:
+		case Data::BodyType2D::Dynamic:
 			return b2_dynamicBody;
 
 		default:
@@ -34,7 +34,7 @@ namespace DeadFrame2D::Internal::Physics
 	/**
 	 * @brief Converts BodyDefinition2D wrapper into a b2BodyDef instance for use with Box2D.
 	 */
-	inline b2BodyDef ToB2BodyDef(const DeadFrame2D::Data::BodyDefinition2D& bodyDef)
+	inline b2BodyDef ToB2BodyDef(const Data::BodyDefinition2D& bodyDef)
 	{
 		b2BodyDef b2Def;
 
@@ -58,7 +58,7 @@ namespace DeadFrame2D::Internal::Physics
 	/**
 	 * @brief Converts PhysicsMaterial wrapper into a b2FixtureDef instance for use with Box2D.
 	 */
-	inline b2FixtureDef ToB2FixtureDef(const DeadFrame2D::Data::PhysicsMaterial& physicsMaterial, uintptr_t userDataPtr)
+	inline b2FixtureDef ToB2FixtureDef(const Data::PhysicsMaterial& physicsMaterial, uintptr_t userDataPtr)
 	{
 		b2FixtureDef b2FDef;
 
@@ -91,12 +91,12 @@ namespace DeadFrame2D::Internal::Physics
 	inline b2PolygonShape* ToB2BoxShape(
 		float halfWidth,
 		float halfHeight,
-		const DeadFrame2D::Core::Vector2F& center = DeadFrame2D::Core::Vector2F::Zero,
+		const Core::Vector2F& center = Core::Vector2F::Zero,
 		float angle = 0.0f)
 	{
 		auto boxShape = new b2PolygonShape();
 
-		const auto METER_PER_PIXEL = DeadFrame2D::Core::PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
+		const auto METER_PER_PIXEL = Core::PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
 
 		boxShape->SetAsBox(
 			halfWidth * METER_PER_PIXEL,
@@ -116,11 +116,11 @@ namespace DeadFrame2D::Internal::Physics
 	* @param center Center of the circle in pixels (optional).
 	* @return b2CircleShape* Pointer to the newly created shape. Caller is responsible for deleting it.
 	*/
-	inline b2CircleShape* ToB2CircleShape(float radius, const DeadFrame2D::Core::Vector2F& center = DeadFrame2D::Core::Vector2F::Zero)
+	inline b2CircleShape* ToB2CircleShape(float radius, const Core::Vector2F& center = Core::Vector2F::Zero)
 	{
 		auto circleShape = new b2CircleShape();
 
-		const auto METER_PER_PIXEL = DeadFrame2D::Core::PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
+		const auto METER_PER_PIXEL = Core::PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
 
 		circleShape->m_radius = radius * METER_PER_PIXEL;
 		circleShape->m_p = b2Vec2(

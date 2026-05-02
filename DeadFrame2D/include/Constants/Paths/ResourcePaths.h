@@ -4,7 +4,7 @@
 #include <string_view>
 
 
-namespace DeadFrame2D::Constants::Paths
+namespace DF2D::Constants::Paths
 {
 	namespace Folders
 	{

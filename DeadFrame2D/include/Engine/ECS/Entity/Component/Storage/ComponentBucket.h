@@ -6,7 +6,7 @@
 #include <vector>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class GameObject;
 
@@ -79,7 +79,7 @@ namespace DeadFrame2D::Engine
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	template<typename F>
 	inline void ComponentBucket::ForEach(F&& func)
@@ -126,7 +126,7 @@ namespace DeadFrame2D::Engine
 	inline ComponentHandle<T> ComponentBucket::AddComponent(const ObjectHandle<GameObject>& owner, Args && ...args)
 	{
 		static_assert(std::is_base_of<GameComponent, T>::value, "GameComponent T must derive from GameComponent");
-		static_assert(DeadFrame2D::Core::HasTypeInfo<T>::value, "GameComponent T must declare TYPE_INFO");
+		static_assert(Core::HasTypeInfo<T>::value, "GameComponent T must declare TYPE_INFO");
 
 		auto index = FindFreeSlot();
 

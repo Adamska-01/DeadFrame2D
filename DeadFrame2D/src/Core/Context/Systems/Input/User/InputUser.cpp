@@ -3,9 +3,9 @@
 #include "Core/Context/Systems/Input/User/InputUserManager.h"
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
-	using namespace DeadFrame2D::Data;
+	using namespace DF2D::Data;
 
 
 	InputUser::InputUser(InputUserID id, const std::string& name)

@@ -4,7 +4,7 @@
 #include <SDL_render.h>
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	struct SpriteRenderData
 	{
@@ -20,6 +20,6 @@ namespace DeadFrame2D::Data
 
 		std::optional<SDL_FPoint> rotationOrigin = std::nullopt;
 
-		SDL_Color colorMod = DeadFrame2D::Constants::CommonColors::WHITE;
+		SDL_Color colorMod = Constants::CommonColors::WHITE;
 	};
 }

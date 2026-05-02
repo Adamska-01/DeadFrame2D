@@ -10,15 +10,15 @@
 #include <optional>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	template<>
-	struct RenderResolver<DeadFrame2D::Data::CircleBatchRenderData>
+	struct RenderResolver<Data::CircleBatchRenderData>
 	{
 		static void Render(
 			IRenderBackend& renderBackend,
-			const DeadFrame2D::Data::CircleBatchRenderData& renderData,
-			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera,
+			const Data::CircleBatchRenderData& renderData,
+			Engine::ComponentHandle<Engine::Camera> camera,
 			bool requiresScreenSpaceConversion)
 		{
 			for (const auto& circle : renderData.circleBatch)
@@ -40,12 +40,12 @@ namespace DeadFrame2D::Core
 			}
 		}
 
-		static std::optional<DeadFrame2D::Data::CircleBatchRenderData> Cull(
-			const DeadFrame2D::Data::CircleBatchRenderData& renderData,
-			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera)
+		static std::optional<Data::CircleBatchRenderData> Cull(
+			const Data::CircleBatchRenderData& renderData,
+			Engine::ComponentHandle<Engine::Camera> camera)
 		{
-			using namespace DeadFrame2D::Data;
-			using namespace DeadFrame2D::Utilities;
+			using namespace DF2D::Data;
+			using namespace DF2D::Utilities;
 
 
 			// Always visible if no camera (screen space)

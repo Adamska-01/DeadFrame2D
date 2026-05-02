@@ -11,10 +11,10 @@
 #include "Models/Input/ActionMap/Processors/Settings/ScaleProcessorSettings.h"
 
 
-namespace DeadFrame2D::Factories
+namespace DF2D::Factories
 {
-	using namespace DeadFrame2D::Factories;
-	using namespace DeadFrame2D::Models;
+	using namespace DF2D::Factories;
+	using namespace DF2D::Models;
 
 
 	std::unique_ptr<IInputProcessor> InputProcessorFactory::CreateProduct(const InputProcessor& inputProcessorModel)

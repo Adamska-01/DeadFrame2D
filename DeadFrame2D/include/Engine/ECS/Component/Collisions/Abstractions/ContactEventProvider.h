@@ -6,7 +6,7 @@
 #include <functional>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class DF2D_API ContactEventProvider : public GameComponent
 	{
@@ -14,9 +14,9 @@ namespace DeadFrame2D::Engine
 
 
 	protected:
-		DeadFrame2D::Utilities::MulticastDelegate<const DeadFrame2D::Data::CollisionInfo&> onContactEnter;
+		Utilities::MulticastDelegate<const Data::CollisionInfo&> onContactEnter;
 
-		DeadFrame2D::Utilities::MulticastDelegate<const DeadFrame2D::Data::CollisionInfo&> onContactExit;
+		Utilities::MulticastDelegate<const Data::CollisionInfo&> onContactExit;
 
 
 	public:
@@ -25,11 +25,11 @@ namespace DeadFrame2D::Engine
 		virtual ~ContactEventProvider() override;
 
 
-		void RegisterContactEnterHandler(const ObjectHandleBase& listener, const std::function<void(const DeadFrame2D::Data::CollisionInfo&)>& handler);
-		void RegisterContactEnterHandler(const ComponentHandleBase& listener, const std::function<void(const DeadFrame2D::Data::CollisionInfo&)>& handler);
+		void RegisterContactEnterHandler(const ObjectHandleBase& listener, const std::function<void(const Data::CollisionInfo&)>& handler);
+		void RegisterContactEnterHandler(const ComponentHandleBase& listener, const std::function<void(const Data::CollisionInfo&)>& handler);
 
-		void RegisterContactExitHandler(const ObjectHandleBase& listener, const std::function<void(const DeadFrame2D::Data::CollisionInfo&)>& handler);
-		void RegisterContactExitHandler(const ComponentHandleBase& listener, const std::function<void(const DeadFrame2D::Data::CollisionInfo&)>& handler);
+		void RegisterContactExitHandler(const ObjectHandleBase& listener, const std::function<void(const Data::CollisionInfo&)>& handler);
+		void RegisterContactExitHandler(const ComponentHandleBase& listener, const std::function<void(const Data::CollisionInfo&)>& handler);
 
 		void DeregisterContactEnterHandler(const ObjectHandleBase& listener);
 		void DeregisterContactEnterHandler(const ComponentHandleBase& listener);
@@ -38,8 +38,8 @@ namespace DeadFrame2D::Engine
 		void DeregisterContactExitHandler(const ComponentHandleBase& listener);
 
 
-		virtual void InvokeCollisionEnter(const DeadFrame2D::Data::CollisionInfo& info);
+		virtual void InvokeCollisionEnter(const Data::CollisionInfo& info);
 
-		virtual void InvokeCollisionExit(const DeadFrame2D::Data::CollisionInfo& info);
+		virtual void InvokeCollisionExit(const Data::CollisionInfo& info);
 	};
 }

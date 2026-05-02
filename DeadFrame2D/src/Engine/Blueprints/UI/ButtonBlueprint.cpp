@@ -4,10 +4,10 @@
 #include "Engine/ECS/Component/UI/TextMesh.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
-	using namespace DeadFrame2D::Core;
-	using namespace DeadFrame2D::Data;
+	using namespace DF2D::Core;
+	using namespace DF2D::Data;
 
 
 	ButtonBlueprint::ButtonBlueprint(const ButtonBlueprintModel& buttonBlueprintConfiguration)

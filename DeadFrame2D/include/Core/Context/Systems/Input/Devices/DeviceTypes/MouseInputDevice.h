@@ -9,7 +9,7 @@
 #include <unordered_set>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	/**
 	 * @brief Mouse device wrapper.

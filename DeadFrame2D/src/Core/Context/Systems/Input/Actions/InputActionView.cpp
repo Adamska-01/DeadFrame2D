@@ -1,7 +1,7 @@
 #include "Core/Context/Systems/Input/Actions/InputActionView.h"
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	InputActionView::InputActionView(ActionPhase phase, std::variant<bool, float, Vector2F> value)
 		: phase(phase),

@@ -2,7 +2,7 @@
 #include "Engine/ECS/System/Scene/Abstractions/ISceneHandleProvider.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	ObjectHandleBase::ObjectHandleBase(std::weak_ptr<ISceneHandleProvider> scene, uint32_t index, uint32_t generation)
 		: scene(std::move(scene)), index(index), generation(generation)

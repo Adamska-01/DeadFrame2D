@@ -13,7 +13,7 @@ class b2Fixture;
 class b2CircleShape;
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class Transform;
 	class AudioListener;
@@ -50,14 +50,14 @@ namespace DeadFrame2D::Engine
 
 		int playingChannel;
 
-		DeadFrame2D::Core::Vector2F lastTransformPosition;
+		Core::Vector2F lastTransformPosition;
 
 		float lastTransformRotation;
 
 
-		void OnAudioSourceEnterHandler(const DeadFrame2D::Data::CollisionInfo& collisionInfo);
+		void OnAudioSourceEnterHandler(const Data::CollisionInfo& collisionInfo);
 
-		void OnAudioSourceExitHandler(const DeadFrame2D::Data::CollisionInfo& collisionInfo);
+		void OnAudioSourceExitHandler(const Data::CollisionInfo& collisionInfo);
 
 		void RebuildFixture();
 

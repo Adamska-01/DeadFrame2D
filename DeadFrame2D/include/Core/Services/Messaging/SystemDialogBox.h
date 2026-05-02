@@ -5,7 +5,7 @@
 #include <vector>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	class DF2D_API SystemDialogBox
 	{
@@ -22,7 +22,7 @@ namespace DeadFrame2D::Core
 
 
 	public:
-		static int ShowDialogBox(const DeadFrame2D::Data::MessageBoxConfig& config);
+		static int ShowDialogBox(const Data::MessageBoxConfig& config);
 
 
 		// Helpers

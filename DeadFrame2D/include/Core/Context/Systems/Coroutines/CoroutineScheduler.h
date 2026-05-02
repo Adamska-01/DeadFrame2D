@@ -4,7 +4,7 @@
 #include <vector>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	class ICoroutineAwaitable;
 	struct Task;

@@ -2,7 +2,7 @@
 #include "Engine/ECS/Entity/Component/Storage/ComponentBucket.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	ComponentHandleBase::ComponentHandleBase(std::weak_ptr<ComponentBucket> bucket, uint32_t index, uint32_t generation)
 		: bucket(std::move(bucket)), 

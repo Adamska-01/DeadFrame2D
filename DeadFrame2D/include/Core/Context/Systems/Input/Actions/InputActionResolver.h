@@ -14,12 +14,12 @@
 #include <unordered_set>
 
 
-namespace DeadFrame2D::Models
+namespace DF2D::Models
 {
 	struct Binding;
 }
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class DispatchableEvent;
 	class ComponentHandleBase;
@@ -27,7 +27,7 @@ namespace DeadFrame2D::Engine
 }
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	class RuntimeInputAction;
 	class InputDevice;

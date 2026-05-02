@@ -3,7 +3,7 @@
 #include "Data/Blueprints/UI/Text/TextMeshComponentModel.h"
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	// TODO: Remove this
 	struct ButtonBlueprintModel

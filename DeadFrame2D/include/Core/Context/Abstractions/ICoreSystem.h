@@ -2,7 +2,7 @@
 #include "DF2D_API.h"
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	class DF2D_API ICoreSystem
 	{

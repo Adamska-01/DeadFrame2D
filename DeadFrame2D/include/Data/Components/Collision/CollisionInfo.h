@@ -3,16 +3,16 @@
 #include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	struct CollisionInfo
 	{
-		DeadFrame2D::Core::Vector2F contactPoint = DeadFrame2D::Core::Vector2F::Zero;
+		Core::Vector2F contactPoint = Core::Vector2F::Zero;
 
-		DeadFrame2D::Core::Vector2F normal = DeadFrame2D::Core::Vector2F::Zero;
+		Core::Vector2F normal = Core::Vector2F::Zero;
 
-		DeadFrame2D::Engine::ObjectHandle<DeadFrame2D::Engine::GameObject> thisGameObject;
+		Engine::ObjectHandle<Engine::GameObject> thisGameObject;
 
-		DeadFrame2D::Engine::ObjectHandle<DeadFrame2D::Engine::GameObject> otherGameObject;
+		Engine::ObjectHandle<Engine::GameObject> otherGameObject;
 	};
 }

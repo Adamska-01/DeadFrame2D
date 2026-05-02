@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace DeadFrame2D::Constants::DefaultDeviceNames
+namespace DF2D::Constants::DefaultDeviceNames
 {
 	constexpr const char* KEYBOARD = "Keyboard";
 

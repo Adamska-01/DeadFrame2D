@@ -1,7 +1,7 @@
-#include "Engine/ECS/Component/UI/Abstractions/IInteractableUI.h"
+#include "Engine/ECS/Entity/Component/Core/UI/Abstractions/IInteractableUI.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	bool IInteractableUI::IsPressed() const
 	{

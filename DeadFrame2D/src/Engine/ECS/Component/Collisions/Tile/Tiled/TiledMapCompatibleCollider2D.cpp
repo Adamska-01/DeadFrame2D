@@ -7,14 +7,14 @@
 #include "Utilities/Debugging/Guards.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
-	using namespace DeadFrame2D::Core;
-	using namespace DeadFrame2D::Constants;
-	using namespace DeadFrame2D::Internal;
-	using namespace DeadFrame2D::Data;
-	using namespace DeadFrame2D::Models;
-	using namespace DeadFrame2D::Utilities;
+	using namespace DF2D::Core;
+	using namespace DF2D::Constants;
+	using namespace DF2D::Internal;
+	using namespace DF2D::Data;
+	using namespace DF2D::Models;
+	using namespace DF2D::Utilities;
 
 
 	TiledMapCompatibleCollider2D::TiledMapCompatibleCollider2D(const PhysicsMaterial& physicsMaterial)

@@ -3,7 +3,7 @@
 #include <numbers>
 
 
-namespace DeadFrame2D::Constants::MathConstants
+namespace DF2D::Constants::MathConstants
 {
 	inline constexpr double PI = std::numbers::pi;
 

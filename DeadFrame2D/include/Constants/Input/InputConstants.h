@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace DeadFrame2D::Constants::InputConstants
+namespace DF2D::Constants::InputConstants
 {
 	constexpr float ANALOG_PRESS_THRESHOLD = 0.001f;		// counts as a digital "press"
 

@@ -5,7 +5,7 @@
 #include <tuple>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	template <typename T>
 	class Vector2
@@ -104,7 +104,7 @@ namespace DeadFrame2D::Core
 }
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	// Static member initializations
 	template <typename T>
@@ -146,7 +146,7 @@ namespace DeadFrame2D::Core
 	template<typename T>
 	inline constexpr T Vector2<T>::AngleBetween(const Vector2<T> other) const
 	{
-		auto angle = atan2(y - other.y, x - other.x) * (DeadFrame2D::Constants::MathConstants::PI / 180.0);
+		auto angle = atan2(y - other.y, x - other.x) * (Constants::MathConstants::PI / 180.0);
 
 		return angle >= 0 ? angle : 360 + angle;
 	}
@@ -178,7 +178,7 @@ namespace DeadFrame2D::Core
 	template<typename T>
 	inline constexpr Vector2<T> Vector2<T>::Rotated(float angleInDegrees) const
 	{
-		auto radians = (angleInDegrees * DeadFrame2D::Constants::MathConstants::PI_f) / 180.0f;
+		auto radians = (angleInDegrees * Constants::MathConstants::PI_f) / 180.0f;
 		auto cosA = cosf(radians);
 		auto sinA = sinf(radians);
 
@@ -335,9 +335,9 @@ namespace DeadFrame2D::Core
 namespace std
 {
 	template<typename T>
-	struct hash<DeadFrame2D::Core::Vector2<T>>
+	struct hash<DF2D::Core::Vector2<T>>
 	{
-		std::size_t operator()(const DeadFrame2D::Core::Vector2<T>& v) const noexcept
+		std::size_t operator()(const DF2D::Core::Vector2<T>& v) const noexcept
 		{
 			std::size_t h1 = std::hash<T>{}(v.x);
 			std::size_t h2 = std::hash<T>{}(v.y);

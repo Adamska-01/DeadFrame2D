@@ -2,7 +2,7 @@
 #include <utility>
 
 
-namespace DeadFrame2D::Utilities
+namespace DF2D::Utilities
 {
 	struct PairHash
 	{

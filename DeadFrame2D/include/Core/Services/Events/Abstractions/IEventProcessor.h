@@ -6,7 +6,7 @@
 union SDL_Event;
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	class DF2D_API IEventProcessor
 	{

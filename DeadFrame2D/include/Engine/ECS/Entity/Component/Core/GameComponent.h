@@ -4,7 +4,7 @@
 #include "Engine/ECS/Entity/Component/Core/GameObjectObserver.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class GameObject;
 
@@ -21,7 +21,7 @@ namespace DeadFrame2D::Engine
 
 
 	public:
-		static inline const DeadFrame2D::Core::TypeInfo StaticTypeInfo{ "GameComponent", nullptr };
+		static inline const Core::TypeInfo StaticTypeInfo{ "GameComponent", nullptr };
 
 
 		GameComponent();
@@ -31,7 +31,7 @@ namespace DeadFrame2D::Engine
 		virtual ~GameComponent() override;
 
 
-		virtual const DeadFrame2D::Core::TypeInfo* GetTypeInfo() const = 0;
+		virtual const Core::TypeInfo* GetTypeInfo() const = 0;
 
 
 		virtual void Init();
@@ -52,6 +52,6 @@ namespace DeadFrame2D::Engine
 
 		void SetActive(bool value);
 
-		bool IsA(const DeadFrame2D::Core::TypeInfo* type) const;
+		bool IsA(const Core::TypeInfo* type) const;
 	};
 }

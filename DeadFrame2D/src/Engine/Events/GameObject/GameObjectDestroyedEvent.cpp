@@ -2,7 +2,7 @@
 #include "Engine/Events/GameObject/GameObjectDestroyedEvent.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	GameObjectDestroyedEvent::GameObjectDestroyedEvent(ObjectHandle<GameObject> gameObjectDestroyed)
 		: gameObjectDestroyed(gameObjectDestroyed)

@@ -8,13 +8,13 @@
 #include <string>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class ComponentHandleBase;
 }
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	class DF2D_API IInputActions
 	{

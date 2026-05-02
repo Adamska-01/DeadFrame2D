@@ -8,7 +8,7 @@ class b2Body;
 class b2Fixture;
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class Transform;
 	
@@ -25,7 +25,7 @@ namespace DeadFrame2D::Engine
 
 		b2Fixture* collisionFixture;
 
-		DeadFrame2D::Core::Vector2F lastTransformPosition;
+		Core::Vector2F lastTransformPosition;
 
 		float lastTransformRotation;
 

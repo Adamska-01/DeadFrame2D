@@ -6,7 +6,7 @@
 #include <variant>
 
 
-namespace DeadFrame2D::Utilities
+namespace DF2D::Utilities
 {
 	/**
 	 * @brief Listener bound to an engine handle (ObjectHandleBase or ComponentHandleBase).
@@ -16,16 +16,16 @@ namespace DeadFrame2D::Utilities
 	struct HandleListener final : IListener<Args...>
 	{
 		std::variant<
-			DeadFrame2D::Engine::ComponentHandleBase,
-			DeadFrame2D::Engine::ObjectHandleBase
+			Engine::ComponentHandleBase,
+			Engine::ObjectHandleBase
 		> handle;
 
 		std::function<void(Args...)> func;
 
 
-		HandleListener(const DeadFrame2D::Engine::ComponentHandleBase& compHandle, std::function<void(Args...)> f);
+		HandleListener(const Engine::ComponentHandleBase& compHandle, std::function<void(Args...)> f);
 
-		HandleListener(const DeadFrame2D::Engine::ObjectHandleBase& objHandle, std::function<void(Args...)> f);
+		HandleListener(const Engine::ObjectHandleBase& objHandle, std::function<void(Args...)> f);
 
 
 		void Invoke(const Args& ...args) override;
@@ -37,16 +37,16 @@ namespace DeadFrame2D::Utilities
 }
 
 
-namespace DeadFrame2D::Utilities
+namespace DF2D::Utilities
 {
 	template<typename ...Args>
-	inline HandleListener<Args...>::HandleListener(const DeadFrame2D::Engine::ComponentHandleBase& compHandle, std::function<void(Args...)> f)
+	inline HandleListener<Args...>::HandleListener(const Engine::ComponentHandleBase& compHandle, std::function<void(Args...)> f)
 		: handle(compHandle), func(std::move(f))
 	{
 	}
 
 	template<typename ...Args>
-	inline HandleListener<Args...>::HandleListener(const DeadFrame2D::Engine::ObjectHandleBase& objHandle, std::function<void(Args...)> f)
+	inline HandleListener<Args...>::HandleListener(const Engine::ObjectHandleBase& objHandle, std::function<void(Args...)> f)
 		: handle(objHandle), func(std::move(f)) 
 	{
 	}
@@ -82,7 +82,7 @@ namespace DeadFrame2D::Utilities
 	template<typename ...Args>
 	inline bool HandleListener<Args...>::MatchesIdentity(const void* identity, const std::type_info& type) const
 	{
-		using namespace DeadFrame2D::Engine;
+		using namespace DF2D::Engine;
 
 
 		if (type == typeid(ObjectHandleBase))

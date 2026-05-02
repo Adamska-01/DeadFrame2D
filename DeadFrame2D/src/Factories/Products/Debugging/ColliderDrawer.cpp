@@ -4,11 +4,11 @@
 #include "Factories/Products/Debugging/ColliderDrawer.h"
 
 
-namespace DeadFrame2D::Factories
+namespace DF2D::Factories
 {
-	using namespace DeadFrame2D::Constants;
-	using namespace DeadFrame2D::Core;
-	using namespace DeadFrame2D::Data;
+	using namespace DF2D::Constants;
+	using namespace DF2D::Core;
+	using namespace DF2D::Data;
 
 
 	ColliderDrawer::ColliderDrawer()

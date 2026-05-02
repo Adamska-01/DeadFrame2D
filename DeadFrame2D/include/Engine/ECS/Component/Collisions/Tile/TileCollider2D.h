@@ -3,7 +3,7 @@
 #include "Engine/ECS/Component/Collisions/Collider2D.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	template <typename TRenderer>
 	class TileCollider2D : public Collider2D
@@ -15,7 +15,7 @@ namespace DeadFrame2D::Engine
 		ComponentHandle<TRenderer> tileMapRenderer;
 
 
-		TileCollider2D(const DeadFrame2D::Data::PhysicsMaterial& physicsMaterial = DeadFrame2D::Data::PhysicsMaterial())
+		TileCollider2D(const Data::PhysicsMaterial& physicsMaterial = Data::PhysicsMaterial())
 			: Collider2D(physicsMaterial)
 		{
 		}

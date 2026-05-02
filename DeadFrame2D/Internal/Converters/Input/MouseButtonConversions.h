@@ -3,7 +3,7 @@
 #include <SDL_mouse.h>
 
 
-namespace DeadFrame2D::Internal::MouseButtonConversions
+namespace DF2D::Internal::MouseButtonConversions
 {
 	/**
 	 * @brief Converts a MouseButtonCode to SDL's internal mouse code.

@@ -1,4 +1,4 @@
-#include "Engine/ECS/Component/GameComponent.h"
+#include "Engine/ECS/Entity/Component/Core/GameComponent.h"
 #include "Engine/ECS/Entity/Component/Storage/ComponentBucket.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
@@ -7,7 +7,7 @@
 #include <cassert>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	ComponentBucket::ComponentBucket()
 	{

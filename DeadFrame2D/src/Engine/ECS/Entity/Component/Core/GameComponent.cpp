@@ -3,7 +3,7 @@
 #include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	GameComponent::GameComponent()
 	{
@@ -53,7 +53,7 @@ namespace DeadFrame2D::Engine
 		isActive = value;
 	}
 
-	bool GameComponent::IsA(const DeadFrame2D::Core::TypeInfo* type) const
+	bool GameComponent::IsA(const DF2D::Core::TypeInfo* type) const
 	{
 		const auto* current = GetTypeInfo();
 

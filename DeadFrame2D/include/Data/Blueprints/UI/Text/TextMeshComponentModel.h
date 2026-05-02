@@ -6,7 +6,7 @@
 #include <string_view>
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	struct TextMeshComponentModel
 	{

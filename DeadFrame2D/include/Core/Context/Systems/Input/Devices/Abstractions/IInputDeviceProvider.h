@@ -4,7 +4,7 @@
 #include <vector>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	class InputDevice;
 	class KeyboardInputDevice;
@@ -18,7 +18,7 @@ namespace DeadFrame2D::Core
 		virtual ~IInputDeviceProvider() = default;
 
 
-		virtual InputDevice* GetDevice(DeadFrame2D::Data::InputDeviceID id) = 0;
+		virtual InputDevice* GetDevice(Data::InputDeviceID id) = 0;
 
 		virtual std::vector<InputDevice*> GetAllDevices() const = 0;
 
@@ -26,7 +26,7 @@ namespace DeadFrame2D::Core
 
 		virtual MouseInputDevice* Mouse() = 0;
 
-		virtual ControllerInputDevice* Controller(DeadFrame2D::Data::InputDeviceID id) = 0;
+		virtual ControllerInputDevice* Controller(Data::InputDeviceID id) = 0;
 
 		virtual ControllerInputDevice* CurrentController() = 0;
 	};

@@ -9,15 +9,15 @@
 #include <optional>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	template<>
-	struct RenderResolver<DeadFrame2D::Data::SpriteRenderData>
+	struct RenderResolver<Data::SpriteRenderData>
 	{
 		static void Render(
 			IRenderBackend& renderBackend,
-			const DeadFrame2D::Data::SpriteRenderData& renderData,
-			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera,
+			const Data::SpriteRenderData& renderData,
+			Engine::ComponentHandle<Engine::Camera> camera,
 			bool requiresScreenSpaceConversion)
 		{
 			SDL_FRect destRect;
@@ -47,11 +47,11 @@ namespace DeadFrame2D::Core
 				renderData.colorMod);
 		}
 
-		static std::optional<DeadFrame2D::Data::SpriteRenderData> Cull(
-			const DeadFrame2D::Data::SpriteRenderData& renderData,
-			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera)
+		static std::optional<Data::SpriteRenderData> Cull(
+			const Data::SpriteRenderData& renderData,
+			Engine::ComponentHandle<Engine::Camera> camera)
 		{
-			using namespace DeadFrame2D::Utilities;
+			using namespace DF2D::Utilities;
 
 
 			// Always visible if no rect or no camera

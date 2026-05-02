@@ -3,16 +3,16 @@
 #include "Data/Components/Physics/BodyType2D.h"
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	/**
 	 * @brief Wrapper for Box2D body definition with default values matching b2BodyDef.
 	 */
 	struct BodyDefinition2D
 	{
-		DeadFrame2D::Core::Vector2F position = DeadFrame2D::Core::Vector2F(0.0f, 0.0f);
+		Core::Vector2F position = Core::Vector2F(0.0f, 0.0f);
 
-		DeadFrame2D::Core::Vector2F linearVelocity = DeadFrame2D::Core::Vector2F(0.0f, 0.0f);
+		Core::Vector2F linearVelocity = Core::Vector2F(0.0f, 0.0f);
 
 		BodyType2D type = BodyType2D::Static;
 

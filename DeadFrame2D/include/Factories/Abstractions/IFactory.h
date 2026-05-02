@@ -2,7 +2,7 @@
 #include "DF2D_API.h"
 
 
-namespace DeadFrame2D::Factories
+namespace DF2D::Factories
 {
 	template<typename T>
 	class DF2D_API IFactory

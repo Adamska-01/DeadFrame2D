@@ -1,9 +1,9 @@
 #include "Engine/Events/Context/Input/DeviceAddedEvent.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
-	using namespace DeadFrame2D::Data;
+	using namespace DF2D::Data;
 
 
 	DeviceAddedEvent::DeviceAddedEvent(InputDeviceID deviceID, const std::string& deviceName)

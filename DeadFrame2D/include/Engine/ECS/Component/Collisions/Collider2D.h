@@ -8,7 +8,7 @@
 class b2Fixture;
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class Transform;
 	class RigidBody2D;
@@ -26,10 +26,10 @@ namespace DeadFrame2D::Engine
 
 		ComponentHandle<RigidBody2D> rigidBody;
 
-		DeadFrame2D::Data::PhysicsMaterial physicsMaterial;
+		Data::PhysicsMaterial physicsMaterial;
 
 
-		Collider2D(const DeadFrame2D::Data::PhysicsMaterial& physicsMaterial);
+		Collider2D(const Data::PhysicsMaterial& physicsMaterial);
 
 		virtual ~Collider2D() override;
 
@@ -53,6 +53,6 @@ namespace DeadFrame2D::Engine
 
 		ComponentHandle<Transform> GetTranform() const;
 
-		const DeadFrame2D::Data::PhysicsMaterial& GetPhysicsMaterial();
+		const Data::PhysicsMaterial& GetPhysicsMaterial();
 	};
 }

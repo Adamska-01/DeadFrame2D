@@ -4,47 +4,47 @@
 #include "Core/Context/Systems/Coroutines/Awaitables/WaitOneFrame.h"
 
 
-namespace DeadFrame2D::Utilities
+namespace DF2D::Utilities
 {
-	inline DeadFrame2D::Core::WaitOneFrame& WaitFrame()
+	inline Core::WaitOneFrame& WaitFrame()
 	{
-		if (!DeadFrame2D::Core::Task::GetCurrentTask())
+		if (!Core::Task::GetCurrentTask())
 		{
 			throw std::runtime_error("WaitFrame must be called inside a running Task.");
 		}
 
-		auto* awaitable = new DeadFrame2D::Core::WaitOneFrame();
+		auto* awaitable = new Core::WaitOneFrame();
 
-		DeadFrame2D::Core::Task::GetCurrentTask()->AddAwaitable(awaitable);
-
-		return *awaitable;
-	}
-
-	inline DeadFrame2D::Core::WaitForSeconds& WaitSeconds(float seconds)
-	{
-		if (!DeadFrame2D::Core::Task::GetCurrentTask())
-		{
-			throw std::runtime_error("WaitSeconds must be called inside a running Task.");
-		}
-
-		auto* awaitable = new DeadFrame2D::Core::WaitForSeconds(seconds);
-
-		DeadFrame2D::Core::Task::GetCurrentTask()->AddAwaitable(awaitable);
+		Core::Task::GetCurrentTask()->AddAwaitable(awaitable);
 
 		return *awaitable;
 	}
 
-
-	inline DeadFrame2D::Core::WaitForSecondsUnscaled& WaitSecondsUnscaled(float seconds)
+	inline Core::WaitForSeconds& WaitSeconds(float seconds)
 	{
-		if (!DeadFrame2D::Core::Task::GetCurrentTask())
+		if (!Core::Task::GetCurrentTask())
 		{
 			throw std::runtime_error("WaitSeconds must be called inside a running Task.");
 		}
 
-		auto* awaitable = new DeadFrame2D::Core::WaitForSecondsUnscaled(seconds);
+		auto* awaitable = new Core::WaitForSeconds(seconds);
 
-		DeadFrame2D::Core::Task::GetCurrentTask()->AddAwaitable(awaitable);
+		Core::Task::GetCurrentTask()->AddAwaitable(awaitable);
+
+		return *awaitable;
+	}
+
+
+	inline Core::WaitForSecondsUnscaled& WaitSecondsUnscaled(float seconds)
+	{
+		if (!Core::Task::GetCurrentTask())
+		{
+			throw std::runtime_error("WaitSeconds must be called inside a running Task.");
+		}
+
+		auto* awaitable = new Core::WaitForSecondsUnscaled(seconds);
+
+		Core::Task::GetCurrentTask()->AddAwaitable(awaitable);
 
 		return *awaitable;
 	}

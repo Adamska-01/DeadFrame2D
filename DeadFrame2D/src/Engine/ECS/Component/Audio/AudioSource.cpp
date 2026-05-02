@@ -10,13 +10,13 @@
 #include <box2d/b2_body.h>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
-	using namespace DeadFrame2D::Core;
-	using namespace DeadFrame2D::Internal;
-	using namespace DeadFrame2D::Constants;
-	using namespace DeadFrame2D::Data;
-	using namespace DeadFrame2D::Utilities;
+	using namespace DF2D::Core;
+	using namespace DF2D::Internal;
+	using namespace DF2D::Constants;
+	using namespace DF2D::Data;
+	using namespace DF2D::Utilities;
 
 
 	AudioSource::AudioSource()
@@ -120,7 +120,7 @@ namespace DeadFrame2D::Engine
 		lastTransformPosition = transform->GetWorldPosition();
 		lastTransformRotation = transform->GetWorldRotation();
 
-		const auto METER_PER_PIXEL = DeadFrame2D::Core::PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
+		const auto METER_PER_PIXEL = DF2D::Core::PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
 
 		auto angleRad = lastTransformRotation * (MathConstants::PI_f / 180.0f);
 
@@ -156,7 +156,7 @@ namespace DeadFrame2D::Engine
 
 		if (currentTransformPosition != lastTransformPosition || currentTransformRotation != lastTransformRotation)
 		{
-			currentTransformPosition *= DeadFrame2D::Core::PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
+			currentTransformPosition *= DF2D::Core::PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
 
 			auto angleRad = currentTransformRotation * (MathConstants::PI_f / 180.0f);
 

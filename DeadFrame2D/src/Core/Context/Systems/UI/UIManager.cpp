@@ -7,9 +7,9 @@
 #include <sstream>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
-	using namespace DeadFrame2D::Utilities;
+	using namespace DF2D::Utilities;
 
 
 	std::unordered_map<std::pair<std::string, int>, std::shared_ptr<TTF_Font>, PairHash> UIManager::fontCache = {};

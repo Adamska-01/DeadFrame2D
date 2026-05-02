@@ -9,7 +9,7 @@
 #include <string>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class DF2D_API PlayerInput : public GameComponent
 	{
@@ -17,11 +17,11 @@ namespace DeadFrame2D::Engine
 
 
 	private:
-		DeadFrame2D::Data::InputUserID userID;
+		Data::InputUserID userID;
 
 		std::string playerName;
 
-		std::vector<DeadFrame2D::Data::ActionListenerEntry> registeredListeners;
+		std::vector<Data::ActionListenerEntry> registeredListeners;
 
 
 	public:
@@ -30,15 +30,15 @@ namespace DeadFrame2D::Engine
 		virtual ~PlayerInput() override;
 
 
-		DeadFrame2D::Utilities::ListenerID RegisterAction(
+		Utilities::ListenerID RegisterAction(
 			const std::string& actionMapName,
 			const std::string& actionName,
 			const ComponentHandleBase& listener,
-			const std::function<void(const DeadFrame2D::Core::InputActionView&)>& handler);
+			const std::function<void(const Core::InputActionView&)>& handler);
 
 		void DeregisterAction(const std::string& actionMapName, const std::string& actionName, const ComponentHandleBase& listener);
 
-		void DeregisterActionByID(const std::string& actionMapName, const std::string& actionName, DeadFrame2D::Utilities::ListenerID listenerID);
+		void DeregisterActionByID(const std::string& actionMapName, const std::string& actionName, Utilities::ListenerID listenerID);
 
 		bool EnableActionMap(const std::string& actionMapName) const;
 

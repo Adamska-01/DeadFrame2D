@@ -1,10 +1,10 @@
 #include "Factories/Products/Input/Processors/DeadzoneProcessor.h"
 
 
-namespace DeadFrame2D::Factories
+namespace DF2D::Factories
 {
-	using namespace DeadFrame2D::Core;
-	using namespace DeadFrame2D::Models;
+	using namespace DF2D::Core;
+	using namespace DF2D::Models;
 
 
 	DeadzoneProcessor::DeadzoneProcessor(const float threshold)

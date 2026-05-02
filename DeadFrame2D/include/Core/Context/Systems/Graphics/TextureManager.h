@@ -9,7 +9,7 @@
 struct SDL_Texture;
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	class DF2D_API TextureManager : public ICoreSystem
 	{

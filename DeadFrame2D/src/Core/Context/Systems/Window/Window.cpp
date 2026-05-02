@@ -9,11 +9,11 @@
 #include <set>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
-	using namespace DeadFrame2D::Constants;
-	using namespace DeadFrame2D::Models;
-	using namespace DeadFrame2D::Data;
+	using namespace DF2D::Constants;
+	using namespace DF2D::Models;
+	using namespace DF2D::Data;
 
 
 	SDL_Window* Window::window = nullptr;

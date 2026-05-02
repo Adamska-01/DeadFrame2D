@@ -4,7 +4,7 @@
 #include <vector>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class GameObject;
 

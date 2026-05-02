@@ -7,14 +7,14 @@
 #include <memory>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class ObjectHandleBase;
 	class ComponentHandleBase;
 }
 
 
-namespace DeadFrame2D::Utilities
+namespace DF2D::Utilities
 {
 	template<typename ... Args>
 	class MulticastDelegate
@@ -53,9 +53,9 @@ namespace DeadFrame2D::Utilities
 		*/
 		ListenerID AddLambda(std::function<void(Args...)> func);
 
-		ListenerID AddHandle(const DeadFrame2D::Engine::ObjectHandleBase& handle, std::function<void(Args...)> func);
+		ListenerID AddHandle(const Engine::ObjectHandleBase& handle, std::function<void(Args...)> func);
 
-		ListenerID AddHandle(const DeadFrame2D::Engine::ComponentHandleBase& handle, std::function<void(Args...)> func);
+		ListenerID AddHandle(const Engine::ComponentHandleBase& handle, std::function<void(Args...)> func);
 
 
 		/**
@@ -101,7 +101,7 @@ namespace DeadFrame2D::Utilities
 #include "Utilities/Delegates/Listeners/SharedPtrListener.h"
 
 
-namespace DeadFrame2D::Utilities
+namespace DF2D::Utilities
 {
 	template<typename ...Args>
 	inline void MulticastDelegate<Args...>::PruneExpired()
@@ -160,7 +160,7 @@ namespace DeadFrame2D::Utilities
 	}
 
 	template<typename ...Args>
-	inline ListenerID MulticastDelegate<Args...>::AddHandle(const DeadFrame2D::Engine::ObjectHandleBase& handle, std::function<void(Args...)> func)
+	inline ListenerID MulticastDelegate<Args...>::AddHandle(const Engine::ObjectHandleBase& handle, std::function<void(Args...)> func)
 	{
 		auto id = nextID++;
 
@@ -173,7 +173,7 @@ namespace DeadFrame2D::Utilities
 	}
 
 	template<typename ...Args>
-	inline ListenerID MulticastDelegate<Args...>::AddHandle(const DeadFrame2D::Engine::ComponentHandleBase& handle, std::function<void(Args...)> func)
+	inline ListenerID MulticastDelegate<Args...>::AddHandle(const Engine::ComponentHandleBase& handle, std::function<void(Args...)> func)
 	{
 		auto id = nextID++;
 

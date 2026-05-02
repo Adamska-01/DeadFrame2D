@@ -2,9 +2,9 @@
 #include "Utilities/Debugging/Guards.h"
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
-	using namespace DeadFrame2D::Utilities;
+	using namespace DF2D::Utilities;
 
 	
 	InputDevice::InputDevice(const char* name, IInputActionHandler* actionHandler)

@@ -4,7 +4,7 @@
 #include <SDL_gamecontroller.h>
 
 
-namespace DeadFrame2D::Internal::ControllerButtonConversions
+namespace DF2D::Internal::ControllerButtonConversions
 {
 	/**
 	 * @brief Converts a ControllerButtonCode to SDL's SDL_GameControllerButton.

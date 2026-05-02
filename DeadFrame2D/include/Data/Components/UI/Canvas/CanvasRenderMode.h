@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	/**
 	 * @brief Defines how a canvas is rendered relative to the screen or camera.

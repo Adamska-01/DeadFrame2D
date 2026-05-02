@@ -5,7 +5,7 @@
 #include <functional>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class GameObject;
 	class GameComponent;
@@ -26,19 +26,19 @@ namespace DeadFrame2D::Engine
 		~GameObjectNotifier();
 
 
-		DeadFrame2D::Utilities::MulticastDelegate<ObjectHandle<GameObject>, bool> OnActiveStateChanged;
+		Utilities::MulticastDelegate<ObjectHandle<GameObject>, bool> OnActiveStateChanged;
 
-		DeadFrame2D::Utilities::MulticastDelegate<ObjectHandle<GameObject>, bool> OnChildActiveStateChanged;
+		Utilities::MulticastDelegate<ObjectHandle<GameObject>, bool> OnChildActiveStateChanged;
 
-		DeadFrame2D::Utilities::MulticastDelegate<ObjectHandle<GameObject>> OnChildDestroyed;
+		Utilities::MulticastDelegate<ObjectHandle<GameObject>> OnChildDestroyed;
 
-		DeadFrame2D::Utilities::MulticastDelegate<const ComponentHandle<GameComponent>&> OnNewComponentAdded;
+		Utilities::MulticastDelegate<const ComponentHandle<GameComponent>&> OnNewComponentAdded;
 
-		DeadFrame2D::Utilities::MulticastDelegate<const ComponentHandle<GameComponent>&> OnComponentRemoved;
+		Utilities::MulticastDelegate<const ComponentHandle<GameComponent>&> OnComponentRemoved;
 
-		DeadFrame2D::Utilities::MulticastDelegate<ObjectHandle<GameObject>> OnChildGameObjectAdded;
+		Utilities::MulticastDelegate<ObjectHandle<GameObject>> OnChildGameObjectAdded;
 
-		DeadFrame2D::Utilities::MulticastDelegate<ObjectHandle<GameObject>> OnParentGameObjectChanged;
+		Utilities::MulticastDelegate<ObjectHandle<GameObject>> OnParentGameObjectChanged;
 
 
 	public:

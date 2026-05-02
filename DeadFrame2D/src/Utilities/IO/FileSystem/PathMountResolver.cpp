@@ -3,7 +3,7 @@
 #include "Utilities/IO/FileSystem/ResourceMount.h"
 
 
-namespace DeadFrame2D::Utilities
+namespace DF2D::Utilities
 {
 	void PathMountResolver::Mount(const ResourceMount& resourceMount)
 	{

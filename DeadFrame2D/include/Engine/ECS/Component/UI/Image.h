@@ -6,7 +6,7 @@
 #include <string_view>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class DF2D_API Image : public UIComponent
 	{

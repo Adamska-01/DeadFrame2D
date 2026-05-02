@@ -2,7 +2,7 @@
 #include "Factories/Products/Debugging/ColliderDrawer.h"
 
 
-namespace DeadFrame2D::Factories
+namespace DF2D::Factories
 {
 	b2Draw* ColliderDrawerFactory::CreateProduct()
 	{

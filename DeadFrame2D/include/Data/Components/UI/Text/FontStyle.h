@@ -2,7 +2,7 @@
 #include <SDL_ttf.h>
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	enum FontStyle
 	{

@@ -3,10 +3,10 @@
 #include "Engine/ECS/Component/UI/Canvas.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
-	using namespace DeadFrame2D::Constants;
-	using namespace DeadFrame2D::Data;
+	using namespace DF2D::Constants;
+	using namespace DF2D::Data;
 
 
 	Canvas::Canvas()

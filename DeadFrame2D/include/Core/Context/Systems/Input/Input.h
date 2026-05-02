@@ -4,13 +4,13 @@
 #include <memory>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class DispatchableEvent;
 }
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	class IInputFrameLifecycle;
 	class IInputActions;
@@ -53,13 +53,13 @@ namespace DeadFrame2D::Core
 		std::shared_ptr<InputUserManager> userManager;
 
 
-		void InputUserCreatedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
+		void InputUserCreatedEventHandler(std::shared_ptr<Engine::DispatchableEvent> dispatchableEvent);
 
-		void InputUserDestroyedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
+		void InputUserDestroyedEventHandler(std::shared_ptr<Engine::DispatchableEvent> dispatchableEvent);
 
-		void DeviceAddedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
+		void DeviceAddedEventHandler(std::shared_ptr<Engine::DispatchableEvent> dispatchableEvent);
 
-		void DeviceRemovedEventHandler(std::shared_ptr<DeadFrame2D::Engine::DispatchableEvent> dispatchableEvent);
+		void DeviceRemovedEventHandler(std::shared_ptr<Engine::DispatchableEvent> dispatchableEvent);
 
 
 		void BeginFrame() override;

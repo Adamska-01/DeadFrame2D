@@ -5,7 +5,7 @@
 #include <memory>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class GameObject;
 
@@ -65,7 +65,7 @@ namespace DeadFrame2D::Engine
 }
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	template<typename T>
 	ComponentHandle<T> ComponentContext::GetHandleAs() const

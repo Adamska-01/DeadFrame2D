@@ -10,13 +10,13 @@
 #include <SDL.h>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class Camera;
 }
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	class RenderPipeline;
 

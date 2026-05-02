@@ -2,11 +2,11 @@
 #include "Engine/ECS/Component/Collisions/BoxCollider2D.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
-	using namespace DeadFrame2D::Core;
-	using namespace DeadFrame2D::Internal;
-	using namespace DeadFrame2D::Data;
+	using namespace DF2D::Core;
+	using namespace DF2D::Internal;
+	using namespace DF2D::Data;
 
 
 	void BoxCollider2D::DeleteShape()

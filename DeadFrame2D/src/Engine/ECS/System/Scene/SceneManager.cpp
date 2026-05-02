@@ -5,9 +5,9 @@
 
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
-	using namespace DeadFrame2D::Core;
+	using namespace DF2D::Core;
 
 
 	std::shared_ptr<Scene> SceneManager::currentScene = nullptr;

@@ -2,7 +2,7 @@
 #include "Engine/ECS/Entity/Object/Core/IGameEntityHandle.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	void IGameEntityHandle::SetThisHandle(ObjectHandle<GameObject> thisGameObject)
 	{

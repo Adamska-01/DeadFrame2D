@@ -6,7 +6,7 @@
 #include <vector>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	/**
 	 * @brief Keyboard device wrapper.
@@ -14,7 +14,7 @@ namespace DeadFrame2D::Core
 	class DF2D_API KeyboardInputDevice : public InputDevice
 	{
 	private:
-		std::vector<DeadFrame2D::Data::InputControlState> states;
+		std::vector<Data::InputControlState> states;
 
 		std::unordered_set<uint16_t> activeControlIDs;
 
@@ -23,9 +23,9 @@ namespace DeadFrame2D::Core
 
 		void ProcessEvent(const SDL_Event& event) override;
 
-		DeadFrame2D::Data::InputControlState GetButtonState(int buttonID) const override;
+		Data::InputControlState GetButtonState(int buttonID) const override;
 
-		DeadFrame2D::Data::InputControlState GetAxisState(int axisID) const override;
+		Data::InputControlState GetAxisState(int axisID) const override;
 
 
 	public:

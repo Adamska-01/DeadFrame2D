@@ -2,7 +2,7 @@
 #include "Core/Math/Vector2.h"
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	enum class UIAnchor
 	{
@@ -26,7 +26,7 @@ namespace DeadFrame2D::Data
 	};
 
 
-	inline DeadFrame2D::Core::Vector2F GetAnchorFromPreset(UIAnchor preset)
+	inline Core::Vector2F GetAnchorFromPreset(UIAnchor preset)
 	{
 		switch (preset)
 		{

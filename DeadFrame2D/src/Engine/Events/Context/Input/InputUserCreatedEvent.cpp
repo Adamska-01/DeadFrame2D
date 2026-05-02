@@ -1,12 +1,12 @@
 #include "Engine/Events/Context/Input/InputUserCreatedEvent.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
-	using namespace DeadFrame2D::Data;
+	using namespace DF2D::Data;
 
 
-	InputUserCreatedEvent::InputUserCreatedEvent(DeadFrame2D::Data::InputUserID inputUserID, const std::string& inputUserName)
+	InputUserCreatedEvent::InputUserCreatedEvent(DF2D::Data::InputUserID inputUserID, const std::string& inputUserName)
 		: inputUserID(inputUserID),
 		inputUserName(inputUserName)
 
@@ -18,7 +18,7 @@ namespace DeadFrame2D::Engine
 		return inputUserName;
 	}
 
-	DeadFrame2D::Data::InputUserID InputUserCreatedEvent::GetInputUserID() const
+	DF2D::Data::InputUserID InputUserCreatedEvent::GetInputUserID() const
 	{
 		return inputUserID;
 	}

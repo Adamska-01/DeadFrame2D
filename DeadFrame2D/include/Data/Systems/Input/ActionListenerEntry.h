@@ -4,7 +4,7 @@
 #include <string>
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	struct ActionListenerEntry
 	{
@@ -12,8 +12,8 @@ namespace DeadFrame2D::Data
 
 		std::string actionName = "default";
 
-		DeadFrame2D::Engine::ComponentHandleBase listener;
+		Engine::ComponentHandleBase listener;
 
-		DeadFrame2D::Utilities::ListenerID listenerID = -1;
+		Utilities::ListenerID listenerID = -1;
 	};
 }

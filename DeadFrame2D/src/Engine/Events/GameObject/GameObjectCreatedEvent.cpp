@@ -2,7 +2,7 @@
 #include "Engine/Events/GameObject/GameObjectCreatedEvent.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	GameObjectCreatedEvent::GameObjectCreatedEvent(const ObjectHandle<GameObject>& createdObject)
 		: gameObjectCreated(createdObject)

@@ -2,7 +2,7 @@
 #include <string_view>
 
 
-namespace DeadFrame2D::Utilities
+namespace DF2D::Utilities
 {
 	template <typename T>
 	class XML_Parser

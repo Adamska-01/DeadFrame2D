@@ -5,7 +5,7 @@
 #include <memory>
 
 
-namespace DeadFrame2D::Factories
+namespace DF2D::Factories
 {
 	class InputProcessorFactory : public IFactoryWithInitialiser<std::unique_ptr<IInputProcessor>, const Models::InputProcessor&>
 	{

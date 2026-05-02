@@ -5,7 +5,7 @@
 #include <memory>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class DispatchableEvent;
 	class UIComponent;
@@ -24,7 +24,7 @@ namespace DeadFrame2D::Engine
 	protected:
 		float layoutSpacing;
 
-		DeadFrame2D::Data::LayoutPadding layoutPadding;
+		Data::LayoutPadding layoutPadding;
 
 
 		virtual void OnChildActiveStateChangedHandler(const ObjectHandle<GameObject>& child, bool activeState) override;
@@ -35,7 +35,7 @@ namespace DeadFrame2D::Engine
 
 
 	public:
-		LayoutGroup(float layoutSpacing, DeadFrame2D::Data::LayoutPadding layoutPadding);
+		LayoutGroup(float layoutSpacing, Data::LayoutPadding layoutPadding);
 
 		virtual ~LayoutGroup() override = default;
 

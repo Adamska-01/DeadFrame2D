@@ -11,14 +11,14 @@
 
 struct SDL_Texture;
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	struct Circle;
 	class DeadFrameRuntime;
 }
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class Transform;
 
@@ -34,7 +34,7 @@ namespace DeadFrame2D::Engine
 
 		ComponentHandle<Transform> transform;
 
-		DeadFrame2D::Core::Vector2I resolutionTarget;
+		Core::Vector2I resolutionTarget;
 
 		SDL_FRect normalizedViewport;
 		
@@ -73,10 +73,10 @@ namespace DeadFrame2D::Engine
 		SDL_Texture* GetRenderTarget();
 
 		/** @brief Converts world position to screen position. */
-		DeadFrame2D::Core::Vector2F WorldToScreen(const DeadFrame2D::Core::Vector2F& worldPos) const;
+		Core::Vector2F WorldToScreen(const Core::Vector2F& worldPos) const;
 
 		/** @brief Converts screen position to world position. */
-		DeadFrame2D::Core::Vector2F ScreenToWorld(const DeadFrame2D::Core::Vector2F& screenPos) const;
+		Core::Vector2F ScreenToWorld(const Core::Vector2F& screenPos) const;
 
 
 		static const std::vector<Camera*>& GetCameras();

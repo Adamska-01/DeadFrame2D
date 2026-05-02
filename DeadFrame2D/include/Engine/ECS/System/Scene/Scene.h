@@ -8,7 +8,7 @@
 #include <vector>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class GameObject;
 	class ComponentBucket;
@@ -34,7 +34,7 @@ namespace DeadFrame2D::Engine
 
 		std::vector<uint32_t> frameSnapshot;
 
-		std::vector<DeadFrame2D::Data::ObjectEntry> entries;
+		std::vector<Data::ObjectEntry> entries;
 
 
 		uint32_t FindFreeSlot();
@@ -108,12 +108,12 @@ namespace DeadFrame2D::Engine
 #include "Engine/ECS/Entity/Component/Core/GameComponent.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	template<typename T, typename ...Args>
 	inline ObjectHandle<T> Scene::Instantiate(Args && ...args)
 	{
-		using namespace DeadFrame2D::Data;
+		using namespace DF2D::Data;
 
 
 		auto index = FindFreeSlot();

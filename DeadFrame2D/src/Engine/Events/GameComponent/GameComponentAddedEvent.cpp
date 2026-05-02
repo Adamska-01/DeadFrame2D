@@ -2,7 +2,7 @@
 #include "Engine/Events/GameComponent/GameComponentAddedEvent.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	GameComponentAddedEvent::GameComponentAddedEvent(const ComponentHandle<GameComponent>& componentHandle)
 		: componentHandle(componentHandle)

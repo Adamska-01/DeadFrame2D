@@ -12,7 +12,7 @@
 #include <variant>
 
 
-namespace DeadFrame2D::Models
+namespace DF2D::Models
 {
 	struct InputBinding
 	{

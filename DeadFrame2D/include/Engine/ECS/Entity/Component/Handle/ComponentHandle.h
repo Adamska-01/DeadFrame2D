@@ -5,7 +5,7 @@
 #include <type_traits>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class ComponentBucket;
 
@@ -52,7 +52,7 @@ namespace DeadFrame2D::Engine
 #include "Engine/ECS/Entity/Component/Storage/ComponentBucket.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	template<typename T>
 	inline ComponentHandle<T>::ComponentHandle(std::weak_ptr<ComponentBucket> bucket, uint32_t index, uint32_t generation)

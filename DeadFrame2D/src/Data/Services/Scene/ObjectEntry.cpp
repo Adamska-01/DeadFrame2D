@@ -2,7 +2,7 @@
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	// cpp is necessary to avoid circular dependency issue between Scene and GameObject
 	ObjectEntry::ObjectEntry() = default;

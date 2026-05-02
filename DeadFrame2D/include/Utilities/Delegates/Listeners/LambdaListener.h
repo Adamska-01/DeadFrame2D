@@ -3,7 +3,7 @@
 #include <functional>
 
 
-namespace DeadFrame2D::Utilities
+namespace DF2D::Utilities
 {
 	template<typename... Args>
 	struct LambdaListener final : IListener<Args...>
@@ -23,7 +23,7 @@ namespace DeadFrame2D::Utilities
 }
 
 
-namespace DeadFrame2D::Utilities
+namespace DF2D::Utilities
 {
 	template<typename ...Args>
 	inline LambdaListener<Args...>::LambdaListener(std::function<void(Args...)> f)
@@ -44,7 +44,7 @@ namespace DeadFrame2D::Utilities
 	}
 
 	template<typename ...Args>
-	inline bool DeadFrame2D::Utilities::LambdaListener<Args...>::MatchesIdentity(const void* identity, const std::type_info& type) const
+	inline bool Utilities::LambdaListener<Args...>::MatchesIdentity(const void* identity, const std::type_info& type) const
 	{
 		// Lambda has no owner, so it never matches anything
 		return false;

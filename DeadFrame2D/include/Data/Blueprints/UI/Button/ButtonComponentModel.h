@@ -5,7 +5,7 @@
 #include <string_view>
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	struct ButtonComponentModel
 	{
@@ -19,6 +19,6 @@ namespace DeadFrame2D::Data
 
 		std::string_view pressedButtonSource = "";
 
-		DeadFrame2D::Core::Vector2F buttonSize = DeadFrame2D::Core::Vector2F(100.f, 50.f);
+		Core::Vector2F buttonSize = Core::Vector2F(100.f, 50.f);
 	};
 }

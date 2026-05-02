@@ -3,7 +3,7 @@
 #include <box2d/box2d.h>
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	struct PhysicsMaterial
 	{

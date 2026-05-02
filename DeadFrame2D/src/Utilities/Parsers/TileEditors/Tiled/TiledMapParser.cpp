@@ -5,12 +5,12 @@
 #include <tinyxml2.h>
 
 
-namespace DeadFrame2D::Utilities
+namespace DF2D::Utilities
 {
 	using namespace tinyxml2;
 
-	using namespace DeadFrame2D::Core;
-	using namespace DeadFrame2D::Models;
+	using namespace DF2D::Core;
+	using namespace DF2D::Models;
 
 
 	TiledTileSet TiledMapParser::ParseTileSet(XMLElement* xmlTileset)

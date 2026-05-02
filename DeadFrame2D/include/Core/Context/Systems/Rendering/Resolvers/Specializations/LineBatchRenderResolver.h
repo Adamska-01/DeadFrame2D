@@ -9,15 +9,15 @@
 #include <optional>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	template<>
-	struct RenderResolver<DeadFrame2D::Data::LineBatchRenderData>
+	struct RenderResolver<Data::LineBatchRenderData>
 	{
 		static void Render(
 			IRenderBackend& renderBackend,
-			const DeadFrame2D::Data::LineBatchRenderData& renderData,
-			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera,
+			const Data::LineBatchRenderData& renderData,
+			Engine::ComponentHandle<Engine::Camera> camera,
 			bool requiresScreenSpaceConversion)
 		{
 			for (const auto& line : renderData.lineBatch)
@@ -35,12 +35,12 @@ namespace DeadFrame2D::Core
 			}
 		}
 
-		static std::optional<DeadFrame2D::Data::LineBatchRenderData> Cull(
-			const DeadFrame2D::Data::LineBatchRenderData& renderData,
-			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera)
+		static std::optional<Data::LineBatchRenderData> Cull(
+			const Data::LineBatchRenderData& renderData,
+			Engine::ComponentHandle<Engine::Camera> camera)
 		{
-			using namespace DeadFrame2D::Data;
-			using namespace DeadFrame2D::Utilities;
+			using namespace DF2D::Data;
+			using namespace DF2D::Utilities;
 
 
 			// Always visible if no camera (screen space)

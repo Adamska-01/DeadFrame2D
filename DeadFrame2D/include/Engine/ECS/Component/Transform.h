@@ -4,7 +4,7 @@
 #include "Engine/ECS/Entity/Component/Core/GameComponent.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class DF2D_API Transform : public GameComponent
 	{
@@ -12,19 +12,19 @@ namespace DeadFrame2D::Engine
 
 
 	private:
-		mutable DeadFrame2D::Core::Vector2F position = DeadFrame2D::Core::Vector2F::Zero;
+		mutable Core::Vector2F position = Core::Vector2F::Zero;
 
-		mutable DeadFrame2D::Core::Vector2F scale = DeadFrame2D::Core::Vector2F::One;
+		mutable Core::Vector2F scale = Core::Vector2F::One;
 
 		mutable float rotation = 0.0f;
 
-		DeadFrame2D::Core::Vector2F localPosition = DeadFrame2D::Core::Vector2F::Zero;
+		Core::Vector2F localPosition = Core::Vector2F::Zero;
 
-		DeadFrame2D::Core::Vector2F localScale = DeadFrame2D::Core::Vector2F::One;
+		Core::Vector2F localScale = Core::Vector2F::One;
 
 		float localRotation = 0.0f;
 
-		DeadFrame2D::Core::Vector2F startFramePosition;
+		Core::Vector2F startFramePosition;
 
 
 		void RecalculateWorldTransform() const;
@@ -36,8 +36,8 @@ namespace DeadFrame2D::Engine
 
 	public:
 		Transform(
-			DeadFrame2D::Core::Vector2F position = DeadFrame2D::Core::Vector2F::Zero,
-			DeadFrame2D::Core::Vector2F scale = DeadFrame2D::Core::Vector2F::One, 
+			Core::Vector2F position = Core::Vector2F::Zero,
+			Core::Vector2F scale = Core::Vector2F::One, 
 			float angle = 0.0f);
 
 		Transform(Transform&& other) = default;
@@ -49,13 +49,13 @@ namespace DeadFrame2D::Engine
 
 		void TranslateY(float y);
 
-		void Translate(DeadFrame2D::Core::Vector2F v);
+		void Translate(Core::Vector2F v);
 
 		void ScaleX(float x);
 
 		void ScaleY(float y);
 
-		void Scale(DeadFrame2D::Core::Vector2F v);
+		void Scale(Core::Vector2F v);
 
 		void RotateByRadians(float radian);
 
@@ -65,29 +65,29 @@ namespace DeadFrame2D::Engine
 		void Update(float dt) override;
 
 
-		DeadFrame2D::Core::Vector2F GetStartFramePosition() const;
+		Core::Vector2F GetStartFramePosition() const;
 
-		DeadFrame2D::Core::Vector2F GetLocalPosition() const;
+		Core::Vector2F GetLocalPosition() const;
 
-		DeadFrame2D::Core::Vector2F GetWorldPosition() const;
+		Core::Vector2F GetWorldPosition() const;
 
-		DeadFrame2D::Core::Vector2F GetLocalScale() const;
+		Core::Vector2F GetLocalScale() const;
 
-		DeadFrame2D::Core::Vector2F GetWorldScale() const;
+		Core::Vector2F GetWorldScale() const;
 
 		float GetLocalRotation() const;
 
 		float GetWorldRotation() const;
 
-		DeadFrame2D::Core::Vector2F GetForward() const;
+		Core::Vector2F GetForward() const;
 
-		void SetLocalPosition(const DeadFrame2D::Core::Vector2F& pos);
+		void SetLocalPosition(const Core::Vector2F& pos);
 
-		void SetWorldPosition(const DeadFrame2D::Core::Vector2F& worldPos);
+		void SetWorldPosition(const Core::Vector2F& worldPos);
 
-		void SetLocalScale(const DeadFrame2D::Core::Vector2F& scale);
+		void SetLocalScale(const Core::Vector2F& scale);
 
-		void SetWorldScale(const DeadFrame2D::Core::Vector2F& worldScale);
+		void SetWorldScale(const Core::Vector2F& worldScale);
 
 		void SetLocalRotation(float rotation);
 

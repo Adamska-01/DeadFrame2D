@@ -7,10 +7,10 @@
 #include <SDL_image.h>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
-	using namespace DeadFrame2D::Engine;
-	using namespace DeadFrame2D::Constants;
+	using namespace DF2D::Engine;
+	using namespace DF2D::Constants;
 
 
 	std::unordered_map<std::string, std::weak_ptr<SDL_Texture>> TextureManager::textureCache = {};

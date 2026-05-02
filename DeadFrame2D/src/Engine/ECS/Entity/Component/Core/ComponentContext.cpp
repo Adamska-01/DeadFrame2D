@@ -3,7 +3,7 @@
 #include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	struct ComponentContext::Impl
 	{

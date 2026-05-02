@@ -7,7 +7,7 @@
 #include <SDL_rect.h>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class Camera;
 	class Transform;
@@ -27,9 +27,9 @@ namespace DeadFrame2D::Engine
 
 		SDL_FRect worldBounds;
 
-		DeadFrame2D::Core::Vector2F offset;
+		Core::Vector2F offset;
 
-		DeadFrame2D::Core::Vector2I resolutionTarget;
+		Core::Vector2I resolutionTarget;
 
 		float followSpeed;
 
@@ -50,7 +50,7 @@ namespace DeadFrame2D::Engine
 
 		void SetBounds(const SDL_FRect& bounds);
 
-		void SetOffset(DeadFrame2D::Core::Vector2F newOffset);
+		void SetOffset(Core::Vector2F newOffset);
 
 		void SetFollowSpeed(float speed);
 	};

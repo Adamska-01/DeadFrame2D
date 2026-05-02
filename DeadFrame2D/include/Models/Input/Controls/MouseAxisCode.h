@@ -3,7 +3,7 @@
 #include <nlohmann/json.hpp>
 
 
-namespace DeadFrame2D::Models
+namespace DF2D::Models
 {
 	enum class MouseAxisCode : uint8_t
 	{

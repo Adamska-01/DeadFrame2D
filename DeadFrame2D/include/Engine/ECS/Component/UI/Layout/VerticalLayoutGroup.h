@@ -4,7 +4,7 @@
 #include "Engine/ECS/Component/UI/Layout/Abstractions/LayoutGroup.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class DF2D_API VerticalLayoutGroup : public LayoutGroup
 	{
@@ -12,7 +12,7 @@ namespace DeadFrame2D::Engine
 
 
 	public:
-		VerticalLayoutGroup(float layoutSpacing, DeadFrame2D::Data::LayoutPadding layoutPadding);
+		VerticalLayoutGroup(float layoutSpacing, Data::LayoutPadding layoutPadding);
 
 
 		virtual void UpdateLayout() override;

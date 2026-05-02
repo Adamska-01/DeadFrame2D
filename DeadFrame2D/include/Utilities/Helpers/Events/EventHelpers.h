@@ -2,7 +2,7 @@
 #include <functional>
 
 
-namespace DeadFrame2D::Utilities::EventHelpers
+namespace DF2D::Utilities::EventHelpers
 {
 	template <typename T, typename R, typename... Args>
 	inline std::function<R(Args...)> BindFunction(T* instance, R(T::* member_function)(Args...))

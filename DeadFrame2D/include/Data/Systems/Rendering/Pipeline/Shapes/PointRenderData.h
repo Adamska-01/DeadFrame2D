@@ -4,12 +4,12 @@
 #include <SDL_render.h>
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	struct PointRenderData
 	{
-		DeadFrame2D::Core::Vector2F pos = DeadFrame2D::Core::Vector2F::Zero;
+		Core::Vector2F pos = Core::Vector2F::Zero;
 
-		SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE;
+		SDL_Color color = Constants::CommonColors::WHITE;
 	};
 }

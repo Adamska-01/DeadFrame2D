@@ -10,13 +10,13 @@
 #include <box2d/b2_body.h>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
-	using namespace DeadFrame2D::Core;
-	using namespace DeadFrame2D::Internal;
-	using namespace DeadFrame2D::Data;
-	using namespace DeadFrame2D::Utilities;
-	using namespace DeadFrame2D::Constants;
+	using namespace DF2D::Core;
+	using namespace DF2D::Internal;
+	using namespace DF2D::Data;
+	using namespace DF2D::Utilities;
+	using namespace DF2D::Constants;
 
 
 	RigidBody2D::RigidBody2D(const BodyDefinition2D& bodyDefinition)

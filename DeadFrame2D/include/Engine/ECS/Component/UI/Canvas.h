@@ -4,7 +4,7 @@
 #include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class Camera;
 
@@ -25,7 +25,7 @@ namespace DeadFrame2D::Engine
 		/**
 		 * @brief Current render mode used by the canvas.
 		 */
-		DeadFrame2D::Data::CanvasRenderMode renderMode;
+		Data::CanvasRenderMode renderMode;
 
 		/**
 		 * @brief Target camera used when rendering in screen space camera mode.
@@ -44,7 +44,7 @@ namespace DeadFrame2D::Engine
 		 *
 		 * @return The active canvas render mode.
 		 */
-		DeadFrame2D::Data::CanvasRenderMode GetRenderMode() const;
+		Data::CanvasRenderMode GetRenderMode() const;
 
 		/**
 		 * @brief Returns the sorting order of the canvas.

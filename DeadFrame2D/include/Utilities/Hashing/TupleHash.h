@@ -4,7 +4,7 @@
 #include <tuple>
 
 
-namespace DeadFrame2D::Utilities
+namespace DF2D::Utilities
 {
 	// https://www.variadic.xyz/post/0120-hashing-tuples/
 	inline void hash_combine(std::size_t& seed, std::size_t value)

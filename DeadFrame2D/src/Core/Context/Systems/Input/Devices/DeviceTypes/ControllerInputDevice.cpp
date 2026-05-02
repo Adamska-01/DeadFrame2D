@@ -6,12 +6,12 @@
 #include <SDL_events.h>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
-	using namespace DeadFrame2D::Constants;
-	using namespace DeadFrame2D::Data;
-	using namespace DeadFrame2D::Internal;
-	using namespace DeadFrame2D::Models;
+	using namespace DF2D::Constants;
+	using namespace DF2D::Data;
+	using namespace DF2D::Internal;
+	using namespace DF2D::Models;
 
 
 	ControllerInputDevice::ControllerInputDevice(SDL_GameController* controller, InputDeviceID instanceID, IInputActionHandler* actionHandler)
@@ -19,8 +19,8 @@ namespace DeadFrame2D::Core
 		controller(controller), 
 		instanceID(instanceID)
 	{
-		buttonStates = std::vector<DeadFrame2D::Data::InputControlState>(SDL_CONTROLLER_BUTTON_MAX);
-		axisStates = std::vector<DeadFrame2D::Data::InputControlState>(SDL_CONTROLLER_AXIS_MAX);
+		buttonStates = std::vector<DF2D::Data::InputControlState>(SDL_CONTROLLER_BUTTON_MAX);
+		axisStates = std::vector<DF2D::Data::InputControlState>(SDL_CONTROLLER_AXIS_MAX);
 	}
 
 	ControllerInputDevice::~ControllerInputDevice()

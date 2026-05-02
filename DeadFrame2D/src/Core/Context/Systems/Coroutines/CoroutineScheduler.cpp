@@ -8,9 +8,9 @@
 #include <stdexcept>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
-	using namespace DeadFrame2D::Utilities;
+	using namespace DF2D::Utilities;
 
 
 	CoroutineScheduler* CoroutineScheduler::instance = nullptr;

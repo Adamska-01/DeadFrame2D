@@ -2,7 +2,7 @@
 #include "Factories/Products/Input/Processors/Abstractions/IInputProcessor.h"
 
 
-namespace DeadFrame2D::Factories
+namespace DF2D::Factories
 {
 	class DF2D_API DeadzoneProcessor final : public IInputProcessor
 	{

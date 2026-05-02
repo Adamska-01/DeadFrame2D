@@ -5,7 +5,7 @@
 #include <variant>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	class DF2D_API InputActionView
 	{
@@ -33,7 +33,7 @@ namespace DeadFrame2D::Core
 }
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	template<typename T>
 	inline T InputActionView::ReadValue() const

@@ -3,7 +3,7 @@
 #include <SDL_render.h>
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	struct RectRenderData
 	{
@@ -13,6 +13,6 @@ namespace DeadFrame2D::Data
 
 		float rotation = 0.0f;
 
-		SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE;
+		SDL_Color color = Constants::CommonColors::WHITE;
 	};
 }

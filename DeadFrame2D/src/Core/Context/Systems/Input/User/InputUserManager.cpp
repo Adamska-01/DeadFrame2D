@@ -8,11 +8,11 @@
 #include "Engine/Events/Context/Input/InputUserDestroyedEvent.h"
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
-	using namespace DeadFrame2D::Constants;
-	using namespace DeadFrame2D::Data;
-	using namespace DeadFrame2D::Engine;
+	using namespace DF2D::Constants;
+	using namespace DF2D::Data;
+	using namespace DF2D::Engine;
 
 
 	InputUserManager::InputUserManager()

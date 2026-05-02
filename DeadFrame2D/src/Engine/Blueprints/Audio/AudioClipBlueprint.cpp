@@ -3,9 +3,9 @@
 #include "Engine/ECS/Component/Transform.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
-	using namespace DeadFrame2D::Core;
+	using namespace DF2D::Core;
 
 
 	AudioClipBlueprint::AudioClipBlueprint(const std::string_view& audioSourcePath, Vector2F position, float volume, bool isMusic, bool loop)

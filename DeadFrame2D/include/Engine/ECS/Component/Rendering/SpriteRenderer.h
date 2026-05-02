@@ -10,7 +10,7 @@
 struct SDL_Texture;
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class Transform;
 
@@ -25,9 +25,9 @@ namespace DeadFrame2D::Engine
 
 		ComponentHandle<Transform> transform;
 
-		DeadFrame2D::Core::Vector2I spriteSize;
+		Core::Vector2I spriteSize;
 
-		DeadFrame2D::Data::RenderTask renderTask;
+		Data::RenderTask renderTask;
 
 
 	public:

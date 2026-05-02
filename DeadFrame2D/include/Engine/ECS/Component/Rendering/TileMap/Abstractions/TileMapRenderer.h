@@ -4,7 +4,7 @@
 #include "Engine/ECS/Entity/Component/Core/GameComponent.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	template <typename TMap>
 	class TileMapRenderer : public GameComponent
@@ -15,7 +15,7 @@ namespace DeadFrame2D::Engine
 	protected:
 		TMap tileMap;
 
-		DeadFrame2D::Data::RenderTask renderTask;
+		Data::RenderTask renderTask;
 
 
 	protected:
@@ -31,13 +31,13 @@ namespace DeadFrame2D::Engine
 }
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	template<typename TMap>
 	inline TileMapRenderer<TMap>::TileMapRenderer()
 	{
-		using namespace DeadFrame2D::Constants;
-		using namespace DeadFrame2D::Data;
+		using namespace DF2D::Constants;
+		using namespace DF2D::Data;
 
 
 		renderTask.renderPhase = RenderPhase::WORLD;

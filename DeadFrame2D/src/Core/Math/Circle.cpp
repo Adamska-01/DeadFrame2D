@@ -3,9 +3,9 @@
 #include "Core/Math/Vector2.h"
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
-	using namespace DeadFrame2D::Constants;
+	using namespace DF2D::Constants;
 
 
 	Circle::Circle()

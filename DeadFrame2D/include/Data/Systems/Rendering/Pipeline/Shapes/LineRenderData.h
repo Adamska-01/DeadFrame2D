@@ -4,14 +4,14 @@
 #include <SDL_render.h>
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	struct LineRenderData
 	{
-		DeadFrame2D::Core::Vector2F p1 = DeadFrame2D::Core::Vector2F::Zero;
+		Core::Vector2F p1 = Core::Vector2F::Zero;
 
-		DeadFrame2D::Core::Vector2F p2 = DeadFrame2D::Core::Vector2F::Zero;
+		Core::Vector2F p2 = Core::Vector2F::Zero;
 
-		SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE;
+		SDL_Color color = Constants::CommonColors::WHITE;
 	};
 }

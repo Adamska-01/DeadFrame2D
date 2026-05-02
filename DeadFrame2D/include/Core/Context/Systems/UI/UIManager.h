@@ -11,7 +11,7 @@
 struct SDL_Texture;
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	class DF2D_API UIManager : public ICoreSystem
 	{
@@ -33,7 +33,7 @@ namespace DeadFrame2D::Core
 		UIManager& operator=(UIManager&&) = delete;
 
 
-		static std::unordered_map<std::pair<std::string, int>, std::shared_ptr<TTF_Font>, DeadFrame2D::Utilities::PairHash> fontCache;
+		static std::unordered_map<std::pair<std::string, int>, std::shared_ptr<TTF_Font>, Utilities::PairHash> fontCache;
 
 
 		void BeginFrame() override;

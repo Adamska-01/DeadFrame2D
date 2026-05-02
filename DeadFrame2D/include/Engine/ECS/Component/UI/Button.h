@@ -6,23 +6,23 @@
 #include <functional>
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	struct ButtonComponentModel;
 }
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
-	class DF2D_API Button : public IInteractableUI, public DeadFrame2D::Core::IEventProcessor
+	class DF2D_API Button : public IInteractableUI, public Core::IEventProcessor
 	{
 		TYPE_INFO(Button, IInteractableUI);
 
 
 	private:
-		DeadFrame2D::Utilities::MultiCastVoid onPressedCallback;
+		Utilities::MultiCastVoid onPressedCallback;
 
-		DeadFrame2D::Utilities::MultiCastVoid onEnterCallback;
+		Utilities::MultiCastVoid onEnterCallback;
 
 		std::shared_ptr<SDL_Texture> currentButtonImage;
 
@@ -43,7 +43,7 @@ namespace DeadFrame2D::Engine
 
 
 	public:
-		Button(const DeadFrame2D::Data::ButtonComponentModel& buttonConfiguration);
+		Button(const Data::ButtonComponentModel& buttonConfiguration);
 
 		virtual ~Button() override = default;
 

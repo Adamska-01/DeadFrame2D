@@ -7,10 +7,10 @@
 #include <SDL.h>
 
 
-namespace DeadFrame2D::Utilities::Collision
+namespace DF2D::Utilities::Collision
 {
-	using namespace DeadFrame2D::Constants;
-	using namespace DeadFrame2D::Core;
+	using namespace DF2D::Constants;
+	using namespace DF2D::Core;
 
 
 	bool PointVsBox(const Vector2F& point, const SDL_FRect& box)

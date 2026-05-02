@@ -4,16 +4,16 @@
 #include <SDL_render.h>
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	struct CircleRenderData
 	{
-		DeadFrame2D::Core::Vector2F center = DeadFrame2D::Core::Vector2F::Zero;
+		Core::Vector2F center = Core::Vector2F::Zero;
 
 		float radius = 1.0f;
 
 		bool filled = true;
 
-		SDL_Color color = DeadFrame2D::Constants::CommonColors::WHITE;
+		SDL_Color color = Constants::CommonColors::WHITE;
 	};
 }

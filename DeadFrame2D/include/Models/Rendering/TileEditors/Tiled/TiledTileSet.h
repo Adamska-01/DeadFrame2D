@@ -7,7 +7,7 @@
 struct SDL_Texture;
 
 
-namespace DeadFrame2D::Models
+namespace DF2D::Models
 {
 	struct DF2D_API TiledTileSet
 	{

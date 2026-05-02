@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	enum class ActionPhase
 	{

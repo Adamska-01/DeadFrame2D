@@ -3,7 +3,7 @@
 #include <SDL_scancode.h>
 
 
-namespace DeadFrame2D::Internal::KeyboardKeyCodeConversions
+namespace DF2D::Internal::KeyboardKeyCodeConversions
 {
 	/**
 	 * @brief Converts a KeyboardKeyCode to SDL's SDL_Scancode.

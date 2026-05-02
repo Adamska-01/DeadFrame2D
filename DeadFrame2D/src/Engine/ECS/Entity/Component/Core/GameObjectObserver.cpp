@@ -6,9 +6,9 @@
 #include "Utilities/Helpers/Events/EventHelpers.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
-	using namespace DeadFrame2D::Utilities;
+	using namespace DF2D::Utilities;
 
 
 	GameObjectObserver::GameObjectObserver()

@@ -2,7 +2,7 @@
 #include "Engine/ECS/Entity/Component/Core/UI/Abstractions/INavigableUI.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	ComponentHandle<IInteractableUI> INavigableUI::GetUpInteractable()
 	{

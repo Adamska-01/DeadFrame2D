@@ -12,13 +12,13 @@ struct SDL_Texture;
 struct SDL_Color;
 struct SDL_Rect;
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	struct TextMeshComponentModel;
 }
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class Transform;
 
@@ -31,7 +31,7 @@ namespace DeadFrame2D::Engine
 	private:
 		ComponentHandle<Transform> transform;
 
-		DeadFrame2D::Core::Vector2F initialObjectScale;
+		Core::Vector2F initialObjectScale;
 
 		std::shared_ptr<SDL_Texture> textTexture;
 
@@ -47,7 +47,7 @@ namespace DeadFrame2D::Engine
 
 
 	public:
-		TextMesh(const DeadFrame2D::Data::TextMeshComponentModel& textMeshConfiguration);
+		TextMesh(const Data::TextMeshComponentModel& textMeshConfiguration);
 
 		virtual ~TextMesh() override = default;
 
@@ -61,7 +61,7 @@ namespace DeadFrame2D::Engine
 
 		void SetTextColor(SDL_Color newColor);
 
-		void SetFontStyle(DeadFrame2D::Data::FontStyle newFontStyle);
+		void SetFontStyle(Data::FontStyle newFontStyle);
 
 		void SetText(std::string newText);
 

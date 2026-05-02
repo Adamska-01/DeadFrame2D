@@ -2,10 +2,10 @@
 #include "Factories/Concretions/Input/Processors/InputProcessorFactory.h"
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
-	using namespace DeadFrame2D::Factories;
-	using namespace DeadFrame2D::Models;
+	using namespace DF2D::Factories;
+	using namespace DF2D::Models;
 
 
 	RuntimeInputAction::RuntimeInputAction(

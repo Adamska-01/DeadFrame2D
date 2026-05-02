@@ -1,7 +1,7 @@
 #include "Core/Context/Systems/Coroutines/Awaitables/WaitForSeconds.h"
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	WaitForSeconds::WaitForSeconds(float seconds)
 		: timeRemaining(seconds),

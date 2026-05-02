@@ -3,7 +3,7 @@
 #include <thread>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	using namespace std::chrono;
 

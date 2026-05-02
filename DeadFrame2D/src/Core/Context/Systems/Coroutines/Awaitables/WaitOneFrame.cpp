@@ -2,7 +2,7 @@
 #include "Core/Context/Systems/Coroutines/Awaitables/WaitOneFrame.h"
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	bool WaitOneFrame::await_ready() const noexcept
 	{

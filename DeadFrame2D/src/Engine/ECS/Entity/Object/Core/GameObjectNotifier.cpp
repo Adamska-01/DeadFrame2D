@@ -1,11 +1,11 @@
-#include "Engine/ECS/Component/GameComponent.h"
+#include "Engine/ECS/Entity/Component/Core/GameComponent.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include "Engine/ECS/Entity/Object/Core/GameObjectNotifier.h"
 #include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	GameObjectNotifier::GameObjectNotifier()
 	{

@@ -11,7 +11,7 @@
 #include <variant>
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	using RenderData = std::variant<
 		SpriteRenderData,

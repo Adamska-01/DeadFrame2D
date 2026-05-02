@@ -5,7 +5,7 @@
 #include <unordered_map>
 
 
-namespace DeadFrame2D::Utilities
+namespace DF2D::Utilities
 {
 	struct ResourceMount;
 	struct ResolvedPath;

@@ -4,7 +4,7 @@
 #include "Engine/ECS/Component/Collisions/Collider2D.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class DF2D_API CircleCollider2D : public Collider2D
 	{
@@ -21,12 +21,12 @@ namespace DeadFrame2D::Engine
 	public:
 		CircleCollider2D(
 			float radius, 
-			DeadFrame2D::Core::Vector2F offsetFromCenter = DeadFrame2D::Core::Vector2F::Zero, 
-			const DeadFrame2D::Data::PhysicsMaterial& physicsMaterial = DeadFrame2D::Data::PhysicsMaterial());
+			Core::Vector2F offsetFromCenter = Core::Vector2F::Zero, 
+			const Data::PhysicsMaterial& physicsMaterial = Data::PhysicsMaterial());
 
 		virtual ~CircleCollider2D() override;
 
 
-		void SetNewCircleShape(float radius, DeadFrame2D::Core::Vector2F offsetFromCenter);
+		void SetNewCircleShape(float radius, Core::Vector2F offsetFromCenter);
 	};
 }

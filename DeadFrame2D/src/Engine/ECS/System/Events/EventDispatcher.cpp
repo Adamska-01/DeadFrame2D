@@ -2,7 +2,7 @@
 #include <iostream>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	std::unordered_map<std::type_index, EventHandler> EventDispatcher::eventHandlers;
 

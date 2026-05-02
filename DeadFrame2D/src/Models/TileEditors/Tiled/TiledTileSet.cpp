@@ -4,9 +4,9 @@
 #include <string>
 
 
-namespace DeadFrame2D::Models
+namespace DF2D::Models
 {
-	using namespace DeadFrame2D::Core;
+	using namespace DF2D::Core;
 
 
 	TiledTileSet::TiledTileSet(int firstID, int lastID, int rowCount, int columnCount, int tileCount, int tileSize, const std::string& source)

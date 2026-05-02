@@ -4,22 +4,22 @@
 #include "Engine/ECS/System/Events/DispatchableEvent.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class DF2D_API DeviceAddedEvent : public DispatchableEvent
 	{
 	private:
 		std::string deviceName;
 
-		DeadFrame2D::Data::InputDeviceID deviceID;
+		Data::InputDeviceID deviceID;
 
 
 	public:
-		DeviceAddedEvent(DeadFrame2D::Data::InputDeviceID deviceID, const std::string& deviceName);
+		DeviceAddedEvent(Data::InputDeviceID deviceID, const std::string& deviceName);
 
 
 		const std::string& GetDeviceName() const;
 
-		DeadFrame2D::Data::InputDeviceID GetDeviceID() const;
+		Data::InputDeviceID GetDeviceID() const;
 	};
 }

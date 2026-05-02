@@ -3,7 +3,7 @@
 #include <typeinfo>
 
 
-namespace DeadFrame2D::Utilities
+namespace DF2D::Utilities
 {
 	template<typename... Args>
 	struct IListener
@@ -41,7 +41,7 @@ namespace DeadFrame2D::Utilities
 }
 
 
-namespace DeadFrame2D::Utilities
+namespace DF2D::Utilities
 {
 	template<typename ...Args>
 	inline void IListener<Args...>::SetID(ListenerID newID)

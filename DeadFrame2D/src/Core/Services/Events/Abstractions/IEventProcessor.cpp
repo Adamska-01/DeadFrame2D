@@ -2,7 +2,7 @@
 #include "Core/Services/Events/EventManager.h"
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	IEventProcessor::IEventProcessor()
 	{

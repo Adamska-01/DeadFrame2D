@@ -8,9 +8,9 @@
 #include <cassert>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
-	using namespace DeadFrame2D::Data;
+	using namespace DF2D::Data;
 
 
 	Scene::Scene()

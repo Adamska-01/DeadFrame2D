@@ -22,18 +22,18 @@
 // | ---------------------- | ------------------------- | --------------------------------------------------------- |
 
 
-namespace DeadFrame2D::Factories
+namespace DF2D::Factories
 {
 	class ColliderDrawer : public b2Draw
 	{
 	private:
-		DeadFrame2D::Data::RenderTask renderTask;
+		Data::RenderTask renderTask;
 
-		DeadFrame2D::Data::LineBatchRenderData lineBatchData;
+		Data::LineBatchRenderData lineBatchData;
 
-		DeadFrame2D::Data::PointBatchRenderData pointBatchData;
+		Data::PointBatchRenderData pointBatchData;
 
-		DeadFrame2D::Data::CircleBatchRenderData circleBatchData;
+		Data::CircleBatchRenderData circleBatchData;
 
 
 	public:

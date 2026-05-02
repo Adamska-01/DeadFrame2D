@@ -3,7 +3,7 @@
 #include <vector>
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	struct CircleBatchRenderData
 	{

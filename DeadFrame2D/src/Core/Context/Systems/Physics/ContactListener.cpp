@@ -4,10 +4,10 @@
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
-	using namespace DeadFrame2D::Data;
-	using namespace DeadFrame2D::Engine;
+	using namespace DF2D::Data;
+	using namespace DF2D::Engine;
 
 
 	std::pair<ContactEventProvider*, ContactEventProvider*> ContactListener::GetUserDataFromContact(b2Contact* contact)

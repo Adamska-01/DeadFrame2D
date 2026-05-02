@@ -6,7 +6,7 @@
 #define NAME_OF(ptr) #ptr
 
 
-namespace DeadFrame2D::Utilities::Guard
+namespace DF2D::Utilities::Guard
 {
 	/**
 	 * @brief Ensures that a pointer is not null.
@@ -35,7 +35,7 @@ namespace DeadFrame2D::Utilities::Guard
 	template<typename T>
 	inline T AgainstNullAssignment(const T& ptr, const std::string& varName)
 	{
-		DeadFrame2D::Utilities::Guard::AgainstNull(ptr, varName);
+		Utilities::Guard::AgainstNull(ptr, varName);
 
 		return ptr;
 	}

@@ -7,7 +7,7 @@
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class Transform;
 	class Canvas;
@@ -24,13 +24,13 @@ namespace DeadFrame2D::Engine
 	protected:
 		ComponentHandle<Canvas> parentCanvas;
 
-		DeadFrame2D::Data::UIAnchor anchor;
+		Data::UIAnchor anchor;
 
-		DeadFrame2D::Core::Vector2F widgetSize;
+		Core::Vector2F widgetSize;
 
 		ComponentHandle<Transform> transform;
 
-		DeadFrame2D::Data::RenderTask renderTask;
+		Data::RenderTask renderTask;
 
 
 		void OnParentGameObjectChangedHandler(const ObjectHandle<GameObject>& obj) override;
@@ -47,10 +47,10 @@ namespace DeadFrame2D::Engine
 		void Update(float deltaTime) override;
 
 
-		void SetAnchor(DeadFrame2D::Data::UIAnchor newAnchor);
+		void SetAnchor(Data::UIAnchor newAnchor);
 
-		void SetWidgetSize(DeadFrame2D::Core::Vector2F newWidgetSize);
+		void SetWidgetSize(Core::Vector2F newWidgetSize);
 
-		DeadFrame2D::Core::Vector2F GetWidgetSize() const;
+		Core::Vector2F GetWidgetSize() const;
 	};
 }

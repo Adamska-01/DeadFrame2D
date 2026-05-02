@@ -4,7 +4,7 @@
 #include "Engine/ECS/System/Events/DispatchableEvent.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class GameComponent;
 

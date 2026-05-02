@@ -3,7 +3,7 @@
 #include <string>
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	/** @brief Configuration data for a sprite animation. */
 	struct SpriteAnimationProperties

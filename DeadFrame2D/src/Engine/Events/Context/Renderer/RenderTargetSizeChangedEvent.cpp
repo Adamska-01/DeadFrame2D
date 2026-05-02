@@ -1,9 +1,9 @@
 #include "Engine/Events/Context/Renderer/RenderTargetSizeChangedEvent.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
-	using namespace DeadFrame2D::Core;
+	using namespace DF2D::Core;
 
 
 	RenderTargetSizeChangedEvent::RenderTargetSizeChangedEvent(Vector2I renderTargetSize)

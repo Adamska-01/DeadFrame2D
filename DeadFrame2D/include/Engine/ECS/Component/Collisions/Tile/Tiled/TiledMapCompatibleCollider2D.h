@@ -8,7 +8,7 @@
 class b2Fixture;
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class DF2D_API TiledMapCompatibleCollider2D : public TileCollider2D<TiledMapCompatibleRenderer>
 	{
@@ -20,11 +20,11 @@ namespace DeadFrame2D::Engine
 
 
 	protected:
-		std::vector<DeadFrame2D::Models::TiledLayer> collisionLayers;
+		std::vector<Models::TiledLayer> collisionLayers;
 
 		std::vector<b2Fixture*> fixtures;
 
-		DeadFrame2D::Core::Vector2I tileMapDimension;
+		Core::Vector2I tileMapDimension;
 
 		int tileSize;
 
@@ -33,7 +33,7 @@ namespace DeadFrame2D::Engine
 
 
 	public:
-		TiledMapCompatibleCollider2D(const DeadFrame2D::Data::PhysicsMaterial& physicsMaterial = DeadFrame2D::Data::PhysicsMaterial());
+		TiledMapCompatibleCollider2D(const Data::PhysicsMaterial& physicsMaterial = Data::PhysicsMaterial());
 
 		virtual ~TiledMapCompatibleCollider2D() override;
 
@@ -41,9 +41,9 @@ namespace DeadFrame2D::Engine
 		virtual void Init() override;
 
 
-		const std::vector<DeadFrame2D::Models::TiledLayer>& GetCollisionLayers() const;
+		const std::vector<Models::TiledLayer>& GetCollisionLayers() const;
 
-		const DeadFrame2D::Core::Vector2I& GetTileMapDimensions() const;
+		const Core::Vector2I& GetTileMapDimensions() const;
 
 		int GetTileSize() const;
 	};

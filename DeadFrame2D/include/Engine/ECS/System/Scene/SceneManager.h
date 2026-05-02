@@ -8,20 +8,20 @@
 #include <vector>
 
 
-namespace DeadFrame2D::Core 
+namespace DF2D::Core 
 { 
 	class DeadFrameRuntime; 
 }
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class Scene;
 
 
 	class DF2D_API SceneManager
 	{
-		friend DeadFrame2D::Core::DeadFrameRuntime;
+		friend DF2D::Core::DeadFrameRuntime;
 
 
 	private:
@@ -63,7 +63,7 @@ namespace DeadFrame2D::Engine
 #include "Engine/ECS/System/Scene/Scene.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	template<typename TScene, typename ...Args>
 	inline void SceneManager::LoadScene(Args && ...args)

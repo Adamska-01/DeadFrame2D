@@ -9,15 +9,15 @@
 #include <optional>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	template<>
-	struct RenderResolver<DeadFrame2D::Data::PointBatchRenderData>
+	struct RenderResolver<Data::PointBatchRenderData>
 	{
 		static void Render(
 			IRenderBackend& renderBackend,
-			const DeadFrame2D::Data::PointBatchRenderData& renderData,
-			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera,
+			const Data::PointBatchRenderData& renderData,
+			Engine::ComponentHandle<Engine::Camera> camera,
 			bool requiresScreenSpaceConversion)
 		{
 			for (const auto& point : renderData.pointBatch)
@@ -33,12 +33,12 @@ namespace DeadFrame2D::Core
 			}
 		}
 
-		static std::optional<DeadFrame2D::Data::PointBatchRenderData> Cull(
-			const DeadFrame2D::Data::PointBatchRenderData& renderData,
-			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera)
+		static std::optional<Data::PointBatchRenderData> Cull(
+			const Data::PointBatchRenderData& renderData,
+			Engine::ComponentHandle<Engine::Camera> camera)
 		{
-			using namespace DeadFrame2D::Data;
-			using namespace DeadFrame2D::Utilities;
+			using namespace DF2D::Data;
+			using namespace DF2D::Utilities;
 
 
 			// Always visible if no camera (screen space)

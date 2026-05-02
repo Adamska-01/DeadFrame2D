@@ -3,17 +3,17 @@
 #include <memory>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class GameObject;
 }
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	struct ObjectEntry
 	{
-		std::unique_ptr<DeadFrame2D::Engine::GameObject> object;
+		std::unique_ptr<Engine::GameObject> object;
 
 		uint32_t generation = 0;
 

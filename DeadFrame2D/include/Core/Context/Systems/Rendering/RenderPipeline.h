@@ -7,13 +7,13 @@
 #include <vector>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class Camera;
 }
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	class IRenderBackend;
 
@@ -40,8 +40,8 @@ namespace DeadFrame2D::Core
 			IRenderBackend& renderBackend, 
 			std::array<
 				std::unordered_map<
-					DeadFrame2D::Engine::Camera*, 
-					std::vector<DeadFrame2D::Data::RenderTask>>,
-				(int)DeadFrame2D::Data::RenderPhase::RENDER_PHASE_COUNT>& renderTasks);
+					Engine::Camera*, 
+					std::vector<Data::RenderTask>>,
+				(int)Data::RenderPhase::RENDER_PHASE_COUNT>& renderTasks);
 	};
 }

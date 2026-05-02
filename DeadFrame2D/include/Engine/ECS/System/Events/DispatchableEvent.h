@@ -4,7 +4,7 @@
 #include <memory>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class DF2D_API DispatchableEvent
 	{

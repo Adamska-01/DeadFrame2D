@@ -3,7 +3,7 @@
 #include <SDL.h>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	std::vector<IEventProcessor*> EventManager::eventProcessors = {};
 

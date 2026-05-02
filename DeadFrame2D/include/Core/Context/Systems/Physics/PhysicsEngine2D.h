@@ -14,13 +14,13 @@ class b2ContactListener;
 class b2Draw;
 
 
-namespace DeadFrame2D::Factories
+namespace DF2D::Factories
 {
 	class ColliderDrawer;
 }
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	class DF2D_API PhysicsEngine2D : public ICoreSystem
 	{

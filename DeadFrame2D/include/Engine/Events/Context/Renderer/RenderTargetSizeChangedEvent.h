@@ -4,14 +4,14 @@
 #include "Engine/ECS/System/Events/DispatchableEvent.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class DF2D_API RenderTargetSizeChangedEvent : public DispatchableEvent
 	{
 	public:
-		DeadFrame2D::Core::Vector2I renderTargetSize;
+		Core::Vector2I renderTargetSize;
 
 
-		RenderTargetSizeChangedEvent(DeadFrame2D::Core::Vector2I renderTargetSize);
+		RenderTargetSizeChangedEvent(Core::Vector2I renderTargetSize);
 	};
 }

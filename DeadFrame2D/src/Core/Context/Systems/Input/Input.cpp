@@ -11,12 +11,12 @@
 #include <iostream>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
-	using namespace DeadFrame2D::Models;
-	using namespace DeadFrame2D::Engine;
-	using namespace DeadFrame2D::Data;
-	using namespace DeadFrame2D::Utilities;
+	using namespace DF2D::Models;
+	using namespace DF2D::Engine;
+	using namespace DF2D::Data;
+	using namespace DF2D::Utilities;
 
 
 	Input* Input::instance = nullptr;

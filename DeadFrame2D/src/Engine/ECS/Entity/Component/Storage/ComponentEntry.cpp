@@ -2,7 +2,7 @@
 #include "Engine/ECS/Entity/Component/Storage/ComponentEntry.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	ComponentEntry::ComponentEntry() = default;
 

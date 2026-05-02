@@ -7,9 +7,9 @@
 #include <unordered_map>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
-	using EventHandler = DeadFrame2D::Utilities::MulticastDelegate<std::shared_ptr<DispatchableEvent>>;
+	using EventHandler = Utilities::MulticastDelegate<std::shared_ptr<DispatchableEvent>>;
 
 
 	class DF2D_API EventDispatcher
@@ -35,7 +35,7 @@ namespace DeadFrame2D::Engine
 }
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	template<typename T>
 	inline void EventDispatcher::RegisterEventHandler(const std::type_index& eventType, T* instance, void(T::* func)(std::shared_ptr<DispatchableEvent>))

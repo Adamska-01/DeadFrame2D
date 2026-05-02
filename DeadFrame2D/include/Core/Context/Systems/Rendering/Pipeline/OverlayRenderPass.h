@@ -4,12 +4,12 @@
 #include <array>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	class OverlayRenderPass : public RenderPass
 	{
 	private:
-		std::array<DeadFrame2D::Data::RenderPhase, 2> phasesInOrder;
+		std::array<Data::RenderPhase, 2> phasesInOrder;
 
 
 	public:
@@ -20,8 +20,8 @@ namespace DeadFrame2D::Core
 			IRenderBackend& renderBackend, 
 			std::array<
 				std::unordered_map<
-					DeadFrame2D::Engine::Camera*, 
-					std::vector<DeadFrame2D::Data::RenderTask>>,
-				(int)DeadFrame2D::Data::RenderPhase::RENDER_PHASE_COUNT>& renderTasks) override;
+					Engine::Camera*, 
+					std::vector<Data::RenderTask>>,
+				(int)Data::RenderPhase::RENDER_PHASE_COUNT>& renderTasks) override;
 	};
 }

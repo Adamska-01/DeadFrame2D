@@ -3,7 +3,7 @@
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class IInteractableUI;
 

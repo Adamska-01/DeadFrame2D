@@ -6,18 +6,18 @@
 #include <SDL_events.h>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
-	using namespace DeadFrame2D::Constants;
-	using namespace DeadFrame2D::Data;
-	using namespace DeadFrame2D::Internal;
-	using namespace DeadFrame2D::Models;
+	using namespace DF2D::Constants;
+	using namespace DF2D::Data;
+	using namespace DF2D::Internal;
+	using namespace DF2D::Models;
 
 
 	KeyboardInputDevice::KeyboardInputDevice(IInputActionHandler* actionHandler)
 		: InputDevice(DefaultDeviceNames::KEYBOARD, actionHandler)
 	{
-		states = std::vector<DeadFrame2D::Data::InputControlState>(SDL_NUM_SCANCODES);
+		states = std::vector<DF2D::Data::InputControlState>(SDL_NUM_SCANCODES);
 	}
 
 

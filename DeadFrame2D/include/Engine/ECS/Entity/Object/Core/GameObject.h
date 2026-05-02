@@ -6,7 +6,7 @@
 #include <memory>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class Transform;
 
@@ -79,7 +79,7 @@ namespace DeadFrame2D::Engine
 
 		void Destroy();
 
-		DeadFrame2D::Core::Task Destroy(float delaySeconds);
+		Core::Task Destroy(float delaySeconds);
 
 
 		ComponentHandle<Transform> GetTransform() const;
@@ -98,7 +98,7 @@ namespace DeadFrame2D::Engine
 #include "Engine/ECS/System/Scene/Scene.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	template<typename T, typename ...Args>
 	inline ObjectHandle<T> GameObject::Instantiate(Args && ...args)

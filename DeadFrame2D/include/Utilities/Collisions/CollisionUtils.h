@@ -6,31 +6,31 @@
 struct SDL_Rect;
 struct SDL_FRect;
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 { 
 	struct Circle;
 }
 
 
-namespace DeadFrame2D::Utilities::Collision
+namespace DF2D::Utilities::Collision
 {
-	DF2D_API bool PointVsBox(const DeadFrame2D::Core::Vector2F& point, const SDL_FRect& box);
+	DF2D_API bool PointVsBox(const Core::Vector2F& point, const SDL_FRect& box);
 
-	DF2D_API bool PointVsCircle(const DeadFrame2D::Core::Vector2F& point, const DeadFrame2D::Core::Circle& circle);
+	DF2D_API bool PointVsCircle(const Core::Vector2F& point, const Core::Circle& circle);
 
 	DF2D_API bool RectVsRect(const SDL_FRect& boxA, const SDL_FRect& boxB);
 
 	DF2D_API bool RectVsRect(const SDL_Rect& boxA, const SDL_Rect& boxB);
 
-	DF2D_API bool CircleVsRect(const DeadFrame2D::Core::Circle& circle, const SDL_FRect& rect);
+	DF2D_API bool CircleVsRect(const Core::Circle& circle, const SDL_FRect& rect);
 
-	DF2D_API bool SegmentVsRect(const DeadFrame2D::Core::Vector2F& p0, const DeadFrame2D::Core::Vector2F& p1, const SDL_FRect& rect);
+	DF2D_API bool SegmentVsRect(const Core::Vector2F& p0, const Core::Vector2F& p1, const SDL_FRect& rect);
 
 	DF2D_API bool RayVsRect(
-		const DeadFrame2D::Core::Vector2F& ray_origin,
-		const DeadFrame2D::Core::Vector2F& ray_dir,
+		const Core::Vector2F& ray_origin,
+		const Core::Vector2F& ray_dir,
 		const SDL_Rect& target,
-		DeadFrame2D::Core::Vector2F& contact_point,
-		DeadFrame2D::Core::Vector2F& contact_normal,
+		Core::Vector2F& contact_point,
+		Core::Vector2F& contact_normal,
 		float& t_hit_near);
 }

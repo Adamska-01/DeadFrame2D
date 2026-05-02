@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	/**
 	 * @brief Enum representing the type of a 2D physics body.

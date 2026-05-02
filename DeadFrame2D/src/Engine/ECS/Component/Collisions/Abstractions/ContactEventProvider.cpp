@@ -1,9 +1,9 @@
 #include "Engine/ECS/Component/Collisions/Abstractions/ContactEventProvider.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
-	using namespace DeadFrame2D::Data;
+	using namespace DF2D::Data;
 
 
 	ContactEventProvider::ContactEventProvider()
@@ -18,7 +18,7 @@ namespace DeadFrame2D::Engine
 		onContactExit.Clear();
 	}
 
-	void ContactEventProvider::RegisterContactEnterHandler(const ObjectHandleBase& listener, const std::function<void(const DeadFrame2D::Data::CollisionInfo&)>& handler)
+	void ContactEventProvider::RegisterContactEnterHandler(const ObjectHandleBase& listener, const std::function<void(const DF2D::Data::CollisionInfo&)>& handler)
 	{
 		onContactEnter.AddHandle(listener, handler);
 	}
@@ -28,7 +28,7 @@ namespace DeadFrame2D::Engine
 		onContactEnter.AddHandle(listener, handler);
 	}
 
-	void ContactEventProvider::RegisterContactExitHandler(const ObjectHandleBase& listener, const std::function<void(const DeadFrame2D::Data::CollisionInfo&)>& handler)
+	void ContactEventProvider::RegisterContactExitHandler(const ObjectHandleBase& listener, const std::function<void(const DF2D::Data::CollisionInfo&)>& handler)
 	{
 		onContactExit.AddHandle(listener, handler);
 	}

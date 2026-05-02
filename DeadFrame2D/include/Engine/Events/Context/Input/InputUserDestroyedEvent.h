@@ -5,22 +5,22 @@
 #include <string>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class DF2D_API InputUserDestroyedEvent : public DispatchableEvent
 	{
 	private:
 		std::string inputUserName;
 
-		DeadFrame2D::Data::InputUserID inputUserID;
+		Data::InputUserID inputUserID;
 
 
 	public:
-		InputUserDestroyedEvent(DeadFrame2D::Data::InputUserID inputUserID, const std::string& inputUserName);
+		InputUserDestroyedEvent(Data::InputUserID inputUserID, const std::string& inputUserName);
 
 
 		const std::string& GetInputUserName() const;
 
-		DeadFrame2D::Data::InputUserID GetInputUserID() const;
+		Data::InputUserID GetInputUserID() const;
 	};
 }

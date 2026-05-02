@@ -4,16 +4,16 @@
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class DF2D_API ButtonBlueprint : public GameObject
 	{
 	private:
-		DeadFrame2D::Data::ButtonBlueprintModel buttonBlueprintConfiguration;
+		Data::ButtonBlueprintModel buttonBlueprintConfiguration;
 
 
 	public:
-		ButtonBlueprint(const DeadFrame2D::Data::ButtonBlueprintModel& buttonBlueprintConfiguration);
+		ButtonBlueprint(const Data::ButtonBlueprintModel& buttonBlueprintConfiguration);
 
 		virtual ~ButtonBlueprint() override = default;
 

@@ -6,7 +6,7 @@
 #include <iostream>
 
 
-namespace DeadFrame2D::Utilities::JsonSerializer
+namespace DF2D::Utilities::JsonSerializer
 {
 	template <typename T>
 	nlohmann::json Serialize(const T& obj) 

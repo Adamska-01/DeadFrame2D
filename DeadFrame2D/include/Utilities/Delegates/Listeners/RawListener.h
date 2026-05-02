@@ -2,7 +2,7 @@
 #include "Utilities/Delegates/Listeners/Abstractions/IListener.h"
 
 
-namespace DeadFrame2D::Utilities
+namespace DF2D::Utilities
 {
 	template<typename T, typename... Args>
 	struct RawListener : IListener<Args...>
@@ -24,7 +24,7 @@ namespace DeadFrame2D::Utilities
 }
 
 
-namespace DeadFrame2D::Utilities
+namespace DF2D::Utilities
 {
 	template<typename T, typename ...Args>
 	inline RawListener<T, Args...>::RawListener(T* o, void(T::* m)(Args...))

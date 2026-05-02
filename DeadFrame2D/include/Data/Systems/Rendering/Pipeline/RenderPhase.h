@@ -2,7 +2,7 @@
 #include <cstdint>
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	enum class RenderPhase : uint8_t
 	{

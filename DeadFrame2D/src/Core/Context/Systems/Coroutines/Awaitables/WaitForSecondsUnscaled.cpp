@@ -1,8 +1,8 @@
 #include "Core/Context/Systems/Coroutines/Awaitables/WaitForSecondsUnscaled.h"
-#include "Core/Framerate/FrameTimer.h"
+#include "Core/Services/Time/FrameTimer.h"
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	WaitForSecondsUnscaled::WaitForSecondsUnscaled(float seconds)
 		: timeRemaining(seconds),

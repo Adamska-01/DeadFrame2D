@@ -6,7 +6,7 @@
 #include <string_view>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class AudioSource;
 
@@ -18,7 +18,7 @@ namespace DeadFrame2D::Engine
 
 		std::string_view audioSourcePath;
 
-		DeadFrame2D::Core::Vector2F position;
+		Core::Vector2F position;
 
 		float volume;
 
@@ -30,7 +30,7 @@ namespace DeadFrame2D::Engine
 	public:
 		AudioClipBlueprint(
 			const std::string_view& audioSourcePath,
-			DeadFrame2D::Core::Vector2F position = DeadFrame2D::Core::Vector2F::Zero,
+			Core::Vector2F position = Core::Vector2F::Zero,
 			float volume = 1.0f,
 			bool isMusic = false,
 			bool loop = false);

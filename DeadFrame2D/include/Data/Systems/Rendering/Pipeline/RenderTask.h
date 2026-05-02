@@ -5,22 +5,22 @@
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	class RenderSystem;
 }
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class Canvas;
 }
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	struct RenderTask
 	{
-		friend class DeadFrame2D::Core::RenderSystem;
+		friend class Core::RenderSystem;
 
 
 	private:
@@ -45,7 +45,7 @@ namespace DeadFrame2D::Data
 
 		int sortOrder = 0;
 
-		DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Canvas> canvas;
+		Engine::ComponentHandle<Engine::Canvas> canvas;
 
 
 		inline RenderSortKey GetSortKey() const

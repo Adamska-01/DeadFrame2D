@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace DeadFrame2D::Constants::DefaultSortOrders
+namespace DF2D::Constants::DefaultSortOrders
 {
 	constexpr int SPRITE_RENDERER = 0;
 

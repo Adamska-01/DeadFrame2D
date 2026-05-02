@@ -4,7 +4,7 @@
 #include <nlohmann/json.hpp>
 
 
-namespace DeadFrame2D::Models
+namespace DF2D::Models
 {
 	struct NamedBitflag
 	{

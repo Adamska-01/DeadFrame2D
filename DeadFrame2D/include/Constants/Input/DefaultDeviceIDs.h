@@ -2,7 +2,7 @@
 #include <cstdint>
 
 
-namespace DeadFrame2D::Constants::DefaultDeviceIDs
+namespace DF2D::Constants::DefaultDeviceIDs
 {
 	constexpr int32_t KEYBOARD = -1;
 

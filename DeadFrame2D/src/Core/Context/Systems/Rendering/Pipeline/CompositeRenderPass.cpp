@@ -3,11 +3,11 @@
 #include "Engine/ECS/Component/Rendering/Camera/Camera.h"
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
-	using namespace DeadFrame2D::Engine;
-	using namespace DeadFrame2D::Data;
-	using namespace DeadFrame2D::Utilities;
+	using namespace DF2D::Engine;
+	using namespace DF2D::Data;
+	using namespace DF2D::Utilities;
 
 
 	void CompositeRenderPass::Execute(

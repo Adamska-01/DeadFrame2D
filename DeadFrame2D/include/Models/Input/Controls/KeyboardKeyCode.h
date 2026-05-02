@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 
-namespace DeadFrame2D::Models
+namespace DF2D::Models
 {
 	enum class KeyboardKeyCode : uint16_t
 	{

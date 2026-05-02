@@ -9,15 +9,15 @@
 #include <optional>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	template<>
-	struct RenderResolver<DeadFrame2D::Data::CircleRenderData>
+	struct RenderResolver<Data::CircleRenderData>
 	{
 		static void Render(
 			IRenderBackend& renderBackend,
-			const DeadFrame2D::Data::CircleRenderData& renderData,
-			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera,
+			const Data::CircleRenderData& renderData,
+			Engine::ComponentHandle<Engine::Camera> camera,
 			bool requiresScreenSpaceConversion)
 		{
 			Vector2F pos = renderData.center;
@@ -37,11 +37,11 @@ namespace DeadFrame2D::Core
 		}
 
 
-		static std::optional<DeadFrame2D::Data::CircleRenderData> Cull(
-			const DeadFrame2D::Data::CircleRenderData& renderData,
-			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera)
+		static std::optional<Data::CircleRenderData> Cull(
+			const Data::CircleRenderData& renderData,
+			Engine::ComponentHandle<Engine::Camera> camera)
 		{
-			using namespace DeadFrame2D::Utilities;
+			using namespace DF2D::Utilities;
 
 
 			// Always visible if no camera (screen space)

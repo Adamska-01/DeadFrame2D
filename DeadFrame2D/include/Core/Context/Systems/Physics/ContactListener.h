@@ -3,13 +3,13 @@
 #include <utility>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class ContactEventProvider;
 }
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	/**
 	 * @brief Custom contact listener for Box2D collision events.
@@ -20,7 +20,7 @@ namespace DeadFrame2D::Core
 	class ContactListener : public b2ContactListener
 	{
 	private:
-		std::pair<DeadFrame2D::Engine::ContactEventProvider*, DeadFrame2D::Engine::ContactEventProvider*> GetUserDataFromContact(b2Contact* contact);
+		std::pair<Engine::ContactEventProvider*, Engine::ContactEventProvider*> GetUserDataFromContact(b2Contact* contact);
 
 
 	public:

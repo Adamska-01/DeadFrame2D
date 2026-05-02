@@ -8,15 +8,15 @@
 #include <optional>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	template<>
-	struct RenderResolver<DeadFrame2D::Data::PointRenderData>
+	struct RenderResolver<Data::PointRenderData>
 	{
 		static void Render(
 			IRenderBackend& renderBackend,
-			const DeadFrame2D::Data::PointRenderData& renderData,
-			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera,
+			const Data::PointRenderData& renderData,
+			Engine::ComponentHandle<Engine::Camera> camera,
 			bool requiresScreenSpaceConversion)
 		{
 			Vector2F pos = renderData.pos;
@@ -29,11 +29,11 @@ namespace DeadFrame2D::Core
 			renderBackend.DrawPixel(pos, renderData.color);
 		}
 
-		static std::optional<DeadFrame2D::Data::PointRenderData> Cull(
-			const DeadFrame2D::Data::PointRenderData& renderData,
-			DeadFrame2D::Engine::ComponentHandle<DeadFrame2D::Engine::Camera> camera)
+		static std::optional<Data::PointRenderData> Cull(
+			const Data::PointRenderData& renderData,
+			Engine::ComponentHandle<Engine::Camera> camera)
 		{
-			using namespace DeadFrame2D::Utilities;
+			using namespace DF2D::Utilities;
 
 
 			// Always visible if no camera (screen space)

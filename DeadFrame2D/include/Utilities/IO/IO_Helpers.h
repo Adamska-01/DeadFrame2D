@@ -8,7 +8,7 @@
 /**
  * Utility functions related to filesystem operations.
  */
-namespace DeadFrame2D::Utilities::IO_Helpers
+namespace DF2D::Utilities::IO_Helpers
 {
 	/**
 	 * Retrieves all regular file paths from a given folder.

@@ -9,7 +9,7 @@
 #include <unordered_map>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class Transform;
 	class SpriteRenderer;
@@ -25,13 +25,13 @@ namespace DeadFrame2D::Engine
 
 		ComponentHandle<SpriteRenderer> sprite;
 
-		std::unordered_map<std::string, DeadFrame2D::Data::SpriteAnimationProperties> animations;
+		std::unordered_map<std::string, Data::SpriteAnimationProperties> animations;
 
 		std::string currentAnimationID;
 
-		DeadFrame2D::Data::SpriteAnimationState animState;
+		Data::SpriteAnimationState animState;
 
-		DeadFrame2D::Data::RenderTask renderTask;
+		Data::RenderTask renderTask;
 
 
 	public:
@@ -45,7 +45,7 @@ namespace DeadFrame2D::Engine
 		virtual void Draw() override;
 
 
-		void AddAnimation(const DeadFrame2D::Data::SpriteAnimationProperties& properties);
+		void AddAnimation(const Data::SpriteAnimationProperties& properties);
 
 		void PlayAnimation(const std::string& name, bool restartIfPlaying = false);
 
@@ -55,7 +55,7 @@ namespace DeadFrame2D::Engine
 
 		float GetAnimationProgressRatio() const;
 
-		const DeadFrame2D::Data::SpriteAnimationProperties* GetCurrentAnimationProperties() const;
+		const Data::SpriteAnimationProperties* GetCurrentAnimationProperties() const;
 
 		SDL_Rect GetFrameRect() const;
 	};

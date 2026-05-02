@@ -2,9 +2,9 @@
 #include <unordered_set>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
-	using namespace DeadFrame2D::Models;
+	using namespace DF2D::Models;
 
 
 	RuntimeActionMap::RuntimeActionMap(InputActionMap actionMap)

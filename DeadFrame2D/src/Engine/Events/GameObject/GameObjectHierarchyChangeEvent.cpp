@@ -2,7 +2,7 @@
 #include "Engine/Events/GameObject/GameObjectHierarchyChangeEvent.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	GameObjectHierarchyChangeEvent::GameObjectHierarchyChangeEvent(ObjectHandle<GameObject> obj, ObjectHandle<GameObject> oldParent, ObjectHandle<GameObject> newParent)
 		: obj(obj),

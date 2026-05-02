@@ -2,7 +2,7 @@
 #include "Engine/ECS/Entity/Object/Handle/ObjectHandleBase.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	class ISceneHandleProvider;
 
@@ -50,7 +50,7 @@ namespace DeadFrame2D::Engine
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
 	template<typename T>
 	inline ObjectHandle<T>::ObjectHandle(std::weak_ptr<ISceneHandleProvider> scene, uint32_t index, uint32_t generation)

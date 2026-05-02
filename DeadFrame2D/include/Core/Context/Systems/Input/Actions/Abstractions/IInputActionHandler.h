@@ -3,7 +3,7 @@
 #include "Models/Input/ActionMap/Types/InputControlType.h"
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	class InputDevice;
 

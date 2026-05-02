@@ -3,7 +3,7 @@
 #include <algorithm>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	// Necessary when running multi-threaded coroutines
 	thread_local Task* currentTask = nullptr;

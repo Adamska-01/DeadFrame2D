@@ -10,10 +10,10 @@
 #include <limits>
 
 
-namespace DeadFrame2D::Engine
+namespace DF2D::Engine
 {
-	using namespace DeadFrame2D::Core;
-	using namespace DeadFrame2D::Utilities;
+	using namespace DF2D::Core;
+	using namespace DF2D::Utilities;
 
 
 	CameraFollow::CameraFollow(ComponentHandle<Camera> camera, ObjectHandle<GameObject> target)

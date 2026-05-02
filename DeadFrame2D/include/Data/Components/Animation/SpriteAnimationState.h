@@ -2,7 +2,7 @@
 #include <SDL_render.h>
 
 
-namespace DeadFrame2D::Data
+namespace DF2D::Data
 {
 	/** @brief Runtime state of an animation. */
 	struct SpriteAnimationState

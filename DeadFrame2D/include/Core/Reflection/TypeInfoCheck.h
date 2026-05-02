@@ -2,7 +2,7 @@
 #include <type_traits>
 
 
-namespace DeadFrame2D::Core
+namespace DF2D::Core
 {
 	template<typename, typename = void>
 	struct HasTypeInfo : std::false_type
