@@ -1,6 +1,6 @@
 #pragma once
-#include "Data/Input/InputDeviceID.h"
-#include "Data/Input/InputUserID.h"
+#include "Data/Systems/Input/InputDeviceID.h"
+#include "Data/Systems/Input/InputUserID.h"
 #include <string>
 #include <vector>
 

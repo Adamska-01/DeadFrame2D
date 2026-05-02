@@ -1,7 +1,7 @@
 #pragma once
-#include "Data/Animation/SpriteAnimationProperties.h"
-#include "Data/Animation/SpriteAnimationState.h"
-#include "Data/Rendering/Pipeline/RenderTask.h"
+#include "Data/Components/Animation/SpriteAnimationProperties.h"
+#include "Data/Components/Animation/SpriteAnimationState.h"
+#include "Data/Systems/Rendering/Pipeline/RenderTask.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/GameComponent.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"

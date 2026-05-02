@@ -1,6 +1,6 @@
 #pragma once
 #include "Core/Context/Systems/Audio/AudioManager.h"
-#include "Data/Collision/CollisionInfo.h"
+#include "Data/Components/Collision/CollisionInfo.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Component/Collisions/Abstractions/ContactEventProvider.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"

@@ -1,5 +1,5 @@
 #pragma once
-#include "Data/Rendering/Pipeline/Shapes/SpriteRenderData.h"
+#include "Data/Systems/Rendering/Pipeline/Shapes/SpriteRenderData.h"
 #include <vector>
 
 

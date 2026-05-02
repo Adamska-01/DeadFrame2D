@@ -1,6 +1,6 @@
 #pragma once
 #include "Core/Math/Vector2.h"
-#include "Data/Collision/PhysicsMaterial.h"
+#include "Data/Components/Collision/PhysicsMaterial.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Component/Collisions/Collider2D.h"
 

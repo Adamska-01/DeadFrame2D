@@ -1,7 +1,7 @@
 #include "Core/Context/Systems/Graphics/TextureManager.h"
 #include "Core/Context/Systems/Rendering/RenderSystem.h"
 #include "Core/Context/Systems/UI/UIManager.h"
-#include "Data/Components/UI/TextMeshComponentModel.h"
+#include "Data/Blueprints/UI/Text/TextMeshComponentModel.h"
 #include "Engine/ECS/Component/Transform.h"
 #include "Engine/ECS/Component/UI/Canvas.h"
 #include "Engine/ECS/Component/UI/TextMesh.h"

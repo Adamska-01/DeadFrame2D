@@ -1,6 +1,6 @@
 #include "Converters/Physics/PhysicsConversions.h"
 #include "Core/Context/Systems/Physics/PhysicsEngine2D.h"
-#include "Data/Collision/PhysicsMaterial.h"
+#include "Data/Components/Collision/PhysicsMaterial.h"
 #include "Engine/ECS/Component/Audio/AudioListener.h"
 #include "Engine/ECS/Component/Transform.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"

@@ -1,4 +1,4 @@
-#include "Data/Entity/ObjectEntry.h"
+#include "Data/Services/Scene/ObjectEntry.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
 
 

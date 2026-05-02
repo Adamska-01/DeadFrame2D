@@ -1,7 +1,7 @@
 #include "Converters/Physics/PhysicsConversions.h"
 #include "Core/Context/Systems/Coroutines/CoroutineScheduler.h"
 #include "Core/Context/Systems/Physics/PhysicsEngine2D.h"
-#include "Data/Physics/BodyDefinition2D.h"
+#include "Data/Components/Physics/BodyDefinition2D.h"
 #include "Engine/ECS/Component/Physics/RigidBody2D.h"
 #include "Engine/ECS/Component/Transform.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"

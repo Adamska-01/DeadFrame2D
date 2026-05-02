@@ -1,7 +1,7 @@
 #pragma once
-#include "Data/Rendering/Pipeline/RenderPhase.h"
-#include "Data/Rendering/Pipeline/RenderSortKey.h"
-#include "Data/Rendering/Pipeline/RenderTask.h"
+#include "Data/Systems/Rendering/Pipeline/RenderPhase.h"
+#include "Data/Systems/Rendering/Pipeline/RenderSortKey.h"
+#include "Data/Systems/Rendering/Pipeline/RenderTask.h"
 #include "DF2D_API.h"
 #include <array>
 #include <unordered_map>

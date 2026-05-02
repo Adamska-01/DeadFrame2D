@@ -1,5 +1,5 @@
 #pragma once
-#include "Data/Rendering/CanvasRenderMode.h"
+#include "Data/Components/UI/Canvas/CanvasRenderMode.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
 

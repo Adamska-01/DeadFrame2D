@@ -8,7 +8,7 @@
 #include "Core/Context/Systems/Input/Input.h"
 #include "Core/Context/Systems/Input/User/InputUser.h"
 #include "Core/Context/Systems/Input/User/InputUserManager.h"
-#include "Data/Input/InputControlState.h"
+#include "Data/Systems/Input/InputControlState.h"
 #include "Engine/ECS/System/Events/DispatchableEvent.h"
 #include "Engine/ECS/System/Events/EventDispatcher.h"
 #include "Engine/Events/Context/Input/InputUserCreatedEvent.h"

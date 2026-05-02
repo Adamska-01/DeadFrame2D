@@ -1,5 +1,5 @@
 #pragma once
-#include "Data/Blueprints/UI/ButtonBlueprintModel.h"
+#include "Data/Blueprints/UI/Button/ButtonBlueprintModel.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
 

@@ -3,7 +3,7 @@
 #include "Core/Context/Systems/Rendering/Resolvers/Abstractions/RenderResolver.h"
 #include "Core/Math/Circle.h"
 #include "Core/Math/Vector2.h"
-#include "Data/Rendering/Pipeline/Shapes/CircleBatchRenderData.h"
+#include "Data/Systems/Rendering/Pipeline/Shapes/CircleBatchRenderData.h"
 #include "Engine/ECS/Component/Rendering/Camera/Camera.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Utilities/Collisions/CollisionUtils.h"

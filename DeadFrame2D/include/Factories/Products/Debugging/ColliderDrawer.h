@@ -1,15 +1,15 @@
 #pragma once
 #include "Core/Context/Systems/Rendering/RenderSystem.h"
-#include "Data/Rendering/Pipeline/Shapes/CircleBatchRenderData.h"
-#include "Data/Rendering/Pipeline/Shapes/LineBatchRenderData.h"
-#include "Data/Rendering/Pipeline/Shapes/PointBatchRenderData.h"
+#include "Data/Systems/Rendering/Pipeline/Shapes/CircleBatchRenderData.h"
+#include "Data/Systems/Rendering/Pipeline/Shapes/LineBatchRenderData.h"
+#include "Data/Systems/Rendering/Pipeline/Shapes/PointBatchRenderData.h"
 #include <box2d/box2d.h>
 
 
 // Debug Color Legend:
-// 
+//
 // | ---------------------- | ------------------------- | --------------------------------------------------------- |
-// |	  **Element**		|         **Color**			|						**Notes**							|
+// |	  **Element**		|		  **Color**			|						**Notes**							|
 // | ---------------------- | ------------------------- | --------------------------------------------------------- |
 // | Static bodies			| Green						| These don't move (e.g., ground, walls).					|
 // | Kinematic bodies		| Blue						| Move manually but not affected by forces.					|

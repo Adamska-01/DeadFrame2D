@@ -1,7 +1,7 @@
 #pragma once
-#include "Data/Rendering/Pipeline/RenderData.h"
-#include "Data/Rendering/Pipeline/RenderPhase.h"
-#include "Data/Rendering/Pipeline/RenderSortKey.h"
+#include "Data/Systems/Rendering/Pipeline/RenderData.h"
+#include "Data/Systems/Rendering/Pipeline/RenderPhase.h"
+#include "Data/Systems/Rendering/Pipeline/RenderSortKey.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 
 

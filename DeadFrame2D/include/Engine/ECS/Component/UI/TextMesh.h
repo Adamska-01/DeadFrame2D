@@ -1,6 +1,6 @@
 #pragma once
 #include "Core/Math/Vector2.h"
-#include "Data/UI/FontStyle.h"
+#include "Data/Components/UI/Text/FontStyle.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"

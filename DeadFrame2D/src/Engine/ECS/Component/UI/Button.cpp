@@ -1,7 +1,7 @@
 #include "Constants/CommonColors.h"
 #include "Core/Context/Systems/Graphics/TextureManager.h"
 #include "Core/Context/Systems/Rendering/RenderSystem.h"
-#include "Data/Components/UI/Button/ButtonComponentModel.h"
+#include "Data/Blueprints/UI/Button/ButtonComponentModel.h"
 #include "Engine/ECS/Component/Transform.h"
 #include "Engine/ECS/Component/UI/Button.h"
 #include "Engine/ECS/Component/UI/Canvas.h"

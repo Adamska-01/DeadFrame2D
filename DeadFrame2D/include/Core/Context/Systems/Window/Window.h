@@ -2,7 +2,7 @@
 #include "Core/Context/Abstractions/ICoreSystem.h"
 #include "Core/Math/Vector2.h"
 #include "Core/Services/Events/Abstractions/IEventProcessor.h"
-#include "Data/Window/WindowMode.h"
+#include "Data/Systems/Window/WindowMode.h"
 #include "DF2D_API.h"
 #include "Models/Window/WindowConfig.h"
 #include <SDL_video.h>

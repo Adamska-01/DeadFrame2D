@@ -1,7 +1,7 @@
 #pragma once
 #include "Constants/Paths/ResourcePaths.h"
 #include "Core/Math/Vector2.h"
-#include "Data/UI/FontStyle.h"
+#include "Data/Components/UI/Text/FontStyle.h"
 #include <string>
 #include <string_view>
 

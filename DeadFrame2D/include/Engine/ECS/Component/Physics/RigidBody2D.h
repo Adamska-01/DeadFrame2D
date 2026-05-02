@@ -1,8 +1,8 @@
 #pragma once
 #include "Core/Context/Systems/Coroutines/Task.h"
 #include "Core/Math/Vector2.h"
-#include "Data/Physics/BodyDefinition2D.h"
-#include "Data/Physics/BodyType2D.h"
+#include "Data/Components/Physics/BodyDefinition2D.h"
+#include "Data/Components/Physics/BodyType2D.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/GameComponent.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"

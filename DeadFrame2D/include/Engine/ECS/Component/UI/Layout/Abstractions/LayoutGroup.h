@@ -1,5 +1,5 @@
 #pragma once
-#include "Data/UI/LayoutPadding.h"
+#include "Data/Components/UI/Layout/LayoutPadding.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/GameComponent.h"
 #include <memory>

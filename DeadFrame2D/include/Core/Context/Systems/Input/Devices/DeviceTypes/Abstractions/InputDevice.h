@@ -1,6 +1,6 @@
 #pragma once
-#include "Data/Input/InputControlState.h"
-#include "Data/Input/InputDeviceID.h"
+#include "Data/Systems/Input/InputControlState.h"
+#include "Data/Systems/Input/InputDeviceID.h"
 #include "DF2D_API.h"
 #include "Models/Input/InputDeviceType.h"
 #include <string>

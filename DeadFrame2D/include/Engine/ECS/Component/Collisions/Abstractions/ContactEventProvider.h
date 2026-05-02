@@ -1,5 +1,5 @@
 #pragma once
-#include "Data/Collision/CollisionInfo.h"
+#include "Data/Components/Collision/CollisionInfo.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/GameComponent.h"
 #include "Utilities/Delegates/MulticastDelegate.h"

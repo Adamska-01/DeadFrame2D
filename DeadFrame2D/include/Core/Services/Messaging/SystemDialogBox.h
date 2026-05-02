@@ -1,5 +1,5 @@
 #pragma once
-#include "Data/Window/MessageBoxConfig.h"
+#include "Data/Services/Messaging/MessageBoxConfig.h"
 #include "DF2D_API.h"
 #include <string>
 #include <vector>

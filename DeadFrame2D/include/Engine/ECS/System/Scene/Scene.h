@@ -1,5 +1,5 @@
 #pragma once
-#include "Data/Entity/ObjectEntry.h"
+#include "Data/Services/Scene/ObjectEntry.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"

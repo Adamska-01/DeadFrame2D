@@ -1,7 +1,7 @@
 #pragma once
 #include "Core/Context/Systems/Rendering/Abstractions/IRenderBackend.h"
 #include "Core/Context/Systems/Rendering/Resolvers/Abstractions/RenderResolver.h"
-#include "Data/Rendering/Pipeline/Shapes/PointRenderData.h"
+#include "Data/Systems/Rendering/Pipeline/Shapes/PointRenderData.h"
 #include "Engine/ECS/Component/Rendering/Camera/Camera.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Utilities/Collisions/CollisionUtils.h"

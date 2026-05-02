@@ -1,6 +1,6 @@
 #pragma once
 #include "Core/Math/Vector2.h"
-#include "Data/Rendering/ScrollDirection.h"
+#include "Data/Components/Rendering/ScrollDirection.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Component/Rendering/SpriteRenderer.h"
 #include <memory>

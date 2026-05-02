@@ -1,6 +1,6 @@
 #pragma once
 #include "Core/Math/Vector2.h"
-#include "Data/Physics/BodyType2D.h"
+#include "Data/Components/Physics/BodyType2D.h"
 
 
 namespace DeadFrame2D::Data

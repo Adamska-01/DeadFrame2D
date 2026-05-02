@@ -1,7 +1,7 @@
 #pragma once
-#include "Data/Collision/PhysicsMaterial.h"
-#include "Data/Physics/BodyDefinition2D.h"
-#include "Data/Physics/BodyType2D.h"
+#include "Data/Components/Collision/PhysicsMaterial.h"
+#include "Data/Components/Physics/BodyDefinition2D.h"
+#include "Data/Components/Physics/BodyType2D.h"
 #include <box2d/b2_body.h>
 #include <cassert>
 
