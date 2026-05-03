@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Context/Abstractions/ICoreSystem.h"
+#include "Data/Systems/CoreContext.h"
 #include "DF2D_API.h"
 #include "Models/SystemConfig.h"
 
@@ -9,11 +10,11 @@ namespace DF2D::Core
 	class DF2D_API SystemInitializer
 	{
 	private:
-		std::array<ICoreSystem*, 8> subSystems;
+		DF2D::Data::CoreContext ctx;
 
 
 	public:
-		SystemInitializer();
+		SystemInitializer() = default;
 
 		~SystemInitializer();
 

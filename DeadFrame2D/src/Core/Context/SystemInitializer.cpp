@@ -7,29 +7,24 @@
 #include "Core/Context/Systems/Rendering/Renderer.h"
 #include "Core/Context/Systems/UI/UIManager.h"
 #include "Core/Context/Systems/Window/Window.h"
+#include "Helpers/Context/CoreContextIterator.h"
 
 
 namespace DF2D::Core
 {
 	using namespace DF2D::Constants;
+	using namespace DF2D::Data;
 	using namespace DF2D::Models;
+	using namespace DF2D::Internal;
 
-
-	SystemInitializer::SystemInitializer()
-	{
-		subSystems.fill(nullptr);
-	}
 
 	SystemInitializer::~SystemInitializer()
 	{
-		// Delete in reverse order to respect dependencies
-		for (int i = static_cast<int>(subSystems.size()) - 1; i >= 0; --i)
+		CoreContextIterator::ForEach(ctx, [](auto*& system)
 		{
-			if (subSystems[i] == nullptr)
-				continue;
-
-			delete subSystems[i];
-		}
+			delete system;
+			system = nullptr;
+		});
 
 		if (SDL_WasInit(SDL_INIT_EVERYTHING))
 		{
@@ -43,52 +38,50 @@ namespace DF2D::Core
 	{
 		auto window = new Window(config.window);
 
-		subSystems[0] = window;
+		auto renderer = new Renderer(window->GetWindow(), config.rendering);
 
-		subSystems[1] = new Renderer(window->GetWindow(), config.rendering);
-
-		subSystems[2] = new Input();
-
-		subSystems[3] = new TextureManager();
-
-		subSystems[4] = new UIManager();
-
-		subSystems[5] = new AudioManager(config.audio);
-
-		subSystems[6] = new PhysicsEngine2D(config.physics);
-
-		subSystems[7] = new CoroutineScheduler();
+		ctx = CoreContext
+		{
+			.audioManager = new AudioManager(config.audio),
+			.coroutineScheduler = new CoroutineScheduler(),
+			.textureManager = new TextureManager(),
+			.input = new Input(),
+			.physicsEngine = new PhysicsEngine2D(config.physics),
+			.renderer = renderer,
+			.uiManager = new UIManager(),
+			.window = window
+		};
 	}
 
 	void SystemInitializer::BeginFrame()
 	{
-		for (const auto& subSystem : subSystems)
+		CoreContextIterator::ForEach(ctx, [](auto* system)
 		{
-			subSystem->BeginFrame();
-		}
+			system->BeginFrame();
+		});
 	}
 
 	void SystemInitializer::PreUpdate(float deltaTime)
 	{
-		for (const auto& subSystem : subSystems)
+		CoreContextIterator::ForEach(ctx, [&](auto* system)
 		{
-			subSystem->PreUpdate(deltaTime);
-		}
+			system->PreUpdate(deltaTime);
+		});
 	}
 
 	void SystemInitializer::EndUpdate(float deltaTime)
 	{
-		for (const auto& subSystem : subSystems)
+		CoreContextIterator::ForEach(ctx, [&](auto* system)
 		{
-			subSystem->EndUpdate(deltaTime);
-		}
+			system->EndUpdate(deltaTime);
+		});
 	}
 
 	void SystemInitializer::EndDraw()
 	{
-		for (const auto& subSystem : subSystems)
+		CoreContextIterator::ForEach(ctx, [](auto* system)
 		{
-			subSystem->EndDraw();
-		}
+			system->EndDraw();
+		});
 	}
 }
