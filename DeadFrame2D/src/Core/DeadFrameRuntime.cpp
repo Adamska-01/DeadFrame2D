@@ -1,7 +1,9 @@
 #include "Constants/Paths/ResourcePaths.h"
+#include "Core/Context/SystemInitializer.h"
 #include "Core/Context/Systems/Graphics/TextureManager.h"
 #include "Core/Context/Systems/Rendering/Renderer.h"
 #include "Core/DeadFrameRuntime.h"
+#include "Core/Services/ServiceInitializer.h"
 #include "Data/Systems/Rendering/Pipeline/RenderTask.h"
 #include "Models/Other/SplashScreenConfig.h"
 #include "Models/SystemConfig.h"
@@ -21,27 +23,16 @@ namespace DF2D::Core
 	{
 		auto systemConfig = SystemConfig::LoadFromFiles();
 
-		engineSubSystems = std::make_unique<SystemInitializer>();
-		engineSubSystems->InitializeSubSystems(systemConfig);
+		systemInitializer = std::make_unique<SystemInitializer>(systemConfig);
 
-		sceneManager = std::make_unique<SceneManager>();
-
-		auto targetFramerate = systemConfig.rendering.targetFramerate;
-		if (targetFramerate.has_value())
-		{
-			frameTimer.SetTargetFramerate(*targetFramerate);
-		}
-		else
-		{
-			frameTimer.UnlockFramerate();
-		}
+		serviceInitializer = std::make_unique<ServiceInitializer>(systemConfig);
 	}
 
 	DeadFrameRuntime::~DeadFrameRuntime()
 	{
 		// Delete subsystems last
-		sceneManager.reset();
-		engineSubSystems.reset();
+		serviceInitializer.reset();
+		systemInitializer.reset();
 	}
 
 	std::optional<int> DeadFrameRuntime::RenderSplashScreen()
@@ -78,14 +69,18 @@ namespace DF2D::Core
 			}
 		};
 
+		auto serviceCtx = serviceInitializer->GetServiceContext();
+		auto frameTimer = serviceCtx.frameTimer;
+		auto eventManager = serviceCtx.eventManager;
+
 		while (elapsedTime < totalDuration)
 		{
-			frameTimer.StartClock();
+			frameTimer->StartClock();
 
-			if (const auto ecode = eventManager.ProcessEvents())
+			if (const auto ecode = eventManager->ProcessEvents())
 				return *ecode;
 
-			elapsedTime += frameTimer.DeltaTime();
+			elapsedTime += frameTimer->DeltaTime();
 
 			auto alpha = static_cast<float>(MaxAlpha);
 
@@ -107,8 +102,8 @@ namespace DF2D::Core
 
 			Renderer::ClearAndPresentBuffer();
 
-			frameTimer.EndClock();
-			frameTimer.DelayByFrameTime();
+			frameTimer->EndClock();
+			frameTimer->DelayByFrameTime();
 		}
 
 		return std::nullopt;
@@ -119,37 +114,42 @@ namespace DF2D::Core
 		if (const auto& splashCode = RenderSplashScreen())
 			return *splashCode;
 
+		auto serviceCtx = serviceInitializer->GetServiceContext();
+		auto frameTimer = serviceCtx.frameTimer;
+		auto eventManager = serviceCtx.eventManager;
+		auto sceneManager = serviceCtx.sceneManager;
+
 		while (true)
 		{
-			frameTimer.StartClock();
+			frameTimer->StartClock();
 
-			auto deltaTime = frameTimer.DeltaTime();
+			auto deltaTime = frameTimer->DeltaTime();
 
-			engineSubSystems->BeginFrame();
+			systemInitializer->BeginFrame();
 
 			// Only returns in case of QUIT event
-			if (const auto& ecode = eventManager.ProcessEvents())
+			if (const auto& ecode = eventManager->ProcessEvents())
 				return *ecode;
 
-			engineSubSystems->PreUpdate(deltaTime);
+			systemInitializer->PreUpdate(deltaTime);
 
 			sceneManager->UpdateScene(deltaTime);
 
-			engineSubSystems->EndUpdate(deltaTime);
+			systemInitializer->EndUpdate(deltaTime);
 
 			sceneManager->LateUpdateScene(deltaTime);
 
 			sceneManager->DrawScene();
 
-			engineSubSystems->EndDraw();
+			systemInitializer->EndDraw();
 
 			Renderer::ClearAndPresentBuffer();
 
 			sceneManager->LoadNewSceneIfAvailable();
 
 			// FPS and delay
-			frameTimer.EndClock();
-			frameTimer.DelayByFrameTime();
+			frameTimer->EndClock();
+			frameTimer->DelayByFrameTime();
 		}
 	}
 }

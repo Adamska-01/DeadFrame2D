@@ -18,23 +18,7 @@ namespace DF2D::Core
 	using namespace DF2D::Internal;
 
 
-	SystemInitializer::~SystemInitializer()
-	{
-		CoreContextIterator::ForEach(ctx, [](auto*& system)
-		{
-			delete system;
-			system = nullptr;
-		});
-
-		if (SDL_WasInit(SDL_INIT_EVERYTHING))
-		{
-			SDL_Quit();
-
-			std::cout << "[Info] SDL successfully quit.\n";
-		}
-	}
-
-	void SystemInitializer::InitializeSubSystems(SystemConfig config)
+	SystemInitializer::SystemInitializer(SystemConfig config)
 	{
 		auto window = new Window(config.window);
 
@@ -52,6 +36,23 @@ namespace DF2D::Core
 			.window = window
 		};
 	}
+
+	SystemInitializer::~SystemInitializer()
+	{
+		CoreContextIterator::ForEach(ctx, [](auto*& system)
+		{
+			delete system;
+			system = nullptr;
+		});
+
+		if (SDL_WasInit(SDL_INIT_EVERYTHING))
+		{
+			SDL_Quit();
+
+			std::cout << "[Info] SDL successfully quit.\n";
+		}
+	}
+
 
 	void SystemInitializer::BeginFrame()
 	{

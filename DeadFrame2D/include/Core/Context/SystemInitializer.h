@@ -10,16 +10,13 @@ namespace DF2D::Core
 	class DF2D_API SystemInitializer
 	{
 	private:
-		DF2D::Data::CoreContext ctx;
+		Data::CoreContext ctx;
 
 
 	public:
-		SystemInitializer() = default;
+		SystemInitializer(Models::SystemConfig config);
 
 		~SystemInitializer();
-
-
-		void InitializeSubSystems(Models::SystemConfig config);
 
 
 		void BeginFrame();

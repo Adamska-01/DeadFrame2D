@@ -1,6 +1,7 @@
 #pragma once
 #include "DF2D_API.h"
 #include <chrono>
+#include <optional>
 
 
 namespace DF2D::Core
@@ -32,7 +33,7 @@ namespace DF2D::Core
 
 
 	public:
-		FrameTimer();
+		FrameTimer(std::optional<int> targetFramerate);
 
 
 		void CalculateFPS();

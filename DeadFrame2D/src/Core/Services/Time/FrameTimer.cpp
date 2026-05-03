@@ -17,7 +17,7 @@ namespace DF2D::Core
 	std::chrono::duration<float> FrameTimer::workTime;
 
 
-	FrameTimer::FrameTimer()
+	FrameTimer::FrameTimer(std::optional<int> targetFramerate)
 		: countedFrames(0),
 		counterDelay(0),
 		isFpsLocked(true)
@@ -25,7 +25,14 @@ namespace DF2D::Core
 		start = system_clock::now();
 		end = start;
 
-		SetTargetFramerate(60);
+		if (targetFramerate.has_value())
+		{
+			SetTargetFramerate(*targetFramerate);
+		}
+		else
+		{
+			UnlockFramerate();
+		}
 	}
 
 	void FrameTimer::CalculateFPS()
