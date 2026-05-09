@@ -1,4 +1,6 @@
 #pragma once
+#include "Data/Services/ServiceContext.h"
+#include "Data/Systems/CoreContext.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
@@ -32,6 +34,10 @@ namespace DF2D::Engine
 
 		static std::function<std::shared_ptr<Scene>()> newSceneFactory;
 
+		static Data::CoreContext coreCtx;
+
+		static Data::ServiceContext serviceCtx;
+
 
 		void UpdateScene(float deltaTime) const;
 
@@ -44,6 +50,9 @@ namespace DF2D::Engine
 
 		template<typename T, typename... Args>
 		static ObjectHandle<T> Instantiate(Args&&... args);
+
+
+		void SetContexts(Data::CoreContext coreCtx, Data::ServiceContext serviceCtx);
 
 
 	public:
@@ -82,7 +91,7 @@ namespace DF2D::Engine
 			throw std::runtime_error("There is no active scene! Load a scene before instantiating a GameObject!");
 		}
 
-		return currentScene->template Instantiate<T>(std::forward<Args>(args)...);
+		return currentScene->template Instantiate<T>(coreCtx, serviceCtx, std::forward<Args>(args)...);
 	}
 
 	template<typename TScene, typename ...Args>

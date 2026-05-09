@@ -7,15 +7,25 @@
 namespace DF2D::Engine
 {
 	using namespace DF2D::Core;
+	using namespace DF2D::Data;
 
 
 	std::shared_ptr<Scene> SceneManager::currentScene = nullptr;
 	std::function<std::shared_ptr<Scene>()> SceneManager::newSceneFactory = {};
+	Data::CoreContext SceneManager::coreCtx;
+	Data::ServiceContext SceneManager::serviceCtx;
 
 
 	SceneManager::~SceneManager()
 	{
 		currentScene.reset();
+	}
+
+
+	void SceneManager::SetContexts(CoreContext coreCtx, ServiceContext serviceCtx)
+	{
+		this->coreCtx = coreCtx;
+		this->serviceCtx = serviceCtx;
 	}
 
 	void SceneManager::UpdateScene(float deltaTime) const
