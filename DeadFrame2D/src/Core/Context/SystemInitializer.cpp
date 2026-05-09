@@ -85,4 +85,9 @@ namespace DF2D::Core
 				system->EndDraw();
 			});
 	}
+
+	CoreContext SystemInitializer::GetContext() const
+	{
+		return ctx;
+	}
 }

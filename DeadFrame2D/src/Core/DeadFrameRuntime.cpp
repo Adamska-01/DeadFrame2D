@@ -24,7 +24,6 @@ namespace DF2D::Core
 		auto systemConfig = SystemConfig::LoadFromFiles();
 
 		systemInitializer = std::make_unique<SystemInitializer>(systemConfig);
-
 		serviceInitializer = std::make_unique<ServiceInitializer>(systemConfig);
 	}
 

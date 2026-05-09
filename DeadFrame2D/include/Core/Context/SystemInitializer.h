@@ -26,5 +26,8 @@ namespace DF2D::Core
 		void EndUpdate(float deltaTime);
 
 		void EndDraw();
+
+
+		Data::CoreContext GetContext() const;
 	};
 }
