@@ -25,6 +25,11 @@ namespace DF2D::Core
 
 		systemInitializer = std::make_unique<SystemInitializer>(systemConfig);
 		serviceInitializer = std::make_unique<ServiceInitializer>(systemConfig);
+
+		auto coreCtx = systemInitializer->GetCoreContext();
+		auto serviceCtx = serviceInitializer->GetServiceContext();
+
+		serviceCtx.sceneManager->SetContexts(coreCtx, serviceCtx);
 	}
 
 	DeadFrameRuntime::~DeadFrameRuntime()

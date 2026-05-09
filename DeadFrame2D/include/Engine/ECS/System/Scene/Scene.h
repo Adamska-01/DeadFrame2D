@@ -1,5 +1,7 @@
 #pragma once
 #include "Data/Services/Scene/ObjectEntry.h"
+#include "Data/Services/ServiceContext.h"
+#include "Data/Systems/CoreContext.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
@@ -46,7 +48,7 @@ namespace DF2D::Engine
 
 
 		template<typename T, typename... Args>
-		ObjectHandle<T> Instantiate(Args&&... args);
+		ObjectHandle<T> Instantiate(Data::CoreContext coreCtx, Data::ServiceContext serviceCtx, Args&&... args);
 
 		template<typename Fn>
 		void TraverseRoots(bool includeInactive, Fn&& fn);
@@ -111,7 +113,7 @@ namespace DF2D::Engine
 namespace DF2D::Engine
 {
 	template<typename T, typename ...Args>
-	inline ObjectHandle<T> Scene::Instantiate(Args && ...args)
+	inline ObjectHandle<T> Scene::Instantiate(Data::CoreContext coreCtx, Data::ServiceContext serviceCtx, Args && ...args)
 	{
 		using namespace DF2D::Data;
 
@@ -124,7 +126,9 @@ namespace DF2D::Engine
 
 		auto handle = ObjectHandle<T>(shared_from_this(), index, entry.generation);
 
+		// Set dependencies
 		entry.object->SetThisHandle(handle);
+		entry.object->SetContexts(coreCtx, serviceCtx);
 
 		// Every GameObject starts with a Transform, which needs to be linked to the owner post-creation.
 		entry.object->componentBucket->ForEach([&handle, obj = entry.object.get()](GameComponent& comp)
