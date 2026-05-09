@@ -1,5 +1,6 @@
 #pragma once
 #include "DF2D_API.h"
+#include "Engine/ECS/Entity/Object/Core/IGameContextProvider.h"
 #include "Engine/ECS/Entity/Object/Core/IGameEntityHandle.h"
 #include "Utilities/Delegates/MulticastDelegate.h"
 #include <functional>
@@ -18,7 +19,7 @@ namespace DF2D::Engine
 	class ObjectHandle;
 
 
-	class DF2D_API GameObjectNotifier : public IGameEntityHandle
+	class DF2D_API GameObjectNotifier : public IGameEntityHandle, public IGameContextProvider
 	{
 	protected:
 		GameObjectNotifier();
