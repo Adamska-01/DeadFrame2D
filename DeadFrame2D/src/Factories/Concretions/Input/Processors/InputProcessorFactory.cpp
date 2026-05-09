@@ -63,5 +63,7 @@ namespace DF2D::Factories
 			return std::make_unique<ClampProcessor>();
 		}
 		}
+
+		throw std::invalid_argument("Unknown ProcessorType");
 	}
 }
