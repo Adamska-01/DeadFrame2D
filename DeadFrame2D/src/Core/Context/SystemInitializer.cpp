@@ -86,7 +86,7 @@ namespace DF2D::Core
 			});
 	}
 
-	CoreContext SystemInitializer::GetContext() const
+	CoreContext SystemInitializer::GetCoreContext() const
 	{
 		return ctx;
 	}

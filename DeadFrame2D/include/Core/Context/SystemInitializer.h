@@ -28,6 +28,6 @@ namespace DF2D::Core
 		void EndDraw();
 
 
-		Data::CoreContext GetContext() const;
+		Data::CoreContext GetCoreContext() const;
 	};
 }
