@@ -1,8 +1,10 @@
 #pragma once
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
+#include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
 #include <functional>
 #include <memory>
+#include <stdexcept>
 #include <tuple>
 #include <type_traits>
 #include <vector>
@@ -21,7 +23,8 @@ namespace DF2D::Engine
 
 	class DF2D_API SceneManager
 	{
-		friend DF2D::Core::DeadFrameRuntime;
+		friend class GameObject;
+		friend Core::DeadFrameRuntime;
 
 
 	private:
@@ -37,6 +40,10 @@ namespace DF2D::Engine
 		void DrawScene() const;
 
 		bool LoadNewSceneIfAvailable();
+
+
+		template<typename T, typename... Args>
+		static ObjectHandle<T> Instantiate(Args&&... args);
 
 
 	public:
@@ -65,6 +72,19 @@ namespace DF2D::Engine
 
 namespace DF2D::Engine
 {
+	template<typename T, typename ...Args>
+	inline ObjectHandle<T> SceneManager::Instantiate(Args && ...args)
+	{
+		static_assert(std::is_base_of<GameObject, T>::value, "T must derive from GameObject");
+
+		if (!currentScene)
+		{
+			throw std::runtime_error("There is no active scene! Load a scene before instantiating a GameObject!");
+		}
+
+		return currentScene->template Instantiate<T>(std::forward<Args>(args)...);
+	}
+
 	template<typename TScene, typename ...Args>
 	inline void SceneManager::LoadScene(Args && ...args)
 	{

@@ -18,7 +18,7 @@ namespace DF2D::Engine
 
 	class DF2D_API Scene : public std::enable_shared_from_this<Scene>, public ISceneHandleProvider
 	{
-		friend class GameObject;
+		friend class SceneManager;
 
 
 	private:

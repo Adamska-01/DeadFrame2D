@@ -10,8 +10,6 @@ namespace DF2D::Engine
 {
 	class Transform;
 
-	class Scene;
-
 	class ComponentBucket;
 
 
@@ -25,9 +23,6 @@ namespace DF2D::Engine
 
 
 		void PropagateActiveStateToChildren();
-
-
-		static Scene* SafeGetActiveScene();
 
 
 	protected:
@@ -96,6 +91,7 @@ namespace DF2D::Engine
 #include "Engine/ECS/Entity/Component/Core/GameComponent.h"
 #include "Engine/ECS/Entity/Component/Storage/ComponentBucket.h"
 #include "Engine/ECS/System/Scene/Scene.h"
+#include "Engine/ECS/System/Scene/SceneManager.h"
 
 
 namespace DF2D::Engine
@@ -103,9 +99,7 @@ namespace DF2D::Engine
 	template<typename T, typename ...Args>
 	inline ObjectHandle<T> GameObject::Instantiate(Args && ...args)
 	{
-		static_assert(std::is_base_of<GameObject, T>::value, "T must derive from GameObject");
-
-		return SafeGetActiveScene()->template Instantiate<T>(std::forward<Args>(args)...);
+		return SceneManager::template Instantiate<T>(std::forward<Args>(args)...);
 	}
 
 	template<typename T>

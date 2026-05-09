@@ -1,4 +1,5 @@
 #include "Engine/ECS/System/Events/EventDispatcher.h"
+#include "Engine/ECS/System/Scene/SceneManager.h"
 #include "Engine/ECS/System/Scene/Scene.h"
 #include "Engine/Events/GameComponent/GameComponentAddedEvent.h"
 #include "Engine/Events/GameObject/GameObjectCreatedEvent.h"

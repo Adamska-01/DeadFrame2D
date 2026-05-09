@@ -1,8 +1,6 @@
 #include "Engine/ECS/Component/Transform.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include "Engine/ECS/System/Events/EventDispatcher.h"
-#include "Engine/ECS/System/Scene/Scene.h"
-#include "Engine/ECS/System/Scene/SceneManager.h"
 #include "Engine/Events/GameObject/GameObjectDestroyedEvent.h"
 #include "Engine/Events/GameObject/GameObjectHierarchyChangeEvent.h"
 #include "Utilities/Helpers/Coroutines/CoroutineHelpers.h"
@@ -48,18 +46,6 @@ namespace DF2D::Engine
 				child->PropagateActiveStateToChildren();
 			}
 		}
-	}
-
-	Scene* GameObject::SafeGetActiveScene()
-	{
-		auto activeScene = SceneManager::GetActiveScene();
-
-		if (!activeScene)
-		{
-			throw std::runtime_error("There is no active scene! Load a scene before instantiating a GameObject!");
-		}
-
-		return const_cast<Scene*>(activeScene);
 	}
 
 	void GameObject::ConstructGameObject()
