@@ -1,95 +1,98 @@
 #include "Core/Context/Systems/Audio/AudioManager.h"
 #include <algorithm>
-#include <algorithm>
-#include <cassert>
-#include <iostream>
 
 
 namespace DF2D::Core
 {
+	using namespace DF2D::Data;
 	using namespace DF2D::Models;
 
 
 	AudioManager::AudioManager(AudioConfig audioConfig, std::unique_ptr<IAudioBackend> backend)
-		: audioConfig(audioConfig), 
+		: audioConfig(audioConfig),
 		backend(std::move(backend))
 	{
 	}
 
 
-	std::shared_ptr<Mix_Music> AudioManager::LoadMusic(const std::string& filePath)
+	void AudioManager::BeginFrame()
+	{
+
+	}
+
+	void AudioManager::PreUpdate(float deltaTime)
+	{
+
+	}
+
+	void AudioManager::EndUpdate(float deltaTime)
+	{
+
+	}
+
+	void AudioManager::EndDraw()
+	{
+
+	}
+
+
+	AudioResourceID AudioManager::LoadMusic(const std::string& filePath)
 	{
 		std::lock_guard lock(mutex);
 
 		auto it = musicCache.find(filePath);
 
 		if (it != musicCache.end())
-		{
-			auto locked = it->second.lock();
+			return it->second;
 
-			if (locked != nullptr)
-				return locked;
+		auto id = backend->LoadMusic(filePath);
+
+		if (id != -1)
+		{
+			musicCache[filePath] = id;
 		}
 
-		auto raw = backend->LoadMusic(filePath);
-
-		if (raw == nullptr)
-			return nullptr;
-
-		auto shared = std::shared_ptr<Mix_Music>(raw, Mix_FreeMusic);
-
-		musicCache[filePath] = shared;
-
-		return shared;
+		return id;
 	}
 
-	std::shared_ptr<Mix_Chunk> AudioManager::LoadSFX(const std::string& filePath)
+	AudioResourceID AudioManager::LoadSFX(const std::string& filePath)
 	{
 		std::lock_guard lock(mutex);
 
 		auto it = sfxCache.find(filePath);
 
 		if (it != sfxCache.end())
-		{
-			auto locked = it->second.lock();
+			return it->second;
 
-			if (locked != nullptr)
-				return locked;
-		}
+		auto id = backend->LoadSFX(filePath);
 
-		auto raw = backend->LoadSFX(filePath);
+		if (id != 0)
+			sfxCache[filePath] = id;
 
-		if (raw == nullptr)
-			return nullptr;
-
-		auto shared = std::shared_ptr<Mix_Chunk>(raw, Mix_FreeChunk);
-
-		sfxCache[filePath] = shared;
-
-		return shared;
+		return id;
 	}
 
-	bool AudioManager::PlayMusics(const std::shared_ptr<Mix_Music>& music, int loops)
+	bool AudioManager::PlayMusics(AudioResourceID music, int loops)
 	{
-		if (music == nullptr)
+		if (music == 0)
 			return false;
 
-		backend->SetMusicVolume(static_cast<int>(audioConfig.masterVolume * audioConfig.musicVolume));
+		backend->SetMusicVolume(audioConfig.masterVolume * audioConfig.musicVolume);
 
-		return backend->PlayMusic(music.get(), loops);
+		return backend->PlayMusic(music, loops);
 	}
 
-	int AudioManager::PlaySFX(const std::shared_ptr<Mix_Chunk>& sfx, int loops)
+	int AudioManager::PlaySFX(AudioResourceID sfx, int loops)
 	{
-		if (sfx == nullptr)
+		if (sfx == 0)
 			return -1;
 
-		auto channel = backend->PlayChannel(-1, sfx.get(), loops);
+		auto channel = backend->PlayChannel(-1, sfx, loops);
 
 		if (channel < 0)
 			return -1;
 
-		backend->SetChannelVolume(channel, static_cast<int>(audioConfig.masterVolume * audioConfig.sfxVolume));
+		backend->SetChannelVolume(channel, audioConfig.masterVolume * audioConfig.sfxVolume);
 
 		return channel;
 	}
@@ -114,21 +117,31 @@ namespace DF2D::Core
 		backend->ResumeMusic();
 	}
 
+	void AudioManager::PauseChannel(int channel)
+	{
+		backend->PauseChannel(channel);
+	}
+
+	void AudioManager::ResumeChannel(int channel)
+	{
+		backend->ResumeChannel(channel);
+	}
+
 	void AudioManager::SetMasterVolume(float v)
 	{
 		audioConfig.masterVolume = std::clamp(v, 0.0f, 1.0f);
 
-		backend->SetMusicVolume(audioConfig.musicVolume);
-		backend->SetChannelVolume(-1, audioConfig.sfxVolume);
+		backend->SetMusicVolume(audioConfig.masterVolume * audioConfig.musicVolume);
+		backend->SetChannelVolume(-1, audioConfig.masterVolume * audioConfig.sfxVolume);
 	}
 
 	void AudioManager::SetMusicVolume(float volume)
-`	{
+	{
 		audioConfig.musicVolume = std::clamp(volume, 0.0f, 1.0f);
 
-		backend->SetMusicVolume(static_cast<int>(audioConfig.masterVolume * audioConfig.musicVolume));
+		backend->SetMusicVolume(audioConfig.masterVolume * audioConfig.musicVolume);
 	}
-	
+
 	void AudioManager::SetSFXVolume(float volume, int sfxChannel)
 	{
 		volume = std::clamp(volume, 0.0f, 1.0f);
@@ -136,16 +149,13 @@ namespace DF2D::Core
 		if (sfxChannel == -1)
 		{
 			audioConfig.sfxVolume = volume;
+
+			backend->SetChannelVolume(-1, audioConfig.masterVolume * audioConfig.sfxVolume);
 		}
 		else
 		{
-			volume *= audioConfig.sfxVolume;
+			backend->SetChannelVolume(sfxChannel, audioConfig.masterVolume * audioConfig.sfxVolume * volume);
 		}
-
-		auto sfxVolume = audioConfig.sfxVolume;
-		auto masterVolume = audioConfig.masterVolume;
-
-		backend->SetChannelVolume(sfxChannel, static_cast<int>(audioConfig.masterVolume * volume));
 	}
 
 	float AudioManager::GetMasterVolume() const

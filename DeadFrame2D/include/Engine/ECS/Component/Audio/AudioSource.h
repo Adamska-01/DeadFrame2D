@@ -1,16 +1,21 @@
 #pragma once
-#include "Core/Context/Systems/Audio/AudioManager.h"
+#include "Core/Context/Systems/Audio/Abstractions/IAudioBackend.h"
 #include "Data/Components/Collision/CollisionInfo.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Component/Collisions/Abstractions/ContactEventProvider.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
-#include <memory>
-#include <string_view>
+#include <string>
 
 
 class b2Body;
 class b2Fixture;
 class b2CircleShape;
+
+
+namespace DF2D::Core
+{
+	class AudioManager;
+}
 
 
 namespace DF2D::Engine
@@ -25,13 +30,15 @@ namespace DF2D::Engine
 
 
 	protected:
+		Core::AudioManager* audioManager;
+
 		ComponentHandle<Transform> transform;
 
 		ComponentHandle<AudioListener> audioListenerInContact;
 
-		std::shared_ptr<Mix_Chunk> sfxClip;
+		Data::AudioResourceID sfxClip;
 
-		std::shared_ptr<Mix_Music> musicTrack;
+		Data::AudioResourceID musicTrack;
 
 		// Using Box2D to detect audio source collisions with audio listeners
 		b2Body* collisionBody;
@@ -67,19 +74,19 @@ namespace DF2D::Engine
 
 		AudioSource(const std::string& audioSource, bool isMusic = false, float volume = 1.0f);
 
-		virtual ~AudioSource() override;
+		~AudioSource() override;
 
 
-		virtual void Init() override;
+		void Init() override;
 
-		virtual void Update(float deltaTime) override;
+		void Update(float deltaTime) override;
 
-		virtual void LateUpdate(float deltaTime) override;
+		void LateUpdate(float deltaTime) override;
 
-		virtual void Draw() override;
+		void Draw() override;
 
 
-		void LoadAudio(const std::string_view& audioSource, bool isMusic = false);
+		void LoadAudio(const std::string& audioSource, bool isMusic = false);
 
 		void Play(bool loop = false);
 

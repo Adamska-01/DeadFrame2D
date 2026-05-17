@@ -7,6 +7,7 @@
 #include "Core/Context/Systems/Rendering/Renderer.h"
 #include "Core/Context/Systems/UI/UIManager.h"
 #include "Core/Context/Systems/Window/Window.h"
+#include "Factories/Concretions/Context/Systems/Audio/AudioBackendFactory.h"
 #include "Helpers/Context/CoreContextIterator.h"
 
 
@@ -15,6 +16,7 @@ namespace DF2D::Core
 	using namespace DF2D::Constants;
 	using namespace DF2D::Data;
 	using namespace DF2D::Models;
+	using namespace DF2D::Factories;
 	using namespace DF2D::Internal;
 
 
@@ -26,7 +28,7 @@ namespace DF2D::Core
 
 		ctx = CoreContext
 		{
-			.audioManager = new AudioManager(config.audio),
+			.audioManager = new AudioManager(config.audio, AudioBackendFactory().CreateProduct(config.audio)),
 			.coroutineScheduler = new CoroutineScheduler(),
 			.textureManager = new TextureManager(),
 			.input = new Input(),

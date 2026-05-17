@@ -1,27 +1,27 @@
 #pragma once
 #include "Core/Context/Abstractions/ICoreSystem.h"
-#include "Core/Context/Systems/Audio/Backends/Abstractions/IAudioBackend.h"
+#include "Core/Context/Systems/Audio/Abstractions/IAudioBackend.h"
+#include "Data/Systems/Audio/AudioResourceID.h"
 #include "DF2D_API.h"
 #include "Models/Audio/AudioConfig.h"
 #include <memory>
 #include <mutex>
 #include <string>
-#include <SDL_mixer.h>
 #include <unordered_map>
 
 
 namespace DF2D::Core
 {
-	class DF2D_API AudioManager
+	class DF2D_API AudioManager : public ICoreSystem
 	{
 	private:
 		Models::AudioConfig audioConfig;
 
 		std::unique_ptr<IAudioBackend> backend;
 
-		std::unordered_map<std::string, std::weak_ptr<Mix_Music>> musicCache;
+		std::unordered_map<std::string, Data::AudioResourceID> musicCache;
 
-		std::unordered_map<std::string, std::weak_ptr<Mix_Chunk>> sfxCache;
+		std::unordered_map<std::string, Data::AudioResourceID> sfxCache;
 
 		std::mutex mutex;
 
@@ -30,14 +30,23 @@ namespace DF2D::Core
 		AudioManager(Models::AudioConfig audioConfig, std::unique_ptr<IAudioBackend> backend);
 
 
-		std::shared_ptr<Mix_Music> LoadMusic(const std::string& filePath);
+		void BeginFrame() override;
 
-		std::shared_ptr<Mix_Chunk> LoadSFX(const std::string& filePath);
+		void PreUpdate(float deltaTime) override;
+
+		void EndUpdate(float deltaTime) override;
+
+		void EndDraw() override;
 
 
-		bool PlayMusics(const std::shared_ptr<Mix_Music>& music, int loops = 0);
+		Data::AudioResourceID LoadMusic(const std::string& filePath);
 
-		int PlaySFX(const std::shared_ptr<Mix_Chunk>& sfx, int loops = 0);
+		Data::AudioResourceID LoadSFX(const std::string& filePath);
+
+
+		bool PlayMusics(Data::AudioResourceID music, int loops = 0);
+
+		int PlaySFX(Data::AudioResourceID sfx, int loops = 0);
 
 		void StopMusic();
 
@@ -46,6 +55,10 @@ namespace DF2D::Core
 		void PauseMusic();
 
 		void ResumeMusic();
+
+		void PauseChannel(int channel);
+
+		void ResumeChannel(int channel);
 
 
 		void SetMasterVolume(float v);

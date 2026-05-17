@@ -8,7 +8,7 @@ namespace DF2D::Engine
 	using namespace DF2D::Core;
 
 
-	AudioClipBlueprint::AudioClipBlueprint(const std::string_view& audioSourcePath, Vector2F position, float volume, bool isMusic, bool loop)
+	AudioClipBlueprint::AudioClipBlueprint(const std::string& audioSourcePath, Vector2F position, float volume, bool isMusic, bool loop)
 		: audioSourcePath(audioSourcePath),
 		position(position),
 		volume(volume),

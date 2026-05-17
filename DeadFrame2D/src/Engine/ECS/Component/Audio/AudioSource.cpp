@@ -1,4 +1,5 @@
 #include "Converters/Physics/PhysicsConversions.h"
+#include "Core/Context/Systems/Audio/AudioManager.h"
 #include "Core/Context/Systems/Physics/PhysicsEngine2D.h"
 #include "Engine/ECS/Component/Audio/AudioListener.h"
 #include "Engine/ECS/Component/Audio/AudioSource.h"
@@ -20,7 +21,10 @@ namespace DF2D::Engine
 
 
 	AudioSource::AudioSource()
-		: collisionBody(nullptr),
+		: audioManager(nullptr),
+		sfxClip(-1),
+		musicTrack(-1),
+		collisionBody(nullptr),
 		collisionFixture(nullptr),
 		isMusic(false),
 		minReachingDistance(1),
@@ -135,6 +139,7 @@ namespace DF2D::Engine
 		RegisterContactExitHandler(GetHandle(), EventHelpers::BindFunction(this, &AudioSource::OnAudioSourceExitHandler));
 
 		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
+		audioManager = Guard::AgainstNullAssignment(GetGameObject()->CoreContext().audioManager, NAME_OF(audioManager));
 
 		isDirty = true;
 	}
@@ -168,7 +173,7 @@ namespace DF2D::Engine
 			return;
 
 		// Audio attenuation logic 
-		if (audioListenerInContact == nullptr || sfxClip == nullptr)
+		if (audioListenerInContact == nullptr || sfxClip == 0)
 			return;
 
 		auto listenerTransform = audioListenerInContact->GetGameObject()->GetTransform();
@@ -188,7 +193,7 @@ namespace DF2D::Engine
 
 		auto attenuatedVolume = (1.0f - t) * volume;
 
-		AudioManager::SetSFXVolume(attenuatedVolume, playingChannel);
+		audioManager->SetSFXVolume(attenuatedVolume, playingChannel);
 	}
 
 	void AudioSource::Draw()
@@ -197,7 +202,7 @@ namespace DF2D::Engine
 		lastTransformRotation = transform->GetWorldRotation();
 	}
 
-	void AudioSource::LoadAudio(const std::string_view& audioSource, bool isMusic)
+	void AudioSource::LoadAudio(const std::string& audioSource, bool isMusic)
 	{
 		Stop();
 
@@ -205,53 +210,57 @@ namespace DF2D::Engine
 
 		if (isMusic)
 		{
-			musicTrack = AudioManager::LoadMusic(audioSource);
+			musicTrack = audioManager->LoadMusic(audioSource);
 		}
 		else
 		{
-			sfxClip = AudioManager::LoadSFX(audioSource);
+			sfxClip = audioManager->LoadSFX(audioSource);
 		}
-
-		// Could handle errors here
 	}
 
 	void AudioSource::Play(bool loop)
 	{
 		Stop();
 
-		if (isMusic && musicTrack != nullptr)
+		auto* am = GetGameObject()->CoreContext().audioManager;
+
+		if (isMusic && musicTrack != 0)
 		{
-			AudioManager::PlayMusicTrack(musicTrack, loop ? -1 : 0);
-			AudioManager::SetMusicVolume(volume);
+			am->PlayMusics(musicTrack, loop ? -1 : 0);
+			am->SetMusicVolume(volume);
 		}
-		else if (sfxClip)
+		else if (sfxClip != 0)
 		{
-			playingChannel = AudioManager::PlaySFX(sfxClip, loop ? -1 : 0);
-			AudioManager::SetSFXVolume(volume, playingChannel);
+			playingChannel = am->PlaySFX(sfxClip, loop ? -1 : 0);
+			am->SetSFXVolume(volume, playingChannel);
 		}
 	}
 
 	void AudioSource::Pause()
 	{
+		auto* am = GetGameObject()->CoreContext().audioManager;
+
 		if (isMusic)
 		{
-			AudioManager::PauseMusic();
+			am->PauseMusic();
 		}
 		else if (playingChannel != -1)
 		{
-			AudioManager::PauseSFX(playingChannel);
+			am->PauseChannel(playingChannel);
 		}
 	}
 
 	void AudioSource::Stop()
 	{
+		auto* am = GetGameObject()->CoreContext().audioManager;
+
 		if (isMusic)
 		{
-			AudioManager::StopMusic();
+			am->StopMusic();
 		}
 		else if (playingChannel != -1)
 		{
-			AudioManager::StopSFX(playingChannel);
+			am->StopChannel(playingChannel);
 		}
 	}
 
@@ -259,13 +268,15 @@ namespace DF2D::Engine
 	{
 		volume = std::clamp(vol, 0.0f, 1.0f);
 
+		auto* am = GetGameObject()->CoreContext().audioManager;
+
 		if (isMusic)
 		{
-			AudioManager::SetMusicVolume(vol);
+			am->SetMusicVolume(vol);
 		}
 		else if (playingChannel != -1)
 		{
-			AudioManager::SetSFXVolume(vol, playingChannel);
+			am->SetSFXVolume(vol, playingChannel);
 		}
 	}
 
