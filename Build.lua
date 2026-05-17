@@ -33,8 +33,37 @@ workspace "Project"
 		}
 	end
 
+	function make_dir(path)
+		if os.host() == "windows" then
+			path = path:gsub("/", "\\")
+			return '{MKDIR} "' .. path .. '"'
+		else
+			return 'mkdir -p ' .. path
+		end
+	end
+
+	function copy_dir(src, dst)
+		if os.host() == "windows" then
+			src = src:gsub("/", "\\")
+			dst = dst:gsub("/", "\\")
+			return string.format('xcopy /E /Y /I "%s" "%s"', src, dst)
+		else
+			return string.format('cp -r %s %s', src, dst)
+		end
+	end
+
+	function copy_file(src, dst)
+		if os.host() == "windows" then
+			src = src:gsub("/", "\\")
+			dst = dst:gsub("/", "\\")
+			return '{COPY} "' .. src .. '" "' .. dst .. '"'
+		else
+			return 'cp -v ' .. src .. ' ' .. dst
+		end
+	end
+
 	
-	-- Include Core build script
+	-- Include Core build scripts
 	include "DeadFrame2D/Build-DeadFrame2D.lua"
 	include "Vendor/Box2D/Build-Box2D.lua"
 	include "Vendor/tinyxml2-10.0.0/Build-tinyxml2.lua"
