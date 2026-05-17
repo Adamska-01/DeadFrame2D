@@ -60,6 +60,8 @@ namespace DF2D::Core
 
 		void ResumeChannel(int channel);
 
+		bool IsMusicPlaying();
+
 
 		void SetMasterVolume(float v);
 

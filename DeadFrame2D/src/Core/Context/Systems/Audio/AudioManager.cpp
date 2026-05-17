@@ -70,7 +70,7 @@ namespace DF2D::Core
 
 	bool AudioManager::PlayMusics(AudioResourceID music, int loops)
 	{
-		if (music == 0)
+		if (music < 0)
 			return false;
 
 		backend->SetMusicVolume(audioConfig.masterVolume * audioConfig.musicVolume);
@@ -80,7 +80,7 @@ namespace DF2D::Core
 
 	int AudioManager::PlaySFX(AudioResourceID sfx, int loops)
 	{
-		if (sfx == 0)
+		if (sfx < 0)
 			return -1;
 
 		auto channel = backend->PlayChannel(-1, sfx, loops);
@@ -121,6 +121,11 @@ namespace DF2D::Core
 	void AudioManager::ResumeChannel(int channel)
 	{
 		backend->ResumeChannel(channel);
+	}
+
+	bool AudioManager::IsMusicPlaying()
+	{
+		return backend->IsMusicPlaying();
 	}
 
 	void AudioManager::SetMasterVolume(float v)
