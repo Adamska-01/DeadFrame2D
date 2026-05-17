@@ -14,9 +14,6 @@ namespace DF2D::Core
 {
 	class DF2D_API AudioManager : public ICoreSystem
 	{
-		friend class SystemInitializer;
-
-
 	private:
 		Models::AudioConfig audioConfig;
 
