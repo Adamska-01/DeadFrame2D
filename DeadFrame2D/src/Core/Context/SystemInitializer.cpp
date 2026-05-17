@@ -58,7 +58,7 @@ namespace DF2D::Core
 
 	void SystemInitializer::BeginFrame()
 	{
-		CoreContextIterator::ForEach(ctx, [](auto* system)
+		CoreContextIterator::ForEach(ctx, [](ICoreSystem* system)
 			{
 				system->BeginFrame();
 			});
@@ -66,7 +66,7 @@ namespace DF2D::Core
 
 	void SystemInitializer::PreUpdate(float deltaTime)
 	{
-		CoreContextIterator::ForEach(ctx, [&](auto* system)
+		CoreContextIterator::ForEach(ctx, [&](ICoreSystem* system)
 			{
 				system->PreUpdate(deltaTime);
 			});
@@ -74,7 +74,7 @@ namespace DF2D::Core
 
 	void SystemInitializer::EndUpdate(float deltaTime)
 	{
-		CoreContextIterator::ForEach(ctx, [&](auto* system)
+		CoreContextIterator::ForEach(ctx, [&](ICoreSystem* system)
 			{
 				system->EndUpdate(deltaTime);
 			});
@@ -82,7 +82,7 @@ namespace DF2D::Core
 
 	void SystemInitializer::EndDraw()
 	{
-		CoreContextIterator::ForEach(ctx, [](auto* system)
+		CoreContextIterator::ForEach(ctx, [](ICoreSystem* system)
 			{
 				system->EndDraw();
 			});
