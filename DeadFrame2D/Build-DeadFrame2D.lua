@@ -15,12 +15,15 @@ project "DeadFrame2D"
 	files { 
 		"include/**.h", 
 		"src/**.cpp",
+		"Internal/include/**.h",
+		"Internal/src/**.cpp",
 		"Resources/**.*"
 	}
 
 	includedirs { 
 		"include",
 		"Internal",
+		"Internal/include",
 		"../Vendor/nlohmann-3.11.3", 
 		"../Vendor/tinyxml2-10.0.0", 
 		"../Vendor/Box2D/Module/include",
