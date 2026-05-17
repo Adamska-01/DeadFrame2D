@@ -1,5 +1,6 @@
 #include "Core/Context/Systems/Audio/AudioManager.h"
 #include <algorithm>
+#include <algorithm>
 #include <cassert>
 #include <iostream>
 
@@ -9,251 +10,156 @@ namespace DF2D::Core
 	using namespace DF2D::Models;
 
 
-	AudioManager* AudioManager::instance;
-
-
-	AudioManager::AudioManager(const AudioConfig& audioConfig)
-		: audioConfig(audioConfig)
+	AudioManager::AudioManager(AudioConfig audioConfig, std::unique_ptr<IAudioBackend> backend)
+		: audioConfig(audioConfig), 
+		backend(std::move(backend))
 	{
-		assert(instance == nullptr && "AudioManager was already initialized!");
+	}
 
-		instance = this;
 
-		musicCache.clear();
-		sfxCache.clear();
+	std::shared_ptr<Mix_Music> AudioManager::LoadMusic(const std::string& filePath)
+	{
+		std::lock_guard lock(mutex);
 
-		if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+		auto it = musicCache.find(filePath);
+
+		if (it != musicCache.end())
 		{
-			std::cerr << "SDL_Mixer could not initialize! SDL_mixer Error: " << Mix_GetError() << std::endl;
+			auto locked = it->second.lock();
 
-			return;
+			if (locked != nullptr)
+				return locked;
 		}
 
-		Mix_AllocateChannels(audioConfig.maxSFXChannelAllocation);
-
-		std::cout << "[Info] SDL_Mixer successfully initialized." << std::endl;
-	}
-
-	AudioManager::~AudioManager()
-	{
-		instance = nullptr;
-
-		musicCache.clear();
-		sfxCache.clear();
-
-		Mix_CloseAudio();
-
-		std::cout << "[Info] SDL_Mixer subsystem successfully quit." << std::endl;
-	}
-
-	void AudioManager::BeginFrame()
-	{
-
-	}
-
-	void AudioManager::PreUpdate(float deltaTime)
-	{
-
-	}
-
-	void AudioManager::EndUpdate(float deltaTime)
-	{
-
-	}
-
-	void AudioManager::EndDraw()
-	{
-
-	}
-
-	std::shared_ptr<Mix_Music> AudioManager::LoadMusic(const std::string_view& filepath)
-	{
-		auto filePathString = std::string(filepath);
-
-		std::lock_guard<std::mutex> lock(instance->audioMutex);
-
-		auto it = instance->musicCache.find(filePathString);
-
-		if (it != instance->musicCache.end())
-		{
-			if (auto cached = it->second.lock())
-				return cached;
-		}
-
-		auto raw = Mix_LoadMUS(filePathString.c_str());
+		auto raw = backend->LoadMusic(filePath);
 
 		if (raw == nullptr)
-		{
-			std::cerr << "Failed to load music: " << Mix_GetError() << std::endl;
-		
 			return nullptr;
-		}
 
 		auto shared = std::shared_ptr<Mix_Music>(raw, Mix_FreeMusic);
 
-		instance->musicCache[filePathString] = shared;
-	
+		musicCache[filePath] = shared;
+
 		return shared;
 	}
 
-	std::shared_ptr<Mix_Chunk> AudioManager::LoadSFX(const std::string_view& filepath)
+	std::shared_ptr<Mix_Chunk> AudioManager::LoadSFX(const std::string& filePath)
 	{
-		auto filePathString = std::string(filepath);
+		std::lock_guard lock(mutex);
 
-		std::lock_guard<std::mutex> lock(instance->audioMutex);
+		auto it = sfxCache.find(filePath);
 
-		auto it = instance->sfxCache.find(filePathString);
-
-		if (it != instance->sfxCache.end())
+		if (it != sfxCache.end())
 		{
-			if (auto cached = it->second.lock())
-				return cached;
+			auto locked = it->second.lock();
+
+			if (locked != nullptr)
+				return locked;
 		}
 
-		auto raw = Mix_LoadWAV(filePathString.c_str());
+		auto raw = backend->LoadSFX(filePath);
 
 		if (raw == nullptr)
-		{
-			std::cerr << "Failed to load SFX: " << Mix_GetError() << std::endl;
-		
 			return nullptr;
-		}
 
 		auto shared = std::shared_ptr<Mix_Chunk>(raw, Mix_FreeChunk);
 
-		instance->sfxCache[filePathString] = shared;
+		sfxCache[filePath] = shared;
 
 		return shared;
 	}
 
-	bool AudioManager::PlayMusicTrack(const std::shared_ptr<Mix_Music>& music, int loopCount)
+	bool AudioManager::PlayMusics(const std::shared_ptr<Mix_Music>& music, int loops)
 	{
 		if (music == nullptr)
 			return false;
 
-		auto musicVolume = instance->audioConfig.musicVolume;
-		auto masterVolume = instance->audioConfig.masterVolume;
+		backend->SetMusicVolume(static_cast<int>(audioConfig.masterVolume * audioConfig.musicVolume));
 
-		Mix_VolumeMusic(static_cast<int>(musicVolume * masterVolume * MIX_MAX_VOLUME));
-
-		return Mix_PlayMusic(music.get(), loopCount) == 0;
+		return backend->PlayMusic(music.get(), loops);
 	}
 
-	int AudioManager::PlaySFX(const std::shared_ptr<Mix_Chunk>& sfx, int loopCount)
+	int AudioManager::PlaySFX(const std::shared_ptr<Mix_Chunk>& sfx, int loops)
 	{
 		if (sfx == nullptr)
 			return -1;
 
-		auto channel = -1;
+		auto channel = backend->PlayChannel(-1, sfx.get(), loops);
 
-		// Play on the first free channel (-1)
-		channel = Mix_PlayChannel(-1, sfx.get(), loopCount);
-
-		if (channel == -1)
-		{
-			std::cerr << "Failed to play SFX: " << Mix_GetError() << std::endl;
-
+		if (channel < 0)
 			return -1;
-		}
 
-		auto sfxVolume = instance->audioConfig.sfxVolume;
-		auto masterVolume = instance->audioConfig.masterVolume;
-
-		Mix_Volume(channel, static_cast<int>(sfxVolume * masterVolume * MIX_MAX_VOLUME));
-
-		// Set the chunk volume to max by default (let the volume be controlled by the channel)
-		Mix_VolumeChunk(sfx.get(), MIX_MAX_VOLUME);
+		backend->SetChannelVolume(channel, static_cast<int>(audioConfig.masterVolume * audioConfig.sfxVolume));
 
 		return channel;
 	}
 
-	void AudioManager::FadeInMusicTrack(const std::shared_ptr<Mix_Music>& music, int loopCount, int fadeTimeMs)
-	{
-		if (Mix_PlayingMusic())
-		{
-			Mix_FadeOutMusic(fadeTimeMs);
-		}
-
-		auto musicVolume = instance->audioConfig.musicVolume;
-		auto masterVolume = instance->audioConfig.masterVolume;
-
-		Mix_VolumeMusic(static_cast<int>(musicVolume * masterVolume * MIX_MAX_VOLUME));
-
-		Mix_FadeInMusic(music.get(), loopCount, fadeTimeMs);
-	}
-
 	void AudioManager::StopMusic()
 	{
-		Mix_HaltMusic();
+		backend->StopMusic();
 	}
 
-	void AudioManager::StopSFX(int sfxChannel)
+	void AudioManager::StopChannel(int c)
 	{
-		Mix_HaltChannel(sfxChannel);
+		backend->StopChannel(c);
 	}
 
 	void AudioManager::PauseMusic()
 	{
-		Mix_PauseMusic();
-	}
-
-	void AudioManager::PauseSFX(int sfxChannel)
-	{
-		Mix_Pause(sfxChannel);
+		backend->PauseMusic();
 	}
 
 	void AudioManager::ResumeMusic()
 	{
-		Mix_ResumeMusic();
+		backend->ResumeMusic();
+	}
+
+	void AudioManager::SetMasterVolume(float v)
+	{
+		audioConfig.masterVolume = std::clamp(v, 0.0f, 1.0f);
+
+		backend->SetMusicVolume(audioConfig.musicVolume);
+		backend->SetChannelVolume(-1, audioConfig.sfxVolume);
 	}
 
 	void AudioManager::SetMusicVolume(float volume)
-	{
-		auto newMusicVolume = instance->audioConfig.musicVolume = std::clamp(volume, 0.0f, 1.0f);
-		auto masterVolume = instance->audioConfig.masterVolume;
+`	{
+		audioConfig.musicVolume = std::clamp(volume, 0.0f, 1.0f);
 
-		Mix_VolumeMusic(static_cast<int>(newMusicVolume * masterVolume * MIX_MAX_VOLUME));
+		backend->SetMusicVolume(static_cast<int>(audioConfig.masterVolume * audioConfig.musicVolume));
 	}
-
-	void AudioManager::SetGlobalSFXVolume(float volume)
-	{
-		auto newSfxVolume = instance->audioConfig.sfxVolume = std::clamp(volume, 0.0f, 1.0f);
-
-		SetSFXVolume(newSfxVolume);
-	}
-
+	
 	void AudioManager::SetSFXVolume(float volume, int sfxChannel)
 	{
 		volume = std::clamp(volume, 0.0f, 1.0f);
 
-		auto sfxVolume = instance->audioConfig.sfxVolume;
-		auto masterVolume = instance->audioConfig.masterVolume;
+		if (sfxChannel == -1)
+		{
+			audioConfig.sfxVolume = volume;
+		}
+		else
+		{
+			volume *= audioConfig.sfxVolume;
+		}
 
-		// If sfxChannel == -1, it will set the volume of all channels
-		Mix_Volume(sfxChannel, static_cast<int>(volume * sfxVolume * masterVolume * MIX_MAX_VOLUME));
+		auto sfxVolume = audioConfig.sfxVolume;
+		auto masterVolume = audioConfig.masterVolume;
+
+		backend->SetChannelVolume(sfxChannel, static_cast<int>(audioConfig.masterVolume * volume));
 	}
 
-	void AudioManager::SetMasterVolume(float volume)
+	float AudioManager::GetMasterVolume() const
 	{
-		auto newMasterVolume = instance->audioConfig.masterVolume = std::clamp(volume, 0.0f, 1.0f);
-		auto sfxVolume = instance->audioConfig.sfxVolume;
-
-		SetMusicVolume(newMasterVolume);
-		SetSFXVolume(sfxVolume);
+		return audioConfig.masterVolume;
 	}
 
-	float AudioManager::GetMasterVolume()
+	float AudioManager::GetMusicVolume() const
 	{
-		return instance->audioConfig.masterVolume;
+		return audioConfig.musicVolume;
 	}
 
-	float AudioManager::GetMusicGlobalVolume()
+	float AudioManager::GetSFXVolume() const
 	{
-		return instance->audioConfig.musicVolume;
-	}
-
-	float AudioManager::GetGlobalSFXVolume()
-	{
-		return instance->audioConfig.sfxVolume;
+		return audioConfig.sfxVolume;
 	}
 }

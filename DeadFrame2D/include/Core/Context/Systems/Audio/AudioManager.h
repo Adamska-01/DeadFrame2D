@@ -1,90 +1,63 @@
 #pragma once
 #include "Core/Context/Abstractions/ICoreSystem.h"
+#include "Core/Context/Systems/Audio/Backends/Abstractions/IAudioBackend.h"
 #include "DF2D_API.h"
 #include "Models/Audio/AudioConfig.h"
 #include <memory>
 #include <mutex>
+#include <string>
 #include <SDL_mixer.h>
-#include <string_view>
 #include <unordered_map>
 
 
 namespace DF2D::Core
 {
-	class DF2D_API AudioManager : public ICoreSystem
+	class DF2D_API AudioManager
 	{
-		friend class SystemInitializer;
-
-
 	private:
-		static AudioManager* instance;
-
-
 		Models::AudioConfig audioConfig;
+
+		std::unique_ptr<IAudioBackend> backend;
 
 		std::unordered_map<std::string, std::weak_ptr<Mix_Music>> musicCache;
 
 		std::unordered_map<std::string, std::weak_ptr<Mix_Chunk>> sfxCache;
 
-		std::mutex audioMutex;
-
-
-		AudioManager(const Models::AudioConfig& audioConfig);
-
-		~AudioManager() override;
-
-		AudioManager(const AudioManager&) = delete;
-
-		AudioManager(AudioManager&&) = delete;
-
-
-		AudioManager& operator=(const AudioManager&) = delete;
-
-		AudioManager& operator=(AudioManager&&) = delete;
-
-
-		void BeginFrame() override;
-
-		void PreUpdate(float deltaTime) override;
-
-		void EndUpdate(float deltaTime) override;
-
-		void EndDraw() override;
+		std::mutex mutex;
 
 
 	public:
-		static std::shared_ptr<Mix_Music> LoadMusic(const std::string_view& filepath);
+		AudioManager(Models::AudioConfig audioConfig, std::unique_ptr<IAudioBackend> backend);
 
-		static std::shared_ptr<Mix_Chunk> LoadSFX(const std::string_view& filepath);
 
-		static bool PlayMusicTrack(const std::shared_ptr<Mix_Music>& music, int loopCount = 0);
+		std::shared_ptr<Mix_Music> LoadMusic(const std::string& filePath);
 
-		static int PlaySFX(const std::shared_ptr<Mix_Chunk>& sfx, int loopCount = 0);
+		std::shared_ptr<Mix_Chunk> LoadSFX(const std::string& filePath);
 
-		static void FadeInMusicTrack(const std::shared_ptr<Mix_Music>& music, int loopCount, int fadeTimeMs);
 
-		static void StopMusic();
+		bool PlayMusics(const std::shared_ptr<Mix_Music>& music, int loops = 0);
 
-		static void StopSFX(int sfxChannel);
+		int PlaySFX(const std::shared_ptr<Mix_Chunk>& sfx, int loops = 0);
 
-		static void PauseMusic();
+		void StopMusic();
 
-		static void PauseSFX(int sfxChannel);
+		void StopChannel(int c);
 
-		static void ResumeMusic();
+		void PauseMusic();
 
-		static void SetMusicVolume(float volume /*[0-1]*/);
+		void ResumeMusic();
 
-		static void SetGlobalSFXVolume(float volume /*[0-1]*/); 
 
-		static void SetSFXVolume(float volume /*[0-1]*/, int sfxChannel = -1);
+		void SetMasterVolume(float v);
 
-		static void SetMasterVolume(float volume);
+		void SetMusicVolume(float volume);
 
-		static float GetMasterVolume();
+		void SetSFXVolume(float volume, int sfxChannel);
 
-		static float GetMusicGlobalVolume();
+		float GetMasterVolume() const;
 
-		static float GetGlobalSFXVolume();
+		float GetMusicVolume() const;
+
+		float GetSFXVolume() const;
 	};
 }
