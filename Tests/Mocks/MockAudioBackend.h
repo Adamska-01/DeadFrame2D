@@ -46,6 +46,7 @@ struct MockAudioBackend : DF2D::Core::IAudioBackend
 	{
 		lastPlayedMusic = id;
 		playMusicCount++;
+		isMusicPlayingResult = true;
 
 		return playMusicResult;
 	}
@@ -61,21 +62,24 @@ struct MockAudioBackend : DF2D::Core::IAudioBackend
 	void StopMusic() override
 	{
 		lastStoppedMusicCount++;
-	}
-
-	void StopChannel(int c) override
-	{
-		lastStoppedChannel = c;
+		isMusicPlayingResult = false;
 	}
 
 	void PauseMusic() override
 	{
 		lastPausedMusicCount++;
+		isMusicPlayingResult = false;
 	}
 
 	void ResumeMusic() override
 	{
 		lastResumedMusicCount++;
+		isMusicPlayingResult = true;
+	}
+
+	void StopChannel(int c) override
+	{
+		lastStoppedChannel = c;
 	}
 
 	void PauseChannel(int c) override

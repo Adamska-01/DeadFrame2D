@@ -227,13 +227,13 @@ TEST_CASE("PlaySFX sets channel volume after playing via backend")
 }
 
 
-TEST_CASE("PlaySFX with invalid id (0) returns -1 and does not call backend")
+TEST_CASE("PlaySFX with invalid id (-1) returns -1 and does not call backend")
 {
 	AudioConfig config;
 	MockAudioBackend* mock = nullptr;
 	auto manager = MakeManager(config, mock);
 
-	auto channel = manager->PlaySFX(0, 0);
+	auto channel = manager->PlaySFX(-1, 0);
 
 	CHECK(channel == -1);
 	CHECK(mock->playChannelCount == 0);
@@ -362,16 +362,16 @@ TEST_CASE("SetSFXVolume with specific channel does not update global sfxVolume")
 }
 
 
-TEST_CASE("PlayMusics with id == -1 passes through to backend")
+TEST_CASE("PlayMusics with id == 0 passes through to backend (only negative values are guarded)")
 {
 	AudioConfig config;
 	MockAudioBackend* mock = nullptr;
 	auto manager = MakeManager(config, mock);
 
-	auto result = manager->PlayMusics(-1, 0);
+	auto result = manager->PlayMusics(0, 0);
 
-	CHECK(mock->playMusicCount == 1); // Not guarded — reaches backend
-	CHECK(mock->lastPlayedMusic == -1);
+	CHECK(mock->playMusicCount == 1);
+	CHECK(mock->lastPlayedMusic == 0);
 }
 
 
@@ -388,6 +388,27 @@ TEST_CASE("PlaySFX when backend returns -1 channel propagates -1")
 
 	CHECK(channel == -1);
 	CHECK(mock->playChannelCount == 1); // Backend was called
+}
+
+
+TEST_CASE("IsMusicPlaying reflects play/stop/pause/resume state")
+{
+	AudioConfig config;
+	MockAudioBackend* mock = nullptr;
+	auto manager = MakeManager(config, mock);
+
+	auto id = manager->LoadMusic("song.ogg");
+	manager->PlayMusics(id, 0);
+	CHECK(manager->IsMusicPlaying() == true);
+
+	manager->PauseMusic();
+	CHECK(manager->IsMusicPlaying() == false);
+
+	manager->ResumeMusic();
+	CHECK(manager->IsMusicPlaying() == true);
+
+	manager->StopMusic();
+	CHECK(manager->IsMusicPlaying() == false);
 }
 
 
