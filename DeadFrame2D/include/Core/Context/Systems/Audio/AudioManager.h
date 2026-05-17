@@ -14,6 +14,9 @@ namespace DF2D::Core
 {
 	class DF2D_API AudioManager : public ICoreSystem
 	{
+		friend class SystemInitializer;
+
+
 	private:
 		Models::AudioConfig audioConfig;
 
@@ -26,10 +29,6 @@ namespace DF2D::Core
 		std::mutex mutex;
 
 
-	public:
-		AudioManager(Models::AudioConfig audioConfig, std::unique_ptr<IAudioBackend> backend);
-
-
 		void BeginFrame() override;
 
 		void PreUpdate(float deltaTime) override;
@@ -37,6 +36,10 @@ namespace DF2D::Core
 		void EndUpdate(float deltaTime) override;
 
 		void EndDraw() override;
+
+
+	public:
+		AudioManager(Models::AudioConfig audioConfig, std::unique_ptr<IAudioBackend> backend);
 
 
 		Data::AudioResourceID LoadMusic(const std::string& filePath);

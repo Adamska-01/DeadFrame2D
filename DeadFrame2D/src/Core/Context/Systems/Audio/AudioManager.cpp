@@ -17,22 +17,18 @@ namespace DF2D::Core
 
 	void AudioManager::BeginFrame()
 	{
-
 	}
 
 	void AudioManager::PreUpdate(float deltaTime)
 	{
-
 	}
 
 	void AudioManager::EndUpdate(float deltaTime)
 	{
-
 	}
 
 	void AudioManager::EndDraw()
 	{
-
 	}
 
 
