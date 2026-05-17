@@ -3,7 +3,7 @@
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
-#include <string>
+#include <string_view>
 
 
 namespace DF2D::Engine
@@ -16,7 +16,7 @@ namespace DF2D::Engine
 	private:
 		ComponentHandle<AudioSource> audioSource;
 
-		std::string audioSourcePath;
+		std::string_view audioSourcePath;
 
 		Core::Vector2F position;
 
@@ -29,7 +29,7 @@ namespace DF2D::Engine
 
 	public:
 		AudioClipBlueprint(
-			const std::string& audioSourcePath,
+			const std::string_view& audioSourcePath,
 			Core::Vector2F position = Core::Vector2F::Zero,
 			float volume = 1.0f,
 			bool isMusic = false,
