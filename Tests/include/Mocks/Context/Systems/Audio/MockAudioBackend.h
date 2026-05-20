@@ -6,25 +6,43 @@ struct MockAudioBackend : DF2D::Core::IAudioBackend
 {
 	// Configurable results
 	DF2D::Data::AudioResourceID nextMusicId{1};
+
 	DF2D::Data::AudioResourceID nextSfxId{1};
+
 	bool playMusicResult{true};
+
 	int playChannelStart{0};
+
 
 	// Call tracking
 	int loadMusicCount{0};
+
 	int loadSFXCount{0};
+
 	int playMusicCount{0};
+
 	int playChannelCount{0};
+
 	DF2D::Data::AudioResourceID lastPlayedMusic{0};
+
 	DF2D::Data::AudioResourceID lastPlayedSFX{0};
+
 	float lastMusicVolume{0};
+
 	float lastSFXVolume{0};
+
 	int lastPausedChannel{-1};
+
 	int lastResumedChannel{-1};
+
 	int lastStoppedChannel{-1};
+
 	int lastStoppedMusicCount{0};
+
 	int lastPausedMusicCount{0};
+
 	int lastResumedMusicCount{0};
+
 	bool isMusicPlayingResult{false};
 
 
