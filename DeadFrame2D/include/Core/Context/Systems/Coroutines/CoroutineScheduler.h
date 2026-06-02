@@ -36,8 +36,6 @@ namespace DF2D::Core
 		CoroutineScheduler& operator=(const CoroutineScheduler&) = delete;
 
 
-
-
 		Task& StartCoroutine(Task&& task);
 
 		void Reset();
