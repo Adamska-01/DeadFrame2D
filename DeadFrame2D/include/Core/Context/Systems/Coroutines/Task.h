@@ -11,7 +11,7 @@ namespace DF2D::Core
 	class ICoroutineAwaitable;
 
 
-	struct DF2D_API Task : std::enable_shared_from_this<Task>
+	struct DF2D_API Task
 	{
 		struct DF2D_API promise_type
 		{
