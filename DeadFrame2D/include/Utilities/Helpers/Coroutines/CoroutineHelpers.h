@@ -10,16 +10,16 @@ namespace DF2D::Utilities::CoroutineHelpers
 {
 	inline auto WaitFrame()
 	{
-		return Core::MakeAwaitableProxy<Core::WaitOneFrame>();
+		return Core::CoroutineAwaitableProxy<Core::WaitOneFrame>();
 	}
 
 	inline auto WaitSeconds(float seconds)
 	{
-		return Core::MakeAwaitableProxy<Core::WaitForSeconds>(seconds);
+		return Core::CoroutineAwaitableProxy<Core::WaitForSeconds, float>(seconds);
 	}
 
 	inline auto WaitSecondsUnscaled(float seconds)
 	{
-		return Core::MakeAwaitableProxy<Core::WaitForSecondsUnscaled>(seconds);
+		return Core::CoroutineAwaitableProxy<Core::WaitForSecondsUnscaled, float>(seconds);
 	}
 }

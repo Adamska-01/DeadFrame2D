@@ -49,11 +49,4 @@ namespace DF2D::Core
 		{
 		}
 	};
-
-
-	template<typename T, typename... Args>
-	inline CoroutineAwaitableProxy<T, std::decay_t<Args>...> MakeAwaitableProxy(Args&&... args)
-	{
-		return CoroutineAwaitableProxy<T, std::decay_t<Args>...>(std::forward<Args>(args)...);
-	}
 }
