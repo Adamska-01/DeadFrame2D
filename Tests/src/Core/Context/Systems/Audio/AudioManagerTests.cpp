@@ -16,6 +16,9 @@ static std::unique_ptr<AudioManager> MakeManager(AudioConfig config, MockAudioBa
 }
 
 
+TEST_SUITE_BEGIN("AudioManager");
+
+
 TEST_CASE("Constructor stores audio config values")
 {
 	auto config = AudioConfig
@@ -429,3 +432,6 @@ TEST_CASE("ICoreSystem lifecycle methods are safe no-ops")
 	system->EndUpdate(0.0f);
 	system->EndDraw();
 }
+
+
+TEST_SUITE_END();
