@@ -16,6 +16,12 @@ class b2Body;
 
 namespace DF2D::Engine
 {
+	class CoroutineScheduler;
+}
+
+
+namespace DF2D::Engine
+{
 	class Transform;
 
 
@@ -25,6 +31,8 @@ namespace DF2D::Engine
 
 
 	private:
+		Core::CoroutineScheduler* coroutineScheduler;
+
 		ComponentHandle<Transform> transform;
 
 		b2Body* body;

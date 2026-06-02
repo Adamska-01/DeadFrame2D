@@ -2,7 +2,6 @@
 #include "DF2D_API.h"
 #include <atomic>
 #include <coroutine>
-#include <exception>
 #include <memory>
 #include <vector>
 
@@ -14,10 +13,7 @@ namespace DF2D::Core
 
 	struct DF2D_API Task : std::enable_shared_from_this<Task>
 	{
-		friend class CoroutineScheduler;
-
-
-		struct DF2D_API  promise_type
+		struct DF2D_API promise_type
 		{
 			struct DF2D_API final_awaiter
 			{
@@ -36,6 +32,8 @@ namespace DF2D::Core
 
 			std::coroutine_handle<> continuation = nullptr;
 
+			Task* owningTask = nullptr;
+
 
 			Task get_return_object();
 
@@ -53,17 +51,13 @@ namespace DF2D::Core
 		};
 
 
-	private:
-		static void SetCurrentTask(Task* task);
-
-
 	public:
 		std::coroutine_handle<promise_type> promiseHandle;
 
-		std::vector<ICoroutineAwaitable*> awaitables;
+		std::vector<std::unique_ptr<ICoroutineAwaitable>> awaitables;
 
 
-		explicit Task(std::coroutine_handle<promise_type> promiseHandle);
+		Task(std::coroutine_handle<promise_type> promiseHandle);
 
 		Task(Task&& other) noexcept;
 
@@ -85,11 +79,8 @@ namespace DF2D::Core
 
 		void Cancel();
 
-		void AddAwaitable(ICoroutineAwaitable* awaitable);
+		void AddAwaitable(std::unique_ptr<ICoroutineAwaitable> awaitable);
 
-		bool TickAwaitables(float deltaTime);
-
-
-		static Task* GetCurrentTask();
+		bool TickAwaitables(float scaledDt, float unscaledDt);
 	};
 }

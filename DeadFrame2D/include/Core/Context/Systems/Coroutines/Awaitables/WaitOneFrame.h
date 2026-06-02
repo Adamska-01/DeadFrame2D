@@ -19,11 +19,13 @@ namespace DF2D::Core
 
 		bool await_ready() const noexcept override;
 
-		void await_suspend(std::coroutine_handle<> h) override;
+		void await_suspend(std::coroutine_handle<> handle) override;
 
 		void await_resume() const noexcept override;
 
+		void SetHandle(std::coroutine_handle<> handle) override;
 
-		bool Tick(float) override;	
+
+		bool Tick(float, float) override;
 	};
 }

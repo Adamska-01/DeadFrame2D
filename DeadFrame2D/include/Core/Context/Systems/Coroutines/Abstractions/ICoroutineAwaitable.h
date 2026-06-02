@@ -7,15 +7,8 @@ namespace DF2D::Core
 {
 	class DF2D_API ICoroutineAwaitable
 	{
-	protected:
-		Task* ownerTask = nullptr;
-
-
 	public:
 		virtual ~ICoroutineAwaitable() = default;
-
-
-		inline void SetOwner(Task* owner);
 
 
 		virtual bool await_ready() const noexcept = 0;
@@ -24,13 +17,9 @@ namespace DF2D::Core
 
 		virtual void await_resume() const noexcept = 0;
 
+		virtual void SetHandle(std::coroutine_handle<> h) = 0;
 
-		virtual bool Tick(float deltaTime) = 0;
+
+		virtual bool Tick(float scaledDt, float unscaledDt) = 0;
 	};
-
-
-	inline void ICoroutineAwaitable::SetOwner(Task* owner)
-	{
-		ownerTask = owner;
-	}
 }

@@ -9,16 +9,21 @@ namespace DF2D::Core
 		return false;
 	}
 
-	void WaitOneFrame::await_suspend(std::coroutine_handle<> h)
+	void WaitOneFrame::await_suspend(std::coroutine_handle<> handle)
 	{
-		continuation = h;
+		continuation = handle;
 	}
 
 	void WaitOneFrame::await_resume() const noexcept
 	{
 	}
 
-	bool WaitOneFrame::Tick(float)
+	void WaitOneFrame::SetHandle(std::coroutine_handle<> handle)
+	{
+		continuation = handle;
+	}
+
+	bool WaitOneFrame::Tick(float, float)
 	{
 		if (!continuation)
 			return true;

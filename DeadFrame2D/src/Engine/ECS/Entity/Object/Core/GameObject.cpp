@@ -114,7 +114,7 @@ namespace DF2D::Engine
 	{
 		if (delaySeconds > 0.0f)
 		{
-			co_await WaitSecondsUnscaled(delaySeconds);
+			co_await CoroutineHelpers::WaitSecondsUnscaled(delaySeconds);
 		}
 
 		Destroy();

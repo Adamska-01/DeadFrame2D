@@ -20,7 +20,8 @@ namespace DF2D::Engine
 
 
 	RigidBody2D::RigidBody2D(const BodyDefinition2D& bodyDefinition)
-		: velocity(Vector2F::Zero),
+		: coroutineScheduler(nullptr),
+		velocity(Vector2F::Zero),
 		acceleration(Vector2F::Zero),
 		lastTransformPosition(Vector2F::Zero),
 		lastTransformRotation(0.0f)
@@ -56,20 +57,21 @@ namespace DF2D::Engine
 
 	void RigidBody2D::OnGameObjectActiveStateChangedHandler(const ObjectHandle<GameObject>& obj, bool isActive)
 	{
-		CoroutineScheduler::StartCoroutine(SetEnabled(isActive));
+		coroutineScheduler->StartCoroutine(SetEnabled(isActive));
 	}
 
 	Task RigidBody2D::SetEnabled(bool isEnabled)
 	{
 		// Can't delete a fixture during a Box2D callback (e.g., BeginContact)
 		// because the world is locked. Defer deletion until the next frame update.
-		co_await WaitFrame();
+		co_await CoroutineHelpers::WaitFrame();
 
 		body->SetEnabled(isEnabled);
 	}
 
 	void RigidBody2D::Init()
 	{
+		coroutineScheduler = Guard::AgainstNullAssignment(GetGameObject()->CoreContext().coroutineScheduler, NAME_OF(coroutineScheduler));
 		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
 
 		lastTransformPosition = transform->GetWorldPosition();

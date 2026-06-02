@@ -1,5 +1,4 @@
 #include "Core/Context/Systems/Coroutines/Awaitables/WaitForSecondsUnscaled.h"
-#include "Core/Services/Time/FrameTimer.h"
 
 
 namespace DF2D::Core
@@ -10,25 +9,29 @@ namespace DF2D::Core
 	{
 	}
 
+
 	bool WaitForSecondsUnscaled::await_ready() const noexcept
 	{
 		return timeRemaining <= 0.0f;
 	}
 
-	void WaitForSecondsUnscaled::await_suspend(std::coroutine_handle<> h)
+	void WaitForSecondsUnscaled::await_suspend(std::coroutine_handle<> handle)
 	{
-		continuation = h;
+		continuation = handle;
 	}
 
 	void WaitForSecondsUnscaled::await_resume() const noexcept
 	{
 	}
 
-	bool WaitForSecondsUnscaled::Tick(float deltaTime)
+	void WaitForSecondsUnscaled::SetHandle(std::coroutine_handle<> handle)
 	{
-		auto unscaledDeltaTime = FrameTimer::DeltaTimeUnscaled();
+		continuation = handle;
+	}
 
-		timeRemaining -= unscaledDeltaTime;
+	bool WaitForSecondsUnscaled::Tick(float, float unscaledDt)
+	{
+		timeRemaining -= unscaledDt;
 
 		if (timeRemaining <= 0.0f)
 		{

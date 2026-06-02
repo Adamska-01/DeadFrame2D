@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Context/Abstractions/ICoreSystem.h"
+#include "Core/Services/Time/FrameTimer.h"
 #include "DF2D_API.h"
 #include <vector>
 
@@ -12,23 +13,8 @@ namespace DF2D::Core
 
 	class DF2D_API CoroutineScheduler : public ICoreSystem
 	{
-		friend class SystemInitializer;
-
-
 	private:
-		static CoroutineScheduler* instance;
-
-
 		std::vector<Task*> tasks;
-
-
-		CoroutineScheduler();
-
-		~CoroutineScheduler() override;
-
-		CoroutineScheduler(const CoroutineScheduler&) = delete;
-
-		CoroutineScheduler& operator=(const CoroutineScheduler&) = delete;
 
 
 		void BeginFrame() override;
@@ -41,8 +27,19 @@ namespace DF2D::Core
 
 
 	public:
-		static Task& StartCoroutine(Task&& task);
+		CoroutineScheduler() = default;
 
-		static void Reset();
+		~CoroutineScheduler() override;
+
+		CoroutineScheduler(const CoroutineScheduler&) = delete;
+
+		CoroutineScheduler& operator=(const CoroutineScheduler&) = delete;
+
+
+
+
+		Task& StartCoroutine(Task&& task);
+
+		void Reset();
 	};
 }

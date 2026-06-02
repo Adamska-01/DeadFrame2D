@@ -2,50 +2,24 @@
 #include "Core/Context/Systems/Coroutines/Awaitables/WaitForSeconds.h"
 #include "Core/Context/Systems/Coroutines/Awaitables/WaitForSecondsUnscaled.h"
 #include "Core/Context/Systems/Coroutines/Awaitables/WaitOneFrame.h"
+#include "Core/Context/Systems/Coroutines/CoroutineAwaitableProxy.h"
+#include <tuple>
 
 
-namespace DF2D::Utilities
+namespace DF2D::Utilities::CoroutineHelpers
 {
-	inline Core::WaitOneFrame& WaitFrame()
+	inline auto WaitFrame()
 	{
-		if (!Core::Task::GetCurrentTask())
-		{
-			throw std::runtime_error("WaitFrame must be called inside a running Task.");
-		}
-
-		auto* awaitable = new Core::WaitOneFrame();
-
-		Core::Task::GetCurrentTask()->AddAwaitable(awaitable);
-
-		return *awaitable;
+		return Core::MakeAwaitableProxy<Core::WaitOneFrame>();
 	}
 
-	inline Core::WaitForSeconds& WaitSeconds(float seconds)
+	inline auto WaitSeconds(float seconds)
 	{
-		if (!Core::Task::GetCurrentTask())
-		{
-			throw std::runtime_error("WaitSeconds must be called inside a running Task.");
-		}
-
-		auto* awaitable = new Core::WaitForSeconds(seconds);
-
-		Core::Task::GetCurrentTask()->AddAwaitable(awaitable);
-
-		return *awaitable;
+		return Core::MakeAwaitableProxy<Core::WaitForSeconds>(seconds);
 	}
 
-
-	inline Core::WaitForSecondsUnscaled& WaitSecondsUnscaled(float seconds)
+	inline auto WaitSecondsUnscaled(float seconds)
 	{
-		if (!Core::Task::GetCurrentTask())
-		{
-			throw std::runtime_error("WaitSeconds must be called inside a running Task.");
-		}
-
-		auto* awaitable = new Core::WaitForSecondsUnscaled(seconds);
-
-		Core::Task::GetCurrentTask()->AddAwaitable(awaitable);
-
-		return *awaitable;
+		return Core::MakeAwaitableProxy<Core::WaitForSecondsUnscaled>(seconds);
 	}
 }

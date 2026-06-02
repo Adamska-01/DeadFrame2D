@@ -15,16 +15,18 @@ namespace DF2D::Core
 
 
 	public:
-		explicit WaitForSeconds(float seconds);
+		WaitForSeconds(float seconds);
 
 
 		bool await_ready() const noexcept override;
 
-		void await_suspend(std::coroutine_handle<> h) override;
+		void await_suspend(std::coroutine_handle<> handle) override;
 
 		void await_resume() const noexcept override;
 
+		void SetHandle(std::coroutine_handle<> handle) override;
 
-		bool Tick(float deltaTime) override;
+
+		bool Tick(float scaledDt, float) override;
 	};
 }

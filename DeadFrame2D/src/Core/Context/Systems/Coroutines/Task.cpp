@@ -5,38 +5,29 @@
 
 namespace DF2D::Core
 {
-	// Necessary when running multi-threaded coroutines
-	thread_local Task* currentTask = nullptr;
-
-
 	/// =========================================================================================
 	/// ========================================= Task =========================================
 	/// =========================================================================================
-	void Task::SetCurrentTask(Task* task)
-	{
-		currentTask = task;
-	}
-
 	Task::Task(std::coroutine_handle<promise_type> promiseHandle)
 		: promiseHandle(promiseHandle)
 	{
-		awaitables.clear();
+		promiseHandle.promise().owningTask = this;
 	}
 
 	Task::Task(Task&& other) noexcept
-		: promiseHandle(other.promiseHandle), 
+		: promiseHandle(other.promiseHandle),
 		awaitables(std::move(other.awaitables))
 	{
 		other.promiseHandle = nullptr;
+
+		if (promiseHandle)
+		{
+			promiseHandle.promise().owningTask = this;
+		}
 	}
 
 	Task::~Task()
 	{
-		for (auto* awaitable : awaitables)
-		{
-			delete awaitable;
-		}
-
 		awaitables.clear();
 
 		if (promiseHandle)
@@ -57,8 +48,15 @@ namespace DF2D::Core
 			}
 
 			promiseHandle = other.promiseHandle;
+
 			awaitables = std::move(other.awaitables);
+
 			other.promiseHandle = nullptr;
+
+			if (promiseHandle)
+			{
+				promiseHandle.promise().owningTask = this;
+			}
 		}
 
 		return *this;
@@ -100,45 +98,33 @@ namespace DF2D::Core
 		promiseHandle.promise().cancel();
 	}
 
-	void Task::AddAwaitable(ICoroutineAwaitable* awaitable)
+	void Task::AddAwaitable(std::unique_ptr<ICoroutineAwaitable> awaitable)
 	{
-		awaitable->SetOwner(this);
-		awaitables.push_back(awaitable);
+		awaitables.push_back(std::move(awaitable));
 	}
 
-	bool Task::TickAwaitables(float deltaTime)
+	bool Task::TickAwaitables(float scaledDt, float unscaledDt)
 	{
 		if (IsCancelled())
 			return true; // Task should be removed
 
-		std::vector<ICoroutineAwaitable*> finished;
+		std::vector<size_t> finishedIndices;
+		size_t count = awaitables.size();
 
-		// Pass 1: Tick and collect finished
-		for (auto* awaitable : awaitables)
+		for (size_t i = 0; i < count; ++i)
 		{
-			if (awaitable->Tick(deltaTime))
-			{
-				finished.push_back(awaitable);
-			}
+			if (!awaitables[i]->Tick(scaledDt, unscaledDt))
+				continue;
+
+			finishedIndices.push_back(i);
 		}
 
-		// Pass 2: Erase and delete
-		for (auto* awaitable : finished)
+		for (auto it = finishedIndices.rbegin(); it != finishedIndices.rend(); ++it)
 		{
-			auto it = std::find(awaitables.begin(), awaitables.end(), awaitable);
-			if (it != awaitables.end())
-			{
-				awaitables.erase(it);
-				delete awaitable;
-			}
+			awaitables.erase(awaitables.begin() + *it);
 		}
 
 		return IsDone() || IsCancelled();
-	}
-
-	Task* Task::GetCurrentTask()
-	{
-		return currentTask;
 	}
 
 
