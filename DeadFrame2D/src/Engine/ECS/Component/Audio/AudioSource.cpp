@@ -51,6 +51,11 @@ namespace DF2D::Engine
 		DeregisterContactEnterHandler(GetHandle());
 		DeregisterContactExitHandler(GetHandle());
 
+		if (audioManager != nullptr)
+		{
+			Stop();
+		}
+
 		if (collisionBody == nullptr)
 			return;
 
