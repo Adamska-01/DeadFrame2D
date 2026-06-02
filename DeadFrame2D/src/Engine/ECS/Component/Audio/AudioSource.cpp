@@ -222,45 +222,39 @@ namespace DF2D::Engine
 	{
 		Stop();
 
-		auto* am = GetGameObject()->CoreContext().audioManager;
-
 		if (isMusic && musicTrack != 0)
 		{
-			am->PlayMusics(musicTrack, loop ? -1 : 0);
-			am->SetMusicVolume(volume);
+			audioManager->PlayMusics(musicTrack, loop ? -1 : 0);
+			audioManager->SetMusicVolume(volume);
 		}
 		else if (sfxClip != 0)
 		{
-			playingChannel = am->PlaySFX(sfxClip, loop ? -1 : 0);
-			am->SetSFXVolume(volume, playingChannel);
+			playingChannel = audioManager->PlaySFX(sfxClip, loop ? -1 : 0);
+			audioManager->SetSFXVolume(volume, playingChannel);
 		}
 	}
 
 	void AudioSource::Pause()
 	{
-		auto* am = GetGameObject()->CoreContext().audioManager;
-
 		if (isMusic)
 		{
-			am->PauseMusic();
+			audioManager->PauseMusic();
 		}
 		else if (playingChannel != -1)
 		{
-			am->PauseChannel(playingChannel);
+			audioManager->PauseChannel(playingChannel);
 		}
 	}
 
 	void AudioSource::Stop()
 	{
-		auto* am = GetGameObject()->CoreContext().audioManager;
-
 		if (isMusic)
 		{
-			am->StopMusic();
+			audioManager->StopMusic();
 		}
 		else if (playingChannel != -1)
 		{
-			am->StopChannel(playingChannel);
+			audioManager->StopChannel(playingChannel);
 		}
 	}
 
@@ -268,15 +262,13 @@ namespace DF2D::Engine
 	{
 		volume = std::clamp(vol, 0.0f, 1.0f);
 
-		auto* am = GetGameObject()->CoreContext().audioManager;
-
 		if (isMusic)
 		{
-			am->SetMusicVolume(vol);
+			audioManager->SetMusicVolume(vol);
 		}
 		else if (playingChannel != -1)
 		{
-			am->SetSFXVolume(vol, playingChannel);
+			audioManager->SetSFXVolume(vol, playingChannel);
 		}
 	}
 
