@@ -13,6 +13,10 @@ namespace DF2D::Core
 
 	class DF2D_API CoroutineScheduler : public ICoreSystem
 	{
+
+		friend class SceneManager;
+
+
 	private:
 		std::vector<Task*> tasks;
 
@@ -24,6 +28,9 @@ namespace DF2D::Core
 		void EndUpdate(float deltaTime) override;
 
 		void EndDraw() override;
+
+
+		void Reset();
 
 
 	public:
@@ -38,6 +45,6 @@ namespace DF2D::Core
 
 		Task& StartCoroutine(Task&& task);
 
-		void Reset();
+		size_t GetActiveTaskCount() const;
 	};
 }

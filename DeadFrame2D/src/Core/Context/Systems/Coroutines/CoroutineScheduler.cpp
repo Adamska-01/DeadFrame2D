@@ -47,6 +47,16 @@ namespace DF2D::Core
 
 	}
 
+	void CoroutineScheduler::Reset()
+	{
+		for (auto* task : tasks)
+		{
+			delete task;
+		}
+
+		tasks.clear();
+	}
+
 	Task& CoroutineScheduler::StartCoroutine(Task&& task)
 	{
 		auto* heapTask = new Task(std::move(task));
@@ -59,13 +69,8 @@ namespace DF2D::Core
 		return *heapTask;
 	}
 
-	void CoroutineScheduler::Reset()
+	size_t CoroutineScheduler::GetActiveTaskCount() const
 	{
-		for (auto* task : tasks)
-		{
-			delete task;
-		}
-
-		tasks.clear();
+		return tasks.size();
 	}
 }
