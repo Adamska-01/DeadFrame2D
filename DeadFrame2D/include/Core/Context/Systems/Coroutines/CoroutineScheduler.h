@@ -5,6 +5,12 @@
 #include <vector>
 
 
+namespace DF2D::Engine
+{
+	class SceneManager;
+}
+
+
 namespace DF2D::Core
 {
 	class ICoroutineAwaitable;
@@ -13,8 +19,7 @@ namespace DF2D::Core
 
 	class DF2D_API CoroutineScheduler : public ICoreSystem
 	{
-
-		friend class SceneManager;
+		friend class Engine::SceneManager;
 
 
 	private:
