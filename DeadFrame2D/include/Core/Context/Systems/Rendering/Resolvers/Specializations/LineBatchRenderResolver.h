@@ -22,8 +22,8 @@ namespace DF2D::Core
 		{
 			for (const auto& line : renderData.lineBatch)
 			{
-				Vector2F p1 = line.p1;
-				Vector2F p2 = line.p2;
+				auto p1 = line.p1;
+				auto p2 = line.p2;
 
 				if (camera != nullptr && requiresScreenSpaceConversion)
 				{

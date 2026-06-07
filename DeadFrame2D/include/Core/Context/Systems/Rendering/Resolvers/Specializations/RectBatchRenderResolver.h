@@ -22,7 +22,7 @@ namespace DF2D::Core
 		{
 			for (const auto& rect : renderData.rectBatch)
 			{
-				SDL_FRect destRect = rect.destRect;
+				RectF destRect = rect.destRect;
 
 				if (camera != nullptr && requiresScreenSpaceConversion)
 				{
@@ -59,7 +59,7 @@ namespace DF2D::Core
 
 			for (const auto& rect : renderData.rectBatch)
 			{
-				SDL_FRect screenRect = rect.destRect;
+				RectF screenRect = rect.destRect;
 
 				auto screenPos = camera->WorldToScreen(Vector2F(screenRect.x, screenRect.y));
 

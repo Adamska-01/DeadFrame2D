@@ -20,10 +20,10 @@ namespace DF2D::Core
 			Engine::ComponentHandle<Engine::Camera> camera,
 			bool requiresScreenSpaceConversion)
 		{
-			SDL_FRect destRect;
+			RectF destRect;
 
 			if (renderData.destRect.has_value())
-			{ 
+			{
 				destRect = *renderData.destRect;
 
 				if (camera != nullptr && requiresScreenSpaceConversion)
@@ -39,9 +39,9 @@ namespace DF2D::Core
 
 			renderBackend.DrawTexture(
 				renderData.texture,
-				renderData.srcRect.has_value() ? &*renderData.srcRect : nullptr,
-				renderData.destRect.has_value() ? &destRect : nullptr,
-				renderData.rotationOrigin.has_value() ? &*renderData.rotationOrigin : nullptr,
+				renderData.srcRect,
+				renderData.destRect.has_value() ? std::optional<RectF>(destRect) : std::nullopt,
+				renderData.rotationOrigin,
 				renderData.rotation,
 				renderData.flip,
 				renderData.colorMod);
@@ -54,13 +54,12 @@ namespace DF2D::Core
 			using namespace DF2D::Utilities;
 
 
-			// Always visible if no rect or no camera
 			if (!renderData.destRect.has_value() || camera == nullptr)
 				return renderData;
 
 			auto screenPos = camera->WorldToScreen(Vector2F(renderData.destRect->x, renderData.destRect->y));
 
-			auto screenRect = SDL_FRect
+			auto screenRect = RectF
 			{
 				.x = screenPos.x,
 				.y = screenPos.y,

@@ -22,7 +22,7 @@ namespace DF2D::Core
 		{
 			for (const auto& sprite : renderData.spriteBatch)
 			{
-				SDL_FRect destRect;
+				RectF destRect;
 
 				if (sprite.destRect.has_value())
 				{
@@ -41,9 +41,9 @@ namespace DF2D::Core
 
 				renderBackend.DrawTexture(
 					sprite.texture,
-					sprite.srcRect.has_value() ? &*sprite.srcRect : nullptr,
-					sprite.destRect.has_value() ? &destRect : nullptr,
-					sprite.rotationOrigin.has_value() ? &*sprite.rotationOrigin : nullptr,
+					sprite.srcRect,
+					sprite.destRect.has_value() ? std::optional<RectF>(destRect) : std::nullopt,
+					sprite.rotationOrigin,
 					sprite.rotation,
 					sprite.flip,
 					sprite.colorMod);
@@ -62,8 +62,9 @@ namespace DF2D::Core
 			if (camera == nullptr)
 				return renderData;
 
+			// Trade memory cost for CPU stability
 			auto filtered = SpriteBatchRenderData();
-			filtered.spriteBatch.reserve(renderData.spriteBatch.size()); // Trade memory cost for CPU stability
+			filtered.spriteBatch.reserve(renderData.spriteBatch.size());
 
 			for (const auto& sprite : renderData.spriteBatch)
 			{
@@ -74,7 +75,7 @@ namespace DF2D::Core
 
 				auto screenPos = camera->WorldToScreen(Vector2F(sprite.destRect->x, sprite.destRect->y));
 
-				auto screenRect = SDL_FRect
+				auto screenRect = RectF
 				{
 					.x = screenPos.x,
 					.y = screenPos.y,

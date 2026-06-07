@@ -20,8 +20,8 @@ namespace DF2D::Core
 			Engine::ComponentHandle<Engine::Camera> camera,
 			bool requiresScreenSpaceConversion)
 		{
-			Vector2F p1 = renderData.p1;
-			Vector2F p2 = renderData.p2;
+			auto p1 = renderData.p1;
+			auto p2 = renderData.p2;
 
 			if (camera != nullptr && requiresScreenSpaceConversion)
 			{

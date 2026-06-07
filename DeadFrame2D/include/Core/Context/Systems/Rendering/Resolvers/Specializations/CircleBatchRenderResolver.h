@@ -23,7 +23,7 @@ namespace DF2D::Core
 		{
 			for (const auto& circle : renderData.circleBatch)
 			{
-				Vector2F pos = circle.center;
+				auto pos = circle.center;
 				auto radius = circle.radius;
 
 				if (camera != nullptr && requiresScreenSpaceConversion)
@@ -48,12 +48,12 @@ namespace DF2D::Core
 			using namespace DF2D::Utilities;
 
 
-			// Always visible if no camera (screen space)
 			if (camera == nullptr)
 				return renderData;
 
+			// Trade memory cost for CPU stability
 			auto filtered = CircleBatchRenderData();
-			filtered.circleBatch.reserve(renderData.circleBatch.size()); // Trade memory cost for CPU stability
+			filtered.circleBatch.reserve(renderData.circleBatch.size());
 
 			for (const auto& circle : renderData.circleBatch)
 			{

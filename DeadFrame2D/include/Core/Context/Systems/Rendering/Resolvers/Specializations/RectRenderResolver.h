@@ -20,12 +20,12 @@ namespace DF2D::Core
 			Engine::ComponentHandle<Engine::Camera> camera,
 			bool requiresScreenSpaceConversion)
 		{
-			SDL_FRect destRect = renderData.destRect;
+			RectF destRect = renderData.destRect;
 
 			if (camera != nullptr && requiresScreenSpaceConversion)
 			{
-				auto screenPos = camera->WorldToScreen(Vector2F(renderData.destRect.x, renderData.destRect.y)); 
-				
+				auto screenPos = camera->WorldToScreen(Vector2F(renderData.destRect.x, renderData.destRect.y));
+
 				destRect.x = screenPos.x;
 				destRect.y = screenPos.y;
 				destRect.w *= camera->GetZoom();
@@ -50,7 +50,7 @@ namespace DF2D::Core
 			if (camera == nullptr)
 				return renderData;
 
-			SDL_FRect destRect = renderData.destRect;
+			RectF destRect = renderData.destRect;
 
 			auto screenPos = camera->WorldToScreen(Vector2F(destRect.x, destRect.y));
 

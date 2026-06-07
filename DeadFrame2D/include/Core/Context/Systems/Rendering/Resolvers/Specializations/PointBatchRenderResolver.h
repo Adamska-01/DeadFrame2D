@@ -22,7 +22,7 @@ namespace DF2D::Core
 		{
 			for (const auto& point : renderData.pointBatch)
 			{
-				Vector2F pos = point.pos;
+				auto pos = point.pos;
 
 				if (camera != nullptr && requiresScreenSpaceConversion)
 				{
@@ -41,12 +41,12 @@ namespace DF2D::Core
 			using namespace DF2D::Utilities;
 
 
-			// Always visible if no camera (screen space)
 			if (camera == nullptr)
 				return renderData;
 
+			// Trade memory cost for CPU stability
 			auto filtered = PointBatchRenderData();
-			filtered.pointBatch.reserve(renderData.pointBatch.size()); // Trade memory cost for CPU stability
+			filtered.pointBatch.reserve(renderData.pointBatch.size());
 
 			for (const auto& point : renderData.pointBatch)
 			{
