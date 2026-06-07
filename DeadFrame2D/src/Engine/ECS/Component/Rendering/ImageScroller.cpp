@@ -77,17 +77,15 @@ namespace DF2D::Engine
 
 	void ImageScroller::Draw()
 	{
-		if (spriteTexture == nullptr)
+		if (spriteTexture == 0)
 			return;
 
 		auto position = transform->GetWorldPosition();
 		auto scale = transform->GetWorldScale();
 
-		// Calculate scaled size
 		auto scaledTileWidth = static_cast<int>(spriteSize.x * scale.x);
 		auto scaledTileHeight = static_cast<int>(spriteSize.y * scale.y);
 
-		// +2 to handle partial tiles at edges
 		auto tilesX = (renderTargetSize.x / scaledTileWidth) + 2;
 		auto tilesY = (renderTargetSize.y / scaledTileHeight) + 2;
 
@@ -107,7 +105,7 @@ namespace DF2D::Engine
 
 				renderTask.renderData = SpriteRenderData
 				{
-					.texture = spriteTexture.get(),
+					.texture = textureManager->GetRawTexture(spriteTexture),
 					.destRect = destRect,
 					.rotation = transform->GetWorldRotation(),
 				};

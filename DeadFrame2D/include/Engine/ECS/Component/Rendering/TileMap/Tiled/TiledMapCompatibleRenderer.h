@@ -4,6 +4,12 @@
 #include "Models/Rendering/TileEditors/Tiled/TiledMap.h"
 
 
+namespace DF2D::Core
+{
+	class TextureManager;
+}
+
+
 namespace DF2D::Engine
 {
 	class Transform;
@@ -18,6 +24,8 @@ namespace DF2D::Engine
 		std::unordered_map<int, int> tileIDToTileSet;
 
 		ComponentHandle<Transform> transform;
+
+		Core::TextureManager* textureManager = nullptr;
 
 
 	public:

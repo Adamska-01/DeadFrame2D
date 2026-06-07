@@ -6,6 +6,12 @@
 #include <tinyxml2.h>
 
 
+namespace DF2D::Core
+{
+	class TextureManager;
+}
+
+
 /*
 Example XML map structure:
 
@@ -36,6 +42,8 @@ namespace DF2D::Utilities
 	class DF2D_API TiledMapParser : public Utilities::XML_Parser<std::shared_ptr<Models::TiledMap>>
 	{
 	private:
+		Core::TextureManager* textureManager = nullptr;
+
 		Models::TiledTileSet ParseTileSet(tinyxml2::XMLElement* xmlTileset);
 
 		Models::TiledLayer ParseLayers(tinyxml2::XMLElement* xmlLayer, int rowcount, int colcount);
@@ -44,11 +52,13 @@ namespace DF2D::Utilities
 
 
 	public:
-		TiledMapParser() = default;
+		explicit TiledMapParser(Core::TextureManager* tm = nullptr);
 
 		~TiledMapParser() = default;
 
 
 		virtual std::shared_ptr<Models::TiledMap> Parse(std::string_view source) override;
+
+		void SetTextureManager(Core::TextureManager* tm);
 	};
 }

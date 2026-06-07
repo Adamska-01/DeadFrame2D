@@ -1,3 +1,4 @@
+#include "Utilities/Debugging/Guards.h"
 #include "Utilities/Parsers/TileEditors/Tiled/TiledMapParser.h"
 #include <filesystem>
 #include <iostream>
@@ -11,7 +12,18 @@ namespace DF2D::Utilities
 
 	using namespace DF2D::Core;
 	using namespace DF2D::Models;
+	using namespace DF2D::Utilities;
 
+
+	TiledMapParser::TiledMapParser(Core::TextureManager* tm)
+		: textureManager(tm)
+	{
+	}
+
+	void TiledMapParser::SetTextureManager(Core::TextureManager* tm)
+	{
+		textureManager = Guard::AgainstNullAssignment(tm, NAME_OF(tm));
+	}
 
 	TiledTileSet TiledMapParser::ParseTileSet(XMLElement* xmlTileset)
 	{
@@ -22,7 +34,8 @@ namespace DF2D::Utilities
 			xmlTileset->IntAttribute("columns"),
 			xmlTileset->IntAttribute("tilecount"),
 			xmlTileset->IntAttribute("tilewidth"),
-			"App/Assets/Sprites/" + std::filesystem::path(xmlTileset->FirstChildElement()->Attribute("source")).filename().string());
+			"App/Assets/Sprites/" + std::filesystem::path(xmlTileset->FirstChildElement()->Attribute("source")).filename().string(),
+			textureManager);
 	}
 
 	TiledLayer TiledMapParser::ParseLayers(tinyxml2::XMLElement* xmlLayer, int rowCount, int colCount)

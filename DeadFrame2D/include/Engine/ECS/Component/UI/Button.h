@@ -1,10 +1,17 @@
 #pragma once
 #include "Core/Services/Events/Abstractions/IEventProcessor.h"
+#include "Data/Systems/Graphics/TextureID.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/UI/Abstractions/IInteractableUI.h"
 #include "Utilities/Delegates/MulticastDelegate.h"
 #include <functional>
+#include <string>
 
+
+namespace DF2D::Core
+{
+	class TextureManager;
+}
 
 namespace DF2D::Data
 {
@@ -24,13 +31,21 @@ namespace DF2D::Engine
 
 		Utilities::MultiCastVoid onEnterCallback;
 
-		std::shared_ptr<SDL_Texture> currentButtonImage;
+		Data::TextureID currentButtonImage = 0;
 
-		std::shared_ptr<SDL_Texture> buttonIdleImage;
+		Data::TextureID buttonIdleImage = 0;
 
-		std::shared_ptr<SDL_Texture> buttonHoveredImage;
+		Data::TextureID buttonHoveredImage = 0;
 
-		std::shared_ptr<SDL_Texture> buttonPressedImage;
+		Data::TextureID buttonPressedImage = 0;
+
+		Core::TextureManager* textureManager = nullptr;
+
+		std::string idleSource;
+
+		std::string hoveredSource;
+
+		std::string pressedSource;
 
 		SDL_Color idleFillColor;
 

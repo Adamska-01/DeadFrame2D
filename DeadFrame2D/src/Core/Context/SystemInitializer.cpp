@@ -8,6 +8,7 @@
 #include "Core/Context/Systems/UI/UIManager.h"
 #include "Core/Context/Systems/Window/Window.h"
 #include "Factories/Concretions/Context/Systems/Audio/AudioBackendFactory.h"
+#include "Factories/Concretions/Context/Systems/Graphics/TextureBackendFactory.h"
 #include "Helpers/Context/CoreContextIterator.h"
 
 
@@ -30,7 +31,7 @@ namespace DF2D::Core
 		{
 			.audioManager = new AudioManager(config.audio, AudioBackendFactory().CreateProduct(config.audio)),
 			.coroutineScheduler = new CoroutineScheduler(),
-			.textureManager = new TextureManager(),
+			.textureManager = new TextureManager(TextureBackendFactory().CreateProduct()),
 			.input = new Input(),
 			.physicsEngine = new PhysicsEngine2D(config.physics),
 			.renderer = renderer,
@@ -58,7 +59,9 @@ namespace DF2D::Core
 
 	void SystemInitializer::BeginFrame()
 	{
-		CoreContextIterator::ForEach(ctx, [](ICoreSystem* system)
+		CoreContextIterator::ForEach(
+			ctx,
+			[](ICoreSystem* system)
 			{
 				system->BeginFrame();
 			});
@@ -66,7 +69,9 @@ namespace DF2D::Core
 
 	void SystemInitializer::PreUpdate(float deltaTime)
 	{
-		CoreContextIterator::ForEach(ctx, [&](ICoreSystem* system)
+		CoreContextIterator::ForEach(
+			ctx,
+			[&](ICoreSystem* system)
 			{
 				system->PreUpdate(deltaTime);
 			});
@@ -74,7 +79,9 @@ namespace DF2D::Core
 
 	void SystemInitializer::EndUpdate(float deltaTime)
 	{
-		CoreContextIterator::ForEach(ctx, [&](ICoreSystem* system)
+		CoreContextIterator::ForEach(
+			ctx,
+			[&](ICoreSystem* system)
 			{
 				system->EndUpdate(deltaTime);
 			});
@@ -82,7 +89,9 @@ namespace DF2D::Core
 
 	void SystemInitializer::EndDraw()
 	{
-		CoreContextIterator::ForEach(ctx, [](ICoreSystem* system)
+		CoreContextIterator::ForEach(
+			ctx,
+			[](ICoreSystem* system)
 			{
 				system->EndDraw();
 			});

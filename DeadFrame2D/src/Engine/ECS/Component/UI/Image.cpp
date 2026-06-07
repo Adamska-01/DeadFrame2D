@@ -4,6 +4,8 @@
 #include "Engine/ECS/Component/Transform.h"
 #include "Engine/ECS/Component/UI/Canvas.h"
 #include "Engine/ECS/Component/UI/Image.h"
+#include "Engine/ECS/Entity/Object/Core/GameObject.h"
+#include "Utilities/Debugging/Guards.h"
 
 
 namespace DF2D::Engine
@@ -12,11 +14,19 @@ namespace DF2D::Engine
 	using namespace DF2D::Core;
 	using namespace DF2D::Data;
 	using namespace DF2D::Engine;
+	using namespace DF2D::Utilities;
 
 
 	Image::Image()
 		: color(CommonColors::WHITE)
 	{
+	}
+
+	void Image::Init()
+	{
+		UIComponent::Init();
+
+		textureManager = Guard::AgainstNullAssignment(GetGameObject()->CoreContext().textureManager, NAME_OF(textureManager));
 	}
 
 	void Image::Draw()
@@ -40,11 +50,11 @@ namespace DF2D::Engine
 		renderTask.sortOrder = parentCanvas->GetSortOrder();
 		renderTask.canvas = parentCanvas;
 
-		if (sourceImage != nullptr)
+		if (sourceImage != 0)
 		{
 			renderTask.renderData = SpriteRenderData
 			{
-				.texture = sourceImage.get(),
+				.texture = textureManager->GetRawTexture(sourceImage),
 				.destRect = destRect,
 				.flip = SDL_RendererFlip::SDL_FLIP_NONE,
 				.rotation = worldRotation,
@@ -67,13 +77,15 @@ namespace DF2D::Engine
 
 	void Image::LoadSprite(std::string_view texturePath)
 	{
-		sourceImage = TextureManager::LoadTexture(texturePath);
+		if (!textureManager)
+			return;
 
-		auto width = 0, height = 0;
-		SDL_QueryTexture(sourceImage.get(), NULL, NULL, &width, &height);
+		sourceImage = textureManager->LoadTexture(texturePath);
 
-		widgetSize.x = static_cast<float>(width);
-		widgetSize.y = static_cast<float>(height);
+		auto size = textureManager->GetTextureSize(sourceImage);
+
+		widgetSize.x = static_cast<float>(size.x);
+		widgetSize.y = static_cast<float>(size.y);
 	}
 
 	void Image::SetColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)

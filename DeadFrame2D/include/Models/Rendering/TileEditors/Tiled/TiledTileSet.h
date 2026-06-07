@@ -1,17 +1,20 @@
 #pragma once
+#include "Data/Systems/Graphics/TextureID.h"
 #include "DF2D_API.h"
-#include <memory>
 #include <string>
 
 
-struct SDL_Texture;
+namespace DF2D::Core
+{
+	class TextureManager;
+}
 
 
 namespace DF2D::Models
 {
 	struct DF2D_API TiledTileSet
 	{
-		std::shared_ptr<SDL_Texture> tileSetTexture;
+		Data::TextureID tileSetTexture = 0;
 
 		std::string source;
 
@@ -28,7 +31,15 @@ namespace DF2D::Models
 		int tileSize;
 
 
-		TiledTileSet(int firstID, int lastID, int rowCount, int columnCount, int tileCount, int tileSize, const std::string& source);
+		TiledTileSet(
+			int firstID,
+			int lastID,
+			int rowCount,
+			int columnCount,
+			int tileCount,
+			int tileSize,
+			const std::string& source,
+			Core::TextureManager* tm);
 
 
 		bool IsValid() const;

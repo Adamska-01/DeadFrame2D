@@ -16,10 +16,9 @@ namespace DF2D::Engine
 
 
 	SpriteRenderer::SpriteRenderer(std::string_view texturePath)
+		: texturePath(texturePath)
 	{
 		spriteSize = Vector2I::One;
-
-		LoadSprite(texturePath);
 
 		renderTask.renderPhase = RenderPhase::WORLD;
 		renderTask.sortOrder = DefaultSortOrders::SPRITE_RENDERER;
@@ -28,6 +27,12 @@ namespace DF2D::Engine
 	void SpriteRenderer::Init()
 	{
 		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
+		textureManager = GetGameObject()->CoreContext().textureManager;
+
+		if (!texturePath.empty())
+		{
+			LoadSprite(texturePath);
+		}
 	}
 
 	void SpriteRenderer::Draw()
@@ -46,7 +51,7 @@ namespace DF2D::Engine
 
 		renderTask.renderData = SpriteRenderData
 		{
-			.texture = spriteTexture.get(),
+			.texture = textureManager->GetRawTexture(spriteTexture),
 			.srcRect = std::nullopt,
 			.destRect = scaledDest,
 			.rotation = worldRotation
@@ -57,12 +62,17 @@ namespace DF2D::Engine
 
 	void SpriteRenderer::LoadSprite(std::string_view texturePath)
 	{
-		spriteTexture = TextureManager::LoadTexture(texturePath);
+		this->texturePath = texturePath;
 
-		SDL_QueryTexture(spriteTexture.get(), NULL, NULL, &spriteSize.x, &spriteSize.y);
+		if (!textureManager)
+			return;
+
+		spriteTexture = textureManager->LoadTexture(texturePath);
+
+		spriteSize = textureManager->GetTextureSize(spriteTexture);
 	}
 
-	std::shared_ptr<SDL_Texture> SpriteRenderer::GetTexture()
+	TextureID SpriteRenderer::GetTexture()
 	{
 		return spriteTexture;
 	}

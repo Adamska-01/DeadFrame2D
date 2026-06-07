@@ -9,7 +9,15 @@ namespace DF2D::Models
 	using namespace DF2D::Core;
 
 
-	TiledTileSet::TiledTileSet(int firstID, int lastID, int rowCount, int columnCount, int tileCount, int tileSize, const std::string& source)
+	TiledTileSet::TiledTileSet(
+		int firstID,
+		int lastID,
+		int rowCount,
+		int columnCount,
+		int tileCount,
+		int tileSize,
+		const std::string& source,
+		TextureManager* tm)
 		: firstID(firstID),
 		lastID(lastID),
 		rowCount(rowCount),
@@ -22,7 +30,10 @@ namespace DF2D::Models
 		if (!IsValid())
 			return;
 
-		tileSetTexture = TextureManager::LoadTexture(source);
+		if (tm)
+		{
+			tileSetTexture = tm->LoadTexture(source);
+		}
 	}
 
 	bool TiledTileSet::IsValid() const

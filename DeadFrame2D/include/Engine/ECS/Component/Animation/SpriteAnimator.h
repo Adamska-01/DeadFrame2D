@@ -9,6 +9,12 @@
 #include <unordered_map>
 
 
+namespace DF2D::Core
+{
+	class TextureManager;
+}
+
+
 namespace DF2D::Engine
 {
 	class Transform;
@@ -24,6 +30,8 @@ namespace DF2D::Engine
 		ComponentHandle<Transform> transform;
 
 		ComponentHandle<SpriteRenderer> sprite;
+
+		Core::TextureManager* textureManager = nullptr;
 
 		std::unordered_map<std::string, Data::SpriteAnimationProperties> animations;
 

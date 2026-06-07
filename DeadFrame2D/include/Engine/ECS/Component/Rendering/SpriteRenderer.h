@@ -1,13 +1,17 @@
 #pragma once
 #include "Core/Math/Vector2.h"
+#include "Data/Systems/Graphics/TextureID.h"
 #include "Data/Systems/Rendering/Pipeline/RenderTask.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/GameComponent.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
-#include <memory>
+#include <string>
 
 
-struct SDL_Texture;
+namespace DF2D::Core
+{
+	class TextureManager;
+}
 
 
 namespace DF2D::Engine
@@ -21,13 +25,17 @@ namespace DF2D::Engine
 
 
 	protected:
-		std::shared_ptr<SDL_Texture> spriteTexture;
+		Data::TextureID spriteTexture = 0;
 
 		ComponentHandle<Transform> transform;
 
 		Core::Vector2I spriteSize;
 
 		Data::RenderTask renderTask;
+
+		std::string texturePath;
+
+		Core::TextureManager* textureManager = nullptr;
 
 
 	public:
@@ -45,7 +53,7 @@ namespace DF2D::Engine
 
 		void LoadSprite(std::string_view texturePath);
 
-		std::shared_ptr<SDL_Texture> GetTexture();
+		Data::TextureID GetTexture();
 
 		int GetSortOrder() const;
 

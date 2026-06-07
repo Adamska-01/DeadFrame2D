@@ -41,11 +41,11 @@ namespace DF2D::Core
 
 	std::optional<int> DeadFrameRuntime::RenderSplashScreen()
 	{
-		auto splashTexture = TextureManager::LoadTexture(Paths::Files::SPLASH_SCREEN);
+		auto coreCtx = systemInitializer->GetCoreContext();
+		auto splashTexture = coreCtx.textureManager->LoadTexture(Paths::Files::SPLASH_SCREEN);
 		auto renderTargetSize = Renderer::GetResolutionTarget();
 
-		auto width = 0, height = 0;
-		SDL_QueryTexture(splashTexture.get(), nullptr, nullptr, &width, &height);
+		auto size = coreCtx.textureManager->GetTextureSize(splashTexture);
 
 		auto splashScreenConfig = JsonSerializer::DeserializeFromFile<SplashScreenConfig>(Paths::Files::SPLASH_SCREEN_CONFIGURATION);
 
@@ -63,13 +63,13 @@ namespace DF2D::Core
 
 		auto renderData = SpriteRenderData
 		{
-			.texture = splashTexture.get(),
+			.texture = coreCtx.textureManager->GetRawTexture(splashTexture),
 			.destRect = SDL_FRect
 			{
-				renderTargetSize.x * 0.5f - width * 0.2f,
-				renderTargetSize.y * 0.5f - height * 0.2f,
-				width * 0.4f,
-				height * 0.4f
+				renderTargetSize.x * 0.5f - size.x * 0.2f,
+				renderTargetSize.y * 0.5f - size.y * 0.2f,
+				size.x * 0.4f,
+				size.y * 0.4f
 			}
 		};
 

@@ -7,6 +7,7 @@
 #include "Engine/ECS/Component/UI/Canvas.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include "Utilities/Collisions/CollisionUtils.h"
+#include "Utilities/Debugging/Guards.h"
 #include <SDL_events.h>
 
 
@@ -36,10 +37,10 @@ namespace DF2D::Engine
 			const auto& handler = *buttonConfiguration.onEnterHandler;
 			AddEnterCallback(handler.handle, handler.callback);
 		}
-	
-		SetIdleButtonImageSource(buttonConfiguration.idleButtonSource);
-		SetHoveredButtonImageSource(buttonConfiguration.hoveredButtonSource);
-		SetPressedButtonImageSource(buttonConfiguration.pressedButtonSource);
+
+		idleSource = buttonConfiguration.idleButtonSource;
+		hoveredSource = buttonConfiguration.hoveredButtonSource;
+		pressedSource = buttonConfiguration.pressedButtonSource;
 
 		idleFillColor = CommonColors::GRAY;
 		hoveredFillColor = CommonColors::LIGHT_GRAY;
@@ -117,6 +118,12 @@ namespace DF2D::Engine
 	void Button::Init()
 	{
 		UIComponent::Init();
+
+		textureManager = Guard::AgainstNullAssignment(GetGameObject()->CoreContext().textureManager, NAME_OF(textureManager));
+
+		SetIdleButtonImageSource(idleSource);
+		SetHoveredButtonImageSource(hoveredSource);
+		SetPressedButtonImageSource(pressedSource);
 	}
 
 	void Button::Draw()
@@ -131,7 +138,7 @@ namespace DF2D::Engine
 		{
 			renderTask.renderData = SpriteRenderData
 			{
-				.texture = currentButtonImage.get(),
+				.texture = textureManager->GetRawTexture(currentButtonImage),
 				.destRect = destRect,
 				.rotation = transform->GetWorldRotation()
 			};
@@ -264,25 +271,31 @@ namespace DF2D::Engine
 
 	void Button::SetIdleButtonImageSource(std::string_view idleButtonSource)
 	{
-		if (!idleButtonSource.empty())
+		idleSource = idleButtonSource;
+
+		if (textureManager && !idleButtonSource.empty())
 		{
-			currentButtonImage = buttonIdleImage = TextureManager::LoadTexture(idleButtonSource);
+			currentButtonImage = buttonIdleImage = textureManager->LoadTexture(idleButtonSource);
 		}
 	}
 
 	void Button::SetHoveredButtonImageSource(std::string_view hoveredButtonSource)
 	{
-		if (!hoveredButtonSource.empty())
+		hoveredSource = hoveredButtonSource;
+
+		if (textureManager && !hoveredButtonSource.empty())
 		{
-			buttonHoveredImage = TextureManager::LoadTexture(hoveredButtonSource);
+			buttonHoveredImage = textureManager->LoadTexture(hoveredButtonSource);
 		}
 	}
 
 	void Button::SetPressedButtonImageSource(std::string_view pressedButtonSource)
 	{
-		if (!pressedButtonSource.empty())
+		pressedSource = pressedButtonSource;
+
+		if (textureManager && !pressedButtonSource.empty())
 		{
-			buttonPressedImage = TextureManager::LoadTexture(pressedButtonSource);
+			buttonPressedImage = textureManager->LoadTexture(pressedButtonSource);
 		}
 	}
 }

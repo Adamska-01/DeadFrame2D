@@ -1,9 +1,15 @@
 #pragma once
+#include "Data/Systems/Graphics/TextureID.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
-#include <memory>
 #include <SDL.h>
 #include <string_view>
+
+
+namespace DF2D::Core
+{
+	class TextureManager;
+}
 
 
 namespace DF2D::Engine
@@ -14,9 +20,11 @@ namespace DF2D::Engine
 
 
 	private:
-		std::shared_ptr<SDL_Texture> sourceImage;
+		Data::TextureID sourceImage = 0;
 
 		SDL_Color color;
+
+		Core::TextureManager* textureManager = nullptr;
 
 
 	public:
@@ -24,6 +32,8 @@ namespace DF2D::Engine
 
 		virtual ~Image() override = default;
 
+
+		virtual void Init() override;
 
 		virtual void Draw() override;
 

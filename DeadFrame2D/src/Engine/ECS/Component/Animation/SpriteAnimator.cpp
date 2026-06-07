@@ -1,4 +1,5 @@
 #include "Constants/Rendering/DefaultSortOrders.h"
+#include "Core/Context/Systems/Graphics/TextureManager.h"
 #include "Core/Context/Systems/Rendering/RenderSystem.h"
 #include "Core/Math/Vector2.h"
 #include "Engine/ECS/Component/Animation/SpriteAnimator.h"
@@ -36,6 +37,8 @@ namespace DF2D::Engine
 		if (sprite == nullptr)
 			return;
 
+		textureManager = gameObject->CoreContext().textureManager;
+
 		sprite->SetActive(false);
 	}
 
@@ -71,9 +74,9 @@ namespace DF2D::Engine
 
 	void SpriteAnimator::Draw()
 	{
-		auto spriteTexture = sprite->GetTexture();
+		auto spriteTextureID = sprite->GetTexture();
 
-		if (!spriteTexture || animations.empty())
+		if (!spriteTextureID || animations.empty())
 			return;
 
 		const auto& props = animations.at(currentAnimationID);
@@ -102,7 +105,7 @@ namespace DF2D::Engine
 
 		renderTask.renderData = SpriteRenderData
 		{
-			.texture = spriteTexture.get(),
+			.texture = textureManager->GetRawTexture(spriteTextureID),
 			.srcRect = srcRect,
 			.destRect = dstRect,
 			.flip = animState.flipState,
@@ -172,21 +175,12 @@ namespace DF2D::Engine
 
 	SDL_Rect SpriteAnimator::GetFrameRect() const
 	{
-		auto textureW = 0;
-		auto textureH = 0;
+		auto size = textureManager->GetTextureSize(sprite->GetTexture());
 
-		SDL_QueryTexture(
-			sprite->GetTexture().get(),
-			nullptr,
-			nullptr,
-			&textureW,
-			&textureH);
-
-		//Get the size of a single frame in a sprite sheet
 		const auto& props = animations.at(currentAnimationID);
 
-		const int frameWidth = textureW / props.columnCount;
-		const int frameHeight = textureH / props.rowCount;
+		const int frameWidth = size.x / props.columnCount;
+		const int frameHeight = size.y / props.rowCount;
 
 		return SDL_Rect
 		{

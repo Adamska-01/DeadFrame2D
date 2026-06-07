@@ -3,6 +3,7 @@
 #include "Core/Context/Systems/Rendering/RenderSystem.h"
 #include "Engine/ECS/Component/Rendering/TileMap/Tiled/TiledMapCompatibleRenderer.h"
 #include "Engine/ECS/Component/Transform.h"
+#include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include "Utilities/Debugging/Guards.h"
 
 
@@ -27,6 +28,7 @@ namespace DF2D::Engine
 	void TiledMapCompatibleRenderer::Init()
 	{
 		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
+		textureManager = GetGameObject()->CoreContext().textureManager;
 
 		auto size = static_cast<int>(tileMap->tileSets.size());
 
@@ -92,7 +94,7 @@ namespace DF2D::Engine
 
 					auto renderData = SpriteRenderData
 					{
-						.texture = tileSet.tileSetTexture.get(),
+						.texture = textureManager->GetRawTexture(tileSet.tileSetTexture),
 						.srcRect = src,
 						.destRect = dest,
 						.rotation = rotation
