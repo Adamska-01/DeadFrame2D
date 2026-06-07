@@ -4,5 +4,5 @@
 
 namespace DF2D::Data
 {
-	using AudioResourceID = int64_t;
+	using AudioResourceID = uint32_t;
 }

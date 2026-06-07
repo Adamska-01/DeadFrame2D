@@ -11,7 +11,7 @@ namespace DF2D::Internal
 
 
 	SDLAudioBackend::SDLAudioBackend(AudioConfig config)
-		: nextID(0)
+		: nextID(1)
 	{
 		if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
 		{
@@ -44,7 +44,7 @@ namespace DF2D::Internal
 		{
 			std::cerr << "Failed to load music: " << Mix_GetError() << std::endl;
 
-			return -1;
+			return 0;
 		}
 
 		auto id = nextID++;

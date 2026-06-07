@@ -22,8 +22,8 @@ namespace DF2D::Engine
 
 	AudioSource::AudioSource()
 		: audioManager(nullptr),
-		sfxClip(-1),
-		musicTrack(-1),
+		sfxClip(0),
+		musicTrack(0),
 		collisionBody(nullptr),
 		collisionFixture(nullptr),
 		isMusic(false),
