@@ -1,6 +1,7 @@
 #pragma once
 #include "Constants/CommonColors.h"
-#include <SDL_render.h>
+#include "Core/Math/Color.h"
+#include "Core/Math/Rect.h"
 
 
 namespace DF2D::Data
@@ -9,10 +10,10 @@ namespace DF2D::Data
 	{
 		bool filled = true;
 
-		SDL_FRect destRect = SDL_FRect{ 0.0f, 0.0f, 0.0f, 0.0f };
+		Core::RectF destRect = Core::RectF{ 0.0f, 0.0f, 0.0f, 0.0f };
 
 		float rotation = 0.0f;
 
-		SDL_Color color = Constants::CommonColors::WHITE;
+		Core::Color color = Constants::CommonColors::WHITE;
 	};
 }

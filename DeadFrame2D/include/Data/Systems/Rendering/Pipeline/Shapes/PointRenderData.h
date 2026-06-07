@@ -1,7 +1,7 @@
 #pragma once
 #include "Constants/CommonColors.h"
+#include "Core/Math/Color.h"
 #include "Core/Math/Vector2.h"
-#include <SDL_render.h>
 
 
 namespace DF2D::Data
@@ -10,6 +10,6 @@ namespace DF2D::Data
 	{
 		Core::Vector2F pos = Core::Vector2F::Zero;
 
-		SDL_Color color = Constants::CommonColors::WHITE;
+		Core::Color color = Constants::CommonColors::WHITE;
 	};
 }

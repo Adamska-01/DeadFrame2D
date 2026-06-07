@@ -1,25 +1,29 @@
 #pragma once
 #include "Constants/CommonColors.h"
+#include "Core/Math/Color.h"
+#include "Core/Math/Rect.h"
+#include "Core/Math/Vector2.h"
+#include "Data/Systems/Graphics/TextureID.h"
+#include "Data/Systems/Rendering/RenderFlip.h"
 #include <optional>
-#include <SDL_render.h>
 
 
 namespace DF2D::Data
 {
 	struct SpriteRenderData
 	{
-		SDL_Texture* texture = nullptr;
+		Data::TextureID texture = 0;
 
-		std::optional<SDL_Rect> srcRect = std::nullopt;
+		std::optional<Core::RectI> srcRect = std::nullopt;
 
-		std::optional<SDL_FRect> destRect = std::nullopt;
+		std::optional<Core::RectF> destRect = std::nullopt;
 
-		SDL_RendererFlip flip = SDL_RendererFlip::SDL_FLIP_NONE;
+		Data::RenderFlip flip = Data::RenderFlip::NONE;
 
 		float rotation = 0.0f;
 
-		std::optional<SDL_FPoint> rotationOrigin = std::nullopt;
+		std::optional<Core::Vector2F> rotationOrigin = std::nullopt;
 
-		SDL_Color colorMod = Constants::CommonColors::WHITE;
+		Core::Color colorMod = Constants::CommonColors::WHITE;
 	};
 }
