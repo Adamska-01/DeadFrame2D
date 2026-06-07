@@ -2,14 +2,10 @@
 #include "Core/Context/Abstractions/ICoreSystem.h"
 #include "Core/Context/Systems/Graphics/Abstractions/ITextureBackend.h"
 #include "Core/Math/Vector2.h"
-#include "DF2D_API.h"
 #include "Data/Systems/Graphics/TextureID.h"
-#include <memory>
+#include "DF2D_API.h"
 #include <string>
 #include <unordered_map>
-
-
-struct SDL_Texture;
 
 
 namespace DF2D::Core
@@ -52,8 +48,6 @@ namespace DF2D::Core
 
 
 		Data::TextureID LoadTexture(std::string_view filename);
-
-		SDL_Texture* GetRawTexture(Data::TextureID id);
 
 		Vector2I GetTextureSize(Data::TextureID id);
 

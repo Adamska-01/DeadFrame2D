@@ -17,8 +17,6 @@ namespace DF2D::Core
 
 		virtual void UnloadTexture(Data::TextureID id) = 0;
 
-		virtual Core::Vector2I GetTextureSize(Data::TextureID id) = 0;
-
-		virtual void* GetNativeHandle(Data::TextureID id) = 0;
+		virtual Vector2I GetTextureSize(Data::TextureID id) = 0;
 	};
 }

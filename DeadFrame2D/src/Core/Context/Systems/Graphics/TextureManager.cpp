@@ -57,12 +57,6 @@ namespace DF2D::Core
 		return id;
 	}
 
-	SDL_Texture* TextureManager::GetRawTexture(Data::TextureID id)
-	{
-		if (id == 0) return nullptr;
-		return static_cast<SDL_Texture*>(backend->GetNativeHandle(id));
-	}
-
 	Vector2I TextureManager::GetTextureSize(Data::TextureID id)
 	{
 		auto it = textureSizes.find(id);
