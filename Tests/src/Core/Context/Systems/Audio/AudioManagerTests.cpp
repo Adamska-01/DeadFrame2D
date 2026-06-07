@@ -196,13 +196,13 @@ TEST_CASE("PlayMusics sets volume then plays via backend")
 }
 
 
-TEST_CASE("PlayMusics with invalid id (-1) returns false and does not call backend")
+TEST_CASE("PlayMusics with invalid id (0) returns false and does not call backend")
 {
 	AudioConfig config;
 	MockAudioBackend* mock = nullptr;
 	auto manager = MakeManager(config, mock);
 
-	auto result = manager->PlayMusics(-1, 0);
+	auto result = manager->PlayMusics(0, 0);
 
 	CHECK(result == false);
 	CHECK(mock->playMusicCount == 0);
@@ -230,13 +230,13 @@ TEST_CASE("PlaySFX sets channel volume after playing via backend")
 }
 
 
-TEST_CASE("PlaySFX with invalid id (-1) returns -1 and does not call backend")
+TEST_CASE("PlaySFX with invalid id (0) returns -1 and does not call backend")
 {
 	AudioConfig config;
 	MockAudioBackend* mock = nullptr;
 	auto manager = MakeManager(config, mock);
 
-	auto channel = manager->PlaySFX(-1, 0);
+	auto channel = manager->PlaySFX(0, 0);
 
 	CHECK(channel == -1);
 	CHECK(mock->playChannelCount == 0);
@@ -305,16 +305,16 @@ TEST_CASE("Different SFX file paths produce different cache entries")
 }
 
 
-TEST_CASE("LoadMusic with backend returning -1 is returned and not cached")
+TEST_CASE("LoadMusic with backend returning 0 is returned and not cached")
 {
 	AudioConfig config;
 	MockAudioBackend* mock = nullptr;
 	auto manager = MakeManager(config, mock);
 
-	mock->nextMusicId = -1; // Backend fails (SDLAudioBackend convention)
+	mock->nextMusicId = 0; // Backend fails
 
 	auto id1 = manager->LoadMusic("song.ogg");
-	CHECK(id1 == -1);
+	CHECK(id1 == 0);
 	CHECK(mock->loadMusicCount == 1);
 
 	mock->nextMusicId = 42; // Backend succeeds on retry
@@ -365,16 +365,18 @@ TEST_CASE("SetSFXVolume with specific channel does not update global sfxVolume")
 }
 
 
-TEST_CASE("PlayMusics with id == 0 passes through to backend (only negative values are guarded)")
+TEST_CASE("PlayMusics with valid id passes through to backend")
 {
 	AudioConfig config;
 	MockAudioBackend* mock = nullptr;
 	auto manager = MakeManager(config, mock);
 
-	auto result = manager->PlayMusics(0, 0);
+	auto id = manager->LoadMusic("song.ogg"); // id == 1
+	auto result = manager->PlayMusics(id, 0);
 
+	CHECK(result == true);
 	CHECK(mock->playMusicCount == 1);
-	CHECK(mock->lastPlayedMusic == 0);
+	CHECK(mock->lastPlayedMusic == id);
 }
 
 
