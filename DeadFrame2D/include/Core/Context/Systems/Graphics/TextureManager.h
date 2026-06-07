@@ -1,6 +1,9 @@
 #pragma once
 #include "Core/Context/Abstractions/ICoreSystem.h"
+#include "Core/Context/Systems/Graphics/Abstractions/ITextureBackend.h"
+#include "Core/Math/Vector2.h"
 #include "DF2D_API.h"
+#include "Data/Systems/Graphics/TextureID.h"
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -13,14 +16,28 @@ namespace DF2D::Core
 {
 	class DF2D_API TextureManager : public ICoreSystem
 	{
-		friend class SystemInitializer;
-
-
 	private:
-		static std::unordered_map<std::string, std::weak_ptr<SDL_Texture>> textureCache;
+		std::unordered_map<std::string, Data::TextureID> filenameToID;
+
+		std::unordered_map<Data::TextureID, Vector2I> textureSizes;
+
+		std::unique_ptr<ITextureBackend> backend;
 
 
-		TextureManager();
+		void BeginFrame() override;
+
+		void PreUpdate(float deltaTime) override;
+
+		void EndUpdate(float deltaTime) override;
+
+		void EndDraw() override;
+
+
+		Data::TextureID LoadTextureImpl(const std::string& filename);
+
+
+	public:
+		TextureManager(std::unique_ptr<ITextureBackend> backend);
 
 		~TextureManager() override;
 
@@ -34,16 +51,12 @@ namespace DF2D::Core
 		TextureManager& operator=(TextureManager&&) = delete;
 
 
-		void BeginFrame() override;
+		Data::TextureID LoadTexture(std::string_view filename);
 
-		void PreUpdate(float deltaTime) override;
+		SDL_Texture* GetRawTexture(Data::TextureID id);
 
-		void EndUpdate(float deltaTime) override;
+		Vector2I GetTextureSize(Data::TextureID id);
 
-		void EndDraw() override;
-
-
-	public:
-		static std::shared_ptr<SDL_Texture> LoadTexture(std::string_view filename);
+		void ClearCache();
 	};
 }

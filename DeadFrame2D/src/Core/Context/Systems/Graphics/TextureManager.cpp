@@ -1,41 +1,16 @@
-#if DEBUG
-#include <cassert>
-#endif
 #include "Core/Context/Systems/Graphics/TextureManager.h"
-#include "Core/Context/Systems/Rendering/Renderer.h"
-#include <memory>
-#include <SDL_image.h>
 
 
 namespace DF2D::Core
 {
-	using namespace DF2D::Engine;
-	using namespace DF2D::Constants;
-
-
-	std::unordered_map<std::string, std::weak_ptr<SDL_Texture>> TextureManager::textureCache = {};
-
-
-	TextureManager::TextureManager()
+	TextureManager::TextureManager(std::unique_ptr<ITextureBackend> backend)
+		: backend(std::move(backend))
 	{
-		auto initFlags = IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
-		if ((initFlags & (IMG_INIT_PNG | IMG_INIT_JPG)) != (IMG_INIT_PNG | IMG_INIT_JPG))
-		{
-			std::cerr << "Failed to initialize SDL_image with PNG/JPG support! Error: " << IMG_GetError() << std::endl;
-
-			return;
-		}
-
-		std::cout << "[Info] SDL_image successfully initialized." << std::endl;
 	}
 
 	TextureManager::~TextureManager()
 	{
-		textureCache.clear();
-
-		IMG_Quit();
-
-		std::cout << "[Info] SDL_image subsystem successfully quit." << std::endl;
+		ClearCache();
 	}
 
 	void TextureManager::BeginFrame()
@@ -58,42 +33,51 @@ namespace DF2D::Core
 
 	}
 
-	std::shared_ptr<SDL_Texture> TextureManager::LoadTexture(std::string_view filename)
+	Data::TextureID TextureManager::LoadTexture(std::string_view filename)
 	{
-		auto filenameString = std::string(filename);
+		return LoadTextureImpl(std::string(filename));
+	}
 
-		auto it = textureCache.find(filenameString);
+	Data::TextureID TextureManager::LoadTextureImpl(const std::string& filename)
+	{
+		auto it = filenameToID.find(filename);
 
-		if (it != textureCache.end())
+		if (it != filenameToID.end())
+			return it->second;
+
+		auto id = backend->LoadFromFile(filename);
+
+		if (id == 0)
+			return Data::TextureID{};
+
+		auto size = backend->GetTextureSize(id);
+		textureSizes[id] = size;
+		filenameToID[filename] = id;
+
+		return id;
+	}
+
+	SDL_Texture* TextureManager::GetRawTexture(Data::TextureID id)
+	{
+		if (id == 0) return nullptr;
+		return static_cast<SDL_Texture*>(backend->GetNativeHandle(id));
+	}
+
+	Vector2I TextureManager::GetTextureSize(Data::TextureID id)
+	{
+		auto it = textureSizes.find(id);
+
+		return it != textureSizes.end() ? it->second : Vector2I::Zero;
+	}
+
+	void TextureManager::ClearCache()
+	{
+		for (const auto& [filename, id] : filenameToID)
 		{
-			if (auto sharedPtr = it->second.lock())
-				return sharedPtr;
+			backend->UnloadTexture(id);
 		}
 
-		auto tempSurface = IMG_Load(filenameString.c_str());
-
-	#if DEBUG
-		assert(tempSurface && SDL_GetError());
-	#endif
-
-		auto texture = SDL_CreateTextureFromSurface(Renderer::GetRenderer(), tempSurface);
-
-	#if DEBUG
-		assert(texture && SDL_GetError());
-	#endif
-
-		SDL_FreeSurface(tempSurface);
-		tempSurface = nullptr;
-
-		auto sharedPtr = std::shared_ptr<SDL_Texture>(texture, [filenameString](SDL_Texture* texture)
-			{
-				SDL_DestroyTexture(texture);
-
-				TextureManager::textureCache.erase(filenameString);
-			});
-
-		textureCache[filenameString] = sharedPtr;
-
-		return sharedPtr;
+		filenameToID.clear();
+		textureSizes.clear();
 	}
 }
