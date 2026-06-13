@@ -19,8 +19,8 @@ namespace DF2D::Engine
 	TextMesh::TextMesh(const TextMeshComponentModel& textMeshConfiguration)
 		: text(textMeshConfiguration.text)
 	{
-		font = UIManager::LoadFont(textMeshConfiguration.fontSource, textMeshConfiguration.fontSize);
-	
+		fontSource = std::string(textMeshConfiguration.fontSource);
+
 		initialObjectScale = textMeshConfiguration.textObjectInitialScale;
 
 		centered = false;
@@ -36,6 +36,7 @@ namespace DF2D::Engine
 	{
 		UIComponent::Init();
 
+		uiManager = Guard::AgainstNullAssignment(GetGameObject()->CoreContext().uiManager, NAME_OF(uiManager));
 		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
 
 		transform->SetLocalScale(initialObjectScale);
@@ -52,7 +53,7 @@ namespace DF2D::Engine
 		renderTask.canvas = parentCanvas;
 		renderTask.renderData = SpriteRenderData
 		{
-			.texture = textTexture.get(),
+			.texture = textTexture,
 			.srcRect = std::nullopt,
 			.destRect = destRect,
 			.rotation = transform->GetWorldRotation()
@@ -61,43 +62,55 @@ namespace DF2D::Engine
 		RenderSystem::Submit(renderTask);
 	}
 
-	void TextMesh::SetFontSize(unsigned int newFontSize)
+	void TextMesh::SetFontSize(int newFontSize)
 	{
 		fontSize = newFontSize;
 	}
 
-	void TextMesh::SetTextColor(SDL_Color newColor)
+	void TextMesh::SetTextColor(Color newColor)
 	{
 		color = newColor;
 
-		textTexture = UIManager::LoadText(font, text, color, centered);
+		if (fontSource.empty() || text.empty())
+			return;
+
+		textTexture = uiManager->LoadText(fontSource, fontSize, text, color, centered);
 	}
 
 	void TextMesh::SetFontStyle(FontStyle newFontStyle)
 	{
+		if (fontSource.empty())
+			return;
+
+		auto font = uiManager->LoadFont(fontSource, fontSize);
+
+		if (font == nullptr)
+			return;
+
+		// TODO: this should not be here (move it in the backend)
 		TTF_SetFontStyle(font.get(), newFontStyle);
 
-		textTexture = UIManager::LoadText(font, text, color, centered);
+		textTexture = uiManager->LoadText(fontSource, fontSize, text, color, centered);
 	}
 
 	void TextMesh::SetText(std::string newText)
 	{
 		text = newText;
 
-		textTexture = UIManager::LoadText(font, text, color, centered);
+		if (fontSource.empty())
+			return;
 
-		auto width = 0, height = 0;
-		SDL_QueryTexture(textTexture.get(), NULL, NULL, &width, &height);
-
-		widgetSize.x = static_cast<float>(width);
-		widgetSize.y = static_cast<float>(height);
+		textTexture = uiManager->LoadText(fontSource, fontSize, text, color, centered);
 	}
 
 	void TextMesh::SetIsCentered(bool isCentered)
 	{
 		centered = isCentered;
 
-		textTexture = UIManager::LoadText(font, text, color, centered);
+		if (fontSource.empty())
+			return;
+
+		textTexture = uiManager->LoadText(fontSource, fontSize, text, color, centered);
 	}
 
 	std::string TextMesh::GetText()
@@ -105,18 +118,18 @@ namespace DF2D::Engine
 		return text;
 	}
 
-	SDL_FRect TextMesh::GetTextDestRect()
+	RectF TextMesh::GetTextDestRect()
 	{
 		auto currentPosition = transform->GetWorldPosition();
 		auto scaledSize = GetWidgetSize();
 		auto anchorVector = GetAnchorFromPreset(anchor);
 
-		return SDL_FRect
+		return RectF
 		{
-			currentPosition.x - (scaledSize.x * anchorVector.x),
-			currentPosition.y - (scaledSize.y * anchorVector.y),
-			scaledSize.x,
-			scaledSize.y
+			.x = currentPosition.x - (scaledSize.x * anchorVector.x),
+			.y = currentPosition.y - (scaledSize.y * anchorVector.y),
+			.w = scaledSize.x,
+			.h = scaledSize.y
 		};
 	}
 }

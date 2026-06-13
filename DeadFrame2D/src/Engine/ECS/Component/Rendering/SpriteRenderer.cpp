@@ -41,7 +41,7 @@ namespace DF2D::Engine
 		auto worldScale = transform->GetWorldScale();
 		auto worldRotation = transform->GetWorldRotation();
 
-		auto scaledDest = SDL_FRect
+		auto scaledDest = RectF
 		{
 			.x = worldPosition.x - (spriteSize.x * worldScale.x) / 2.0f,
 			.y = worldPosition.y - (spriteSize.y * worldScale.y) / 2.0f,
@@ -51,7 +51,7 @@ namespace DF2D::Engine
 
 		renderTask.renderData = SpriteRenderData
 		{
-			.texture = textureManager->GetRawTexture(spriteTexture),
+			.texture = spriteTexture,
 			.srcRect = std::nullopt,
 			.destRect = scaledDest,
 			.rotation = worldRotation

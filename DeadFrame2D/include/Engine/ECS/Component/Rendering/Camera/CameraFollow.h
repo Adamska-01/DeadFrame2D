@@ -1,10 +1,16 @@
 #pragma once
+#include "Core/Math/Rect.h"
 #include "Core/Math/Vector2.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/GameComponent.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Engine/ECS/System/Events/DispatchableEvent.h"
-#include <SDL_rect.h>
+
+
+namespace DF2D::Core
+{
+	class Renderer;
+}
 
 
 namespace DF2D::Engine
@@ -19,13 +25,15 @@ namespace DF2D::Engine
 
 
 	private:
+		Core::Renderer* renderer;
+
 		ComponentHandle<Camera> camera;
 
 		ComponentHandle<Transform> transform;
 
 		ObjectHandle<GameObject> target;
 
-		SDL_FRect worldBounds;
+		Core::RectF worldBounds;
 
 		Core::Vector2F offset;
 
@@ -43,12 +51,14 @@ namespace DF2D::Engine
 		virtual ~CameraFollow() override;
 
 
+		virtual void Init() override;
+
 		virtual void Update(float deltaTime) override;
 
 
 		void SetTarget(ObjectHandle<GameObject> newTarget);
 
-		void SetBounds(const SDL_FRect& bounds);
+		void SetBounds(const Core::RectF& bounds);
 
 		void SetOffset(Core::Vector2F newOffset);
 

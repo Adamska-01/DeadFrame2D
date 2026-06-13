@@ -18,8 +18,6 @@ namespace DF2D::Engine
 	ImageScroller::ImageScroller(std::string_view textureSource, ScrollDirection scrollDirection, float scrollSpeed)
 		: SpriteRenderer(textureSource), scrollDirection(scrollDirection), scrollSpeed(scrollSpeed)
 	{
-		renderTargetSize = Renderer::GetResolutionTarget();
-
 		scrollOffset = 0;
 
 		EventDispatcher::RegisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), this, &ImageScroller::RenderTargetSizeChangedHandler);
@@ -28,6 +26,16 @@ namespace DF2D::Engine
 	ImageScroller::~ImageScroller()
 	{
 		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), this);
+	}
+
+	void ImageScroller::Init()
+	{
+		auto renderer = GetGameObject()->CoreContext().renderer;
+
+		if (renderer != nullptr)
+		{
+			renderTargetSize = renderer->GetResolutionTarget();
+		}
 	}
 
 	void ImageScroller::RenderTargetSizeChangedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
@@ -95,7 +103,7 @@ namespace DF2D::Engine
 		{
 			for (auto x = 0; x < (isHorizontal ? tilesX : 1); ++x)
 			{
-				auto destRect = SDL_FRect
+				auto destRect = RectF
 				{
 					.x = x * scaledTileWidth - (isHorizontal ? scrollOffset : 0) + position.x,
 					.y = y * scaledTileHeight - (isHorizontal ? 0 : scrollOffset) + position.y,
@@ -105,7 +113,7 @@ namespace DF2D::Engine
 
 				renderTask.renderData = SpriteRenderData
 				{
-					.texture = textureManager->GetRawTexture(spriteTexture),
+					.texture = spriteTexture,
 					.destRect = destRect,
 					.rotation = transform->GetWorldRotation(),
 				};

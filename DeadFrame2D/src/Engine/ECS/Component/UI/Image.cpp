@@ -5,7 +5,6 @@
 #include "Engine/ECS/Component/UI/Canvas.h"
 #include "Engine/ECS/Component/UI/Image.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
-#include "Utilities/Debugging/Guards.h"
 
 
 namespace DF2D::Engine
@@ -14,7 +13,6 @@ namespace DF2D::Engine
 	using namespace DF2D::Core;
 	using namespace DF2D::Data;
 	using namespace DF2D::Engine;
-	using namespace DF2D::Utilities;
 
 
 	Image::Image()
@@ -26,7 +24,7 @@ namespace DF2D::Engine
 	{
 		UIComponent::Init();
 
-		textureManager = Guard::AgainstNullAssignment(GetGameObject()->CoreContext().textureManager, NAME_OF(textureManager));
+		textureManager = GetGameObject()->CoreContext().textureManager;
 	}
 
 	void Image::Draw()
@@ -38,12 +36,12 @@ namespace DF2D::Engine
 		auto scaledSize = GetWidgetSize();
 		auto anchorVector = GetAnchorFromPreset(anchor);
 
-		auto destRect = SDL_FRect
+		auto destRect = Core::RectF
 		{
-			currentPosition.x - (scaledSize.x * anchorVector.x),
-			currentPosition.y - (scaledSize.y * anchorVector.y),
-			scaledSize.x,
-			scaledSize.y
+			.x = currentPosition.x - (scaledSize.x * anchorVector.x),
+			.y = currentPosition.y - (scaledSize.y * anchorVector.y),
+			.w = scaledSize.x,
+			.h = scaledSize.y
 		};
 
 		renderTask.renderPhase = parentCanvas->GetRenderMode() == CanvasRenderMode::SCREEN_SPACE_CAMERA ? RenderPhase::SCREEN_SPACE_CAMERA_UI : RenderPhase::SCREEN_SPACE_OVERLAY_UI;
@@ -54,9 +52,9 @@ namespace DF2D::Engine
 		{
 			renderTask.renderData = SpriteRenderData
 			{
-				.texture = textureManager->GetRawTexture(sourceImage),
+				.texture = sourceImage,
 				.destRect = destRect,
-				.flip = SDL_RendererFlip::SDL_FLIP_NONE,
+				.flip = RenderFlip::NONE,
 				.rotation = worldRotation,
 				.colorMod = color
 			};

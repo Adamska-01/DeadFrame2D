@@ -87,7 +87,7 @@ namespace DF2D::Engine
 		const auto position = transform->GetWorldPosition();
 		const auto scale = transform->GetWorldScale();
 
-		auto srcRect = SDL_Rect
+		auto srcRect = RectI
 		{
 			.x = frameRect.w * frameIndex,
 			.y = frameRect.h * props.sourceRowNumber,
@@ -95,7 +95,7 @@ namespace DF2D::Engine
 			.h = frameRect.h
 		};
 
-		auto dstRect = SDL_FRect
+		auto dstRect = RectF
 		{
 			.x = std::round(position.x - (frameRect.w * scale.x * 0.5f)),
 			.y = std::round(position.y - (frameRect.h * scale.y * 0.5f)),
@@ -105,7 +105,7 @@ namespace DF2D::Engine
 
 		renderTask.renderData = SpriteRenderData
 		{
-			.texture = textureManager->GetRawTexture(spriteTextureID),
+			.texture = spriteTextureID,
 			.srcRect = srcRect,
 			.destRect = dstRect,
 			.flip = animState.flipState,
@@ -119,13 +119,13 @@ namespace DF2D::Engine
 	{
 		if (properties.name.empty())
 			return;
-	
+
 		animations[properties.name] = properties;
 
 		if (animations.size() == 1)
 		{
 			currentAnimationID = properties.name;
-		
+
 			animState = SpriteAnimationState();
 		}
 	}
@@ -136,7 +136,7 @@ namespace DF2D::Engine
 			return;
 
 		auto it = animations.find(name);
-	
+
 		if (it == animations.end())
 			return;
 
@@ -150,7 +150,7 @@ namespace DF2D::Engine
 		return currentAnimationID == name;
 	}
 
-	void SpriteAnimator::SetFlipState(SDL_RendererFlip flipState)
+	void SpriteAnimator::SetFlipState(RenderFlip flipState)
 	{
 		animState.flipState = flipState;
 	}
@@ -173,7 +173,7 @@ namespace DF2D::Engine
 		return nullptr;
 	}
 
-	SDL_Rect SpriteAnimator::GetFrameRect() const
+	RectI SpriteAnimator::GetFrameRect() const
 	{
 		auto size = textureManager->GetTextureSize(sprite->GetTexture());
 
@@ -182,7 +182,7 @@ namespace DF2D::Engine
 		const int frameWidth = size.x / props.columnCount;
 		const int frameHeight = size.y / props.rowCount;
 
-		return SDL_Rect
+		return RectI
 		{
 			.x = 0,
 			.y = 0,

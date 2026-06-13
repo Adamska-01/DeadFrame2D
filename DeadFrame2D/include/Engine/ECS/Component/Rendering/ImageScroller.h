@@ -35,6 +35,8 @@ namespace DF2D::Engine
 		virtual ~ImageScroller() override;
 
 
+		virtual void Init() override;
+
 		virtual void Update(float deltaTime) override;
 
 		virtual void Draw() override;

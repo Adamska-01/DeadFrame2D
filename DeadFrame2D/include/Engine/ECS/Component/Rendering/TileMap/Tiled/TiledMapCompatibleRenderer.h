@@ -21,6 +21,8 @@ namespace DF2D::Engine
 
 
 	private:
+		bool extendMapToRenderTarget = false;
+
 		std::unordered_map<int, int> tileIDToTileSet;
 
 		ComponentHandle<Transform> transform;

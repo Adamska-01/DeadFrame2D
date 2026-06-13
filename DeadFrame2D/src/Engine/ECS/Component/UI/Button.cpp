@@ -90,7 +90,7 @@ namespace DF2D::Engine
 				}
 			}
 			break;
-	
+
 		case SDL_EventType::SDL_MOUSEMOTION:
 			{
 				auto destRect = GetBoundingBox();
@@ -138,14 +138,14 @@ namespace DF2D::Engine
 		{
 			renderTask.renderData = SpriteRenderData
 			{
-				.texture = textureManager->GetRawTexture(currentButtonImage),
+				.texture = currentButtonImage,
 				.destRect = destRect,
 				.rotation = transform->GetWorldRotation()
 			};
 		}
 		else
 		{
-			SDL_Color fillColor;
+			Color fillColor;
 
 			if (isPressed)
 			{
@@ -224,47 +224,47 @@ namespace DF2D::Engine
 		this->onEnterCallback.AddHandle(handle, onEnterHandler);
 	}
 
-	SDL_FRect Button::GetBoundingBox() const
+	RectF Button::GetBoundingBox() const
 	{
 		auto currentPosition = transform->GetWorldPosition();
 		auto scaledSize = GetWidgetSize();
 		auto anchorVector = GetAnchorFromPreset(anchor);
 
-		return SDL_FRect
+		return RectF
 		{
-			currentPosition.x - (scaledSize.x * anchorVector.x),
-			currentPosition.y - (scaledSize.y * anchorVector.y),
-			scaledSize.x,
-			scaledSize.y
+			.x = currentPosition.x - (scaledSize.x * anchorVector.x),
+			.y = currentPosition.y - (scaledSize.y * anchorVector.y),
+			.w = scaledSize.x,
+			.h = scaledSize.y
 		};
 	}
 
-	SDL_Color Button::GetIdleFillColor() const
+	Color Button::GetIdleFillColor() const
 	{
 		return idleFillColor;
 	}
 
-	SDL_Color Button::GetHoveredFillColor() const
+	Color Button::GetHoveredFillColor() const
 	{
 		return hoveredFillColor;
 	}
 
-	SDL_Color Button::GetPressedFillColor() const
+	Color Button::GetPressedFillColor() const
 	{
 		return pressedFillColor;
 	}
 
-	void Button::SetIdleFillColor(const SDL_Color& color)
+	void Button::SetIdleFillColor(const Color& color)
 	{
 		idleFillColor = color;
 	}
 
-	void Button::SetHoveredFillColor(const SDL_Color& color)
+	void Button::SetHoveredFillColor(const Color& color)
 	{
 		hoveredFillColor = color;
 	}
 
-	void Button::SetPressedFillColor(const SDL_Color& color)
+	void Button::SetPressedFillColor(const Color& color)
 	{
 		pressedFillColor = color;
 	}

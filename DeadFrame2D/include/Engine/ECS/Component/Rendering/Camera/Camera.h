@@ -1,15 +1,14 @@
 #pragma once
+#include "Core/Math/Rect.h"
 #include "Core/Math/Vector2.h"
+#include "Data/Systems/Graphics/TextureID.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/GameComponent.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Engine/ECS/System/Events/DispatchableEvent.h"
 #include <memory>
-#include <SDL.h>
 #include <vector>
 
-
-struct SDL_Texture;
 
 namespace DF2D::Core
 {
@@ -36,9 +35,9 @@ namespace DF2D::Engine
 
 		Core::Vector2I resolutionTarget;
 
-		SDL_FRect normalizedViewport;
-		
-		SDL_Texture* renderTarget = nullptr;
+		Core::RectF normalizedViewport;
+
+		Data::TextureID renderTarget;
 
 		float zoom;
 
@@ -57,20 +56,20 @@ namespace DF2D::Engine
 
 		void SetZoom(float zoom);
 
-		void SetViewport(const SDL_FRect& normalizedViewport);
+		void SetViewport(const Core::RectF& normalizedViewport);
 
 		float GetZoom() const;
 
-		/** @brief Sets the normalized viewport (0–1 range). */
-		const SDL_FRect& GetViewport() const;
+		/** @brief Sets the normalized viewport (0-1 range). */
+		const Core::RectF& GetViewport() const;
 
 		/** @brief Returns the screen-space viewbox for this camera. */
-		SDL_FRect GetViewBox() const;
+		Core::RectF GetViewBox() const;
 
 		/** @brief Returns the screen-space normalized viewbox for this camera. */
-		SDL_FRect GetNormalizedViewBox() const;
+		Core::RectF GetNormalizedViewBox() const;
 
-		SDL_Texture* GetRenderTarget();
+		Data::TextureID GetRenderTarget() const;
 
 		/** @brief Converts world position to screen position. */
 		Core::Vector2F WorldToScreen(const Core::Vector2F& worldPos) const;

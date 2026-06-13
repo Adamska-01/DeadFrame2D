@@ -1,11 +1,9 @@
-#include "Core/Context/Systems/Graphics/TextureManager.h"
 #include "Core/Context/Systems/Rendering/Renderer.h"
 #include "Engine/ECS/Component/Rendering/Camera/Camera.h"
 #include "Engine/ECS/Component/Transform.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include "Engine/ECS/System/Events/EventDispatcher.h"
 #include "Engine/Events/Context/Renderer/RenderTargetSizeChangedEvent.h"
-#include "Utilities/Collisions/CollisionUtils.h"
 #include "Utilities/Debugging/Guards.h"
 #include <typeindex>
 
@@ -13,6 +11,7 @@
 namespace DF2D::Engine
 {
 	using namespace DF2D::Core;
+	using namespace DF2D::Data;
 	using namespace DF2D::Utilities;
 
 
@@ -21,13 +20,10 @@ namespace DF2D::Engine
 
 	Camera::Camera()
 		: normalizedViewport({ 0.0f, 0.0f, 1.0f, 1.0f }),
+		renderTarget(0),
 		zoom(1.0f)
 	{
 		cameras.push_back(this);
-
-		resolutionTarget = Renderer::GetResolutionTarget();
-
-		renderTarget = SDL_CreateTexture(Renderer::GetRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, resolutionTarget.x, resolutionTarget.y);
 
 		EventDispatcher::RegisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), this, &Camera::RenderTargetSizeChangedEventHandler);
 	}
@@ -35,6 +31,18 @@ namespace DF2D::Engine
 	Camera::~Camera()
 	{
 		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), this);
+
+		if (renderTarget != 0)
+		{
+			auto renderer = GetGameObject()->CoreContext().renderer;
+
+			if (renderer != nullptr)
+			{
+				renderer->DestroyTexture(renderTarget);
+			}
+
+			renderTarget = 0;
+		}
 
 		std::erase(cameras, this);
 	}
@@ -48,25 +56,43 @@ namespace DF2D::Engine
 
 		resolutionTarget = renderTargetSizeChangeEvent->renderTargetSize;
 
-		if (renderTarget != nullptr)
-		{
-			SDL_DestroyTexture(renderTarget);
-		}
+		auto renderer = GetGameObject()->CoreContext().renderer;
 
-		renderTarget = SDL_CreateTexture(Renderer::GetRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, resolutionTarget.x, resolutionTarget.y);
+		if (renderer != nullptr)
+		{
+			if (renderTarget != 0)
+			{
+				renderer->DestroyTexture(renderTarget);
+			}
+
+			renderTarget = renderer->CreateRenderTarget(resolutionTarget.x, resolutionTarget.y);
+		}
 	}
 
 	void Camera::Init()
 	{
 		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
+
+		auto renderer = GetGameObject()->CoreContext().renderer;
+
+		if (renderer != nullptr)
+		{
+			resolutionTarget = renderer->GetResolutionTarget();
+
+			if (renderTarget == 0)
+			{
+				renderTarget = renderer->CreateRenderTarget(resolutionTarget.x, resolutionTarget.y);
+			}
+		}
 	}
 
 	void Camera::SetZoom(float zoom)
 	{
-		this->zoom = std::max(0.01f, zoom); // Prevent negative or zero
+		// Prevent negative or zero
+		this->zoom = std::max(0.01f, zoom);
 	}
 
-	void Camera::SetViewport(const SDL_FRect& normalizedViewport)
+	void Camera::SetViewport(const RectF& normalizedViewport)
 	{
 		this->normalizedViewport = normalizedViewport;
 	}
@@ -76,14 +102,15 @@ namespace DF2D::Engine
 		return zoom;
 	}
 
-	const SDL_FRect& Camera::GetViewport() const
+	const RectF& Camera::GetViewport() const
 	{
 		return normalizedViewport;
 	}
 
-	SDL_FRect Camera::GetViewBox() const
+	// TODO: Return Vector2F (?)
+	RectF Camera::GetViewBox() const
 	{
-		return SDL_FRect
+		return RectF
 		{
 			.x = 0.0f,
 			.y = 0.0f,
@@ -92,9 +119,9 @@ namespace DF2D::Engine
 		};
 	}
 
-	SDL_FRect Camera::GetNormalizedViewBox() const
+	RectF Camera::GetNormalizedViewBox() const
 	{
-		return SDL_FRect
+		return RectF
 		{
 			.x = normalizedViewport.x * resolutionTarget.x,
 			.y = normalizedViewport.y * resolutionTarget.y,
@@ -103,7 +130,7 @@ namespace DF2D::Engine
 		};
 	}
 
-	SDL_Texture* Camera::GetRenderTarget()
+	TextureID Camera::GetRenderTarget() const
 	{
 		return renderTarget;
 	}

@@ -19,16 +19,20 @@ namespace DF2D::Engine
 	{
 		this->tileMap = tileMap;
 
-		if (!extendMapToRenderTarget)
-			return;
-
-		Renderer::SetResolutionTarget({ tileMap->width * tileMap->tileSize + 32, tileMap->height * tileMap->tileSize });
+		this->extendMapToRenderTarget = extendMapToRenderTarget;
 	}
 
 	void TiledMapCompatibleRenderer::Init()
 	{
 		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
 		textureManager = GetGameObject()->CoreContext().textureManager;
+
+		auto renderer = GetGameObject()->CoreContext().renderer;
+
+		if (extendMapToRenderTarget && renderer != nullptr)
+		{
+			renderer->SetResolutionTarget({ tileMap->width * tileMap->tileSize + 32, tileMap->height * tileMap->tileSize });
+		}
 
 		auto size = static_cast<int>(tileMap->tileSets.size());
 
@@ -41,13 +45,10 @@ namespace DF2D::Engine
 		}
 	}
 
-	// TODO: Should perform pre-culling here (Culling is performed during the rendering pipeline,
-	// but iterating through every single tile every frame is not ideal. Use the camera to 
-	// calculate which tiles need to be renderered (Take multiple-camera scenarios into account)
 	void TiledMapCompatibleRenderer::Draw()
 	{
 		const auto& tileSets = tileMap->tileSets;
-		
+
 		auto rotation = transform->GetWorldRotation();
 
 		auto batchData = SpriteBatchRenderData();
@@ -61,40 +62,36 @@ namespace DF2D::Engine
 				{
 					auto tileID = layer.Data[i][j];
 
-					// Skip empty tiles
-					if (tileID == 0) 
-						continue; 
+					if (tileID == 0)
+						continue;
 
-					// Get tileSetIndex directly from the precomputed map
 					auto tileSetIndex = tileIDToTileSet[tileID];
 
-					// Get the corresponding TileSet
 					const auto& tileSet = tileSets[tileSetIndex];
 					auto tileSetSize = tileSet.tileSize;
 					auto tileSetColumnCount = tileSet.columnCount;
 
-					// Calculate tileRow and tileCol
 					auto tileRow = (tileID - tileSet.firstID) / tileSetColumnCount;
 					auto tileCol = (tileID - tileSet.firstID) % tileSetColumnCount;
 
-					auto src = SDL_Rect
-					{ 
+					auto src = Core::RectI
+					{
 						.x = tileCol * tileSetSize,
 						.y = tileRow * tileSetSize,
 						.w = tileSetSize,
 						.h = tileSetSize
 					};
-					auto dest = SDL_FRect
-					{ 
-						.x = static_cast<float>(j * tileSetSize), 
-						.y = static_cast<float>(i * tileSetSize), 
-						.w = static_cast<float>(tileSetSize), 
-						.h = static_cast<float>(tileSetSize) 
+					auto dest = Core::RectF
+					{
+						.x = static_cast<float>(j * tileSetSize),
+						.y = static_cast<float>(i * tileSetSize),
+						.w = static_cast<float>(tileSetSize),
+						.h = static_cast<float>(tileSetSize)
 					};
 
-					auto renderData = SpriteRenderData
-					{
-						.texture = textureManager->GetRawTexture(tileSet.tileSetTexture),
+				auto renderData = SpriteRenderData
+				{
+					.texture = tileSet.tileSetTexture,
 						.srcRect = src,
 						.destRect = dest,
 						.rotation = rotation

@@ -1,5 +1,6 @@
 #pragma once
 #include "Constants/Paths/ResourcePaths.h"
+#include "Core/Math/Color.h"
 #include "Core/Math/Vector2.h"
 #include "Data/Components/UI/Text/FontStyle.h"
 #include <string>
@@ -16,8 +17,8 @@ namespace DF2D::Data
 
 		std::string text = "New Text";
 
-		SDL_Color textColor = SDL_Color{ 255, 255,  255,  255 };
-	
+		Core::Color textColor = Core::Color{ 255, 255, 255, 255 };
+
 		unsigned int fontSize = 30;
 
 		Core::Vector2F textObjectInitialScale = Core::Vector2F::One;

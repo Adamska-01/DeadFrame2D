@@ -1,5 +1,5 @@
 #pragma once
-#include <SDL_render.h>
+#include "Data/Systems/Rendering/RenderFlip.h"
 
 
 namespace DF2D::Data
@@ -14,6 +14,6 @@ namespace DF2D::Data
 		bool started = false;
 
 		/** @brief Optional flip state. */
-		SDL_RendererFlip flipState = SDL_RendererFlip::SDL_FLIP_NONE;
+		RenderFlip flipState = RenderFlip::NONE;
 	};
 }

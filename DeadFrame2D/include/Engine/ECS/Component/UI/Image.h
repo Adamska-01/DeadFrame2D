@@ -1,8 +1,9 @@
 #pragma once
+#include "Core/Math/Color.h"
 #include "Data/Systems/Graphics/TextureID.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
-#include <SDL.h>
+#include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include <string_view>
 
 
@@ -20,11 +21,13 @@ namespace DF2D::Engine
 
 
 	private:
-		Data::TextureID sourceImage = 0;
-
-		SDL_Color color;
+		ComponentHandle<Transform> transform;
 
 		Core::TextureManager* textureManager = nullptr;
+
+		Data::TextureID sourceImage = 0;
+
+		Core::Color color;
 
 
 	public:

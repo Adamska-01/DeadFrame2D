@@ -1,16 +1,19 @@
 #pragma once
+#include "Core/Math/Color.h"
+#include "Core/Math/Rect.h"
 #include "Core/Math/Vector2.h"
 #include "Data/Components/UI/Text/FontStyle.h"
+#include "Data/Systems/Graphics/TextureID.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
-#include <memory>
 #include <string>
 
 
-struct SDL_Texture;
-struct SDL_Color;
-struct SDL_Rect;
+namespace DF2D::Core
+{
+	class UIManager;
+}
 
 namespace DF2D::Data
 {
@@ -29,21 +32,23 @@ namespace DF2D::Engine
 
 
 	private:
+		Core::UIManager* uiManager;
+
 		ComponentHandle<Transform> transform;
 
 		Core::Vector2F initialObjectScale;
 
-		std::shared_ptr<SDL_Texture> textTexture;
+		Data::TextureID textTexture = 0;
 
-		std::shared_ptr<TTF_Font> font;
+		std::string fontSource;
+
+		int fontSize = 30;
 
 		std::string text;
 
-		SDL_Color color;
+		Core::Color color;
 
 		bool centered;
-
-		unsigned int fontSize;
 
 
 	public:
@@ -57,9 +62,9 @@ namespace DF2D::Engine
 		virtual void Draw() override;
 
 
-		void SetFontSize(unsigned int newFontSize);
+		void SetFontSize(int newFontSize);
 
-		void SetTextColor(SDL_Color newColor);
+		void SetTextColor(Core::Color newColor);
 
 		void SetFontStyle(Data::FontStyle newFontStyle);
 
@@ -69,6 +74,6 @@ namespace DF2D::Engine
 
 		std::string GetText();
 
-		SDL_FRect GetTextDestRect();
+		Core::RectF GetTextDestRect();
 	};
 }

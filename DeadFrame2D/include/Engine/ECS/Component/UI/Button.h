@@ -1,4 +1,6 @@
 #pragma once
+#include "Core/Math/Color.h"
+#include "Core/Math/Rect.h"
 #include "Core/Services/Events/Abstractions/IEventProcessor.h"
 #include "Data/Systems/Graphics/TextureID.h"
 #include "DF2D_API.h"
@@ -47,11 +49,11 @@ namespace DF2D::Engine
 
 		std::string pressedSource;
 
-		SDL_Color idleFillColor;
+		Core::Color idleFillColor;
 
-		SDL_Color hoveredFillColor;
+		Core::Color hoveredFillColor;
 
-		SDL_Color pressedFillColor;
+		Core::Color pressedFillColor;
 
 
 		std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
@@ -81,19 +83,19 @@ namespace DF2D::Engine
 
 		void AddEnterCallback(const ComponentHandleBase& handle, std::function<void()> onEnterHandler);
 
-		SDL_FRect GetBoundingBox() const;
+		Core::RectF GetBoundingBox() const;
 
-		SDL_Color GetIdleFillColor() const;
+		Core::Color GetIdleFillColor() const;
 
-		SDL_Color GetHoveredFillColor() const;
+		Core::Color GetHoveredFillColor() const;
 
-		SDL_Color GetPressedFillColor() const;
+		Core::Color GetPressedFillColor() const;
 
-		void SetIdleFillColor(const SDL_Color& color);
+		void SetIdleFillColor(const Core::Color& color);
 
-		void SetHoveredFillColor(const SDL_Color& color);
+		void SetHoveredFillColor(const Core::Color& color);
 
-		void SetPressedFillColor(const SDL_Color& color);
+		void SetPressedFillColor(const Core::Color& color);
 
 		void SetIdleButtonImageSource(std::string_view idleButtonSource);
 

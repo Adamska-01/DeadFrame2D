@@ -5,7 +5,7 @@
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include "Engine/ECS/System/Events/EventDispatcher.h"
 #include "Engine/Events/Context/Renderer/RenderTargetSizeChangedEvent.h"
-#include "Utilities/Helpers/Events/EventHelpers.h"
+#include "Utilities/Debugging/Guards.h"
 #include <algorithm>
 #include <limits>
 
@@ -17,22 +17,31 @@ namespace DF2D::Engine
 
 
 	CameraFollow::CameraFollow(ComponentHandle<Camera> camera, ObjectHandle<GameObject> target)
-		: camera(camera),
+		: renderer(nullptr),
+		camera(camera),
 		target(target),
 		offset(Vector2F::Zero),
 		followSpeed(10.0f)
 	{
-		worldBounds = SDL_FRect
-		{ 
+		worldBounds = RectF
+		{
 			-std::numeric_limits<float>::infinity(),
 			-std::numeric_limits<float>::infinity(),
 			std::numeric_limits<float>::infinity(),
 			std::numeric_limits<float>::infinity()
 		};
 
-		resolutionTarget = Renderer::GetResolutionTarget();
-
 		EventDispatcher::RegisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), this, &CameraFollow::RenderTargetSizeChangedEventHandler);
+	}
+
+	void CameraFollow::Init()
+	{
+		renderer = Guard::AgainstNullAssignment(GetGameObject()->CoreContext().renderer, NAME_OF(renderer));
+
+		if (renderer != nullptr)
+		{
+			resolutionTarget = renderer->GetResolutionTarget();
+		}
 	}
 
 	CameraFollow::~CameraFollow()
@@ -65,7 +74,7 @@ namespace DF2D::Engine
 
 		const auto targetPos = targetTransform->GetWorldPosition();
 		const auto zoom = std::max(camera->GetZoom(), 0.01f);
-		const auto res = Renderer::GetResolutionTarget();
+		const auto res = resolutionTarget;
 
 		const auto viewSize = Vector2F
 		{
@@ -102,7 +111,7 @@ namespace DF2D::Engine
 		target = newTarget;
 	}
 
-	void CameraFollow::SetBounds(const SDL_FRect& bounds)
+	void CameraFollow::SetBounds(const RectF& bounds)
 	{
 		worldBounds = bounds;
 	}

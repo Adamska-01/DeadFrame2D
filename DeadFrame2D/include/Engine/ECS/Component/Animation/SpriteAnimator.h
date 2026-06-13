@@ -1,7 +1,9 @@
 #pragma once
+#include "Core/Math/Rect.h"
 #include "Data/Components/Animation/SpriteAnimationProperties.h"
 #include "Data/Components/Animation/SpriteAnimationState.h"
 #include "Data/Systems/Rendering/Pipeline/RenderTask.h"
+#include "Data/Systems/Rendering/RenderFlip.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/GameComponent.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
@@ -59,12 +61,12 @@ namespace DF2D::Engine
 
 		bool IsPlaying(const std::string& name) const;
 
-		void SetFlipState(SDL_RendererFlip flipState);
+		void SetFlipState(Data::RenderFlip flipState);
 
 		float GetAnimationProgressRatio() const;
 
 		const Data::SpriteAnimationProperties* GetCurrentAnimationProperties() const;
 
-		SDL_Rect GetFrameRect() const;
+		Core::RectI GetFrameRect() const;
 	};
 }
