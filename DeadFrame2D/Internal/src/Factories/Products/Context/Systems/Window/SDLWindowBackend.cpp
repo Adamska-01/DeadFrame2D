@@ -10,8 +10,9 @@
 #include <set>
 
 
-namespace DF2D::Core
+namespace DF2D::Internal
 {
+	using namespace DF2D::Core;
 	using namespace DF2D::Constants;
 
 

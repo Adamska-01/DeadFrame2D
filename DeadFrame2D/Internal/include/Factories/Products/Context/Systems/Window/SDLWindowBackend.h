@@ -6,9 +6,9 @@
 struct SDL_Window;
 
 
-namespace DF2D::Core
+namespace DF2D::Internal
 {
-	class DF2D_API SDLWindowBackend : public IWindowBackend
+	class DF2D_API SDLWindowBackend : public Core::IWindowBackend
 	{
 	private:
 		SDL_Window* window = nullptr;
