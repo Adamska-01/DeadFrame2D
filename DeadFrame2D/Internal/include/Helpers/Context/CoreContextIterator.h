@@ -5,7 +5,7 @@
 namespace DF2D::Internal::CoreContextIterator
 {
 	template<typename Func>
-	void ForEach(Data::CoreContext & ctx, Func&& func)
+	void ForEach(Data::CoreContext& ctx, Func&& func)
 	{
 		func(ctx.audioManager);
 		func(ctx.coroutineScheduler);
