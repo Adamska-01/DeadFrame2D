@@ -9,6 +9,6 @@ namespace DF2D::Data
 	{
 		TextureID textureID = 0;
 
-		Core::Vector2I size = Core::Vector2I::One;
+		Core::Vector2I size = Core::Vector2I::Zero;
 	};
 }
