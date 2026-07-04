@@ -14,6 +14,7 @@ namespace DF2D::Core
 {
 	struct Circle;
 	class DeadFrameRuntime;
+	class Renderer;
 }
 
 
@@ -32,6 +33,8 @@ namespace DF2D::Engine
 
 
 		ComponentHandle<Transform> transform;
+
+		Core::Renderer* renderer = nullptr;
 
 		Core::Vector2I resolutionTarget;
 

@@ -15,7 +15,7 @@ namespace DF2D::Factories
 	{
 		renderTask.renderPhase = RenderPhase::DEBUG_WORLD;
 		renderTask.sortOrder = DefaultSortOrders::DEBUG_RENDERER;
-		
+
 		SetFlags(
 			b2Draw::e_shapeBit |
 			b2Draw::e_jointBit |
@@ -28,7 +28,7 @@ namespace DF2D::Factories
 	{
 		const auto PIXEL_PER_METER = PhysicsEngine2D::GetPhysicsConfig().pixelPerMeter;
 
-		auto lineColor = SDL_Color(uint8_t(color.r * 255), uint8_t(color.g * 255), uint8_t(color.b * 255), uint8_t(color.a * 255));
+		auto lineColor = Color(uint8_t(color.r * 255), uint8_t(color.g * 255), uint8_t(color.b * 255), uint8_t(color.a * 255));
 
 		for (int32 i = 0; i < vertexCount; ++i)
 		{
@@ -60,7 +60,7 @@ namespace DF2D::Factories
 			.center = Vector2F(center.x * PIXEL_PER_METER, center.y * PIXEL_PER_METER),
 			.radius = radius * PIXEL_PER_METER,
 			.filled = false,
-			.color = SDL_Color{ Uint8(color.r * 255), Uint8(color.g * 255), Uint8(color.b * 255), Uint8(color.a * 255) }
+			.color = Color{ uint8_t(color.r * 255), uint8_t(color.g * 255), uint8_t(color.b * 255), uint8_t(color.a * 255) }
 		};
 
 		circleBatchData.circleBatch.push_back(circleRenderData);
@@ -74,12 +74,18 @@ namespace DF2D::Factories
 	void ColliderDrawer::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
 	{
 		const auto PIXEL_PER_METER = PhysicsEngine2D::GetPhysicsConfig().pixelPerMeter;
-		
+
 		auto lineRenderData = LineRenderData
 		{
 			.p1 = Vector2F(p1.x * PIXEL_PER_METER, p1.y * PIXEL_PER_METER),
 			.p2 = Vector2F(p2.x * PIXEL_PER_METER, p2.y * PIXEL_PER_METER),
-			.color = SDL_Color(uint8_t(color.r * 255), uint8_t(color.g * 255), uint8_t(color.b * 255), uint8_t(color.a * 255))
+			.color = Color
+			{
+				.r = uint8_t(color.r * 255),
+				.g = uint8_t(color.g * 255),
+				.b = uint8_t(color.b * 255),
+				.a = uint8_t(color.a * 255)
+			}
 		};
 
 		lineBatchData.lineBatch.push_back(lineRenderData);
@@ -98,7 +104,13 @@ namespace DF2D::Factories
 
 		auto halfSize = static_cast<int>(std::round(size * 0.5f));
 
-		auto pointColor = SDL_Color(uint8_t(color.r * 255), uint8_t(color.g * 255), uint8_t(color.b * 255), uint8_t(color.a * 255));
+		auto pointColor = Color
+		{
+			.r = uint8_t(color.r * 255),
+			.g = uint8_t(color.g * 255),
+			.b = uint8_t(color.b * 255),
+			.a = uint8_t(color.a * 255)
+		};
 
 		for (auto dx = -halfSize; dx <= halfSize; ++dx)
 		{
@@ -120,18 +132,18 @@ namespace DF2D::Factories
 		if (!lineBatchData.lineBatch.empty())
 		{
 			renderTask.renderData = std::move(lineBatchData);
-			
+
 			RenderSystem::Submit(renderTask);
-			
+
 			lineBatchData.lineBatch.clear();
 		}
 
 		if (!pointBatchData.pointBatch.empty())
 		{
 			renderTask.renderData = std::move(pointBatchData);
-			
+
 			RenderSystem::Submit(renderTask);
-			
+
 			pointBatchData.pointBatch.clear();
 		}
 

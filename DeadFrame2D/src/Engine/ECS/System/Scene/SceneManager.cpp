@@ -75,10 +75,16 @@ namespace DF2D::Engine
 		newSceneFactory = {};
 
 		return true;
-	}	
+	}
 
 	const Scene* SceneManager::GetActiveScene()
 	{
 		return currentScene.get();
+	}
+
+
+	Data::CoreContext DF2D::Engine::SceneManager::GetCoreContext()
+	{
+		return coreCtx;
 	}
 }

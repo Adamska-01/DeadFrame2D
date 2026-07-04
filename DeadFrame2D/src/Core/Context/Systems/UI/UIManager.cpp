@@ -1,39 +1,22 @@
-#if DEBUG
-#include <cassert>
-#endif
-#include "Core/Context/Systems/Rendering/Renderer.h"
 #include "Core/Context/Systems/UI/UIManager.h"
-#include <iostream>
 #include <sstream>
 
 
 namespace DF2D::Core
 {
-	using namespace DF2D::Utilities;
+	using namespace DF2D::Data;
 
 
-	std::unordered_map<std::pair<std::string, int>, std::shared_ptr<TTF_Font>, PairHash> UIManager::fontCache = {};
-
-
-	UIManager::UIManager()
+	UIManager::UIManager(std::unique_ptr<ITextBackend> backend)
+		: backend(std::move(backend))
 	{
-		if (TTF_Init() < 0)
-		{
-			std::cerr << "Failed to initialize SDL_TTF: " << SDL_GetError() << std::endl;
-
-			return;
-		}
-
-		std::cout << "[Info] SDL_TTF successfully initialized." << std::endl;
 	}
 
 	UIManager::~UIManager()
 	{
 		fontCache.clear();
 
-		TTF_Quit();
-
-		std::cout << "[Info] SDL_TTF subsystem successfully quit." << std::endl;
+		backend.reset();
 	}
 
 	void UIManager::BeginFrame()
@@ -56,37 +39,44 @@ namespace DF2D::Core
 
 	}
 
-	std::shared_ptr<TTF_Font> UIManager::LoadFont(std::string_view textSource, int fontsize)
+	FontID UIManager::LoadFont(std::string_view fontSource, int fontSize)
 	{
-		auto filenameString = std::string(textSource);
-
-		// Check if the font is already cached
-		auto key = std::make_pair(filenameString, fontsize);
+		auto key = std::make_pair(std::string(fontSource), fontSize);
 		auto it = fontCache.find(key);
-	
-		if (it != fontCache.end()) 
+
+		if (it != fontCache.end())
 			return it->second;
 
-		// If the font is not in the cache, load it from the file
-		auto font = std::shared_ptr<TTF_Font>(TTF_OpenFont(filenameString.c_str(), fontsize), TTF_CloseFont);
+		auto font = backend->LoadFont(key.first, fontSize);
 
-		// Check if the font loaded successfully
-	#if _DEBUG
-		assert(font && TTF_GetError());
-	#endif
+		if (font == 0)
+			return 0;
 
-		// Store the font in the cache (shared_ptr automatically manages the memory)
 		fontCache[key] = font;
 
 		return font;
 	}
 
-	std::shared_ptr<SDL_Texture> UIManager::LoadText(std::shared_ptr<TTF_Font> font, std::string text, SDL_Color color, bool centerText)
+	void UIManager::SetFontStyle(std::string_view fontSource, int fontSize, FontStyle style)
+	{
+		auto font = LoadFont(fontSource, fontSize);
+
+		if (font == 0)
+			return;
+
+		backend->SetFontStyle(font, style);
+	}
+
+	TextTexture UIManager::LoadText(std::string_view fontSource, int fontSize, std::string text, Color color, bool centerText)
 	{
 		if (text.empty())
-			return nullptr;
+			return {};
 
-		// Helper: Expand tab characters to spaces
+		auto font = LoadFont(fontSource, fontSize);
+
+		if (font == 0)
+			return {};
+
 		auto ExpandTabs = [](const std::string& line, int tabWidth = 4) -> std::string
 			{
 				std::string result;
@@ -110,7 +100,6 @@ namespace DF2D::Core
 				return result;
 			};
 
-		// Split into lines (preserve blank lines and trailing newlines)
 		std::vector<std::string> lines;
 		std::istringstream stream(text);
 		std::string line;
@@ -122,67 +111,9 @@ namespace DF2D::Core
 				line = " ";
 			}
 
-			lines.push_back(line);
+			lines.push_back(ExpandTabs(line));
 		}
 
-
-		// Render each line to get total width and height
-		std::vector<SDL_Surface*> lineSurfaces;
-		auto maxWidth = 0;
-		auto totalHeight = 0;
-
-		for (const auto& rawLine : lines)
-		{
-			auto expanded = ExpandTabs(rawLine); // expand tabs
-
-			auto surface = TTF_RenderText_Blended(font.get(), expanded.c_str(), color);
-
-			if (surface == nullptr)
-			{
-				SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to render line: %s", TTF_GetError());
-				continue;
-			}
-
-			maxWidth = std::max(maxWidth, surface->w);
-			totalHeight += surface->h;
-			lineSurfaces.push_back(surface);
-		}
-
-		if (lineSurfaces.empty())
-			return nullptr;
-
-		// Create final surface
-		auto finalSurface = SDL_CreateRGBSurfaceWithFormat(0, maxWidth, totalHeight, 32, SDL_PIXELFORMAT_RGBA32);
-		SDL_FillRect(finalSurface, nullptr, SDL_MapRGBA(finalSurface->format, 0, 0, 0, 0)); // transparent
-
-		auto y = 0;
-		for (auto lineSurface : lineSurfaces)
-		{
-			auto dstRect = SDL_Rect
-			{
-				.x = centerText ? (maxWidth - lineSurface->w) / 2 : 0,
-				.y = y,
-				.w = lineSurface->w,
-				.h = lineSurface->h
-			};
-
-			SDL_BlitSurface(lineSurface, nullptr, finalSurface, &dstRect);
-		
-			y += lineSurface->h;
-
-			SDL_FreeSurface(lineSurface);
-		}
-
-		auto textTexture = SDL_CreateTextureFromSurface(Renderer::GetRenderer(), finalSurface);
-		SDL_FreeSurface(finalSurface);
-
-		if (!textTexture)
-		{
-			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to create texture: %s", TTF_GetError());
-
-			return nullptr;
-		}
-
-		return std::shared_ptr<SDL_Texture>(textTexture, SDL_DestroyTexture);
+		return backend->CreateTextTexture(font, lines, color, centerText);
 	}
 }

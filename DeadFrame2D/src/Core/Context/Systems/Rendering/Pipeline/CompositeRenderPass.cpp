@@ -1,5 +1,5 @@
+#include "Core/Context/Systems/Rendering/Abstractions/IRenderBackend.h"
 #include "Core/Context/Systems/Rendering/Pipeline/CompositeRenderPass.h"
-#include "Core/Context/Systems/Rendering/Renderer.h"
 #include "Engine/ECS/Component/Rendering/Camera/Camera.h"
 
 
@@ -11,14 +11,14 @@ namespace DF2D::Core
 
 
 	void CompositeRenderPass::Execute(
-		IRenderBackend& renderBackend, 
+		IRenderBackend& renderBackend,
 		std::array<
 			std::unordered_map<
-				Camera*, 
-				std::vector<RenderTask>>, 
+				Camera*,
+				std::vector<RenderTask>>,
 			(int)RenderPhase::RENDER_PHASE_COUNT>& renderTasks)
 	{
-		renderBackend.SetRenderTarget(NULL);
+		renderBackend.SetRenderTarget(0);
 		renderBackend.ClearCurrentRenderTarget();
 
 		for (auto camera : Camera::GetCameras())
@@ -28,11 +28,14 @@ namespace DF2D::Core
 
 			auto viewport = camera->GetNormalizedViewBox();
 
-			SDL_RenderCopyF(
-				Renderer::GetRenderer(),
+			renderBackend.DrawTexture(
 				camera->GetRenderTarget(),
-				nullptr,
-				&viewport);
+				std::nullopt,
+				viewport,
+				std::nullopt,
+				0.0f,
+				Data::RenderFlip::NONE,
+				Constants::CommonColors::WHITE);
 		}
 	}
 }

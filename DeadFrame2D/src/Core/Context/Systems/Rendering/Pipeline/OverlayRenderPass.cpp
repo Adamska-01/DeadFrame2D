@@ -12,22 +12,22 @@ namespace DF2D::Core
 
 
 	OverlayRenderPass::OverlayRenderPass()
-		: phasesInOrder{ 
-			RenderPhase::SCREEN_SPACE_OVERLAY_UI, 
-			RenderPhase::DEBUG_OVERLAY 
+		: phasesInOrder{
+			RenderPhase::SCREEN_SPACE_OVERLAY_UI,
+			RenderPhase::DEBUG_OVERLAY
 		}
 	{
 	}
 
 	void OverlayRenderPass::Execute(
-		IRenderBackend& renderBackend, 
+		IRenderBackend& renderBackend,
 		std::array<
 			std::unordered_map<
-				Camera*, 
-				std::vector<RenderTask>>, 
+				Camera*,
+				std::vector<RenderTask>>,
 			(int)RenderPhase::RENDER_PHASE_COUNT>& renderTasks)
 	{
-		renderBackend.SetRenderTarget(NULL);
+		renderBackend.SetRenderTarget(0);
 
 		for (auto phase : phasesInOrder)
 		{

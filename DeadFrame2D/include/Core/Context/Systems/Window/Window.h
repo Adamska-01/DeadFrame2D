@@ -1,37 +1,22 @@
 #pragma once
 #include "Core/Context/Abstractions/ICoreSystem.h"
+#include "Core/Context/Systems/Window/Abstractions/IWindowBackend.h"
 #include "Core/Math/Vector2.h"
 #include "Core/Services/Events/Abstractions/IEventProcessor.h"
 #include "Data/Systems/Window/WindowMode.h"
 #include "DF2D_API.h"
-#include "Models/Window/WindowConfig.h"
-#include <SDL_video.h>
-#include <vector>
+#include <memory>
+
+
+union SDL_Event;
 
 
 namespace DF2D::Core
 {
 	class DF2D_API Window : public IEventProcessor, public ICoreSystem
 	{
-		friend class SystemInitializer;
-
-
 	private:
-		static SDL_Window* window;
-
-
-		Window(Models::WindowConfig windowConfig);
-
-		~Window() override;
-
-		Window(const Window&) = delete;
-
-		Window(Window&&) = delete;
-
-
-		Window& operator=(const Window&) = delete;
-
-		Window& operator=(Window&&) = delete;
+		std::unique_ptr<IWindowBackend> backend;
 
 
 		void BeginFrame() override;
@@ -42,23 +27,31 @@ namespace DF2D::Core
 
 		void EndDraw() override;
 
-
 		std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
 
 
 	public:
-		static SDL_Window* GetWindow();
+		Window(std::unique_ptr<IWindowBackend> backend);
 
-		static Vector2I GetResolution();
+		~Window() override;
 
-		static std::vector<SDL_DisplayMode> GetSupportedResolutions();
+		Window(const Window&) = delete;
 
-		static void SetWindowTitle(const std::string& title);
+		Window(Window&&) = delete;
 
-		static void SetWindowIcon(std::string_view iconSource);
+		Window& operator=(const Window&) = delete;
 
-		static void SetWindowMode(Data::WindowMode mode);
+		Window& operator=(Window&&) = delete;
 
-		static bool SetResolution(Vector2I resolution);
+
+		Vector2I GetResolution();
+
+		void SetWindowTitle(const std::string& title);
+
+		void SetWindowIcon(std::string_view iconSource);
+
+		void SetWindowMode(Data::WindowMode mode);
+
+		bool SetResolution(Vector2I resolution);
 	};
 }

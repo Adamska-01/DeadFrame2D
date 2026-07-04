@@ -17,19 +17,20 @@ namespace DF2D::Engine
 
 
 	TextMesh::TextMesh(const TextMeshComponentModel& textMeshConfiguration)
-		: text(textMeshConfiguration.text)
+		: uiManager(nullptr),
+		text(textMeshConfiguration.text)
 	{
 		fontSource = std::string(textMeshConfiguration.fontSource);
 
 		initialObjectScale = textMeshConfiguration.textObjectInitialScale;
 
-		centered = false;
-		fontSize = 30;
+		color = textMeshConfiguration.textColor;
 
-		SetText(text);
-		SetTextColor(textMeshConfiguration.textColor);
-		SetFontStyle(textMeshConfiguration.fontStyle);
-		SetIsCentered(textMeshConfiguration.isCentered);
+		fontStyle = textMeshConfiguration.fontStyle;
+
+		centered = textMeshConfiguration.isCentered;
+
+		fontSize = textMeshConfiguration.fontSize;
 	}
 
 	void TextMesh::Init()
@@ -40,6 +41,8 @@ namespace DF2D::Engine
 		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
 
 		transform->SetLocalScale(initialObjectScale);
+
+		RebuildTextTexture();
 	}
 
 	void TextMesh::Draw()
@@ -62,6 +65,19 @@ namespace DF2D::Engine
 		RenderSystem::Submit(renderTask);
 	}
 
+	void TextMesh::RebuildTextTexture()
+	{
+		// uiManager is only available after Init; setters called earlier just store state.
+		if (uiManager == nullptr || fontSource.empty())
+			return;
+
+		uiManager->SetFontStyle(fontSource, fontSize, fontStyle);
+
+		auto result = uiManager->LoadText(fontSource, fontSize, text, color, centered);
+		textTexture = result.textureID;
+		SetWidgetSize(Core::Vector2F(static_cast<float>(result.size.x), static_cast<float>(result.size.y)));
+	}
+
 	void TextMesh::SetFontSize(int newFontSize)
 	{
 		fontSize = newFontSize;
@@ -71,46 +87,28 @@ namespace DF2D::Engine
 	{
 		color = newColor;
 
-		if (fontSource.empty() || text.empty())
-			return;
-
-		textTexture = uiManager->LoadText(fontSource, fontSize, text, color, centered);
+		RebuildTextTexture();
 	}
 
 	void TextMesh::SetFontStyle(FontStyle newFontStyle)
 	{
-		if (fontSource.empty())
-			return;
+		fontStyle = newFontStyle;
 
-		auto font = uiManager->LoadFont(fontSource, fontSize);
-
-		if (font == nullptr)
-			return;
-
-		// TODO: this should not be here (move it in the backend)
-		TTF_SetFontStyle(font.get(), newFontStyle);
-
-		textTexture = uiManager->LoadText(fontSource, fontSize, text, color, centered);
+		RebuildTextTexture();
 	}
 
 	void TextMesh::SetText(std::string newText)
 	{
 		text = newText;
 
-		if (fontSource.empty())
-			return;
-
-		textTexture = uiManager->LoadText(fontSource, fontSize, text, color, centered);
+		RebuildTextTexture();
 	}
 
 	void TextMesh::SetIsCentered(bool isCentered)
 	{
 		centered = isCentered;
 
-		if (fontSource.empty())
-			return;
-
-		textTexture = uiManager->LoadText(fontSource, fontSize, text, color, centered);
+		RebuildTextTexture();
 	}
 
 	std::string TextMesh::GetText()

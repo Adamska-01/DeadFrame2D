@@ -48,7 +48,12 @@ namespace DF2D::Engine
 
 		Core::Color color;
 
+		Data::FontStyle fontStyle = Data::FontStyle::NORMAL;
+
 		bool centered;
+
+
+		void RebuildTextTexture();
 
 
 	public:

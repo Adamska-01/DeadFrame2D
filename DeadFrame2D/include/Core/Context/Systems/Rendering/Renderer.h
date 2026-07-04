@@ -1,13 +1,17 @@
 #pragma once
-#include "Constants/CommonColors.h"
 #include "Core/Context/Abstractions/ICoreSystem.h"
 #include "Core/Context/Systems/Rendering/Abstractions/IRenderBackend.h"
 #include "Core/Context/Systems/Rendering/RenderSystem.h"
+#include "Core/Math/Color.h"
+#include "Core/Math/Rect.h"
 #include "Core/Math/Vector2.h"
+#include "Data/Systems/Graphics/TextureID.h"
+#include "Data/Systems/Rendering/RenderFlip.h"
 #include "DF2D_API.h"
-#include "Models/Rendering/RendererConfig.h"
 #include <cstdint>
-#include <SDL.h>
+#include <memory>
+#include <optional>
+#include <string>
 
 
 namespace DF2D::Engine
@@ -21,22 +25,32 @@ namespace DF2D::Core
 	class RenderPipeline;
 
 
-	class DF2D_API Renderer : public ICoreSystem, protected RenderSystem, private IRenderBackend
+	class DF2D_API Renderer : public ICoreSystem, protected RenderSystem
 	{
 		friend class DeadFrameRuntime;
 		friend class SystemInitializer;
 
 
 	private:
-		static Renderer* instance;
-
-
-		SDL_Renderer* renderer;
+		std::unique_ptr<IRenderBackend> renderBackend;
 
 		std::unique_ptr<RenderPipeline> renderPipeline;
 
 
-		Renderer(SDL_Window* window, const Models::RendererConfig& config);
+		void BeginFrame() override;
+
+		void PreUpdate(float deltaTime) override;
+
+		void EndUpdate(float deltaTime) override;
+
+		void EndDraw() override;
+
+
+		void ClearAndPresentBuffer();
+
+
+	public:
+		Renderer(std::unique_ptr<IRenderBackend> backend);
 
 		~Renderer() override;
 
@@ -49,51 +63,18 @@ namespace DF2D::Core
 		Renderer& operator=(Renderer&&) = delete;
 
 
-		void BeginFrame() override;
+		Data::TextureID CreateRenderTarget(int w, int h);
 
-		void PreUpdate(float deltaTime) override;
+		void DestroyTexture(Data::TextureID id);
 
-		void EndUpdate(float deltaTime) override;
+		Color GetDisplayColor();
 
-		void EndDraw() override;
+		Vector2I GetResolutionTarget();
 
+		void SetViewport(RectI viewPort);
 
-		void DrawPixel(const Vector2F& pixelPos, SDL_Color color = Constants::CommonColors::WHITE) override;
-		
-		void DrawLine(const Vector2F& p1, const Vector2F& p2, SDL_Color color = Constants::CommonColors::WHITE) override;
+		void SetDisplayColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 
-		void DrawRect(SDL_FRect rect, float angleDegrees, SDL_Color color = Constants::CommonColors::WHITE, bool filled = false) override;
-
-		void DrawCircle(const Vector2F& center, float radius, SDL_Color color, bool filled) override;
-
-		void DrawTexture(
-			SDL_Texture* texture,
-			const SDL_Rect* srcRect = NULL,
-			const SDL_FRect* dstRect = NULL,
-			const SDL_FPoint* rotationOrigin = NULL,
-			float angle = 0.0f,
-			SDL_RendererFlip flip = SDL_FLIP_NONE,
-			SDL_Color colorMod = Constants::CommonColors::WHITE) override;
-
-		void SetRenderTarget(SDL_Texture* renderTarget) override;
-
-		void ClearCurrentRenderTarget() override;
-
-
-		static void ClearAndPresentBuffer();
-
-
-	public:
-		static SDL_Renderer* GetRenderer();
-
-		static SDL_Color GetDisplayColor();
-
-		static Vector2I GetResolutionTarget();
-
-		static void SetViewport(const SDL_Rect& viewPort);
-
-		static void SetDisplayColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
-
-		static void SetResolutionTarget(Vector2I targetResolution);
+		void SetResolutionTarget(Vector2I targetResolution);
 	};
 }

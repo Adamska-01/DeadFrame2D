@@ -72,6 +72,8 @@ namespace DF2D::Engine
 
 
 		static const Scene* GetActiveScene();
+
+		static Data::CoreContext GetCoreContext();
 	};
 }
 

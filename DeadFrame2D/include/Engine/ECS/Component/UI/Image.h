@@ -21,8 +21,6 @@ namespace DF2D::Engine
 
 
 	private:
-		ComponentHandle<Transform> transform;
-
 		Core::TextureManager* textureManager = nullptr;
 
 		Data::TextureID sourceImage = 0;

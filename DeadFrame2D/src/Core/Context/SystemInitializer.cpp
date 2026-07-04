@@ -8,13 +8,12 @@
 #include "Core/Context/Systems/UI/UIManager.h"
 #include "Core/Context/Systems/Window/Window.h"
 #include "Factories/Concretions/Context/Systems/Audio/AudioBackendFactory.h"
-#include "Factories/Concretions/Context/Systems/Graphics/TextureBackendFactory.h"
+#include "Factories/Concretions/Context/Systems/Graphics/GraphicsBackendFactory.h"
 #include "Helpers/Context/CoreContextIterator.h"
 
 
 namespace DF2D::Core
 {
-	using namespace DF2D::Constants;
 	using namespace DF2D::Data;
 	using namespace DF2D::Models;
 	using namespace DF2D::Factories;
@@ -23,20 +22,18 @@ namespace DF2D::Core
 
 	SystemInitializer::SystemInitializer(SystemConfig config)
 	{
-		auto window = new Window(config.window);
-
-		auto renderer = new Renderer(window->GetWindow(), config.rendering);
+		auto graphicsBackends = GraphicsBackendFactory().CreateProduct(config.window, config.rendering);
 
 		ctx = CoreContext
 		{
 			.audioManager = new AudioManager(config.audio, AudioBackendFactory().CreateProduct(config.audio)),
 			.coroutineScheduler = new CoroutineScheduler(),
-			.textureManager = new TextureManager(TextureBackendFactory().CreateProduct()),
+			.textureManager = new TextureManager(std::move(graphicsBackends.textureBackend)),
 			.input = new Input(),
 			.physicsEngine = new PhysicsEngine2D(config.physics),
-			.renderer = renderer,
-			.uiManager = new UIManager(),
-			.window = window
+			.renderer = new Renderer(std::move(graphicsBackends.renderBackend)),
+			.uiManager = new UIManager(std::move(graphicsBackends.textBackend)),
+			.window = new Window(std::move(graphicsBackends.windowBackend))
 		};
 	}
 
@@ -47,13 +44,6 @@ namespace DF2D::Core
 			delete system;
 			system = nullptr;
 		});
-
-		if (SDL_WasInit(SDL_INIT_EVERYTHING))
-		{
-			SDL_Quit();
-
-			std::cout << "[Info] SDL successfully quit.\n";
-		}
 	}
 
 
@@ -97,7 +87,7 @@ namespace DF2D::Core
 			});
 	}
 
-	CoreContext SystemInitializer::GetCoreContext() const
+	Data::CoreContext SystemInitializer::GetCoreContext() const
 	{
 		return ctx;
 	}

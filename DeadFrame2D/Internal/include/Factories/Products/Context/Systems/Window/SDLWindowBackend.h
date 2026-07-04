@@ -28,16 +28,17 @@ namespace DF2D::Internal
 		SDLWindowBackend& operator=(SDLWindowBackend&&) = delete;
 
 
-		void* GetNativeHandle() override;
-
 		Core::Vector2I GetResolution() override;
 
 		void SetWindowTitle(const std::string& title) override;
 
 		void SetWindowIcon(std::string_view iconSource) override;
 
-		void SetWindowMode(int mode) override;
+		void SetWindowMode(Data::WindowMode mode) override;
 
 		bool SetResolution(Core::Vector2I resolution) override;
+
+
+		SDL_Window* GetSDLWindow();
 	};
 }

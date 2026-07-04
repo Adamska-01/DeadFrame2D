@@ -34,7 +34,6 @@ namespace DF2D::Core
 
 	DeadFrameRuntime::~DeadFrameRuntime()
 	{
-		// Delete subsystems last
 		serviceInitializer.reset();
 		systemInitializer.reset();
 	}
@@ -43,7 +42,7 @@ namespace DF2D::Core
 	{
 		auto coreCtx = systemInitializer->GetCoreContext();
 		auto splashTexture = coreCtx.textureManager->LoadTexture(Paths::Files::SPLASH_SCREEN);
-		auto renderTargetSize = Renderer::GetResolutionTarget();
+		auto renderTargetSize = coreCtx.renderer->GetResolutionTarget();
 
 		auto size = coreCtx.textureManager->GetTextureSize(splashTexture);
 
@@ -61,17 +60,13 @@ namespace DF2D::Core
 		auto renderTask = RenderTask();
 		renderTask.renderPhase = RenderPhase::SCREEN_SPACE_OVERLAY_UI;
 
-		auto renderData = SpriteRenderData
-		{
-			.texture = coreCtx.textureManager->GetRawTexture(splashTexture),
-			.destRect = SDL_FRect
-			{
-				renderTargetSize.x * 0.5f - size.x * 0.2f,
-				renderTargetSize.y * 0.5f - size.y * 0.2f,
-				size.x * 0.4f,
-				size.y * 0.4f
-			}
-		};
+		auto renderData = SpriteRenderData();
+		renderData.texture = splashTexture;
+		renderData.destRect = Core::RectF(
+			renderTargetSize.x * 0.5f - size.x * 0.2f,
+			renderTargetSize.y * 0.5f - size.y * 0.2f,
+			size.x * 0.4f,
+			size.y * 0.4f);
 
 		auto serviceCtx = serviceInitializer->GetServiceContext();
 		auto frameTimer = serviceCtx.frameTimer;
@@ -104,7 +99,7 @@ namespace DF2D::Core
 
 			RenderSystem::Submit(renderTask);
 
-			Renderer::ClearAndPresentBuffer();
+			coreCtx.renderer->ClearAndPresentBuffer();
 
 			frameTimer->EndClock();
 			frameTimer->DelayByFrameTime();
@@ -118,6 +113,7 @@ namespace DF2D::Core
 		if (const auto& splashCode = RenderSplashScreen())
 			return *splashCode;
 
+		auto coreCtx = systemInitializer->GetCoreContext();
 		auto serviceCtx = serviceInitializer->GetServiceContext();
 		auto frameTimer = serviceCtx.frameTimer;
 		auto eventManager = serviceCtx.eventManager;
@@ -131,7 +127,6 @@ namespace DF2D::Core
 
 			systemInitializer->BeginFrame();
 
-			// Only returns in case of QUIT event
 			if (const auto& ecode = eventManager->ProcessEvents())
 				return *ecode;
 
@@ -147,11 +142,10 @@ namespace DF2D::Core
 
 			systemInitializer->EndDraw();
 
-			Renderer::ClearAndPresentBuffer();
+			coreCtx.renderer->ClearAndPresentBuffer();
 
 			sceneManager->LoadNewSceneIfAvailable();
 
-			// FPS and delay
 			frameTimer->EndClock();
 			frameTimer->DelayByFrameTime();
 		}

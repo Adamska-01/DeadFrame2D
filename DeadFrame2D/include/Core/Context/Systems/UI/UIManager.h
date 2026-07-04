@@ -1,39 +1,27 @@
 #pragma once
 #include "Core/Context/Abstractions/ICoreSystem.h"
+#include "Core/Context/Systems/UI/Abstractions/ITextBackend.h"
+#include "Core/Math/Color.h"
+#include "Data/Components/UI/Text/FontStyle.h"
+#include "Data/Systems/Graphics/TextureID.h"
+#include "Data/Systems/UI/FontID.h"
+#include "Data/Systems/UI/TextTexture.h"
 #include "DF2D_API.h"
 #include "Utilities/Hashing/PairHash.h"
 #include <memory>
-#include <SDL_ttf.h>
 #include <string>
+#include <string_view>
 #include <unordered_map>
-
-
-struct SDL_Texture;
 
 
 namespace DF2D::Core
 {
 	class DF2D_API UIManager : public ICoreSystem
 	{
-		friend class SystemInitializer;
-
-
 	private:
-		UIManager();
+		std::unique_ptr<ITextBackend> backend;
 
-		~UIManager() override;
-
-		UIManager(const UIManager&) = delete;
-
-		UIManager(UIManager&&) = delete;
-
-
-		UIManager& operator=(const UIManager&) = delete;
-
-		UIManager& operator=(UIManager&&) = delete;
-
-
-		static std::unordered_map<std::pair<std::string, int>, std::shared_ptr<TTF_Font>, Utilities::PairHash> fontCache;
+		std::unordered_map<std::pair<std::string, int>, Data::FontID, Utilities::PairHash> fontCache;
 
 
 		void BeginFrame() override;
@@ -46,8 +34,23 @@ namespace DF2D::Core
 
 
 	public:
-		static std::shared_ptr<TTF_Font> LoadFont(std::string_view textSource, int fontsize);
+		UIManager(std::unique_ptr<ITextBackend> backend);
 
-		static std::shared_ptr<SDL_Texture> LoadText(std::shared_ptr<TTF_Font> font, std::string text, SDL_Color color, bool centerText = false);
+		~UIManager() override;
+
+		UIManager(const UIManager&) = delete;
+
+		UIManager(UIManager&&) = delete;
+
+		UIManager& operator=(const UIManager&) = delete;
+
+		UIManager& operator=(UIManager&&) = delete;
+
+
+		Data::FontID LoadFont(std::string_view fontSource, int fontSize);
+
+		void SetFontStyle(std::string_view fontSource, int fontSize, Data::FontStyle style);
+
+		Data::TextTexture LoadText(std::string_view fontSource, int fontSize, std::string text, Color color, bool centerText = false);
 	};
 }

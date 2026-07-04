@@ -32,15 +32,9 @@ namespace DF2D::Engine
 	{
 		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), this);
 
-		if (renderTarget != 0)
+		if (renderTarget != 0 && renderer != nullptr)
 		{
-			auto renderer = GetGameObject()->CoreContext().renderer;
-
-			if (renderer != nullptr)
-			{
-				renderer->DestroyTexture(renderTarget);
-			}
-
+			renderer->DestroyTexture(renderTarget);
 			renderTarget = 0;
 		}
 
@@ -56,24 +50,22 @@ namespace DF2D::Engine
 
 		resolutionTarget = renderTargetSizeChangeEvent->renderTargetSize;
 
-		auto renderer = GetGameObject()->CoreContext().renderer;
+		if (renderer == nullptr)
+			return;
 
-		if (renderer != nullptr)
+		if (renderTarget != 0)
 		{
-			if (renderTarget != 0)
-			{
-				renderer->DestroyTexture(renderTarget);
-			}
-
-			renderTarget = renderer->CreateRenderTarget(resolutionTarget.x, resolutionTarget.y);
+			renderer->DestroyTexture(renderTarget);
 		}
+
+		renderTarget = renderer->CreateRenderTarget(resolutionTarget.x, resolutionTarget.y);
 	}
 
 	void Camera::Init()
 	{
 		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
 
-		auto renderer = GetGameObject()->CoreContext().renderer;
+		renderer = GetGameObject()->CoreContext().renderer;
 
 		if (renderer != nullptr)
 		{

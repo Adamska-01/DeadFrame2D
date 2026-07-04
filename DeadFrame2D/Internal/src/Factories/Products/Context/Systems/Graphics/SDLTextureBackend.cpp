@@ -1,15 +1,18 @@
-#include "Core/Context/Systems/Rendering/Renderer.h"
 #include "Factories/Products/Context/Systems/Graphics/SDLTextureBackend.h"
 #include <iostream>
+#include <SDL.h>
 #include <SDL_image.h>
 
 
 namespace DF2D::Internal
 {
 	using namespace DF2D::Core;
+	using namespace DF2D::Data;
 
 
-	SDLTextureBackend::SDLTextureBackend()
+	SDLTextureBackend::SDLTextureBackend(SDL_Renderer* renderer, TextureRegistry* textureRegistry)
+		: renderer(renderer),
+		registry(textureRegistry)
 	{
 		auto initFlags = IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
 
@@ -25,15 +28,11 @@ namespace DF2D::Internal
 
 	SDLTextureBackend::~SDLTextureBackend()
 	{
-		for (auto& [id, tex] : textures)
-		{
-			if (tex) SDL_DestroyTexture(tex);
-		}
-
 		IMG_Quit();
 
 		std::cout << "[Info] SDL_image subsystem successfully quit." << std::endl;
 	}
+
 
 	Data::TextureID SDLTextureBackend::LoadFromFile(const std::string& filename)
 	{
@@ -46,7 +45,7 @@ namespace DF2D::Internal
 			return 0;
 		}
 
-		auto texture = SDL_CreateTextureFromSurface(Renderer::GetRenderer(), tempSurface);
+		auto texture = SDL_CreateTextureFromSurface(renderer, tempSurface);
 
 		SDL_FreeSurface(tempSurface);
 
@@ -57,41 +56,25 @@ namespace DF2D::Internal
 			return 0;
 		}
 
-		auto id = nextId++;
-		textures[id] = texture;
-
-		return id;
+		return registry->AddTexture(texture);
 	}
 
 	void SDLTextureBackend::UnloadTexture(Data::TextureID id)
 	{
-		auto it = textures.find(id);
-
-		if (it != textures.end())
-		{
-			if (it->second) SDL_DestroyTexture(it->second);
-			textures.erase(it);
-		}
+		registry->RemoveTexture(id, true);
 	}
 
 	Vector2I SDLTextureBackend::GetTextureSize(Data::TextureID id)
 	{
-		auto it = textures.find(id);
+		auto* texture = registry->GetTexture(id);
 
-		if (it != textures.end() && it->second)
-		{
-			int w = 0, h = 0;
-			SDL_QueryTexture(it->second, nullptr, nullptr, &w, &h);
-			return Vector2I{ w, h };
-		}
+		if (texture == nullptr)
+			return Vector2I::Zero;
 
-		return Vector2I::Zero;
-	}
+		int w = 0, h = 0;
 
-	void* SDLTextureBackend::GetNativeHandle(Data::TextureID id)
-	{
-		auto it = textures.find(id);
+		SDL_QueryTexture(texture, nullptr, nullptr, &w, &h);
 
-		return it != textures.end() ? it->second : nullptr;
+		return Vector2I(w, h);
 	}
 }

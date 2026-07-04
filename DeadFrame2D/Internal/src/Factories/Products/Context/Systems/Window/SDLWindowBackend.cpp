@@ -92,7 +92,7 @@ namespace DF2D::Internal
 
 		if (fullscreen)
 		{
-			SetWindowMode(2); // BORDERLESS
+			SetWindowMode(Data::WindowMode::WINDOW_FULLSCREEN);
 
 			auto maxRes = GetSupportedResolutions(window).front();
 
@@ -113,17 +113,11 @@ namespace DF2D::Internal
 
 		SDL_DestroyWindow(window);
 
-		IMG_Quit();
-
 		SDL_Quit();
 
 		std::cout << "[Info] Window backend successfully destroyed." << std::endl;
 	}
 
-	void* SDLWindowBackend::GetNativeHandle()
-	{
-		return window;
-	}
 
 	Vector2I SDLWindowBackend::GetResolution()
 	{
@@ -185,25 +179,25 @@ namespace DF2D::Internal
 		std::cout << "[Info] Window icon set from '" << iconSource << "'." << std::endl;
 	}
 
-	void SDLWindowBackend::SetWindowMode(int mode)
+	void SDLWindowBackend::SetWindowMode(Data::WindowMode mode)
 	{
 		switch (mode)
 		{
-		case 0: // WINDOWED
+		case Data::WindowMode::WINDOWED:
 			SDL_SetWindowFullscreen(window, 0);
 			SDL_SetWindowBordered(window, SDL_TRUE);
 			break;
 
-		case 1: // BORDERLESS
+		case Data::WindowMode::BORDERLESS:
 			SDL_SetWindowFullscreen(window, 0);
 			SDL_SetWindowBordered(window, SDL_FALSE);
 			break;
 
-		case 2: // WINDOW_FULLSCREEN
+		case Data::WindowMode::WINDOW_FULLSCREEN:
 			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 			break;
 
-		case 3: // FULLSCREEN
+		case Data::WindowMode::FULLSCREEN:
 			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 			break;
 
@@ -238,5 +232,10 @@ namespace DF2D::Internal
 		SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
 		return true;
+	}
+
+	SDL_Window* SDLWindowBackend::GetSDLWindow()
+	{
+		return window;
 	}
 }
