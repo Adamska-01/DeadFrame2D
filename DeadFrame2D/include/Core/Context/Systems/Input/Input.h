@@ -1,65 +1,42 @@
 #pragma once
 #include "Core/Context/Abstractions/ICoreSystem.h"
+#include "Core/Services/Events/Abstractions/ISystemEventSink.h"
 #include "DF2D_API.h"
 #include <memory>
 
 
-namespace DF2D::Engine
-{
-	class DispatchableEvent;
-}
-
-
 namespace DF2D::Core
 {
-	class IInputFrameLifecycle;
 	class IInputActions;
-	class IInputActionHandler;
 	class IInputDeviceProvider;
+	class IInputUsers;
+	class InputActionResolver;
+	class DeviceManager;
 	class InputUserManager;
 
 
-	class DF2D_API Input : public ICoreSystem
+	class DF2D_API Input : public ICoreSystem, public ISystemEventSink
 	{
 		friend class SystemInitializer;
 
 
 	private:
-		static Input* instance;
+		std::unique_ptr<InputActionResolver> actionResolver;
+
+		std::unique_ptr<DeviceManager> deviceManager;
+
+		std::unique_ptr<InputUserManager> userManager;
 
 
 		Input();
 
-		~Input() override;
+		Input(const Input&) = delete;
 
 		Input(Input&&) = delete;
-
 
 		Input& operator=(const Input&) = delete;
 
 		Input& operator=(Input&&) = delete;
-
-
-		std::shared_ptr<IInputFrameLifecycle> actionsFrameLifecycle;
-
-		std::shared_ptr<IInputActions> actions;
-
-		std::shared_ptr<IInputActionHandler> actionsHandler;
-
-		std::shared_ptr<IInputFrameLifecycle> deviceFrameLifecycle;
-
-		std::shared_ptr<IInputDeviceProvider> deviceProvider;
-
-		std::shared_ptr<InputUserManager> userManager;
-
-
-		void InputUserCreatedEventHandler(std::shared_ptr<Engine::DispatchableEvent> dispatchableEvent);
-
-		void InputUserDestroyedEventHandler(std::shared_ptr<Engine::DispatchableEvent> dispatchableEvent);
-
-		void DeviceAddedEventHandler(std::shared_ptr<Engine::DispatchableEvent> dispatchableEvent);
-
-		void DeviceRemovedEventHandler(std::shared_ptr<Engine::DispatchableEvent> dispatchableEvent);
 
 
 		void BeginFrame() override;
@@ -72,10 +49,16 @@ namespace DF2D::Core
 
 
 	public:
-		static IInputDeviceProvider* Devices();
+		~Input() override;
 
-		static InputUserManager* Users();
 
-		static IInputActions* Actions();
+		void OnSystemEvent(const Data::SystemEvent& systemEvent) override;
+
+
+		IInputDeviceProvider* Devices();
+
+		IInputUsers* Users();
+
+		IInputActions* Actions();
 	};
 }

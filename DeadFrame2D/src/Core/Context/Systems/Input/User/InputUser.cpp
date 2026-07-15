@@ -1,4 +1,3 @@
-#include "Core/Context/Systems/Input/Input.h"
 #include "Core/Context/Systems/Input/User/InputUser.h"
 #include "Core/Context/Systems/Input/User/InputUserManager.h"
 
@@ -8,28 +7,30 @@ namespace DF2D::Core
 	using namespace DF2D::Data;
 
 
-	InputUser::InputUser(InputUserID id, const std::string& name)
-		: id(id), name(name)
+	InputUser::InputUser(InputUserID id, InputUserManager* manager, const std::string& name)
+		: id(id),
+		manager(manager),
+		name(name)
 	{
 	}
 
 	InputUserID InputUser::ID() const
-	{ 
-		return id; 
+	{
+		return id;
 	}
-	
+
 	const std::string& InputUser::Name() const
-	{ 
-		return name; 
+	{
+		return name;
 	}
 
 	bool InputUser::IsDevicePaired(InputDeviceID deviceID) const
 	{
-		return Input::Users()->GetUserFromPairedDevice(deviceID) == this;
+		return manager->GetUserFromPairedDevice(deviceID) == this;
 	}
 
 	const std::vector<InputDeviceID>& InputUser::PairedDevices() const
 	{
-		return Input::Users()->GetDevicesPairedToUser(id);
+		return manager->GetDevicesPairedToUser(id);
 	}
 }

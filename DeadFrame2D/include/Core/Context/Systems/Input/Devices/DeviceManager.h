@@ -1,53 +1,70 @@
 #pragma once
-#include "Core/Context/Systems/Input/Abstractions/IInputFrameLifecycle.h"
 #include "Core/Context/Systems/Input/Devices/Abstractions/IInputDeviceProvider.h"
-#include "Core/Services/Events/Abstractions/IEventProcessor.h"
+#include "Data/Systems/Events/SystemEvent.h"
 #include "Data/Systems/Input/InputDeviceID.h"
 #include "DF2D_API.h"
+#include <functional>
 #include <memory>
 #include <unordered_map>
 #include <vector>
 
 
-union SDL_Event;
-
-
 namespace DF2D::Core
 {
 	class IInputActionHandler;
+	class KeyboardInputDevice;
+	class MouseInputDevice;
 
 
 	/**
-	 * @brief Responsible for opening/closing SDL controllers and keeping devices
-	 * keyed by instance id. Also holds keyboard and mouse singletons.
+	 * @brief Routes engine input events to devices and keeps devices keyed by
+	 * instance id. Also holds the keyboard and mouse singletons.
 	 */
-	class DF2D_API DeviceManager : public IEventProcessor, public IInputFrameLifecycle, public IInputDeviceProvider
+	class DF2D_API DeviceManager : public IInputDeviceProvider
 	{
 	private:
-		std::unordered_map<Data::InputDeviceID, std::shared_ptr<InputDevice>> devices;
+		std::unordered_map<Data::InputDeviceID, std::unique_ptr<InputDevice>> devices;
 
-		InputDevice* currentController;
+		KeyboardInputDevice* keyboard = nullptr;
 
-		IInputActionHandler* actionHandler;
+		MouseInputDevice* mouse = nullptr;
 
+		InputDevice* currentController = nullptr;
 
-		void OpenController(int deviceIndex);
+		IInputActionHandler* actionHandler = nullptr;
 
-		void CloseController(Data::InputDeviceID instanceId);
-
-
-		std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
+		std::function<void(Data::InputDeviceID)> onDeviceRemoved;
 
 
-		void BeginFrame() override;
+		void AddController(Data::InputDeviceID instanceID, const std::string& name);
 
-		void PreUpdate() override;
+		void RemoveController(Data::InputDeviceID instanceID);
 
 
 	public:
 		DeviceManager(IInputActionHandler* actionHandler);
 
 		~DeviceManager() override;
+
+		DeviceManager(const DeviceManager&) = delete;
+
+		DeviceManager(DeviceManager&&) = delete;
+
+		DeviceManager& operator=(const DeviceManager&) = delete;
+
+		DeviceManager& operator=(DeviceManager&&) = delete;
+
+
+		/**
+		 * @brief Internal lifecycle hook (set by the Input system) invoked before the
+		 * DeviceRemovedEvent broadcast.
+		 */
+		void SetDeviceRemovedHook(std::function<void(Data::InputDeviceID)> onRemoved);
+
+
+		void HandleEvent(const Data::SystemEvent& systemEvent);
+
+		void BeginFrame();
 
 
 		InputDevice* GetDevice(Data::InputDeviceID id) override;

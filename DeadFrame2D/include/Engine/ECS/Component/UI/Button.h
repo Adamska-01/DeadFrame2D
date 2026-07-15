@@ -1,7 +1,6 @@
 #pragma once
 #include "Core/Math/Color.h"
 #include "Core/Math/Rect.h"
-#include "Core/Services/Events/Abstractions/IEventProcessor.h"
 #include "Data/Systems/Graphics/TextureID.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/UI/Abstractions/IInteractableUI.h"
@@ -12,6 +11,7 @@
 
 namespace DF2D::Core
 {
+	class Input;
 	class TextureManager;
 }
 
@@ -23,7 +23,7 @@ namespace DF2D::Data
 
 namespace DF2D::Engine
 {
-	class DF2D_API Button : public IInteractableUI, public Core::IEventProcessor
+	class DF2D_API Button : public IInteractableUI
 	{
 		TYPE_INFO(Button, IInteractableUI);
 
@@ -43,6 +43,8 @@ namespace DF2D::Engine
 
 		Core::TextureManager* textureManager = nullptr;
 
+		Core::Input* input = nullptr;
+
 		std::string idleSource;
 
 		std::string hoveredSource;
@@ -56,7 +58,7 @@ namespace DF2D::Engine
 		Core::Color pressedFillColor;
 
 
-		std::optional<int> ProcessEvents(const SDL_Event& sdlEvent) override;
+		void ProcessPointer();
 
 
 	public:
@@ -66,6 +68,8 @@ namespace DF2D::Engine
 
 
 		void Init() override;
+
+		void Update(float deltaTime) override;
 
 		void Draw() override;
 

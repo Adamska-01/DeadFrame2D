@@ -2,6 +2,7 @@
 #include "Core/Services/ServiceInitializer.h"
 #include "Core/Services/Time/FrameTimer.h"
 #include "Engine/ECS/System/Scene/SceneManager.h"
+#include "Factories/Concretions/Services/Events/EventSourceFactory.h"
 #include "Helpers/Services/ServiceContextIterator.h"
 
 
@@ -17,7 +18,7 @@ namespace DF2D::Core
 	{
 		ctx = ServiceContext
 		{
-			.eventManager = new EventManager(),
+			.eventManager = new EventManager(Factories::EventSourceFactory().CreateProduct()),
 			.frameTimer = new FrameTimer(config.rendering.targetFramerate),
 			.sceneManager = new SceneManager()
 		};

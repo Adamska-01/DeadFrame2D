@@ -3,18 +3,22 @@
 #include "DF2D_API.h"
 #include "Models/Input/Controls/ControllerAxisCode.h"
 #include "Models/Input/Controls/ControllerButtonCode.h"
-#include <SDL_gamecontroller.h>
+#include <string>
 #include <unordered_set>
 #include <vector>
 
 
 namespace DF2D::Core
 {
+	/**
+	 * @brief Controller device; state keyed by ControllerButtonCode / ControllerAxisCode.
+	 *
+	 * The native controller handle is owned by the event source backend; this
+	 * class only holds per-control state fed through engine events.
+	 */
 	class DF2D_API ControllerInputDevice : public InputDevice
 	{
 	private:
-		SDL_GameController* controller;
-
 		Data::InputDeviceID instanceID;
 
 		std::vector<Data::InputControlState> buttonStates;
@@ -26,24 +30,27 @@ namespace DF2D::Core
 		std::unordered_set<int> activeAxes;
 
 
-		void BeginFrame() override;
+	public:
+		ControllerInputDevice(Data::InputDeviceID instanceID, const std::string& name, IInputActionHandler* actionHandler);
 
-		void ProcessEvent(const SDL_Event& event) override;
+		~ControllerInputDevice() override = default;
+
+
+		void BeginFrame() override;
 
 		Data::InputControlState GetButtonState(int buttonID) const override;
 
 		Data::InputControlState GetAxisState(int axisID) const override;
 
 
-	public:
-		ControllerInputDevice(SDL_GameController* controller, Data::InputDeviceID instanceID, IInputActionHandler* actionHandler);
-
-		~ControllerInputDevice() override;
-
-
 		Models::InputDeviceType Type() const override;
 
 		Data::InputDeviceID ID() const override;
+
+
+		void HandleButton(Models::ControllerButtonCode button, bool pressed);
+
+		void HandleAxis(Models::ControllerAxisCode axis, float normalizedValue);
 
 
 		Data::InputControlState GetButtonState(Models::ControllerButtonCode code) const;

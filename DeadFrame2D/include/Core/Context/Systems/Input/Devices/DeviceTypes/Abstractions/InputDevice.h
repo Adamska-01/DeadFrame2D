@@ -6,9 +6,6 @@
 #include <string>
 
 
-union SDL_Event;
-
-
 namespace DF2D::Core
 {
 	class IInputActionHandler;
@@ -16,12 +13,12 @@ namespace DF2D::Core
 	/**
 	 * @brief Base for all input devices (keyboard, mouse, controller).
 	 *
-	 * Device instances are identified by a stable SDL_JoystickID for controllers
-	 * and by synthetic ids for keyboard/mouse.
+	 * Devices are pure state holders fed with engine-typed events; all control
+	 * state is keyed by the engine control enums (KeyboardKeyCode, MouseButtonCode, ...).
 	 */
 	class DF2D_API InputDevice
 	{
-	protected: 
+	protected:
 		std::string name;
 
 		IInputActionHandler* actionHandler;
@@ -42,15 +39,9 @@ namespace DF2D::Core
 
 
 		/**
-		 * Snapshot states at the beginning of the frame; called by InputManager. 
+		 * Snapshot states at the beginning of the frame; called by the Input system.
 		 */
 		virtual void BeginFrame() = 0;
-
-		/**
-		 * @brief Called when an SDL_Event relevant to this device arrives.
-		 * Device must update its internal ControlState map accordingly.
-		 */
-		virtual void ProcessEvent(const SDL_Event& event) = 0;
 
 		/**
 		 * Digital input (keyboard keys, controller buttons).

@@ -1,5 +1,4 @@
 #include "Core/Context/Systems/Window/Window.h"
-#include <SDL.h>
 #include <iostream>
 
 
@@ -37,25 +36,6 @@ namespace DF2D::Core
 	void Window::EndDraw()
 	{
 
-	}
-
-	std::optional<int> Window::ProcessEvents(const SDL_Event& sdlEvent)
-	{
-		switch (sdlEvent.type)
-		{
-		case SDL_QUIT:
-			return (int)SDL_QUIT;
-
-		case SDL_WINDOWEVENT:
-			if (sdlEvent.window.event == SDL_WINDOWEVENT_CLOSE)
-				return (int)SDL_QUIT;
-			break;
-
-		default:
-			break;
-		}
-
-		return std::nullopt;
 	}
 
 	Vector2I Window::GetResolution()

@@ -1,23 +1,20 @@
 #include "Constants/Input/DefaultDeviceIDs.h"
 #include "Constants/Input/DefaultDeviceNames.h"
-#include "Converters/Input/KeyboardKeyCodeConversions.h"
 #include "Core/Context/Systems/Input/Actions/Abstractions/IInputActionHandler.h"
 #include "Core/Context/Systems/Input/Devices/DeviceTypes/KeyboardInputDevice.h"
-#include <SDL_events.h>
 
 
 namespace DF2D::Core
 {
 	using namespace DF2D::Constants;
 	using namespace DF2D::Data;
-	using namespace DF2D::Internal;
 	using namespace DF2D::Models;
 
 
 	KeyboardInputDevice::KeyboardInputDevice(IInputActionHandler* actionHandler)
 		: InputDevice(DefaultDeviceNames::KEYBOARD, actionHandler)
 	{
-		states = std::vector<DF2D::Data::InputControlState>(SDL_NUM_SCANCODES);
+		states = std::vector<InputControlState>(static_cast<size_t>(KeyboardKeyCode::COUNT_MAX));
 	}
 
 
@@ -40,7 +37,7 @@ namespace DF2D::Core
 			if (state.released)
 			{
 				state.released = false;
-			
+
 				actionHandler->ProcessBinding(*this, InputControlType::DIGITAL, controlID);
 			}
 		}
@@ -48,57 +45,46 @@ namespace DF2D::Core
 		activeControlIDs.clear();
 	}
 
-	void KeyboardInputDevice::ProcessEvent(const SDL_Event& event)
+	void KeyboardInputDevice::HandleKey(KeyboardKeyCode key, bool pressed)
 	{
-		auto eventType = event.type;
+		auto controlID = static_cast<uint16_t>(key);
 
-		switch (eventType)
+		if (controlID >= states.size())
+			return;
+
+		auto& state = states[controlID];
+
+		if (pressed)
 		{
-			case SDL_EventType::SDL_KEYDOWN:
+			// Only set pressed if it wasn't already held
+			if (!state.held && !state.pressed)
 			{
-				auto controlID = event.key.keysym.scancode;
-				auto& state = states[controlID];
-
-				// Only set pressed if it wasn't already held
-				if (!state.held && !state.pressed)
-				{
-					state.value = 1.0f;
-					state.pressed = true;
-					state.held = false;
-					state.released = false;
-
-					activeControlIDs.insert(controlID);
-
-					actionHandler->ProcessBinding(*this, InputControlType::DIGITAL, controlID);
-				}
-
-				break;
-			}
-			case SDL_EventType::SDL_KEYUP:
-			{
-				auto controlID = event.key.keysym.scancode;
-				auto& state = states[controlID];
-
-				state.value = 0.0f;
-				state.pressed = false;
+				state.value = 1.0f;
+				state.pressed = true;
 				state.held = false;
-				state.released = true;
+				state.released = false;
 
 				activeControlIDs.insert(controlID);
-				
+
 				actionHandler->ProcessBinding(*this, InputControlType::DIGITAL, controlID);
-
-				break;
 			}
+		}
+		else
+		{
+			state.value = 0.0f;
+			state.pressed = false;
+			state.held = false;
+			state.released = true;
 
-			default:
-				break;
+			activeControlIDs.insert(controlID);
+
+			actionHandler->ProcessBinding(*this, InputControlType::DIGITAL, controlID);
 		}
 	}
 
 	InputControlState KeyboardInputDevice::GetButtonState(int buttonID) const
 	{
-		if (buttonID < 0 || buttonID >= SDL_Scancode::SDL_NUM_SCANCODES)
+		if (buttonID < 0 || buttonID >= static_cast<int>(states.size()))
 			return {};
 
 		return states[buttonID];
@@ -123,8 +109,6 @@ namespace DF2D::Core
 
 	InputControlState KeyboardInputDevice::GetButtonState(KeyboardKeyCode code) const
 	{
-		auto sdlCode = static_cast<int>(KeyboardKeyCodeConversions::ToSDLScancode(code));
-
-		return GetButtonState(sdlCode);
+		return GetButtonState(static_cast<int>(code));
 	}
 }

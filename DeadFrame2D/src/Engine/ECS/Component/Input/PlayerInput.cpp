@@ -3,6 +3,8 @@
 #include "Core/Context/Systems/Input/User/InputUser.h"
 #include "Core/Context/Systems/Input/User/InputUserManager.h"
 #include "Engine/ECS/Component/Input/PlayerInput.h"
+#include "Engine/ECS/Entity/Object/Core/GameObject.h"
+#include "Utilities/Debugging/Guards.h"
 
 
 namespace DF2D::Engine
@@ -15,19 +17,39 @@ namespace DF2D::Engine
 	PlayerInput::PlayerInput(const std::string& playerName)
 		: playerName(playerName)
 	{
-		userID = Input::Users()->CreateUser(playerName)->ID();
 	}
 
 	PlayerInput::~PlayerInput()
 	{
+		if (input == nullptr)
+			return;
+
 		for (const auto& e : registeredListeners)
 		{
-			Input::Actions()->DeregisterActionByID(userID, e.mapName, e.actionName, e.listenerID);
+			input->Actions()->DeregisterActionByID(userID, e.mapName, e.actionName, e.listenerID);
 		}
 
 		registeredListeners.clear();
 
-		Input::Users()->DestroyUser(userID);
+		input->Users()->DestroyUser(userID);
+	}
+
+	void PlayerInput::Init()
+	{
+		GameComponent::Init();
+
+		input = Guard::AgainstNullAssignment(GetGameObject()->CoreContext().input, NAME_OF(input));
+
+		userID = input->Users()->CreateUser(playerName)->ID();
+
+		auto pending = std::move(pendingOperations);
+
+		pendingOperations.clear();
+
+		for (auto& operation : pending)
+		{
+			operation();
+		}
 	}
 
 	ListenerID PlayerInput::RegisterAction(
@@ -36,7 +58,18 @@ namespace DF2D::Engine
 		const ComponentHandleBase& listener,
 		const std::function<void(const InputActionView&)>& handler)
 	{
-		auto id = Input::Actions()->RegisterAction(userID, actionMapName, actionName, listener, handler);
+		if (input == nullptr)
+		{
+			pendingOperations.push_back(
+				[this, actionMapName, actionName, listener, handler]()
+				{
+					RegisterAction(actionMapName, actionName, listener, handler);
+				});
+
+			return -1;
+		}
+
+		auto id = input->Actions()->RegisterAction(userID, actionMapName, actionName, listener, handler);
 
 		registeredListeners.push_back(
 			ActionListenerEntry
@@ -52,7 +85,18 @@ namespace DF2D::Engine
 
 	void PlayerInput::DeregisterAction(const std::string& actionMapName, const std::string& actionName, const ComponentHandleBase& listener)
 	{
-		Input::Actions()->DeregisterAction(userID, actionMapName, actionName, listener);
+		if (input == nullptr)
+		{
+			pendingOperations.push_back(
+				[this, actionMapName, actionName, listener]()
+				{
+					DeregisterAction(actionMapName, actionName, listener);
+				});
+
+			return;
+		}
+
+		input->Actions()->DeregisterAction(userID, actionMapName, actionName, listener);
 
 		std::erase_if(
 			registeredListeners,
@@ -66,7 +110,10 @@ namespace DF2D::Engine
 
 	void PlayerInput::DeregisterActionByID(const std::string& actionMapName, const std::string& actionName, ListenerID listenerID)
 	{
-		Input::Actions()->DeregisterActionByID(userID, actionMapName, actionName, listenerID);
+		if (input == nullptr)
+			return;
+
+		input->Actions()->DeregisterActionByID(userID, actionMapName, actionName, listenerID);
 
 		std::erase_if(
 			registeredListeners,
@@ -78,19 +125,52 @@ namespace DF2D::Engine
 			});
 	}
 
-	bool PlayerInput::EnableActionMap(const std::string& actionMapName) const
+	bool PlayerInput::EnableActionMap(const std::string& actionMapName)
 	{
-		return Input::Actions()->EnableActionMap(userID, actionMapName);
+		if (input == nullptr)
+		{
+			pendingOperations.push_back(
+				[this, actionMapName]()
+				{
+					EnableActionMap(actionMapName);
+				});
+
+			return false;
+		}
+
+		return input->Actions()->EnableActionMap(userID, actionMapName);
 	}
 
-	bool PlayerInput::DisableActionMap(const std::string& actionMapName) const
+	bool PlayerInput::DisableActionMap(const std::string& actionMapName)
 	{
-		return Input::Actions()->DisableActionMap(userID, actionMapName);
+		if (input == nullptr)
+		{
+			pendingOperations.push_back(
+				[this, actionMapName]()
+				{
+					DisableActionMap(actionMapName);
+				});
+
+			return false;
+		}
+
+		return input->Actions()->DisableActionMap(userID, actionMapName);
 	}
 
-	bool PlayerInput::SwitchToActionMap(const std::string& actionMapName) const
+	bool PlayerInput::SwitchToActionMap(const std::string& actionMapName)
 	{
-		return Input::Actions()->SwitchToActionMap(userID, actionMapName);
+		if (input == nullptr)
+		{
+			pendingOperations.push_back(
+				[this, actionMapName]()
+				{
+					SwitchToActionMap(actionMapName);
+				});
+
+			return false;
+		}
+
+		return input->Actions()->SwitchToActionMap(userID, actionMapName);
 	}
 
 	const std::string& PlayerInput::GetPlayerName() const

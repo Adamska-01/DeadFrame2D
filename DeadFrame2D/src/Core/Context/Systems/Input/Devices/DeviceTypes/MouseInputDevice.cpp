@@ -1,16 +1,13 @@
 #include "Constants/Input/DefaultDeviceIDs.h"
 #include "Constants/Input/DefaultDeviceNames.h"
-#include "Converters/Input/MouseButtonConversions.h"
 #include "Core/Context/Systems/Input/Actions/Abstractions/IInputActionHandler.h"
 #include "Core/Context/Systems/Input/Devices/DeviceTypes/MouseInputDevice.h"
-#include <SDL_events.h>
 
 
 namespace DF2D::Core
 {
 	using namespace DF2D::Constants;
 	using namespace DF2D::Data;
-	using namespace DF2D::Internal;
 	using namespace DF2D::Models;
 
 
@@ -37,7 +34,7 @@ namespace DF2D::Core
 				actionHandler->ProcessBinding(*this, InputControlType::DIGITAL, controlID);
 			}
 
-			// released is true only the frame the key was released
+			// released is true only the frame the button was released
 			if (state.released)
 			{
 				state.released = false;
@@ -48,8 +45,8 @@ namespace DF2D::Core
 
 		activeButtonIDs.clear();
 
-		// Axes
-		for (auto i = 0; i < static_cast<int>(MouseAxisCode::COUNT_MAX); i++)
+		// Delta axes (motion + wheel); position axes are absolute and untouched here
+		for (auto i = static_cast<int>(MouseAxisCode::MOTION_X); i <= static_cast<int>(MouseAxisCode::WHEEL_Y); i++)
 		{
 			auto& state = axisStates[i];
 
@@ -70,7 +67,7 @@ namespace DF2D::Core
 					state.released = false;
 				}
 
-				actionHandler->ProcessBinding(*this, InputControlType::ANALOG, static_cast<int>(i));
+				actionHandler->ProcessBinding(*this, InputControlType::ANALOG, i);
 			}
 			else
 			{
@@ -81,7 +78,7 @@ namespace DF2D::Core
 					state.pressed = false;
 					state.held = false;
 
-					actionHandler->ProcessBinding(*this, InputControlType::ANALOG, static_cast<int>(i));
+					actionHandler->ProcessBinding(*this, InputControlType::ANALOG, i);
 				}
 				else
 				{
@@ -94,106 +91,84 @@ namespace DF2D::Core
 		}
 	}
 
-	void MouseInputDevice::ProcessEvent(const SDL_Event& event)
+	void MouseInputDevice::HandleButton(MouseButtonCode button, bool pressed, const Vector2F& position)
 	{
-		switch (event.type)
+		auto controlID = static_cast<uint8_t>(button);
+
+		if (controlID >= buttonStates.size())
+			return;
+
+		axisStates[static_cast<int>(MouseAxisCode::POSITION_X)].value = position.x;
+		axisStates[static_cast<int>(MouseAxisCode::POSITION_Y)].value = position.y;
+
+		auto& state = buttonStates[controlID];
+
+		if (pressed)
 		{
-			case SDL_EventType::SDL_MOUSEBUTTONDOWN:
+			// Only set pressed if it wasn't already held
+			if (!state.held && !state.pressed)
 			{
-				auto controlID = event.button.button;
-				auto& state = buttonStates[controlID];
-
-				// Only set pressed if it wasn't already held
-				if (!state.held && !state.pressed)
-				{
-					state.value = 1.0f;
-					state.pressed = true;
-					state.held = false;
-					state.released = false;
-
-					activeButtonIDs.insert(controlID);
-
-					actionHandler->ProcessBinding(*this, InputControlType::DIGITAL, controlID);
-				}
-
-				break;
-			}
-
-			case SDL_EventType::SDL_MOUSEBUTTONUP:
-			{
-				auto controlID = event.button.button;
-				auto& state = buttonStates[controlID];
-
-				state.value = 0.0f;
-				state.pressed = false;
+				state.value = 1.0f;
+				state.pressed = true;
 				state.held = false;
-				state.released = true;
+				state.released = false;
 
 				activeButtonIDs.insert(controlID);
 
 				actionHandler->ProcessBinding(*this, InputControlType::DIGITAL, controlID);
-
-				break;
-			}
-
-			case SDL_EventType::SDL_MOUSEMOTION:
-			{
-				auto& motionX = axisStates[static_cast<int>(MouseAxisCode::MOTION_X)];
-				auto& motionY = axisStates[static_cast<int>(MouseAxisCode::MOTION_Y)];
-
-				motionX.value += event.motion.xrel;
-				motionY.value += event.motion.yrel;
-
-				// pressed/held detection for X
-				if (motionX.value != 0.0f)
-				{
-					if (!motionX.held && !motionX.pressed)
-					{
-						motionX.pressed = true;
-						motionX.held = false;
-						motionX.released = false;
-
-						actionHandler->ProcessBinding(*this, InputControlType::ANALOG, static_cast<int>(MouseAxisCode::MOTION_Y));
-					}
-					else
-					{
-						motionX.pressed = false;
-						motionX.held = true;
-					}
-				}
-
-				// pressed/held detection for Y
-				if (motionY.value != 0.0f)
-				{
-					if (!motionY.held && !motionY.pressed)
-					{
-						motionY.pressed = true;
-						motionY.held = false;
-						motionY.released = false;
-
-						actionHandler->ProcessBinding(*this, InputControlType::ANALOG, static_cast<int>(MouseAxisCode::MOTION_Y));
-					}
-					else
-					{
-						motionY.pressed = false;
-						motionY.held = true;
-					}
-				}
-
-				break;
-			}
-
-			case SDL_EventType::SDL_MOUSEWHEEL:
-			{
-				auto& wheelX = axisStates[static_cast<int>(MouseAxisCode::WHEEL_X)];
-				auto& wheelY = axisStates[static_cast<int>(MouseAxisCode::WHEEL_Y)];
-
-				wheelX.value += event.wheel.x;
-				wheelY.value += event.wheel.y;
-
-				break;
 			}
 		}
+		else
+		{
+			state.value = 0.0f;
+			state.pressed = false;
+			state.held = false;
+			state.released = true;
+
+			activeButtonIDs.insert(controlID);
+
+			actionHandler->ProcessBinding(*this, InputControlType::DIGITAL, controlID);
+		}
+	}
+
+	void MouseInputDevice::UpdateMotionAxisPhase(MouseAxisCode axis)
+	{
+		auto& state = axisStates[static_cast<int>(axis)];
+
+		if (state.value == 0.0f)
+			return;
+
+		if (!state.held && !state.pressed)
+		{
+			state.pressed = true;
+			state.held = false;
+			state.released = false;
+
+			actionHandler->ProcessBinding(*this, InputControlType::ANALOG, static_cast<int>(axis));
+		}
+		else
+		{
+			state.pressed = false;
+			state.held = true;
+		}
+	}
+
+	void MouseInputDevice::HandleMove(const Vector2F& position, const Vector2F& delta)
+	{
+		axisStates[static_cast<int>(MouseAxisCode::POSITION_X)].value = position.x;
+		axisStates[static_cast<int>(MouseAxisCode::POSITION_Y)].value = position.y;
+
+		axisStates[static_cast<int>(MouseAxisCode::MOTION_X)].value += delta.x;
+		axisStates[static_cast<int>(MouseAxisCode::MOTION_Y)].value += delta.y;
+
+		UpdateMotionAxisPhase(MouseAxisCode::MOTION_X);
+		UpdateMotionAxisPhase(MouseAxisCode::MOTION_Y);
+	}
+
+	void MouseInputDevice::HandleWheel(const Vector2F& delta)
+	{
+		axisStates[static_cast<int>(MouseAxisCode::WHEEL_X)].value += delta.x;
+		axisStates[static_cast<int>(MouseAxisCode::WHEEL_Y)].value += delta.y;
 	}
 
 	InputControlState MouseInputDevice::GetButtonState(int buttonID) const
@@ -225,14 +200,19 @@ namespace DF2D::Core
 
 	InputControlState MouseInputDevice::GetButtonState(MouseButtonCode code) const
 	{
-		auto sdlCode = static_cast<int>(MouseButtonConversions::ToSDLMouseButton(code));
-
-		return GetButtonState(sdlCode);
+		return GetButtonState(static_cast<int>(code));
 	}
 
 	InputControlState MouseInputDevice::GetAxisState(Models::MouseAxisCode code) const
 	{
 		return GetAxisState(static_cast<int>(code));
+	}
+
+	Vector2F MouseInputDevice::GetMousePosition() const
+	{
+		return Vector2F(
+			axisStates[static_cast<int>(MouseAxisCode::POSITION_X)].value,
+			axisStates[static_cast<int>(MouseAxisCode::POSITION_Y)].value);
 	}
 
 	Vector2F MouseInputDevice::GetMouseDelta() const

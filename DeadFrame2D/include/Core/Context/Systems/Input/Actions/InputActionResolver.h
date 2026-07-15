@@ -1,13 +1,13 @@
 #pragma once
-#include "Core/Context/Systems/Input/Abstractions/IInputFrameLifecycle.h"
 #include "Core/Context/Systems/Input/Actions/Abstractions/IInputActionHandler.h"
 #include "Core/Context/Systems/Input/Actions/Abstractions/IInputActions.h"
 #include "Core/Context/Systems/Input/Actions/ActionMapIndex.h"
 #include "Core/Context/Systems/Input/Actions/ActionPhase.h"
+#include "Core/Context/Systems/Input/User/Abstractions/IUserDevicePairings.h"
 #include "Data/Systems/Input/InputUserID.h"
 #include "DF2D_API.h"
+#include "Models/Input/ActionMap/InputActionMapBucket.h"
 #include <functional>
-#include <memory>
 #include <optional>
 #include <string>
 #include <unordered_map>
@@ -21,9 +21,7 @@ namespace DF2D::Models
 
 namespace DF2D::Engine
 {
-	class DispatchableEvent;
 	class ComponentHandleBase;
-	class PlayerInput;
 }
 
 
@@ -33,9 +31,13 @@ namespace DF2D::Core
 	class InputDevice;
 
 
-	class DF2D_API InputActionResolver final : public IInputActions, public IInputFrameLifecycle, public IInputActionHandler
+	class DF2D_API InputActionResolver final : public IInputActions, public IInputActionHandler
 	{
 	private:
+		Models::InputActionMapBucket actionMapBucket;
+
+		const IUserDevicePairings* userPairings;
+
 		std::unordered_map<Data::InputUserID, ActionMapIndex> runtimeActionMaps;
 
 		std::unordered_map<Data::InputUserID, std::unordered_set<RuntimeInputAction*>> activeActions;
@@ -52,28 +54,23 @@ namespace DF2D::Core
 		void ResolveComposite2D(const InputDevice& device, RuntimeInputAction& action, const Models::Binding& binding);
 
 
-		int ToCustomCode(const InputDevice& device, Models::InputControlType inputControlType, int sdlCode);
+	public:
+		InputActionResolver(Models::InputActionMapBucket actionMapBucket, const IUserDevicePairings& userPairings);
 
-		int ToSDLCode(const InputDevice& device, Models::InputControlType inputControlType, int customCode);
-
-
-		void InputUserCreatedEventHandler(std::shared_ptr<Engine::DispatchableEvent> dispatchableEvent);
-
-		void InputUserDestroyedEventHandler(std::shared_ptr<Engine::DispatchableEvent> dispatchableEvent);
+		~InputActionResolver() override = default;
 
 
-		void BeginFrame() override;
+		void AddUser(Data::InputUserID userID);
 
-		void PreUpdate() override;
+		void RemoveUser(Data::InputUserID userID);
+
+
+		void BeginFrame();
+
+		void PreUpdate();
 
 
 		void ProcessBinding(const InputDevice& device, Models::InputControlType inputControlType, int controlID) override;
-
-
-	public:
-		InputActionResolver();
-
-		~InputActionResolver() override;
 
 
 		Utilities::ListenerID RegisterAction(

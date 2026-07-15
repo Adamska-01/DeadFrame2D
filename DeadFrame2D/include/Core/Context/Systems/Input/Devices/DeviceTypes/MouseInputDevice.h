@@ -1,5 +1,4 @@
 #pragma once
-#include "Constants/Input/InputConstants.h"
 #include "Core/Context/Systems/Input/Devices/DeviceTypes/Abstractions/InputDevice.h"
 #include "Core/Math/Vector2.h"
 #include "DF2D_API.h"
@@ -12,7 +11,10 @@
 namespace DF2D::Core
 {
 	/**
-	 * @brief Mouse device wrapper.
+	 * @brief Mouse device; state keyed by MouseButtonCode / MouseAxisCode.
+	 *
+	 * Motion and wheel axes hold per-frame deltas; the position axes hold the
+	 * absolute cursor position and are not reset between frames.
 	 */
 	class DF2D_API MouseInputDevice : public InputDevice
 	{
@@ -24,13 +26,7 @@ namespace DF2D::Core
 		std::unordered_set<uint8_t> activeButtonIDs;
 
 
-		void BeginFrame() override;
-
-		void ProcessEvent(const SDL_Event& event) override;
-
-		Data::InputControlState GetButtonState(int buttonID) const override;
-
-		Data::InputControlState GetAxisState(int axisID) const override;
+		void UpdateMotionAxisPhase(Models::MouseAxisCode axis);
 
 
 	public:
@@ -39,14 +35,30 @@ namespace DF2D::Core
 		~MouseInputDevice() override = default;
 
 
+		void BeginFrame() override;
+
+		Data::InputControlState GetButtonState(int buttonID) const override;
+
+		Data::InputControlState GetAxisState(int axisID) const override;
+
+
 		Models::InputDeviceType Type() const override;
 
 		Data::InputDeviceID ID() const override;
 
 
+		void HandleButton(Models::MouseButtonCode button, bool pressed, const Vector2F& position);
+
+		void HandleMove(const Vector2F& position, const Vector2F& delta);
+
+		void HandleWheel(const Vector2F& delta);
+
+
 		Data::InputControlState GetButtonState(Models::MouseButtonCode code) const;
 
 		Data::InputControlState GetAxisState(Models::MouseAxisCode code) const;
+
+		Vector2F GetMousePosition() const;
 
 		Vector2F GetMouseDelta() const;
 

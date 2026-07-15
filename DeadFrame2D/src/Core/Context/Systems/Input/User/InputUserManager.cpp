@@ -3,9 +3,9 @@
 #include "Core/Context/Systems/Input/User/InputUser.h"
 #include "Core/Context/Systems/Input/User/InputUserManager.h"
 #include "Engine/ECS/System/Events/EventDispatcher.h"
-#include "Engine/Events/Context/Input/DeviceRemovedEvent.h"
 #include "Engine/Events/Context/Input/InputUserCreatedEvent.h"
 #include "Engine/Events/Context/Input/InputUserDestroyedEvent.h"
+#include <iostream>
 
 
 namespace DF2D::Core
@@ -18,37 +18,23 @@ namespace DF2D::Core
 	InputUserManager::InputUserManager()
 		: nextID(0)
 	{
-		users.clear();
-		pairedDeviceToUser.clear();
-		userToPairedDevices.clear();
-
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(DeviceRemovedEvent)), this, &InputUserManager::DeviceRemovedEventHandler);
 	}
 
 	InputUserManager::~InputUserManager()
 	{
-		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(DeviceRemovedEvent)), this);
 	}
 
-	void InputUserManager::DeviceRemovedEventHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
+	void InputUserManager::SetUserLifecycleHooks(std::function<void(InputUserID)> onCreated, std::function<void(InputUserID)> onDestroyed)
 	{
-		auto deviceRemovedEvent = DispatchableEvent::SafeCast<DeviceRemovedEvent>(dispatchableEvent);
-
-		if (deviceRemovedEvent == nullptr)
-			return;
-
-		auto deviceID = deviceRemovedEvent->GetDeviceID();
-
-		auto user = GetUserFromPairedDevice(deviceID);
-
-		UnpairDevice(user, deviceID);
+		onUserCreated = std::move(onCreated);
+		onUserDestroyed = std::move(onDestroyed);
 	}
 
 	InputUser* InputUserManager::CreateUser(const std::string& name)
 	{
 		auto userID = nextID++;
 
-		auto newUser = std::make_unique<InputUser>(userID, name.empty() ? ("User" + std::to_string(userID)) : name);
+		auto newUser = std::make_unique<InputUser>(userID, this, name.empty() ? ("User" + std::to_string(userID)) : name);
 
 		auto userPtr = newUser.get();
 
@@ -62,6 +48,13 @@ namespace DF2D::Core
 		{
 			PairDeviceToUser(userPtr, DefaultDeviceIDs::MOUSE);
 		}
+
+		if (onUserCreated)
+		{
+			onUserCreated(userPtr->ID());
+		}
+
+		std::cout << "[Input] User created: " << userPtr->Name() << " (ID: " << userPtr->ID() << ")" << std::endl;
 
 		EventDispatcher::SendEvent(std::make_shared<InputUserCreatedEvent>(userPtr->ID(), userPtr->Name()));
 
@@ -85,9 +78,9 @@ namespace DF2D::Core
 	{
 		auto it = users.find(id);
 
-		if (it == users.end()) 
+		if (it == users.end())
 			return;
-		
+
 		auto userToDestroyPtr = it->second.get();
 
 		// Remove all paired devices
@@ -102,12 +95,19 @@ namespace DF2D::Core
 		}
 
 		std::erase_if(
-			pairedDeviceToUser, 
+			pairedDeviceToUser,
 			[userToDestroyPtr](const auto& pair)
 			{
 				return pair.second == userToDestroyPtr;
 			});
-		
+
+		if (onUserDestroyed)
+		{
+			onUserDestroyed(userToDestroyPtr->ID());
+		}
+
+		std::cout << "[Input] User destroyed: " << userToDestroyPtr->Name() << " (ID: " << userToDestroyPtr->ID() << ")" << std::endl;
+
 		EventDispatcher::SendEvent(std::make_shared<InputUserDestroyedEvent>(userToDestroyPtr->ID(), userToDestroyPtr->Name()));
 
 		users.erase(it);
@@ -123,7 +123,7 @@ namespace DF2D::Core
 	std::vector<InputUser*> InputUserManager::GetAllUsers() const
 	{
 		std::vector<InputUser*> out;
-		
+
 		out.reserve(users.size());
 
 		for (auto& p : users)
@@ -137,7 +137,7 @@ namespace DF2D::Core
 	const std::vector<InputDeviceID>& InputUserManager::GetDevicesPairedToUser(InputDeviceID userID) const
 	{
 		static const std::vector<InputDeviceID> empty;
-		
+
 		auto it = userToPairedDevices.find(userID);
 
 		return it != userToPairedDevices.end() ? it->second : empty;
@@ -153,9 +153,19 @@ namespace DF2D::Core
 		return it->second;
 	}
 
+	std::optional<InputUserID> InputUserManager::GetUserIDFromPairedDevice(InputDeviceID deviceID) const
+	{
+		auto it = pairedDeviceToUser.find(deviceID);
+
+		if (it == pairedDeviceToUser.end())
+			return std::nullopt;
+
+		return it->second->ID();
+	}
+
 	void InputUserManager::PairDeviceToUser(InputUser* user, InputDeviceID deviceID)
 	{
-		if (!user) 
+		if (!user)
 			return;
 
 		pairedDeviceToUser[deviceID] = user;
@@ -170,7 +180,7 @@ namespace DF2D::Core
 
 	void InputUserManager::UnpairDevice(InputUser* user, InputDeviceID deviceID)
 	{
-		if (!user) 
+		if (!user)
 			return;
 
 		pairedDeviceToUser.erase(deviceID);
@@ -181,11 +191,11 @@ namespace DF2D::Core
 
 			devices.erase(
 				std::remove(
-					devices.begin(), 
-					devices.end(), 
-					deviceID), 
+					devices.begin(),
+					devices.end(),
+					deviceID),
 				devices.end());
-			
+
 			if (devices.empty())
 			{
 				userToPairedDevices.erase(it);

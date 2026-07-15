@@ -1,7 +1,9 @@
 #pragma once
-#include "Core/Services/Events/Abstractions/IEventProcessor.h"
+#include "Core/Services/Events/Abstractions/IEventSource.h"
+#include "Core/Services/Events/Abstractions/ISystemEventSink.h"
 #include "DF2D_API.h"
-#include <SDL_events.h>
+#include <memory>
+#include <optional>
 #include <vector>
 
 
@@ -10,26 +12,33 @@ namespace DF2D::Core
 	class DF2D_API EventManager
 	{
 	private:
-		SDL_Event sdlEvent;
+		std::unique_ptr<IEventSource> eventSource;
 
-
-		static std::vector<IEventProcessor*> eventProcessors;
+		std::vector<ISystemEventSink*> sinks;
 
 
 	public:
-		EventManager();
+		EventManager(std::unique_ptr<IEventSource> eventSource);
 
-		// Deleting the processors is up to the owners 
+		// Sinks are not owned; deleting them is up to their owners
 		~EventManager() = default;
+
+		EventManager(const EventManager&) = delete;
+
+		EventManager(EventManager&&) = delete;
+
+		EventManager& operator=(const EventManager&) = delete;
+
+		EventManager& operator=(EventManager&&) = delete;
 
 
 		std::optional<int> ProcessEvents();
 
 
-		static void AddEventProcessor(IEventProcessor* eventProcessor);
+		void AddSink(ISystemEventSink* sink);
 
-		static void RemoveEventProcessor(IEventProcessor* eventProcessor);
+		void RemoveSink(ISystemEventSink* sink);
 
-		static void SendSystemEvent(SDL_EventType eventType);
+		void RequestQuit();
 	};
 }

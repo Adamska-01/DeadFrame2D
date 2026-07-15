@@ -7,6 +7,13 @@
 #include "Utilities/Delegates/Listeners/ListenerID.h"
 #include <functional>
 #include <string>
+#include <vector>
+
+
+namespace DF2D::Core
+{
+	class Input;
+}
 
 
 namespace DF2D::Engine
@@ -17,17 +24,25 @@ namespace DF2D::Engine
 
 
 	private:
-		Data::InputUserID userID;
+		Core::Input* input = nullptr;
+
+		Data::InputUserID userID = -1;
 
 		std::string playerName;
 
 		std::vector<Data::ActionListenerEntry> registeredListeners;
+
+		// Calls made before Init (the input system is wired in Init) are replayed there
+		std::vector<std::function<void()>> pendingOperations;
 
 
 	public:
 		PlayerInput(const std::string& playerName);
 
 		virtual ~PlayerInput() override;
+
+
+		virtual void Init() override;
 
 
 		Utilities::ListenerID RegisterAction(
@@ -40,11 +55,11 @@ namespace DF2D::Engine
 
 		void DeregisterActionByID(const std::string& actionMapName, const std::string& actionName, Utilities::ListenerID listenerID);
 
-		bool EnableActionMap(const std::string& actionMapName) const;
+		bool EnableActionMap(const std::string& actionMapName);
 
-		bool DisableActionMap(const std::string& actionMapName) const;
+		bool DisableActionMap(const std::string& actionMapName);
 
-		bool SwitchToActionMap(const std::string& actionMapName) const;
+		bool SwitchToActionMap(const std::string& actionMapName);
 
 		const std::string& GetPlayerName() const;
 	};

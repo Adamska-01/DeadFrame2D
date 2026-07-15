@@ -1,6 +1,7 @@
 #include "Constants/Paths/ResourcePaths.h"
 #include "Core/Context/SystemInitializer.h"
 #include "Core/Context/Systems/Graphics/TextureManager.h"
+#include "Core/Context/Systems/Input/Input.h"
 #include "Core/Context/Systems/Rendering/Renderer.h"
 #include "Core/DeadFrameRuntime.h"
 #include "Core/Services/ServiceInitializer.h"
@@ -28,6 +29,8 @@ namespace DF2D::Core
 
 		auto coreCtx = systemInitializer->GetCoreContext();
 		auto serviceCtx = serviceInitializer->GetServiceContext();
+
+		serviceCtx.eventManager->AddSink(coreCtx.input);
 
 		serviceCtx.sceneManager->SetContexts(coreCtx, serviceCtx);
 	}

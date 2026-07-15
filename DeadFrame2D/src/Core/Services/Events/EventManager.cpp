@@ -1,54 +1,56 @@
 #include "Core/Services/Events/EventManager.h"
+#include "Utilities/Debugging/Guards.h"
 #include <algorithm>
-#include <SDL.h>
 
 
 namespace DF2D::Core
 {
-	std::vector<IEventProcessor*> EventManager::eventProcessors = {};
+	using namespace DF2D::Data;
+	using namespace DF2D::Utilities;
 
 
-	EventManager::EventManager()
+	EventManager::EventManager(std::unique_ptr<IEventSource> eventSource)
+		: eventSource(std::move(eventSource))
 	{
-		sdlEvent = SDL_Event();
+		Guard::AgainstNull(this->eventSource.get(), NAME_OF(eventSource));
 	}
 
 	std::optional<int> EventManager::ProcessEvents()
 	{
-		while (SDL_PollEvent(&sdlEvent))
+		while (auto systemEvent = eventSource->PollEvent())
 		{
-			for (const auto& processor : eventProcessors)
+			if (std::holds_alternative<QuitEvent>(*systemEvent))
+				return 0;
+
+			for (auto* sink : sinks)
 			{
-				if (const auto ecode = processor->ProcessEvents(sdlEvent))
-					return ecode;
+				sink->OnSystemEvent(*systemEvent);
 			}
 		}
 
 		return std::nullopt;
 	}
 
-	void EventManager::AddEventProcessor(IEventProcessor* eventProcessor)
+	void EventManager::AddSink(ISystemEventSink* sink)
 	{
-		eventProcessors.push_back(eventProcessor);
+		if (sink == nullptr)
+			return;
+
+		sinks.push_back(sink);
 	}
 
-	void EventManager::RemoveEventProcessor(IEventProcessor* eventProcessor)
+	void EventManager::RemoveSink(ISystemEventSink* sink)
 	{
-		auto it = std::remove(
-			eventProcessors.begin(), 
-			eventProcessors.end(), 
-			eventProcessor);
-
-		eventProcessors.erase(it, eventProcessors.end());
+		sinks.erase(
+			std::remove(
+				sinks.begin(),
+				sinks.end(),
+				sink),
+			sinks.end());
 	}
 
-	void EventManager::SendSystemEvent(SDL_EventType eventType)
+	void EventManager::RequestQuit()
 	{
-		auto toSend = SDL_Event
-		{
-			.type = (uint32_t)eventType
-		};
-
-		SDL_PushEvent(&toSend);
+		eventSource->PushQuitEvent();
 	}
 }

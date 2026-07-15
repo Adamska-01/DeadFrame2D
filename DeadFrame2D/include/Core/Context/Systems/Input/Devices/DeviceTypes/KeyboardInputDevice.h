@@ -9,7 +9,7 @@
 namespace DF2D::Core
 {
 	/**
-	 * @brief Keyboard device wrapper.
+	 * @brief Keyboard device; state keyed by KeyboardKeyCode.
 	 */
 	class DF2D_API KeyboardInputDevice : public InputDevice
 	{
@@ -19,25 +19,25 @@ namespace DF2D::Core
 		std::unordered_set<uint16_t> activeControlIDs;
 
 
-		void BeginFrame() override;
-
-		void ProcessEvent(const SDL_Event& event) override;
-
-		Data::InputControlState GetButtonState(int buttonID) const override;
-
-		Data::InputControlState GetAxisState(int axisID) const override;
-
-
 	public:
 		KeyboardInputDevice(IInputActionHandler* actionHandler);
 
 		~KeyboardInputDevice() override = default;
 
 
+		void BeginFrame() override;
+
+		Data::InputControlState GetButtonState(int buttonID) const override;
+
+		Data::InputControlState GetAxisState(int axisID) const override;
+
+
 		Models::InputDeviceType Type() const override;
 
 		Data::InputDeviceID ID() const override;
 
+
+		void HandleKey(Models::KeyboardKeyCode key, bool pressed);
 
 		Data::InputControlState GetButtonState(Models::KeyboardKeyCode code) const;
 	};

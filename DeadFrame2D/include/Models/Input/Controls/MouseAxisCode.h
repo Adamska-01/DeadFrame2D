@@ -15,6 +15,10 @@ namespace DF2D::Models
 
 		WHEEL_Y,
 
+		POSITION_X,
+
+		POSITION_Y,
+
 		COUNT_MAX
 	};
 
@@ -24,6 +28,8 @@ namespace DF2D::Models
 		{ MouseAxisCode::MOTION_X, "MotionX"},
 		{ MouseAxisCode::MOTION_Y, "MotionY" },
 		{ MouseAxisCode::WHEEL_X, "WheelX" },
-		{ MouseAxisCode::WHEEL_Y, "WheelY" }
+		{ MouseAxisCode::WHEEL_Y, "WheelY" },
+		{ MouseAxisCode::POSITION_X, "PositionX" },
+		{ MouseAxisCode::POSITION_Y, "PositionY" }
 	});
 }

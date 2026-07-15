@@ -1,5 +1,8 @@
 #include "Constants/CommonColors.h"
 #include "Core/Context/Systems/Graphics/TextureManager.h"
+#include "Core/Context/Systems/Input/Devices/DeviceManager.h"
+#include "Core/Context/Systems/Input/Devices/DeviceTypes/MouseInputDevice.h"
+#include "Core/Context/Systems/Input/Input.h"
 #include "Core/Context/Systems/Rendering/RenderSystem.h"
 #include "Data/Blueprints/UI/Button/ButtonComponentModel.h"
 #include "Engine/ECS/Component/Transform.h"
@@ -8,14 +11,14 @@
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include "Utilities/Collisions/CollisionUtils.h"
 #include "Utilities/Debugging/Guards.h"
-#include <SDL_events.h>
 
 
 namespace DF2D::Engine
 {
+	using namespace DF2D::Constants;
 	using namespace DF2D::Core;
 	using namespace DF2D::Data;
-	using namespace DF2D::Constants;
+	using namespace DF2D::Models;
 	using namespace DF2D::Utilities;
 
 
@@ -47,72 +50,52 @@ namespace DF2D::Engine
 		pressedFillColor = CommonColors::DARK_GRAY;
 	}
 
-	std::optional<int> Button::ProcessEvents(const SDL_Event& sdlEvent)
+	void Button::ProcessPointer()
 	{
-		if (!IsActive() || !GetGameObject()->IsActive())
-			return std::nullopt;
+		auto* mouse = input->Devices()->Mouse();
 
-		switch (sdlEvent.type)
+		if (mouse == nullptr)
+			return;
+
+		auto mousePos = mouse->GetMousePosition();
+		auto destRect = GetBoundingBox();
+
+		auto isColliding = Collision::PointVsBox(mousePos, destRect);
+
+		auto mouseDelta = mouse->GetMouseDelta();
+		auto mouseMoved = mouseDelta.x != 0.0f || mouseDelta.y != 0.0f;
+
+		if (mouseMoved)
 		{
-		case SDL_MOUSEBUTTONDOWN:
-			if (sdlEvent.button.button == SDL_BUTTON_LEFT)
+			if (isColliding && !isHovered && !isPressed)
 			{
-				auto mousePos = Vector2F{
-					static_cast<float>(sdlEvent.button.x),
-					static_cast<float>(sdlEvent.button.y)
-				};
-				auto destRect = GetBoundingBox();
-
-				if (Collision::PointVsBox(mousePos, destRect))
-				{
-					OnPointerDown();
-				}
+				OnPointerEnter();
 			}
-			break;
-
-		case SDL_MOUSEBUTTONUP:
-			if (sdlEvent.button.button == SDL_BUTTON_LEFT)
+			else if (!isColliding && isHovered && !isPressed)
 			{
-				auto mousePos = Vector2F{
-					static_cast<float>(sdlEvent.button.x),
-					static_cast<float>(sdlEvent.button.y)
-				};
-				auto destRect = GetBoundingBox();
-
-				if (Collision::PointVsBox(mousePos, destRect))
-				{
-					OnPointerUp();
-				}
-				else
-				{
-					isPressed = false;
-					currentButtonImage = buttonIdleImage;
-				}
+				OnPointerExit();
 			}
-			break;
-
-		case SDL_EventType::SDL_MOUSEMOTION:
-			{
-				auto destRect = GetBoundingBox();
-				auto isColliding = Collision::PointVsBox(
-					Vector2F(
-						static_cast<float>(sdlEvent.motion.x),
-						static_cast<float>(sdlEvent.motion.y)),
-					destRect);
-
-				if (isColliding && !isHovered && !isPressed)
-				{
-					OnPointerEnter();
-				}
-				else if (!isColliding && isHovered && !isPressed)
-				{
-					OnPointerExit();
-				}
-			}
-			break;
 		}
 
-		return std::nullopt;
+		auto leftButton = mouse->GetButtonState(MouseButtonCode::LEFT);
+
+		if (leftButton.pressed && isColliding)
+		{
+			OnPointerDown();
+		}
+
+		if (leftButton.released)
+		{
+			if (isColliding)
+			{
+				OnPointerUp();
+			}
+			else
+			{
+				isPressed = false;
+				currentButtonImage = buttonIdleImage;
+			}
+		}
 	}
 
 	void Button::Init()
@@ -120,10 +103,21 @@ namespace DF2D::Engine
 		UIComponent::Init();
 
 		textureManager = Guard::AgainstNullAssignment(GetGameObject()->CoreContext().textureManager, NAME_OF(textureManager));
+		input = Guard::AgainstNullAssignment(GetGameObject()->CoreContext().input, NAME_OF(input));
 
 		SetIdleButtonImageSource(idleSource);
 		SetHoveredButtonImageSource(hoveredSource);
 		SetPressedButtonImageSource(pressedSource);
+	}
+
+	void Button::Update(float deltaTime)
+	{
+		UIComponent::Update(deltaTime);
+
+		if (!IsActive() || input == nullptr)
+			return;
+
+		ProcessPointer();
 	}
 
 	void Button::Draw()

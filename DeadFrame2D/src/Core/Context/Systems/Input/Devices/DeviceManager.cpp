@@ -1,5 +1,4 @@
 #include "Constants/Input/DefaultDeviceIDs.h"
-#include "Core/Context/Systems/Input/Actions/Abstractions/IInputActionHandler.h"
 #include "Core/Context/Systems/Input/Devices/DeviceManager.h"
 #include "Core/Context/Systems/Input/Devices/DeviceTypes/Abstractions/InputDevice.h"
 #include "Core/Context/Systems/Input/Devices/DeviceTypes/ControllerInputDevice.h"
@@ -9,7 +8,7 @@
 #include "Engine/Events/Context/Input/DeviceAddedEvent.h"
 #include "Engine/Events/Context/Input/DeviceRemovedEvent.h"
 #include "Utilities/Debugging/Guards.h"
-#include <SDL.h>
+#include <iostream>
 
 
 namespace DF2D::Core
@@ -18,101 +17,110 @@ namespace DF2D::Core
 	using namespace DF2D::Data;
 	using namespace DF2D::Engine;
 	using namespace DF2D::Utilities;
-	using namespace DF2D::Models;
 
 
 	DeviceManager::DeviceManager(IInputActionHandler* actionHandler)
-		: currentController(nullptr)
 	{
 		this->actionHandler = Guard::AgainstNullAssignment(actionHandler, NAME_OF(actionHandler));
-		
+
 		// Keyboard and mouse are always initialised and registered
-		devices[DefaultDeviceIDs::KEYBOARD] = std::make_shared<KeyboardInputDevice>(actionHandler);
-		devices[DefaultDeviceIDs::MOUSE] = std::make_shared<MouseInputDevice>(actionHandler);
+		auto keyboardDevice = std::make_unique<KeyboardInputDevice>(actionHandler);
+		auto mouseDevice = std::make_unique<MouseInputDevice>(actionHandler);
 
+		keyboard = keyboardDevice.get();
+		mouse = mouseDevice.get();
 
-		// IMPORTANT: If you want to disable RawInput/XInput correlation, set the hint
-		// BEFORE initializing the controller subsystem.
-		SDL_SetHint(SDL_HINT_JOYSTICK_RAWINPUT_CORRELATE_XINPUT, "0");
-
-		if (SDL_WasInit(SDL_INIT_GAMECONTROLLER) == 0)
-		{
-			if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) < 0)
-			{
-				std::cerr << "[Input] Failed to init SDL_GAMECONTROLLER: " << SDL_GetError() << std::endl;
-			}
-			else
-			{
-				std::cout << "[Info] Input subsystem successfully initialized." << std::endl;
-			}
-		}
+		devices[DefaultDeviceIDs::KEYBOARD] = std::move(keyboardDevice);
+		devices[DefaultDeviceIDs::MOUSE] = std::move(mouseDevice);
 	}
 
 	DeviceManager::~DeviceManager()
 	{
-		// Close controller devices
-		std::vector<InputDeviceID> toClose;
-		for (auto& [id, device] : devices)
-		{
-			if (id == DefaultDeviceIDs::KEYBOARD || id == DefaultDeviceIDs::MOUSE)
-				continue;
-
-			toClose.push_back(id);
-		}
-
-		for (auto id : toClose)
-		{
-			CloseController(id);
-		}
-
-		devices.clear();
-
-		if (SDL_WasInit(SDL_INIT_GAMECONTROLLER) != 0)
-		{
-			SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
-
-			std::cout << "[Info] Input subsystem successfully shut down." << std::endl;
-		}
-		else
-		{
-			std::cout << "[Info] Input subsystem was not initialized, no need to shut down." << std::endl;
-		}
 	}
 
 
-	void DeviceManager::OpenController(int deviceIndex)
+	void DeviceManager::SetDeviceRemovedHook(std::function<void(InputDeviceID)> onRemoved)
 	{
-		if (!SDL_IsGameController(deviceIndex))
-			return;
+		onDeviceRemoved = std::move(onRemoved);
+	}
 
-		auto gc = SDL_GameControllerOpen(deviceIndex);
-		
-		if (!gc)
-		{
-			std::cerr << "[Input] Failed open controller index " << deviceIndex << ": " << SDL_GetError() << std::endl;
-			
-			return;
-		}
-		
-		auto joystick = SDL_GameControllerGetJoystick(gc);
-		auto inst = SDL_JoystickInstanceID(joystick);
-		auto newDevice = std::make_shared<ControllerInputDevice>(gc, inst, actionHandler);
-		
-		devices.emplace(inst, newDevice);
+
+	void DeviceManager::HandleEvent(const SystemEvent& systemEvent)
+	{
+		std::visit(
+			[&](const auto& event)
+			{
+				using T = std::decay_t<decltype(event)>;
+
+				if constexpr (std::is_same_v<T, KeyEvent>)
+				{
+					keyboard->HandleKey(event.key, event.pressed);
+				}
+				else if constexpr (std::is_same_v<T, MouseButtonEvent>)
+				{
+					mouse->HandleButton(event.button, event.pressed, event.position);
+				}
+				else if constexpr (std::is_same_v<T, MouseMoveEvent>)
+				{
+					mouse->HandleMove(event.position, event.delta);
+				}
+				else if constexpr (std::is_same_v<T, MouseWheelEvent>)
+				{
+					mouse->HandleWheel(event.delta);
+				}
+				else if constexpr (std::is_same_v<T, ControllerConnectedEvent>)
+				{
+					AddController(event.deviceID, event.name);
+				}
+				else if constexpr (std::is_same_v<T, ControllerDisconnectedEvent>)
+				{
+					RemoveController(event.deviceID);
+				}
+				else if constexpr (std::is_same_v<T, ControllerButtonEvent>)
+				{
+					if (auto* controller = Controller(event.deviceID))
+					{
+						controller->HandleButton(event.button, event.pressed);
+
+						currentController = controller;
+					}
+				}
+				else if constexpr (std::is_same_v<T, ControllerAxisEvent>)
+				{
+					if (auto* controller = Controller(event.deviceID))
+					{
+						controller->HandleAxis(event.axis, event.value);
+
+						currentController = controller;
+					}
+				}
+			},
+			systemEvent);
+	}
+
+	void DeviceManager::AddController(InputDeviceID instanceID, const std::string& name)
+	{
+		auto newDevice = std::make_unique<ControllerInputDevice>(instanceID, name, actionHandler);
+
+		auto* devicePtr = newDevice.get();
+
+		devices[instanceID] = std::move(newDevice);
 
 		if (currentController == nullptr)
 		{
-			currentController = newDevice.get();
+			currentController = devicePtr;
 		}
-		
-		EventDispatcher::SendEvent(std::make_shared<DeviceAddedEvent>(newDevice->ID(), newDevice->Name()));
+
+		std::cout << "[Input] Device added: " << devicePtr->Name() << " (ID: " << devicePtr->ID() << ")" << std::endl;
+
+		EventDispatcher::SendEvent(std::make_shared<DeviceAddedEvent>(devicePtr->ID(), devicePtr->Name()));
 	}
 
-	void DeviceManager::CloseController(InputDeviceID instanceId)
+	void DeviceManager::RemoveController(InputDeviceID instanceID)
 	{
-		auto it = devices.find(instanceId);
+		auto it = devices.find(instanceID);
 
-		if (it == devices.end()) 
+		if (it == devices.end())
 			return;
 
 		auto& removedDevice = it->second;
@@ -122,73 +130,24 @@ namespace DF2D::Core
 			currentController = nullptr;
 		}
 
+		if (onDeviceRemoved)
+		{
+			onDeviceRemoved(instanceID);
+		}
+
+		std::cout << "[Input] Device removed: " << removedDevice->Name() << " (ID: " << removedDevice->ID() << ")" << std::endl;
+
 		EventDispatcher::SendEvent(std::make_shared<DeviceRemovedEvent>(removedDevice->ID(), removedDevice->Name()));
 
 		devices.erase(it);
 	}
 
-	std::optional<int> DeviceManager::ProcessEvents(const SDL_Event& sdlEvent)
-	{
-		switch (sdlEvent.type)
-		{
-		// Keyboard
-		case SDL_KEYDOWN:
-		case SDL_KEYUP:
-			devices[DefaultDeviceIDs::KEYBOARD]->ProcessEvent(sdlEvent);
-			break;
-
-		// Mouse
-		case SDL_MOUSEBUTTONDOWN:
-		case SDL_MOUSEBUTTONUP:
-		case SDL_MOUSEMOTION:
-		case SDL_MOUSEWHEEL:
-			devices[DefaultDeviceIDs::MOUSE]->ProcessEvent(sdlEvent);
-			break;
-
-		// Controller
-		case SDL_CONTROLLERDEVICEADDED:
-			OpenController(sdlEvent.cdevice.which);
-			break;
-
-		case SDL_CONTROLLERDEVICEREMOVED:
-			CloseController(sdlEvent.cdevice.which);
-			break;
-
-		case SDL_CONTROLLERBUTTONDOWN:
-		case SDL_CONTROLLERBUTTONUP:
-		case SDL_CONTROLLERAXISMOTION:
-		{
-			auto instance_id = (sdlEvent.type == SDL_CONTROLLERAXISMOTION) ? sdlEvent.caxis.which : sdlEvent.cbutton.which;
-
-			auto it = devices.find(instance_id);
-
-			if (it != devices.end())
-			{
-				it->second->ProcessEvent(sdlEvent);
-
-				currentController = it->second.get();
-			}
-
-			break;
-		}
-
-		default:
-			break;
-		}
-
-		return std::nullopt;
-	}
-
 	void DeviceManager::BeginFrame()
 	{
-		for (auto& d : devices)
+		for (auto& [id, device] : devices)
 		{
-			d.second->BeginFrame();
+			device->BeginFrame();
 		}
-	}
-
-	void DeviceManager::PreUpdate()
-	{
 	}
 
 	InputDevice* DeviceManager::GetDevice(InputDeviceID id)
@@ -202,7 +161,8 @@ namespace DF2D::Core
 	{
 		std::vector<InputDevice*> out;
 
-		// Add all controllers
+		out.reserve(devices.size());
+
 		for (auto& [id, device] : devices)
 		{
 			out.push_back(device.get());
@@ -213,16 +173,19 @@ namespace DF2D::Core
 
 	KeyboardInputDevice* DeviceManager::Keyboard()
 	{
-		return static_cast<KeyboardInputDevice*>(devices[DefaultDeviceIDs::KEYBOARD].get());
+		return keyboard;
 	}
 
 	MouseInputDevice* DeviceManager::Mouse()
 	{
-		return static_cast<MouseInputDevice*>(devices[DefaultDeviceIDs::MOUSE].get());
+		return mouse;
 	}
 
 	ControllerInputDevice* DeviceManager::Controller(Data::InputDeviceID id)
 	{
+		if (id == DefaultDeviceIDs::KEYBOARD || id == DefaultDeviceIDs::MOUSE)
+			return nullptr;
+
 		auto it = devices.find(id);
 
 		return (it != devices.end()) ? static_cast<ControllerInputDevice*>(it->second.get()) : nullptr;
