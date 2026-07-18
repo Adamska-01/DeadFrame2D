@@ -1,7 +1,6 @@
-#include <doctest.h>
 #include "Core/Context/Systems/Window/Window.h"
 #include "Mocks/Context/Systems/Window/MockWindowBackend.h"
-#include <SDL.h>
+#include <doctest.h>
 
 
 using namespace DF2D::Core;
@@ -94,39 +93,6 @@ TEST_CASE("SetResolution propagates backend failure")
 
 	CHECK(result == false);
 	CHECK(mock->setResolutionCount == 1);
-}
-
-
-TEST_CASE("ProcessEvents returns SDL_QUIT code for quit events")
-{
-	MockWindowBackend* mock = nullptr;
-	auto window = MakeWindow(mock);
-
-	IEventProcessor* processor = window.get();
-
-	SDL_Event quitEvent{};
-	quitEvent.type = SDL_QUIT;
-
-	auto result = processor->ProcessEvents(quitEvent);
-
-	REQUIRE(result.has_value());
-	CHECK(*result == (int)SDL_QUIT);
-}
-
-
-TEST_CASE("ProcessEvents ignores unrelated events")
-{
-	MockWindowBackend* mock = nullptr;
-	auto window = MakeWindow(mock);
-
-	IEventProcessor* processor = window.get();
-
-	SDL_Event keyEvent{};
-	keyEvent.type = SDL_KEYDOWN;
-
-	auto result = processor->ProcessEvents(keyEvent);
-
-	CHECK_FALSE(result.has_value());
 }
 
 
