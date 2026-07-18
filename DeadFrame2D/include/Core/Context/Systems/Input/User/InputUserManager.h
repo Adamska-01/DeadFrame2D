@@ -36,7 +36,7 @@ namespace DF2D::Core
 		 */
 		InputUserManager(std::function<void(Data::InputUserID)> onUserCreated = {}, std::function<void(Data::InputUserID)> onUserDestroyed = {});
 
-		~InputUserManager() override = default;
+		~InputUserManager() override;
 
 		InputUserManager(const InputUserManager&) = delete;
 

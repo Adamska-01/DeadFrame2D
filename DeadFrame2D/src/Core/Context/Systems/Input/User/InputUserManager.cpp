@@ -22,6 +22,10 @@ namespace DF2D::Core
 	{
 	}
 
+	InputUserManager::~InputUserManager()
+	{
+	}
+
 
 	InputUser* InputUserManager::CreateUser(const std::string& name)
 	{
