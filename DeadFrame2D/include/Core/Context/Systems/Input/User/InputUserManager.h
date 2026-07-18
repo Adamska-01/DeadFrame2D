@@ -30,9 +30,13 @@ namespace DF2D::Core
 
 
 	public:
-		InputUserManager();
+		/**
+		 * @brief Lifecycle hooks are invoked before the matching engine events are
+		 * broadcast; they are wired once at construction (by the Input system).
+		 */
+		InputUserManager(std::function<void(Data::InputUserID)> onUserCreated = {}, std::function<void(Data::InputUserID)> onUserDestroyed = {});
 
-		~InputUserManager() override;
+		~InputUserManager() override = default;
 
 		InputUserManager(const InputUserManager&) = delete;
 
@@ -41,13 +45,6 @@ namespace DF2D::Core
 		InputUserManager& operator=(const InputUserManager&) = delete;
 
 		InputUserManager& operator=(InputUserManager&&) = delete;
-
-
-		/**
-		 * @brief Internal lifecycle hooks (set by the Input system) invoked before the
-		 * matching engine events are broadcast.
-		 */
-		void SetUserLifecycleHooks(std::function<void(Data::InputUserID)> onCreated, std::function<void(Data::InputUserID)> onDestroyed);
 
 
 		InputUser* CreateUser(const std::string& name = "Player") override;

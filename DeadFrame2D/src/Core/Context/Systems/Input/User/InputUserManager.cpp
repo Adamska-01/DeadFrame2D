@@ -15,20 +15,13 @@ namespace DF2D::Core
 	using namespace DF2D::Engine;
 
 
-	InputUserManager::InputUserManager()
-		: nextID(0)
+	InputUserManager::InputUserManager(std::function<void(InputUserID)> onUserCreated, std::function<void(InputUserID)> onUserDestroyed)
+		: nextID(0),
+		onUserCreated(std::move(onUserCreated)),
+		onUserDestroyed(std::move(onUserDestroyed))
 	{
 	}
 
-	InputUserManager::~InputUserManager()
-	{
-	}
-
-	void InputUserManager::SetUserLifecycleHooks(std::function<void(InputUserID)> onCreated, std::function<void(InputUserID)> onDestroyed)
-	{
-		onUserCreated = std::move(onCreated);
-		onUserDestroyed = std::move(onDestroyed);
-	}
 
 	InputUser* InputUserManager::CreateUser(const std::string& name)
 	{

@@ -1,4 +1,5 @@
 #pragma once
+#include "Core/Context/Systems/Input/Abstractions/IInputFrameLifecycle.h"
 #include "Core/Context/Systems/Input/Actions/Abstractions/IInputActionHandler.h"
 #include "Core/Context/Systems/Input/Actions/Abstractions/IInputActions.h"
 #include "Core/Context/Systems/Input/Actions/ActionMapIndex.h"
@@ -31,7 +32,7 @@ namespace DF2D::Core
 	class InputDevice;
 
 
-	class DF2D_API InputActionResolver final : public IInputActions, public IInputActionHandler
+	class DF2D_API InputActionResolver final : public IInputActions, public IInputActionHandler, public IInputFrameLifecycle
 	{
 	private:
 		Models::InputActionMapBucket actionMapBucket;
@@ -54,6 +55,14 @@ namespace DF2D::Core
 		void ResolveComposite2D(const InputDevice& device, RuntimeInputAction& action, const Models::Binding& binding);
 
 
+		void BeginFrame() override;
+
+		void PreUpdate() override;
+
+
+		void ProcessBinding(const InputDevice& device, Models::InputControlType inputControlType, int controlID) override;
+
+
 	public:
 		InputActionResolver(Models::InputActionMapBucket actionMapBucket, const IUserDevicePairings& userPairings);
 
@@ -63,14 +72,6 @@ namespace DF2D::Core
 		void AddUser(Data::InputUserID userID);
 
 		void RemoveUser(Data::InputUserID userID);
-
-
-		void BeginFrame();
-
-		void PreUpdate();
-
-
-		void ProcessBinding(const InputDevice& device, Models::InputControlType inputControlType, int controlID) override;
 
 
 		Utilities::ListenerID RegisterAction(

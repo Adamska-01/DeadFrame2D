@@ -48,11 +48,11 @@ namespace DF2D::Core
 		void EndDraw() override;
 
 
+		void OnSystemEvent(const Data::SystemEvent& systemEvent) override;
+
+
 	public:
 		~Input() override;
-
-
-		void OnSystemEvent(const Data::SystemEvent& systemEvent) override;
 
 
 		IInputDeviceProvider* Devices();

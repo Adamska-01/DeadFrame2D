@@ -30,13 +30,21 @@ namespace DF2D::Core
 		std::unordered_set<int> activeAxes;
 
 
+		void BeginFrame() override;
+
+		bool HandleEvent(const Data::SystemEvent& systemEvent) override;
+
+
+		void HandleButton(Models::ControllerButtonCode button, bool pressed);
+
+		void HandleAxis(Models::ControllerAxisCode axis, float normalizedValue);
+
+
 	public:
 		ControllerInputDevice(Data::InputDeviceID instanceID, const std::string& name, IInputActionHandler* actionHandler);
 
 		~ControllerInputDevice() override = default;
 
-
-		void BeginFrame() override;
 
 		Data::InputControlState GetButtonState(int buttonID) const override;
 
@@ -46,11 +54,6 @@ namespace DF2D::Core
 		Models::InputDeviceType Type() const override;
 
 		Data::InputDeviceID ID() const override;
-
-
-		void HandleButton(Models::ControllerButtonCode button, bool pressed);
-
-		void HandleAxis(Models::ControllerAxisCode axis, float normalizedValue);
 
 
 		Data::InputControlState GetButtonState(Models::ControllerButtonCode code) const;

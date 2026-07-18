@@ -68,6 +68,37 @@ namespace DF2D::Core
 		activeAxes.clear();
 	}
 
+	bool ControllerInputDevice::HandleEvent(const SystemEvent& systemEvent)
+	{
+		return std::visit(
+			[&](const auto& event) -> bool
+			{
+				using T = std::decay_t<decltype(event)>;
+
+				if constexpr (std::is_same_v<T, ControllerButtonEvent>)
+				{
+					if (event.deviceID != instanceID)
+						return false;
+
+					HandleButton(event.button, event.pressed);
+
+					return true;
+				}
+				else if constexpr (std::is_same_v<T, ControllerAxisEvent>)
+				{
+					if (event.deviceID != instanceID)
+						return false;
+
+					HandleAxis(event.axis, event.value);
+
+					return true;
+				}
+				else
+					return false;
+			},
+			systemEvent);
+	}
+
 	void ControllerInputDevice::HandleButton(ControllerButtonCode button, bool pressed)
 	{
 		auto controlID = static_cast<int>(button);

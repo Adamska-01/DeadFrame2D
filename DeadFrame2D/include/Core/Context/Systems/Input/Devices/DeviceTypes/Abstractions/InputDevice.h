@@ -1,4 +1,5 @@
 #pragma once
+#include "Data/Systems/Events/SystemEvent.h"
 #include "Data/Systems/Input/InputControlState.h"
 #include "Data/Systems/Input/InputDeviceID.h"
 #include "DF2D_API.h"
@@ -42,6 +43,12 @@ namespace DF2D::Core
 		 * Snapshot states at the beginning of the frame; called by the Input system.
 		 */
 		virtual void BeginFrame() = 0;
+
+		/**
+		 * Consume an engine event; returns true when the event updated this device.
+		 * Called by the DeviceManager; overridden privately by concrete devices.
+		 */
+		virtual bool HandleEvent(const Data::SystemEvent& systemEvent) = 0;
 
 		/**
 		 * Digital input (keyboard keys, controller buttons).

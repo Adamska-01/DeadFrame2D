@@ -91,6 +91,37 @@ namespace DF2D::Core
 		}
 	}
 
+	bool MouseInputDevice::HandleEvent(const SystemEvent& systemEvent)
+	{
+		return std::visit(
+			[&](const auto& event) -> bool
+			{
+				using T = std::decay_t<decltype(event)>;
+
+				if constexpr (std::is_same_v<T, MouseButtonEvent>)
+				{
+					HandleButton(event.button, event.pressed, event.position);
+
+					return true;
+				}
+				else if constexpr (std::is_same_v<T, MouseMoveEvent>)
+				{
+					HandleMove(event.position, event.delta);
+
+					return true;
+				}
+				else if constexpr (std::is_same_v<T, MouseWheelEvent>)
+				{
+					HandleWheel(event.delta);
+
+					return true;
+				}
+				else
+					return false;
+			},
+			systemEvent);
+	}
+
 	void MouseInputDevice::HandleButton(MouseButtonCode button, bool pressed, const Vector2F& position)
 	{
 		auto controlID = static_cast<uint8_t>(button);

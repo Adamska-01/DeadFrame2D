@@ -29,13 +29,23 @@ namespace DF2D::Core
 		void UpdateMotionAxisPhase(Models::MouseAxisCode axis);
 
 
+		void BeginFrame() override;
+
+		bool HandleEvent(const Data::SystemEvent& systemEvent) override;
+
+
+		void HandleButton(Models::MouseButtonCode button, bool pressed, const Vector2F& position);
+
+		void HandleMove(const Vector2F& position, const Vector2F& delta);
+
+		void HandleWheel(const Vector2F& delta);
+
+
 	public:
 		MouseInputDevice(IInputActionHandler* actionHandler);
 
 		~MouseInputDevice() override = default;
 
-
-		void BeginFrame() override;
 
 		Data::InputControlState GetButtonState(int buttonID) const override;
 
@@ -45,13 +55,6 @@ namespace DF2D::Core
 		Models::InputDeviceType Type() const override;
 
 		Data::InputDeviceID ID() const override;
-
-
-		void HandleButton(Models::MouseButtonCode button, bool pressed, const Vector2F& position);
-
-		void HandleMove(const Vector2F& position, const Vector2F& delta);
-
-		void HandleWheel(const Vector2F& delta);
 
 
 		Data::InputControlState GetButtonState(Models::MouseButtonCode code) const;

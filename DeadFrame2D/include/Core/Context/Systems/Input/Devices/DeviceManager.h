@@ -1,5 +1,7 @@
 #pragma once
+#include "Core/Context/Systems/Input/Abstractions/IInputFrameLifecycle.h"
 #include "Core/Context/Systems/Input/Devices/Abstractions/IInputDeviceProvider.h"
+#include "Core/Services/Events/Abstractions/ISystemEventSink.h"
 #include "Data/Systems/Events/SystemEvent.h"
 #include "Data/Systems/Input/InputDeviceID.h"
 #include "DF2D_API.h"
@@ -20,7 +22,7 @@ namespace DF2D::Core
 	 * @brief Routes engine input events to devices and keeps devices keyed by
 	 * instance id. Also holds the keyboard and mouse singletons.
 	 */
-	class DF2D_API DeviceManager : public IInputDeviceProvider
+	class DF2D_API DeviceManager : public IInputDeviceProvider, public ISystemEventSink, public IInputFrameLifecycle
 	{
 	private:
 		std::unordered_map<Data::InputDeviceID, std::unique_ptr<InputDevice>> devices;
@@ -41,8 +43,15 @@ namespace DF2D::Core
 		void RemoveController(Data::InputDeviceID instanceID);
 
 
+		void OnSystemEvent(const Data::SystemEvent& systemEvent) override;
+
+		void BeginFrame() override;
+
+		void PreUpdate() override;
+
+
 	public:
-		DeviceManager(IInputActionHandler* actionHandler);
+		DeviceManager(IInputActionHandler* actionHandler, std::function<void(Data::InputDeviceID)> onDeviceRemoved = {});
 
 		~DeviceManager() override;
 
@@ -53,18 +62,6 @@ namespace DF2D::Core
 		DeviceManager& operator=(const DeviceManager&) = delete;
 
 		DeviceManager& operator=(DeviceManager&&) = delete;
-
-
-		/**
-		 * @brief Internal lifecycle hook (set by the Input system) invoked before the
-		 * DeviceRemovedEvent broadcast.
-		 */
-		void SetDeviceRemovedHook(std::function<void(Data::InputDeviceID)> onRemoved);
-
-
-		void HandleEvent(const Data::SystemEvent& systemEvent);
-
-		void BeginFrame();
 
 
 		InputDevice* GetDevice(Data::InputDeviceID id) override;

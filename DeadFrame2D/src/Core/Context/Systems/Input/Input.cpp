@@ -22,15 +22,10 @@ namespace DF2D::Core
 
 		auto actionMapBucket = JsonSerializer::DeserializeFromFile<InputActionMapBucket>(Paths::Files::INPUT_CONTROLS);
 
-		userManager = std::make_unique<InputUserManager>();
-
-		actionResolver = std::make_unique<InputActionResolver>(std::move(actionMapBucket), *userManager);
-
-		deviceManager = std::make_unique<DeviceManager>(actionResolver.get());
-
+		// Hooks capture this and are only invoked after construction completes.
 		// Per-user action tables are managed through direct calls, not the event bus,
 		// so their lifetime is ordered before any InputUserCreated/Destroyed broadcast.
-		userManager->SetUserLifecycleHooks(
+		userManager = std::make_unique<InputUserManager>(
 			[this](InputUserID userID)
 			{
 				actionResolver->AddUser(userID);
@@ -40,8 +35,11 @@ namespace DF2D::Core
 				actionResolver->RemoveUser(userID);
 			});
 
+		actionResolver = std::make_unique<InputActionResolver>(std::move(actionMapBucket), *userManager);
+
 		// Same for device pairings: unpaired before the DeviceRemovedEvent broadcast.
-		deviceManager->SetDeviceRemovedHook(
+		deviceManager = std::make_unique<DeviceManager>(
+			actionResolver.get(),
 			[this](InputDeviceID deviceID)
 			{
 				userManager->UnpairDevice(userManager->GetUserFromPairedDevice(deviceID), deviceID);
@@ -54,19 +52,26 @@ namespace DF2D::Core
 
 	void Input::OnSystemEvent(const SystemEvent& systemEvent)
 	{
-		deviceManager->HandleEvent(systemEvent);
+		ISystemEventSink& deviceSink = *deviceManager;
+
+		deviceSink.OnSystemEvent(systemEvent);
 	}
 
 	void Input::BeginFrame()
 	{
+		IInputFrameLifecycle& resolverLifecycle = *actionResolver;
+		IInputFrameLifecycle& deviceLifecycle = *deviceManager;
+
 		// The call order here matters!
-		actionResolver->BeginFrame();
-		deviceManager->BeginFrame();
+		resolverLifecycle.BeginFrame();
+		deviceLifecycle.BeginFrame();
 	}
 
 	void Input::PreUpdate(float deltaTime)
 	{
-		actionResolver->PreUpdate();
+		IInputFrameLifecycle& resolverLifecycle = *actionResolver;
+
+		resolverLifecycle.PreUpdate();
 	}
 
 	void Input::EndUpdate(float deltaTime)

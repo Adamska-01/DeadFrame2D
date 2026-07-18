@@ -19,13 +19,19 @@ namespace DF2D::Core
 		std::unordered_set<uint16_t> activeControlIDs;
 
 
+		void BeginFrame() override;
+
+		bool HandleEvent(const Data::SystemEvent& systemEvent) override;
+
+
+		void HandleKey(Models::KeyboardKeyCode key, bool pressed);
+
+
 	public:
 		KeyboardInputDevice(IInputActionHandler* actionHandler);
 
 		~KeyboardInputDevice() override = default;
 
-
-		void BeginFrame() override;
 
 		Data::InputControlState GetButtonState(int buttonID) const override;
 
@@ -36,8 +42,6 @@ namespace DF2D::Core
 
 		Data::InputDeviceID ID() const override;
 
-
-		void HandleKey(Models::KeyboardKeyCode key, bool pressed);
 
 		Data::InputControlState GetButtonState(Models::KeyboardKeyCode code) const;
 	};

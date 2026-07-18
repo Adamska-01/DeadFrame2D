@@ -16,10 +16,12 @@ namespace DF2D::Core
 	using namespace DF2D::Constants;
 	using namespace DF2D::Data;
 	using namespace DF2D::Engine;
+	using namespace DF2D::Models;
 	using namespace DF2D::Utilities;
 
 
-	DeviceManager::DeviceManager(IInputActionHandler* actionHandler)
+	DeviceManager::DeviceManager(IInputActionHandler* actionHandler, std::function<void(InputDeviceID)> onDeviceRemoved)
+		: onDeviceRemoved(std::move(onDeviceRemoved))
 	{
 		this->actionHandler = Guard::AgainstNullAssignment(actionHandler, NAME_OF(actionHandler));
 
@@ -39,13 +41,7 @@ namespace DF2D::Core
 	}
 
 
-	void DeviceManager::SetDeviceRemovedHook(std::function<void(InputDeviceID)> onRemoved)
-	{
-		onDeviceRemoved = std::move(onRemoved);
-	}
-
-
-	void DeviceManager::HandleEvent(const SystemEvent& systemEvent)
+	void DeviceManager::OnSystemEvent(const SystemEvent& systemEvent)
 	{
 		std::visit(
 			[&](const auto& event)
@@ -54,19 +50,13 @@ namespace DF2D::Core
 
 				if constexpr (std::is_same_v<T, KeyEvent>)
 				{
-					keyboard->HandleKey(event.key, event.pressed);
+					static_cast<InputDevice*>(keyboard)->HandleEvent(systemEvent);
 				}
-				else if constexpr (std::is_same_v<T, MouseButtonEvent>)
+				else if constexpr (std::is_same_v<T, MouseButtonEvent>
+					|| std::is_same_v<T, MouseMoveEvent>
+					|| std::is_same_v < T, MouseWheelEvent>)
 				{
-					mouse->HandleButton(event.button, event.pressed, event.position);
-				}
-				else if constexpr (std::is_same_v<T, MouseMoveEvent>)
-				{
-					mouse->HandleMove(event.position, event.delta);
-				}
-				else if constexpr (std::is_same_v<T, MouseWheelEvent>)
-				{
-					mouse->HandleWheel(event.delta);
+					static_cast<InputDevice*>(mouse)->HandleEvent(systemEvent);
 				}
 				else if constexpr (std::is_same_v<T, ControllerConnectedEvent>)
 				{
@@ -76,20 +66,11 @@ namespace DF2D::Core
 				{
 					RemoveController(event.deviceID);
 				}
-				else if constexpr (std::is_same_v<T, ControllerButtonEvent>)
+				else if constexpr (std::is_same_v<T, ControllerButtonEvent> || std::is_same_v<T, ControllerAxisEvent>)
 				{
 					if (auto* controller = Controller(event.deviceID))
 					{
-						controller->HandleButton(event.button, event.pressed);
-
-						currentController = controller;
-					}
-				}
-				else if constexpr (std::is_same_v<T, ControllerAxisEvent>)
-				{
-					if (auto* controller = Controller(event.deviceID))
-					{
-						controller->HandleAxis(event.axis, event.value);
+						static_cast<InputDevice*>(controller)->HandleEvent(systemEvent);
 
 						currentController = controller;
 					}
@@ -148,6 +129,10 @@ namespace DF2D::Core
 		{
 			device->BeginFrame();
 		}
+	}
+
+	void DeviceManager::PreUpdate()
+	{
 	}
 
 	InputDevice* DeviceManager::GetDevice(InputDeviceID id)

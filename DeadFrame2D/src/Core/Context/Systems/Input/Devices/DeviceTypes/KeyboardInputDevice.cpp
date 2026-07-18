@@ -45,6 +45,25 @@ namespace DF2D::Core
 		activeControlIDs.clear();
 	}
 
+	bool KeyboardInputDevice::HandleEvent(const SystemEvent& systemEvent)
+	{
+		return std::visit(
+			[&](const auto& event) -> bool
+			{
+				using T = std::decay_t<decltype(event)>;
+
+				if constexpr (std::is_same_v<T, KeyEvent>)
+				{
+					HandleKey(event.key, event.pressed);
+
+					return true;
+				}
+				else
+					return false;
+			},
+			systemEvent);
+	}
+
 	void KeyboardInputDevice::HandleKey(KeyboardKeyCode key, bool pressed)
 	{
 		auto controlID = static_cast<uint16_t>(key);
