@@ -1,0 +1,10 @@
+#pragma once
+#include "Data/Systems/Events/Core/QuitEvent.h"
+#include "Data/Systems/Events/Input/ControllerAxisEvent.h"
+#include "Data/Systems/Events/Input/ControllerButtonEvent.h"
+#include "Data/Systems/Events/Input/ControllerConnectedEvent.h"
+#include "Data/Systems/Events/Input/ControllerDisconnectedEvent.h"
+#include "Data/Systems/Events/Input/KeyEvent.h"
+#include "Data/Systems/Events/Input/MouseButtonEvent.h"
+#include "Data/Systems/Events/Input/MouseMoveEvent.h"
+#include "Data/Systems/Events/Input/MouseWheelEvent.h"
