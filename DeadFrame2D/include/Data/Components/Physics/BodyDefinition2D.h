@@ -6,7 +6,7 @@
 namespace DF2D::Data
 {
 	/**
-	 * @brief Wrapper for Box2D body definition with default values matching b2BodyDef.
+	 * @brief Backend-agnostic physics body definition. Position is in pixels; velocities are in simulation units.
 	 */
 	struct BodyDefinition2D
 	{
