@@ -11,20 +11,13 @@ namespace DF2D::Engine
 		TYPE_INFO(CircleCollider2D, Collider2D);
 
 
-	private:
-		b2CircleShape* shape;
-
-
-		void DeleteShape();
-
-
 	public:
 		CircleCollider2D(
-			float radius, 
-			Core::Vector2F offsetFromCenter = Core::Vector2F::Zero, 
+			float radius,
+			Core::Vector2F offsetFromCenter = Core::Vector2F::Zero,
 			const Data::PhysicsMaterial& physicsMaterial = Data::PhysicsMaterial());
 
-		virtual ~CircleCollider2D() override;
+		virtual ~CircleCollider2D() override = default;
 
 
 		void SetNewCircleShape(float radius, Core::Vector2F offsetFromCenter);

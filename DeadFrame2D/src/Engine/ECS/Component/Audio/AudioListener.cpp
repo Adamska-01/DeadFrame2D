@@ -1,4 +1,3 @@
-#include "Converters/Physics/PhysicsConversions.h"
 #include "Core/Context/Systems/Physics/PhysicsEngine2D.h"
 #include "Data/Components/Collision/PhysicsMaterial.h"
 #include "Engine/ECS/Component/Audio/AudioListener.h"
@@ -12,13 +11,13 @@ namespace DF2D::Engine
 	using namespace DF2D::Core;
 	using namespace DF2D::Data;
 	using namespace DF2D::Constants;
-	using namespace DF2D::Internal;
 	using namespace DF2D::Utilities;
 
 
 	AudioListener::AudioListener()
-		: collisionBody(nullptr),
-		collisionFixture(nullptr),
+		: physicsEngine(nullptr),
+		collisionBody(0),
+		collisionFixture(0),
 		lastTransformPosition(Vector2F::Zero),
 		lastTransformRotation(0.0f)
 	{
@@ -26,16 +25,16 @@ namespace DF2D::Engine
 
 	AudioListener::~AudioListener()
 	{
-		if (collisionBody == nullptr)
+		if (physicsEngine == nullptr || collisionBody == 0)
 			return;
 
-		PhysicsEngine2D::DestroyBody(collisionBody);
-		collisionBody = nullptr;
+		physicsEngine->DestroyBody(collisionBody);
+		collisionBody = 0;
 	}
 
 	void AudioListener::RebuildFixture()
 	{
-		if (collisionBody == nullptr)
+		if (collisionBody == 0)
 		{
 			auto bodyDef = BodyDefinition2D
 			{
@@ -43,42 +42,39 @@ namespace DF2D::Engine
 				.gravityScale = 0.0f
 			};
 
-			auto bodyDefBox2d = Physics::ToB2BodyDef(bodyDef);
-
-			collisionBody = PhysicsEngine2D::CreateBody(&bodyDefBox2d);
+			collisionBody = physicsEngine->CreateBody(bodyDef);
 		}
 
-		if (collisionFixture != nullptr)
+		if (collisionFixture != 0)
 		{
-			collisionBody->DestroyFixture(collisionFixture);
+			physicsEngine->DestroyFixture(collisionFixture);
 
-			collisionFixture = nullptr;
+			collisionFixture = 0;
 		}
 
 		auto physicsMat = PhysicsMaterial
 		{
 			// Tiny circle (box2d doesn't support dots)
-			.shape = Physics::ToB2CircleShape(50.0001f),
+			.shape = CircleShapeDefinition2D
+			{
+				.radius = 50.0001f
+			},
 			.isSensor = true,
 			.filter = FilterData
 			{
-				.categoryBits = PhysicsEngine2D::GetCollisionMasks().GetMaskFlagByName("AUDIO"),
-				.maskBits = PhysicsEngine2D::GetCollisionMasks().GetMaskFlagByName("AUDIO")
+				.categoryBits = physicsEngine->GetCollisionMasks().GetMaskFlagByName("AUDIO"),
+				.maskBits = physicsEngine->GetCollisionMasks().GetMaskFlagByName("AUDIO")
 			}
 		};
 
-		auto fixtureDef = Physics::ToB2FixtureDef(physicsMat, reinterpret_cast<uintptr_t>(this));
-
-		collisionFixture = collisionBody->CreateFixture(&fixtureDef);
+		collisionFixture = physicsEngine->CreateFixture(collisionBody, physicsMat, this);
 
 		lastTransformPosition = transform->GetWorldPosition();
 		lastTransformRotation = transform->GetWorldRotation();
 
-		const auto METER_PER_PIXEL = DF2D::Core::PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
-
 		auto angleRad = lastTransformRotation * (MathConstants::PI_f / 180.0f);
 
-		collisionBody->SetTransform(b2Vec2(lastTransformPosition.x * METER_PER_PIXEL, lastTransformPosition.y * METER_PER_PIXEL), angleRad);
+		physicsEngine->SetBodyTransform(collisionBody, lastTransformPosition, angleRad);
 
 		isDirty = false;
 	}
@@ -86,6 +82,7 @@ namespace DF2D::Engine
 	void AudioListener::Init()
 	{
 		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
+		physicsEngine = Guard::AgainstNullAssignment(GetGameObject()->CoreContext().physicsEngine, NAME_OF(physicsEngine));
 
 		isDirty = true;
 	}
@@ -103,16 +100,14 @@ namespace DF2D::Engine
 		auto currentTransformPosition = transform->GetWorldPosition();
 		auto currentTransformRotation = transform->GetWorldRotation();
 
-		if (currentTransformPosition == lastTransformPosition 
+		if (currentTransformPosition == lastTransformPosition
 			&& currentTransformRotation == lastTransformRotation)
 			return;
 
-		currentTransformPosition *= DF2D::Core::PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
-
 		auto angleRad = currentTransformRotation * (MathConstants::PI_f / 180.0f);
 
-		collisionBody->SetTransform(b2Vec2(currentTransformPosition.x, currentTransformPosition.y), angleRad);
-		collisionBody->SetAwake(true);
+		physicsEngine->SetBodyTransform(collisionBody, currentTransformPosition, angleRad);
+		physicsEngine->SetBodyAwake(collisionBody, true);
 	}
 
 	void AudioListener::Draw()

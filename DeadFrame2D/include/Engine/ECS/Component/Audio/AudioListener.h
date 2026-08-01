@@ -1,29 +1,35 @@
 #pragma once
+#include "Data/Systems/Physics/BodyID.h"
+#include "Data/Systems/Physics/FixtureID.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Component/Collisions/Abstractions/ContactEventProvider.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 
 
-class b2Body;
-class b2Fixture;
+namespace DF2D::Core
+{
+	class PhysicsEngine2D;
+}
 
 
 namespace DF2D::Engine
 {
 	class Transform;
-	
-	
+
+
 	class DF2D_API AudioListener : public ContactEventProvider
 	{
 		TYPE_INFO(AudioListener, ContactEventProvider);
 
 
 	protected:
+		Core::PhysicsEngine2D* physicsEngine;
+
 		ComponentHandle<Transform> transform;
 
-		b2Body* collisionBody;
+		Data::BodyID collisionBody;
 
-		b2Fixture* collisionFixture;
+		Data::FixtureID collisionFixture;
 
 		Core::Vector2F lastTransformPosition;
 

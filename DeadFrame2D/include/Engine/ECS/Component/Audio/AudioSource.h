@@ -1,20 +1,18 @@
 #pragma once
 #include "Core/Context/Systems/Audio/Abstractions/IAudioBackend.h"
 #include "Data/Components/Collision/CollisionInfo.h"
+#include "Data/Systems/Physics/BodyID.h"
+#include "Data/Systems/Physics/FixtureID.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Component/Collisions/Abstractions/ContactEventProvider.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include <string>
 
 
-class b2Body;
-class b2Fixture;
-class b2CircleShape;
-
-
 namespace DF2D::Core
 {
 	class AudioManager;
+	class PhysicsEngine2D;
 }
 
 
@@ -32,6 +30,8 @@ namespace DF2D::Engine
 	protected:
 		Core::AudioManager* audioManager;
 
+		Core::PhysicsEngine2D* physicsEngine;
+
 		ComponentHandle<Transform> transform;
 
 		ComponentHandle<AudioListener> audioListenerInContact;
@@ -40,10 +40,10 @@ namespace DF2D::Engine
 
 		Data::AudioResourceID musicTrack;
 
-		// Using Box2D to detect audio source collisions with audio listeners
-		b2Body* collisionBody;
+		// Using the physics engine to detect audio source collisions with audio listeners
+		Data::BodyID collisionBody;
 
-		b2Fixture* collisionFixture;
+		Data::FixtureID collisionFixture;
 
 		bool isMusic;
 

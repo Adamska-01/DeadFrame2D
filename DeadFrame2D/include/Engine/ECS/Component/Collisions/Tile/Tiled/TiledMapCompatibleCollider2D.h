@@ -1,11 +1,9 @@
 #pragma once
 #include "Core/Math/Vector2.h"
+#include "Data/Systems/Physics/FixtureID.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Component/Collisions/Tile/TileCollider2D.h"
 #include "Engine/ECS/Component/Rendering/TileMap/Tiled/TiledMapCompatibleRenderer.h"
-
-
-class b2Fixture;
 
 
 namespace DF2D::Engine
@@ -22,7 +20,7 @@ namespace DF2D::Engine
 	protected:
 		std::vector<Models::TiledLayer> collisionLayers;
 
-		std::vector<b2Fixture*> fixtures;
+		std::vector<Data::FixtureID> fixtures;
 
 		Core::Vector2I tileMapDimension;
 

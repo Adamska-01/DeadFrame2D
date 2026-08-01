@@ -1,27 +1,27 @@
 #pragma once
 #include "Core/Context/Systems/Coroutines/Task.h"
 #include "Core/Math/Vector2.h"
+#include "Data/Components/Collision/PhysicsMaterial.h"
 #include "Data/Components/Physics/BodyDefinition2D.h"
 #include "Data/Components/Physics/BodyType2D.h"
+#include "Data/Systems/Physics/BodyID.h"
+#include "Data/Systems/Physics/FixtureID.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/GameComponent.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Utilities/Delegates/MulticastDelegate.h"
 
 
-struct b2FixtureDef;
-class b2Fixture;
-class b2Body;
-
-
-namespace DF2D::Engine
+namespace DF2D::Core
 {
 	class CoroutineScheduler;
+	class PhysicsEngine2D;
 }
 
 
 namespace DF2D::Engine
 {
+	class ContactEventProvider;
 	class Transform;
 
 
@@ -33,9 +33,13 @@ namespace DF2D::Engine
 	private:
 		Core::CoroutineScheduler* coroutineScheduler;
 
+		Core::PhysicsEngine2D* physicsEngine;
+
 		ComponentHandle<Transform> transform;
 
-		b2Body* body;
+		Data::BodyDefinition2D bodyDefinition;
+
+		Data::BodyID body;
 
 		mutable Core::Vector2F velocity;
 
@@ -69,11 +73,11 @@ namespace DF2D::Engine
 		void LateUpdate(float deltaTime) override;
 
 
-		b2Fixture* CreateFixture(const b2FixtureDef* fixtureDef);
+		Data::FixtureID CreateFixture(const Data::PhysicsMaterial& physicsMaterial, ContactEventProvider* contactEventProvider);
 
 		void ChangeBodyType(Data::BodyType2D newBodyType);
 
-		void DestroyFixture(b2Fixture* fixtureDef);
+		void DestroyFixture(Data::FixtureID fixture);
 
 
 		Core::Vector2F GetVelocity() const;

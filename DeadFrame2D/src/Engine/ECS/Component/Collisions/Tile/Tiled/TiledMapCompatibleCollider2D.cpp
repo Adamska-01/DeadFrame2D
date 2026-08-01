@@ -1,5 +1,4 @@
 #include "Constants/TiledPropertyNames.h"
-#include "Converters/Physics/PhysicsConversions.h"
 #include "Engine/ECS/Component/Collisions/Tile/Tiled/TiledMapCompatibleCollider2D.h"
 #include "Engine/ECS/Component/Physics/RigidBody2D.h"
 #include "Engine/ECS/Component/Transform.h"
@@ -11,7 +10,6 @@ namespace DF2D::Engine
 {
 	using namespace DF2D::Core;
 	using namespace DF2D::Constants;
-	using namespace DF2D::Internal;
 	using namespace DF2D::Data;
 	using namespace DF2D::Models;
 	using namespace DF2D::Utilities;
@@ -37,12 +35,12 @@ namespace DF2D::Engine
 		if (fixtures.size() <= 0 || rigidBody == nullptr)
 			return;
 
-		for (auto fix : fixtures)
+		for (auto fixture : fixtures)
 		{
-			if (fix == nullptr)
+			if (fixture == 0)
 				continue;
 
-			rigidBody->DestroyFixture(fix);
+			rigidBody->DestroyFixture(fixture);
 		}
 	}
 
@@ -69,12 +67,13 @@ namespace DF2D::Engine
 
 					if (tileID == 0)
 						continue;
-				
-					this->physicsMaterial.shape = Physics::ToB2BoxShape(
-						tileSize * 0.5f,
-						tileSize * 0.5f,
-						Vector2F((j * tileSize + tileSize * 0.5f), (i * tileSize + tileSize * 0.5f)),
-						angle);
+
+					physicsMaterial.shape = BoxShapeDefinition2D
+					{
+						.halfExtents = Vector2F(tileSize * 0.5f, tileSize * 0.5f),
+						.center = Vector2F((j * tileSize + tileSize * 0.5f), (i * tileSize + tileSize * 0.5f)),
+						.angle = angle
+					};
 
 					physicsMaterial.density = layer.GetFloatProperty(TiledPropertyNames::DENSITY, 1.0f);
 					physicsMaterial.friction = layer.GetFloatProperty(TiledPropertyNames::FRICTION, 0.3f);
@@ -82,13 +81,7 @@ namespace DF2D::Engine
 					physicsMaterial.restitution = layer.GetFloatProperty(TiledPropertyNames::RESTITUTION, 0.0f);
 					physicsMaterial.restitutionThreshold = layer.GetFloatProperty(TiledPropertyNames::RESTITUTION_THRESHOLD, 1.0f);
 
-					auto def = Physics::ToB2FixtureDef(physicsMaterial, reinterpret_cast<uintptr_t>(this));
-
-					fixtures.push_back(rigidBody->CreateFixture(&def));
-
-					// Clean up before creating another shape
-					delete this->physicsMaterial.shape;
-					this->physicsMaterial.shape = nullptr;
+					fixtures.push_back(rigidBody->CreateFixture(physicsMaterial, this));
 				}
 			}
 		}

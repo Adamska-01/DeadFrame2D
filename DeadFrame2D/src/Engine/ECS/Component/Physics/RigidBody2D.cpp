@@ -1,19 +1,15 @@
-#include "Converters/Physics/PhysicsConversions.h"
 #include "Core/Context/Systems/Coroutines/CoroutineScheduler.h"
 #include "Core/Context/Systems/Physics/PhysicsEngine2D.h"
-#include "Data/Components/Physics/BodyDefinition2D.h"
 #include "Engine/ECS/Component/Physics/RigidBody2D.h"
 #include "Engine/ECS/Component/Transform.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include "Utilities/Debugging/Guards.h"
 #include "Utilities/Helpers/Coroutines/CoroutineHelpers.h"
-#include <box2d/b2_body.h>
 
 
 namespace DF2D::Engine
 {
 	using namespace DF2D::Core;
-	using namespace DF2D::Internal;
 	using namespace DF2D::Data;
 	using namespace DF2D::Utilities;
 	using namespace DF2D::Constants;
@@ -21,38 +17,25 @@ namespace DF2D::Engine
 
 	RigidBody2D::RigidBody2D(const BodyDefinition2D& bodyDefinition)
 		: coroutineScheduler(nullptr),
+		physicsEngine(nullptr),
+		bodyDefinition(bodyDefinition),
+		body(0),
 		velocity(Vector2F::Zero),
 		acceleration(Vector2F::Zero),
 		lastTransformPosition(Vector2F::Zero),
 		lastTransformRotation(0.0f)
 	{
 		pendingActions.Clear();
-
-		auto bodyDef = Physics::ToB2BodyDef(bodyDefinition);
-
-		body = PhysicsEngine2D::CreateBody(&bodyDef);
 	}
 
 	RigidBody2D::~RigidBody2D()
 	{
-		if (body == nullptr)
+		if (physicsEngine == nullptr || body == 0)
 			return;
 
-		auto fixture = body->GetFixtureList();
+		physicsEngine->DestroyBody(body);
 
-		while (fixture != nullptr)
-		{
-			auto next = fixture->GetNext();
-
-			// Set the user data to nullptr in case the destruction triggers an end contact event
-			fixture->GetUserData().pointer = 0;
-
-			body->DestroyFixture(fixture);
-
-			fixture = next;
-		}
-
-		PhysicsEngine2D::DestroyBody(body);
+		body = 0;
 	}
 
 	void RigidBody2D::OnGameObjectActiveStateChangedHandler(const ObjectHandle<GameObject>& obj, bool isActive)
@@ -62,26 +45,27 @@ namespace DF2D::Engine
 
 	Task RigidBody2D::SetEnabled(bool isEnabled)
 	{
-		// Can't delete a fixture during a Box2D callback (e.g., BeginContact)
-		// because the world is locked. Defer deletion until the next frame update.
+		// Can't delete a fixture during a physics callback (e.g., contact begin)
+		// because the world is locked. Defer until the next frame update.
 		co_await CoroutineHelpers::WaitFrame();
 
-		body->SetEnabled(isEnabled);
+		physicsEngine->SetBodyEnabled(body, isEnabled);
 	}
 
 	void RigidBody2D::Init()
 	{
 		coroutineScheduler = Guard::AgainstNullAssignment(GetGameObject()->CoreContext().coroutineScheduler, NAME_OF(coroutineScheduler));
+		physicsEngine = Guard::AgainstNullAssignment(GetGameObject()->CoreContext().physicsEngine, NAME_OF(physicsEngine));
 		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
+
+		body = physicsEngine->CreateBody(bodyDefinition);
 
 		lastTransformPosition = transform->GetWorldPosition();
 		lastTransformRotation = transform->GetWorldRotation();
 
-		auto METER_PER_PIXEL = PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
-
 		auto angleRad = lastTransformRotation * (MathConstants::PI_f / 180.0f);
 
-		body->SetTransform(b2Vec2(lastTransformPosition.x * METER_PER_PIXEL, lastTransformPosition.y * METER_PER_PIXEL), angleRad);
+		physicsEngine->SetBodyTransform(body, lastTransformPosition, angleRad);
 	}
 
 	void RigidBody2D::Update(float deltaTime)
@@ -96,104 +80,96 @@ namespace DF2D::Engine
 
 	void RigidBody2D::LateUpdate(float deltaTime)
 	{
-		auto PIXEL_PER_METER = PhysicsEngine2D::GetPhysicsConfig().pixelPerMeter;
-		auto METER_PER_PIXEL = PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
-
 		auto currentTransformPosition = transform->GetWorldPosition();
 		auto currentTransformRotation = transform->GetWorldRotation();
 
-		if (currentTransformPosition != lastTransformPosition)
+		if (currentTransformPosition != lastTransformPosition || currentTransformRotation != lastTransformRotation)
 		{
-			currentTransformPosition = currentTransformPosition * METER_PER_PIXEL;
-			body->SetTransform(b2Vec2(currentTransformPosition.x, currentTransformPosition.y), body->GetAngle());
+			auto bodyTransform = physicsEngine->GetBodyTransform(body);
+
+			if (currentTransformPosition != lastTransformPosition)
+				bodyTransform.position = currentTransformPosition;
+
+			if (currentTransformRotation != lastTransformRotation)
+				bodyTransform.angle = currentTransformRotation * (MathConstants::PI_f / 180.0f);
+
+			physicsEngine->SetBodyTransform(body, bodyTransform.position, bodyTransform.angle);
 		}
-		if (currentTransformRotation != lastTransformRotation)
-		{
-			auto angleRad = currentTransformRotation * (MathConstants::PI_f / 180.0f);
 
-			body->SetTransform(body->GetPosition(), angleRad);
-		}
-
-		auto pos = body->GetPosition();
-		auto angle = body->GetAngle() * (180.0f / MathConstants::PI_f);
-
-		pos.x *= PIXEL_PER_METER;
-		pos.y *= PIXEL_PER_METER;
+		auto bodyTransform = physicsEngine->GetBodyTransform(body);
 
 		// Sync transform to physics body
-		transform->SetWorldPosition(Vector2F(pos.x, pos.y));
-		transform->SetLocalRotation(angle);
+		transform->SetWorldPosition(bodyTransform.position);
+		transform->SetLocalRotation(bodyTransform.angle * (180.0f / MathConstants::PI_f));
 
 		lastTransformPosition = transform->GetWorldPosition();
 		lastTransformRotation = transform->GetWorldRotation();
 	}
 
-	b2Fixture* RigidBody2D::CreateFixture(const b2FixtureDef* fixtureDef)
+	FixtureID RigidBody2D::CreateFixture(const PhysicsMaterial& physicsMaterial, ContactEventProvider* contactEventProvider)
 	{
-		return body->CreateFixture(fixtureDef);
+		return physicsEngine->CreateFixture(body, physicsMaterial, contactEventProvider);
 	}
 
 	void RigidBody2D::ChangeBodyType(BodyType2D newBodyType)
 	{
 		pendingActions.AddLambda([this, newBodyType]()
 			{
-				body->SetType(Physics::ToB2BodyType(newBodyType));
+				physicsEngine->SetBodyType(body, newBodyType);
 			});
 	}
 
-	void RigidBody2D::DestroyFixture(b2Fixture* fixtureDef)
+	void RigidBody2D::DestroyFixture(FixtureID fixture)
 	{
-		body->DestroyFixture(fixtureDef);
+		physicsEngine->DestroyFixture(fixture);
 	}
 
 	Vector2F RigidBody2D::GetVelocity() const
 	{
-		auto v = body->GetLinearVelocity();
-
-		return Vector2F(v.x, v.y);
+		return physicsEngine->GetLinearVelocity(body);
 	}
 
 	void RigidBody2D::SetVelocity(const Vector2F& velocity)
 	{
-		body->SetLinearVelocity(b2Vec2(velocity.x, velocity.y));
+		physicsEngine->SetLinearVelocity(body, velocity);
 	}
 
 	void RigidBody2D::SetVelocityX(float velX)
 	{
-		const auto& currentVelocity = body->GetLinearVelocity();
+		auto currentVelocity = physicsEngine->GetLinearVelocity(body);
 
-		body->SetLinearVelocity(b2Vec2(velX, currentVelocity.y));
+		physicsEngine->SetLinearVelocity(body, Vector2F(velX, currentVelocity.y));
 	}
 
 	void RigidBody2D::SetVelocityY(float velY)
 	{
-		const auto& currentVelocity = body->GetLinearVelocity();
+		auto currentVelocity = physicsEngine->GetLinearVelocity(body);
 
-		body->SetLinearVelocity(b2Vec2(currentVelocity.x, velY));
+		physicsEngine->SetLinearVelocity(body, Vector2F(currentVelocity.x, velY));
 	}
 
 	void RigidBody2D::AddImpulse(const Vector2F& impulse)
 	{
-		body->ApplyLinearImpulseToCenter(b2Vec2(impulse.x, impulse.y), true);
+		physicsEngine->ApplyLinearImpulseToCenter(body, impulse);
 	}
 
 	void RigidBody2D::AddImpulseX(float impulseX)
 	{
-		body->ApplyLinearImpulseToCenter(b2Vec2(impulseX, 0.0f), true);
+		physicsEngine->ApplyLinearImpulseToCenter(body, Vector2F(impulseX, 0.0f));
 	}
 
 	void RigidBody2D::AddImpulseY(float impulseY)
 	{
-		body->ApplyLinearImpulseToCenter(b2Vec2(0.0f, impulseY), true);
+		physicsEngine->ApplyLinearImpulseToCenter(body, Vector2F(0.0f, impulseY));
 	}
 
 	void RigidBody2D::AddForce(const Vector2F& force)
 	{
-		body->ApplyForceToCenter(b2Vec2(force.x, force.y), true);
+		physicsEngine->ApplyForceToCenter(body, force);
 	}
 
 	void RigidBody2D::SetGravityScale(float newGravityScale)
 	{
-		body->SetGravityScale(newGravityScale);
+		physicsEngine->SetBodyGravityScale(body, newGravityScale);
 	}
 }

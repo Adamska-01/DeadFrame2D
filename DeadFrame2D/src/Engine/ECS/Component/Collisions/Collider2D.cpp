@@ -1,4 +1,3 @@
-#include "Converters/Physics/PhysicsConversions.h"
 #include "Core/Context/Systems/Coroutines/CoroutineScheduler.h"
 #include "Engine/ECS/Component/Collisions/Collider2D.h"
 #include "Engine/ECS/Component/Physics/RigidBody2D.h"
@@ -13,35 +12,31 @@
 namespace DF2D::Engine
 {
 	using namespace DF2D::Core;
-	using namespace DF2D::Internal;
 	using namespace DF2D::Data;
 	using namespace DF2D::Utilities;
 
 
 	Collider2D::Collider2D(const PhysicsMaterial& physicsMaterial)
-		: fixture(nullptr), 
+		: fixture(0),
 		physicsMaterial(physicsMaterial)
 	{
 	}
 
 	Collider2D::~Collider2D()
 	{
-		if (fixture == nullptr || rigidBody == nullptr)
+		if (fixture <= 0 || rigidBody == nullptr)
 			return;
-
-		// Set the user data to nullptr in case the destruction triggers an end contact event
-		fixture->GetUserData().pointer = 0;
 
 		rigidBody->DestroyFixture(fixture);
 	}
 
 	void Collider2D::RebuildFixture()
 	{
-		if (fixture != nullptr && rigidBody != nullptr)
+		if (fixture > 0 && rigidBody != nullptr)
 		{
 			rigidBody->DestroyFixture(fixture);
 
-			fixture = nullptr;
+			fixture = 0;
 		}
 
 		SearchRigidBody();
@@ -49,9 +44,7 @@ namespace DF2D::Engine
 		if (rigidBody == nullptr)
 			return;
 
-		auto def = Physics::ToB2FixtureDef(physicsMaterial, reinterpret_cast<uintptr_t>(this));
-
-		fixture = rigidBody->CreateFixture(&def);
+		fixture = rigidBody->CreateFixture(physicsMaterial, this);
 
 		isDirty = false;
 	}
