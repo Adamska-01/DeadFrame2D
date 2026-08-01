@@ -1,54 +1,48 @@
 #pragma once
 #include "Core/Context/Abstractions/ICoreSystem.h"
+#include "Core/Context/Systems/Physics/Abstractions/IPhysicsBackend.h"
+#include "Core/Context/Systems/Physics/Abstractions/IPhysicsContactSink.h"
 #include "Core/Math/Vector2.h"
 #include "DF2D_API.h"
 #include "Models/Physics/Masks/CollisionMasks.h"
 #include "Models/Physics/PhysicsConfig.h"
 #include <memory>
+#include <unordered_map>
 
 
-struct b2BodyDef;
-class b2Body;
-class b2World;
-class b2ContactListener;
-class b2Draw;
-
-
-namespace DF2D::Factories
+namespace DF2D::Engine
 {
-	class ColliderDrawer;
+	class ContactEventProvider;
 }
 
 
 namespace DF2D::Core
 {
-	class DF2D_API PhysicsEngine2D : public ICoreSystem
+	class PhysicsDebugDrawer;
+
+
+	class DF2D_API PhysicsEngine2D : public ICoreSystem, private IPhysicsContactSink
 	{
-		friend class SystemInitializer;
-
-
 	private:
-		static PhysicsEngine2D* instance;
+		struct FixtureRecord
+		{
+			Engine::ContactEventProvider* provider = nullptr;
+
+			Data::BodyID body = 0;
+		};
 
 
-		std::unique_ptr<b2World> world;
+		std::unique_ptr<IPhysicsBackend> backend;
 
-		std::unique_ptr<b2ContactListener> contactListener;
-
-		std::unique_ptr<Factories::ColliderDrawer> debugDrawer;
+		std::unique_ptr<PhysicsDebugDrawer> debugDrawer;
 
 		Models::PhysicsConfig physicsConfig;
 
 		Models::CollisionMasks collisionMasks;
 
+		std::unordered_map<Data::FixtureID, FixtureRecord> fixtureRecords;
 
-		PhysicsEngine2D(const Models::PhysicsConfig& physicsConfig);
-
-		~PhysicsEngine2D() override;
-
-		PhysicsEngine2D(const PhysicsEngine2D&) = delete;
-
-		PhysicsEngine2D(PhysicsEngine2D&&) = delete;
+		bool isDebugDrawEnabled;
 
 
 		void BeginFrame() override;
@@ -60,17 +54,61 @@ namespace DF2D::Core
 		void EndDraw() override;
 
 
+		void OnContactBegin(Data::FixtureID fixtureA, Data::FixtureID fixtureB, const Vector2F& contactPoint, const Vector2F& normal) override;
+
+		void OnContactEnd(Data::FixtureID fixtureA, Data::FixtureID fixtureB) override;
+
+
 	public:
-		static Vector2F GetGravity();
+		PhysicsEngine2D(const Models::PhysicsConfig& physicsConfig, Models::CollisionMasks collisionMasks, std::unique_ptr<IPhysicsBackend> backend);
 
-		static void SetGravity(const Vector2F& newGravity);
+		~PhysicsEngine2D() override;
 
-		static b2Body* CreateBody(const b2BodyDef* bodyDef);
+		PhysicsEngine2D(const PhysicsEngine2D&) = delete;
 
-		static void DestroyBody(b2Body* bodyToDestroy);
+		PhysicsEngine2D(PhysicsEngine2D&&) = delete;
 
-		static const Models::PhysicsConfig& GetPhysicsConfig();
 
-		static const Models::CollisionMasks& GetCollisionMasks();
+		Vector2F GetGravity() const;
+
+		void SetGravity(const Vector2F& newGravity);
+
+
+		Data::BodyID CreateBody(const Data::BodyDefinition2D& bodyDefinition);
+
+		void DestroyBody(Data::BodyID body);
+
+		Data::FixtureID CreateFixture(Data::BodyID body, const Data::PhysicsMaterial& physicsMaterial, Engine::ContactEventProvider* contactEventProvider);
+
+		void DestroyFixture(Data::FixtureID fixture);
+
+
+		void SetBodyEnabled(Data::BodyID body, bool isEnabled);
+
+		void SetBodyType(Data::BodyID body, Data::BodyType2D newBodyType);
+
+		void SetBodyTransform(Data::BodyID body, const Vector2F& position, float angle);
+
+		Data::BodyTransform2D GetBodyTransform(Data::BodyID body) const;
+
+		void SetBodyAwake(Data::BodyID body, bool isAwake);
+
+		void SetBodyGravityScale(Data::BodyID body, float gravityScale);
+
+		Vector2F GetLinearVelocity(Data::BodyID body) const;
+
+		void SetLinearVelocity(Data::BodyID body, const Vector2F& velocity);
+
+		void ApplyLinearImpulseToCenter(Data::BodyID body, const Vector2F& impulse);
+
+		void ApplyForceToCenter(Data::BodyID body, const Vector2F& force);
+
+
+		const Models::PhysicsConfig& GetPhysicsConfig() const;
+
+		const Models::CollisionMasks& GetCollisionMasks() const;
+
+
+		void SetDebugDrawEnabled(bool isEnabled);
 	};
 }
