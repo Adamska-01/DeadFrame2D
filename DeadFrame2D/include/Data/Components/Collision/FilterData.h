@@ -1,5 +1,4 @@
 #pragma once
-#include "Core/Context/Systems/Physics/PhysicsEngine2D.h"
 #include <cstdint>
 
 
@@ -7,9 +6,9 @@ namespace DF2D::Data
 {
 	struct FilterData
 	{
-		uint16_t categoryBits = Core::PhysicsEngine2D::GetCollisionMasks().GetMaskFlagByName("DEFAULT");
+		uint16_t categoryBits = 0x0001;
 
-		uint16_t maskBits = Core::PhysicsEngine2D::GetCollisionMasks().GetMaskFlagByName("ALL");
+		uint16_t maskBits = 0xFFFF;
 
 		int16_t groupIndex = 0;
 	};
