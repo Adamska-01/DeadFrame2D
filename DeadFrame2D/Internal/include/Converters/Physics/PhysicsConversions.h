@@ -2,8 +2,7 @@
 #include "Data/Components/Collision/PhysicsMaterial.h"
 #include "Data/Components/Physics/BodyDefinition2D.h"
 #include "Data/Components/Physics/BodyType2D.h"
-#include <box2d/b2_body.h>
-#include <cassert>
+#include <box2d/box2d.h>
 
 
 namespace DF2D::Internal::Physics
@@ -33,12 +32,14 @@ namespace DF2D::Internal::Physics
 
 	/**
 	 * @brief Converts BodyDefinition2D wrapper into a b2BodyDef instance for use with Box2D.
+	 * @param bodyDef The engine body definition (position in pixels).
+	 * @param meterPerPixel Conversion factor from pixels to meters.
 	 */
-	inline b2BodyDef ToB2BodyDef(const Data::BodyDefinition2D& bodyDef)
+	inline b2BodyDef ToB2BodyDef(const Data::BodyDefinition2D& bodyDef, float meterPerPixel)
 	{
 		b2BodyDef b2Def;
 
-		b2Def.position = b2Vec2(bodyDef.position.x, bodyDef.position.y);
+		b2Def.position = b2Vec2(bodyDef.position.x * meterPerPixel, bodyDef.position.y * meterPerPixel);
 		b2Def.angle = bodyDef.angle;
 		b2Def.linearVelocity = b2Vec2(bodyDef.linearVelocity.x, bodyDef.linearVelocity.y);
 		b2Def.angularVelocity = bodyDef.angularVelocity;
@@ -54,15 +55,16 @@ namespace DF2D::Internal::Physics
 
 		return b2Def;
 	}
-	
+
 	/**
 	 * @brief Converts PhysicsMaterial wrapper into a b2FixtureDef instance for use with Box2D.
+	 *
+	 * The shape and user data are not set here — the backend owns both.
 	 */
-	inline b2FixtureDef ToB2FixtureDef(const Data::PhysicsMaterial& physicsMaterial, uintptr_t userDataPtr)
+	inline b2FixtureDef ToB2FixtureDef(const Data::PhysicsMaterial& physicsMaterial)
 	{
 		b2FixtureDef b2FDef;
 
-		b2FDef.shape = physicsMaterial.shape;
 		b2FDef.friction = physicsMaterial.friction;
 		b2FDef.restitution = physicsMaterial.restitution;
 		b2FDef.restitutionThreshold = physicsMaterial.restitutionThreshold;
@@ -71,61 +73,39 @@ namespace DF2D::Internal::Physics
 		b2FDef.filter.categoryBits = physicsMaterial.filter.categoryBits;
 		b2FDef.filter.groupIndex = physicsMaterial.filter.groupIndex;
 		b2FDef.filter.maskBits = physicsMaterial.filter.maskBits;
-		b2FDef.userData.pointer = userDataPtr;
-
-		assert(b2FDef.shape != nullptr && "Shape must not be null");
 
 		return b2FDef;
 	}
 
-
 	/**
-	 * @brief Creates a new b2PolygonShape configured as a box.
-	 *
-	 * @param halfWidth  Half-width of the box in pixels.
-	 * @param halfHeight Half-height of the box in pixels.
-	 * @param center     Center position of the box in pixels (optional).
-	 * @param angle      Rotation angle of the box in radians (optional).
-	 * @return b2PolygonShape* Pointer to the newly created shape. Caller is responsible for deleting it.
+	 * @brief Creates a b2PolygonShape from an engine box shape definition (pixels).
 	 */
-	inline b2PolygonShape* ToB2BoxShape(
-		float halfWidth,
-		float halfHeight,
-		const Core::Vector2F& center = Core::Vector2F::Zero,
-		float angle = 0.0f)
+	inline b2PolygonShape ToB2BoxShape(const Data::BoxShapeDefinition2D& shapeDefinition, float meterPerPixel)
 	{
-		auto boxShape = new b2PolygonShape();
+		b2PolygonShape boxShape;
 
-		const auto METER_PER_PIXEL = Core::PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
-
-		boxShape->SetAsBox(
-			halfWidth * METER_PER_PIXEL,
-			halfHeight * METER_PER_PIXEL,
+		boxShape.SetAsBox(
+			shapeDefinition.halfExtents.x * meterPerPixel,
+			shapeDefinition.halfExtents.y * meterPerPixel,
 			b2Vec2(
-				center.x * METER_PER_PIXEL,
-				center.y * METER_PER_PIXEL),
-			angle);
+				shapeDefinition.center.x * meterPerPixel,
+				shapeDefinition.center.y * meterPerPixel),
+			shapeDefinition.angle);
 
 		return boxShape;
 	}
 
 	/**
-	* @brief Creates a new b2CircleShape with the specified radius and center.
-	*
-	* @param radius Radius of the circle in pixels.
-	* @param center Center of the circle in pixels (optional).
-	* @return b2CircleShape* Pointer to the newly created shape. Caller is responsible for deleting it.
-	*/
-	inline b2CircleShape* ToB2CircleShape(float radius, const Core::Vector2F& center = Core::Vector2F::Zero)
+	 * @brief Creates a b2CircleShape from an engine circle shape definition (pixels).
+	 */
+	inline b2CircleShape ToB2CircleShape(const Data::CircleShapeDefinition2D& shapeDefinition, float meterPerPixel)
 	{
-		auto circleShape = new b2CircleShape();
+		b2CircleShape circleShape;
 
-		const auto METER_PER_PIXEL = Core::PhysicsEngine2D::GetPhysicsConfig().meterPerPixel;
-
-		circleShape->m_radius = radius * METER_PER_PIXEL;
-		circleShape->m_p = b2Vec2(
-			center.x * METER_PER_PIXEL,
-			center.y * METER_PER_PIXEL);
+		circleShape.m_radius = shapeDefinition.radius * meterPerPixel;
+		circleShape.m_p = b2Vec2(
+			shapeDefinition.center.x * meterPerPixel,
+			shapeDefinition.center.y * meterPerPixel);
 
 		return circleShape;
 	}
