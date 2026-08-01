@@ -1,3 +1,4 @@
+#include "Constants/Paths/ResourcePaths.h"
 #include "Core/Context/SystemInitializer.h"
 #include "Core/Context/Systems/Audio/AudioManager.h"
 #include "Core/Context/Systems/Coroutines/CoroutineScheduler.h"
@@ -9,15 +10,19 @@
 #include "Core/Context/Systems/Window/Window.h"
 #include "Factories/Concretions/Context/Systems/Audio/AudioBackendFactory.h"
 #include "Factories/Concretions/Context/Systems/Graphics/GraphicsBackendFactory.h"
+#include "Factories/Concretions/Context/Systems/Physics/PhysicsBackendFactory.h"
 #include "Helpers/Context/CoreContextIterator.h"
+#include "Utilities/IO/Serialization/JsonSerializer.h"
 
 
 namespace DF2D::Core
 {
+	using namespace DF2D::Constants;
 	using namespace DF2D::Data;
 	using namespace DF2D::Models;
 	using namespace DF2D::Factories;
 	using namespace DF2D::Internal;
+	using namespace DF2D::Utilities;
 
 
 	SystemInitializer::SystemInitializer(SystemConfig config)
@@ -30,7 +35,10 @@ namespace DF2D::Core
 			.coroutineScheduler = new CoroutineScheduler(),
 			.textureManager = new TextureManager(std::move(graphicsBackends.textureBackend)),
 			.input = new Input(),
-			.physicsEngine = new PhysicsEngine2D(config.physics),
+			.physicsEngine = new PhysicsEngine2D(
+				config.physics,
+				JsonSerializer::DeserializeFromFile<CollisionMasks>(Paths::Files::COLLISION_MASKS),
+				PhysicsBackendFactory().CreateProduct(config.physics)),
 			.renderer = new Renderer(std::move(graphicsBackends.renderBackend)),
 			.uiManager = new UIManager(std::move(graphicsBackends.textBackend)),
 			.window = new Window(std::move(graphicsBackends.windowBackend))
