@@ -6,6 +6,8 @@ namespace DF2D::Core
 	class EventManager;
 
 	class FrameTimer;
+
+	class SystemDialogBox;
 }
 
 
@@ -22,6 +24,8 @@ namespace DF2D::Data
 		Core::EventManager* eventManager;
 
 		Core::FrameTimer* frameTimer;
+
+		Core::SystemDialogBox* systemDialogBox;
 
 		Engine::SceneManager* sceneManager;
 	};
