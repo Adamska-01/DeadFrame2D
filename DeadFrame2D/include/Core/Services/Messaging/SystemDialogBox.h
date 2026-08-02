@@ -1,6 +1,8 @@
 #pragma once
+#include "Core/Services/Messaging/Abstractions/IDialogBackend.h"
 #include "Data/Services/Messaging/MessageBoxConfig.h"
 #include "DF2D_API.h"
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -10,26 +12,43 @@ namespace DF2D::Core
 	class DF2D_API SystemDialogBox
 	{
 	private:
-		SystemDialogBox() = delete;
-
-		SystemDialogBox(const SystemDialogBox&) = delete;
+		std::unique_ptr<IDialogBackend> dialogBackend;
 
 
-		SystemDialogBox& operator=(const SystemDialogBox&) = delete;
-
-
-		static int ShowBasicBox(const std::string& title, const std::string& message, SDL_MessageBoxFlags type, const std::vector<SDL_MessageBoxButtonData>& buttons);
+		int ShowBasicBox(const std::string& title, const std::string& message, Data::MessageBoxType type, std::vector<Data::MessageBoxButton> buttons);
 
 
 	public:
-		static int ShowDialogBox(const Data::MessageBoxConfig& config);
+		/** @brief Returned when no button was picked (dialog dismissed or failed to open). */
+		static constexpr int NO_BUTTON_SELECTED = -1;
+
+		/** @brief Button ids used by ShowConfirmBox. */
+		static constexpr int CONFIRM_YES_ID = 0;
+
+		static constexpr int CONFIRM_NO_ID = 1;
+
+
+		SystemDialogBox(std::unique_ptr<IDialogBackend> dialogBackend);
+
+		~SystemDialogBox() = default;
+
+		SystemDialogBox(const SystemDialogBox&) = delete;
+
+		SystemDialogBox(SystemDialogBox&&) = delete;
+
+		SystemDialogBox& operator=(const SystemDialogBox&) = delete;
+
+		SystemDialogBox& operator=(SystemDialogBox&&) = delete;
+
+
+		int ShowDialogBox(const Data::MessageBoxConfig& config);
 
 
 		// Helpers
-		static void ShowInfoBox(const std::string& title, const std::string& message);
+		void ShowInfoBox(const std::string& title, const std::string& message);
 
-		static void ShowErrorBox(const std::string& title, const std::string& message);
+		void ShowErrorBox(const std::string& title, const std::string& message);
 
-		static bool ShowConfirmBox(const std::string& title, const std::string& question);
+		bool ShowConfirmBox(const std::string& title, const std::string& question);
 	};
 }
