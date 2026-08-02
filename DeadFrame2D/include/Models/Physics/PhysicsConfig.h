@@ -17,6 +17,8 @@ namespace DF2D::Models
 		float pixelPerMeter = 40.0f;
 
 		float meterPerPixel = 0.0f; // Derived value
+
+		bool debugDrawEnabled = true;
 	};
 
 
@@ -28,6 +30,7 @@ namespace DF2D::Models
 			{"velocityIterations", binding.velocityIterations},
 			{"positionIterations", binding.positionIterations},
 			{"pixelPerMeter", binding.pixelPerMeter},
+			{"debugDrawEnabled", binding.debugDrawEnabled},
 		};
 	}
 
@@ -39,6 +42,8 @@ namespace DF2D::Models
 		j.at("velocityIterations").get_to(binding.velocityIterations);
 		j.at("positionIterations").get_to(binding.positionIterations);
 		j.at("pixelPerMeter").get_to(binding.pixelPerMeter);
+
+		binding.debugDrawEnabled = j.value("debugDrawEnabled", true);
 
 		// Compute derived property automatically
 		binding.meterPerPixel = 1.0f / binding.pixelPerMeter;
