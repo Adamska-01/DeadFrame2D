@@ -1,5 +1,6 @@
 #pragma once
-#include <SDL.h>
+#include "Data/Services/Messaging/MessageBoxButton.h"
+#include "Data/Services/Messaging/MessageBoxType.h"
 #include <string>
 #include <vector>
 
@@ -12,8 +13,9 @@ namespace DF2D::Data
 
 		std::string message = "";
 
-		SDL_MessageBoxFlags type = SDL_MESSAGEBOX_INFORMATION;
+		MessageBoxType type = MessageBoxType::INFORMATION;
 
-		std::vector<SDL_MessageBoxButtonData> buttons = {};
+		/** @brief Empty means a single platform-provided dismiss button. */
+		std::vector<MessageBoxButton> buttons = {};
 	};
 }
