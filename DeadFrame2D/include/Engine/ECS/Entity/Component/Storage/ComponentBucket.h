@@ -152,15 +152,13 @@ namespace DF2D::Engine
 	template<typename T>
 	inline void ComponentBucket::RemoveComponent(const ComponentHandle<T>& handle)
 	{
-		auto locked = handle.GetBucket().lock();
-
-		if (locked == nullptr)
+		if (handle.GetBucket() != this)
 			return;
 
-		if (!locked->IsValid(handle.index, handle.generation))
+		if (!IsValid(handle.GetIndex(), handle.GetGeneration()))
 			return;
 
-		auto& entry = locked->components[handle.index];
+		auto& entry = components[handle.GetIndex()];
 
 		entry.instance.reset();
 		entry.alive = false;
