@@ -59,7 +59,7 @@ namespace DF2D::Engine
 
 		coreCtx.coroutineScheduler->Reset();
 
-		FrameTimer::SetTimeScale(1.0f);
+		serviceCtx.frameTimer->SetTimeScale(1.0f);
 
 		if (currentScene != nullptr)
 		{

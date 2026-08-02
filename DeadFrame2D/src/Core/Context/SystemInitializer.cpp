@@ -8,6 +8,7 @@
 #include "Core/Context/Systems/Rendering/Renderer.h"
 #include "Core/Context/Systems/UI/UIManager.h"
 #include "Core/Context/Systems/Window/Window.h"
+#include "Core/Services/Time/FrameTimer.h"
 #include "Factories/Concretions/Context/Systems/Audio/AudioBackendFactory.h"
 #include "Factories/Concretions/Context/Systems/Graphics/GraphicsBackendFactory.h"
 #include "Factories/Concretions/Context/Systems/Physics/PhysicsBackendFactory.h"
@@ -25,14 +26,14 @@ namespace DF2D::Core
 	using namespace DF2D::Utilities;
 
 
-	SystemInitializer::SystemInitializer(SystemConfig config)
+	SystemInitializer::SystemInitializer(SystemConfig config, ServiceContext serviceCtx)
 	{
 		auto graphicsBackends = GraphicsBackendFactory().CreateProduct(config.window, config.rendering);
 
 		ctx = CoreContext
 		{
 			.audioManager = new AudioManager(config.audio, AudioBackendFactory().CreateProduct(config.audio)),
-			.coroutineScheduler = new CoroutineScheduler(),
+			.coroutineScheduler = new CoroutineScheduler(serviceCtx.frameTimer),
 			.textureManager = new TextureManager(std::move(graphicsBackends.textureBackend)),
 			.input = new Input(),
 			.physicsEngine = new PhysicsEngine2D(

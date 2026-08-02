@@ -4,6 +4,11 @@
 
 namespace DF2D::Core
 {
+	CoroutineScheduler::CoroutineScheduler(const ITimeProvider* timeProvider)
+		: timeProvider(timeProvider)
+	{
+	}
+
 	CoroutineScheduler::~CoroutineScheduler()
 	{
 		Reset();
@@ -17,7 +22,9 @@ namespace DF2D::Core
 
 	void CoroutineScheduler::PreUpdate(float deltaTime)
 	{
-		auto unscaledDt = FrameTimer::DeltaTimeUnscaled();
+		auto unscaledDt = timeProvider != nullptr
+			? timeProvider->DeltaTimeUnscaled()
+			: deltaTime;
 
 		for (auto it = tasks.begin(); it != tasks.end();)
 		{

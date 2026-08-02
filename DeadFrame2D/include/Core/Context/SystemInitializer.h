@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Context/Abstractions/ICoreSystem.h"
+#include "Data/Services/ServiceContext.h"
 #include "Data/Systems/CoreContext.h"
 #include "DF2D_API.h"
 #include "Models/SystemConfig.h"
@@ -14,7 +15,7 @@ namespace DF2D::Core
 
 
 	public:
-		SystemInitializer(Models::SystemConfig config);
+		SystemInitializer(Models::SystemConfig config, Data::ServiceContext serviceCtx);
 
 		~SystemInitializer();
 

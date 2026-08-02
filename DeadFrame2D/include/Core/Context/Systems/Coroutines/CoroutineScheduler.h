@@ -1,6 +1,6 @@
 #pragma once
 #include "Core/Context/Abstractions/ICoreSystem.h"
-#include "Core/Services/Time/FrameTimer.h"
+#include "Core/Services/Time/Abstractions/ITimeProvider.h"
 #include "DF2D_API.h"
 #include <vector>
 
@@ -23,6 +23,8 @@ namespace DF2D::Core
 
 
 	private:
+		const ITimeProvider* timeProvider;
+
 		std::vector<Task*> tasks;
 
 
@@ -39,7 +41,7 @@ namespace DF2D::Core
 
 
 	public:
-		CoroutineScheduler() = default;
+		CoroutineScheduler(const ITimeProvider* timeProvider);
 
 		~CoroutineScheduler() override;
 

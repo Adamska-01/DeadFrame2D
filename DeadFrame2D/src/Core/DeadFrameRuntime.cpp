@@ -24,11 +24,13 @@ namespace DF2D::Core
 	{
 		auto systemConfig = SystemConfig::LoadFromFiles();
 
-		systemInitializer = std::make_unique<SystemInitializer>(systemConfig);
 		serviceInitializer = std::make_unique<ServiceInitializer>(systemConfig);
 
-		auto coreCtx = systemInitializer->GetCoreContext();
 		auto serviceCtx = serviceInitializer->GetServiceContext();
+
+		systemInitializer = std::make_unique<SystemInitializer>(systemConfig, serviceCtx);
+
+		auto coreCtx = systemInitializer->GetCoreContext();
 
 		serviceCtx.eventManager->AddSink(coreCtx.input);
 
@@ -37,6 +39,8 @@ namespace DF2D::Core
 
 	DeadFrameRuntime::~DeadFrameRuntime()
 	{
+		// Services go first so scenes (and their components) are torn down while the core systems they use are still alive.
+		// Core systems only read service pointers during a frame, never while being destroyed.
 		serviceInitializer.reset();
 		systemInitializer.reset();
 	}
