@@ -9,5 +9,7 @@ int main(int argc, char** argv)
 	context.setOption("success", true);
 	context.setOption("verbosity", "high");
 
+	context.applyCommandLine(argc, argv);
+
 	return context.run();
 }
