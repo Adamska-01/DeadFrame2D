@@ -1,4 +1,5 @@
 #include "Core/Context/Systems/Physics/PhysicsEngine2D.h"
+#include "Engine/ECS/Entity/Component/Storage/ComponentBucket.h"
 #include "Mocks/Context/Systems/Physics/FakeContactProvider.h"
 #include "Mocks/Context/Systems/Physics/MockPhysicsBackend.h"
 #include <doctest.h>
@@ -6,6 +7,7 @@
 
 using namespace DF2D::Core;
 using namespace DF2D::Data;
+using namespace DF2D::Engine;
 using namespace DF2D::Models;
 
 
@@ -18,7 +20,8 @@ static PhysicsConfig MakePhysicsConfig()
 		.velocityIterations = 6,
 		.positionIterations = 2,
 		.pixelPerMeter = 40.0f,
-		.meterPerPixel = 1.0f / 40.0f
+		.meterPerPixel = 1.0f / 40.0f,
+		.debugDrawEnabled = true
 	};
 
 	return config;
@@ -45,6 +48,16 @@ static std::unique_ptr<PhysicsEngine2D> MakePhysicsEngine(MockPhysicsBackend*& o
 	outMock = mock.get();
 
 	return std::make_unique<PhysicsEngine2D>(MakePhysicsConfig(), MakeCollisionMasks(), std::move(mock));
+}
+
+
+// Providers live in a real ComponentBucket so their ComponentHandles are valid
+static ComponentHandle<FakeContactProvider> MakeProvider(std::shared_ptr<ComponentBucket>& bucket)
+{
+	if (bucket == nullptr)
+		bucket = std::make_shared<ComponentBucket>();
+
+	return bucket->AddComponent<FakeContactProvider>(ObjectHandle<GameObject>{});
 }
 
 
@@ -113,7 +126,7 @@ TEST_CASE("SetGravity delegates to the backend and updates the configuration")
 
 	auto newGravity = Vector2F(1.0f, -5.0f);
 
-	physicsEngine->SetGravity();
+	physicsEngine->SetGravity(newGravity);
 
 	CHECK(mock->setGravityCount == 1);
 	CHECK(mock->lastGravity.x == doctest::Approx(newGravity.x));
@@ -184,7 +197,8 @@ TEST_CASE("CreateFixture delegates, propagates the id and forwards the material"
 	MockPhysicsBackend* mock = nullptr;
 	auto physicsEngine = MakePhysicsEngine(mock);
 
-	FakeContactProvider provider;
+	std::shared_ptr<ComponentBucket> bucket;
+	auto provider = MakeProvider(bucket);
 
 	auto body = physicsEngine->CreateBody(BodyDefinition2D{});
 
@@ -194,7 +208,7 @@ TEST_CASE("CreateFixture delegates, propagates the id and forwards the material"
 		.isSensor = true
 	};
 
-	auto fixture = physicsEngine->CreateFixture(body, physicsMaterial, &provider);
+	auto fixture = physicsEngine->CreateFixture(body, physicsMaterial, provider);
 
 	CHECK(fixture == 1);
 	CHECK(mock->lastFixtureBody == body);
@@ -208,9 +222,10 @@ TEST_CASE("CreateFixture with body id 0 does not touch the backend")
 	MockPhysicsBackend* mock = nullptr;
 	auto physicsEngine = MakePhysicsEngine(mock);
 
-	FakeContactProvider provider;
+	std::shared_ptr<ComponentBucket> bucket;
+	auto provider = MakeProvider(bucket);
 
-	auto fixture = physicsEngine->CreateFixture(0, PhysicsMaterial{}, &provider);
+	auto fixture = physicsEngine->CreateFixture(0, PhysicsMaterial{}, provider);
 
 	CHECK(fixture == 0);
 	CHECK(mock->createdFixtures.empty());
@@ -222,13 +237,14 @@ TEST_CASE("CreateFixture propagates backend failure as id 0")
 	MockPhysicsBackend* mock = nullptr;
 	auto physicsEngine = MakePhysicsEngine(mock);
 
-	FakeContactProvider provider;
+	std::shared_ptr<ComponentBucket> bucket;
+	auto provider = MakeProvider(bucket);
 
 	auto body = physicsEngine->CreateBody(BodyDefinition2D{});
 
 	mock->createFixtureFails = true;
 
-	auto fixture = physicsEngine->CreateFixture(body, PhysicsMaterial{}, &provider);
+	auto fixture = physicsEngine->CreateFixture(body, PhysicsMaterial{}, provider);
 
 	CHECK(fixture == 0);
 }
@@ -239,29 +255,30 @@ TEST_CASE("Contact begin routes mirrored collision info to both providers")
 	MockPhysicsBackend* mock = nullptr;
 	auto physicsEngine = MakePhysicsEngine(mock);
 
-	FakeContactProvider providerA;
-	FakeContactProvider providerB;
+	std::shared_ptr<ComponentBucket> bucket;
+	auto providerA = MakeProvider(bucket);
+	auto providerB = MakeProvider(bucket);
 
 	auto body = physicsEngine->CreateBody(BodyDefinition2D{});
 
-	auto fixtureA = physicsEngine->CreateFixture(body, PhysicsMaterial{}, &providerA);
-	auto fixtureB = physicsEngine->CreateFixture(body, PhysicsMaterial{}, &providerB);
+	auto fixtureA = physicsEngine->CreateFixture(body, PhysicsMaterial{}, providerA);
+	auto fixtureB = physicsEngine->CreateFixture(body, PhysicsMaterial{}, providerB);
 
 	mock->sink->OnContactBegin(fixtureA, fixtureB, Vector2F(10.0f, 20.0f), Vector2F(0.0f, 1.0f));
 
-	REQUIRE(providerA.enterInfos.size() == 1);
-	REQUIRE(providerB.enterInfos.size() == 1);
+	REQUIRE(providerA->enterInfos.size() == 1);
+	REQUIRE(providerB->enterInfos.size() == 1);
 
-	CHECK(providerA.enterInfos[0].contactPoint.x == doctest::Approx(10.0f));
-	CHECK(providerA.enterInfos[0].contactPoint.y == doctest::Approx(20.0f));
-	CHECK(providerA.enterInfos[0].normal.x == doctest::Approx(0.0f));
-	CHECK(providerA.enterInfos[0].normal.y == doctest::Approx(1.0f));
+	CHECK(providerA->enterInfos[0].contactPoint.x == doctest::Approx(10.0f));
+	CHECK(providerA->enterInfos[0].contactPoint.y == doctest::Approx(20.0f));
+	CHECK(providerA->enterInfos[0].normal.x == doctest::Approx(0.0f));
+	CHECK(providerA->enterInfos[0].normal.y == doctest::Approx(1.0f));
 
 	// The second provider receives the same contact point with a negated normal
-	CHECK(providerB.enterInfos[0].contactPoint.x == doctest::Approx(10.0f));
-	CHECK(providerB.enterInfos[0].contactPoint.y == doctest::Approx(20.0f));
-	CHECK(providerB.enterInfos[0].normal.x == doctest::Approx(0.0f));
-	CHECK(providerB.enterInfos[0].normal.y == doctest::Approx(-1.0f));
+	CHECK(providerB->enterInfos[0].contactPoint.x == doctest::Approx(10.0f));
+	CHECK(providerB->enterInfos[0].contactPoint.y == doctest::Approx(20.0f));
+	CHECK(providerB->enterInfos[0].normal.x == doctest::Approx(0.0f));
+	CHECK(providerB->enterInfos[0].normal.y == doctest::Approx(-1.0f));
 }
 
 
@@ -270,23 +287,24 @@ TEST_CASE("Contact end routes zeroed collision info to both providers")
 	MockPhysicsBackend* mock = nullptr;
 	auto physicsEngine = MakePhysicsEngine(mock);
 
-	FakeContactProvider providerA;
-	FakeContactProvider providerB;
+	std::shared_ptr<ComponentBucket> bucket;
+	auto providerA = MakeProvider(bucket);
+	auto providerB = MakeProvider(bucket);
 
 	auto body = physicsEngine->CreateBody(BodyDefinition2D{});
 
-	auto fixtureA = physicsEngine->CreateFixture(body, PhysicsMaterial{}, &providerA);
-	auto fixtureB = physicsEngine->CreateFixture(body, PhysicsMaterial{}, &providerB);
+	auto fixtureA = physicsEngine->CreateFixture(body, PhysicsMaterial{}, providerA);
+	auto fixtureB = physicsEngine->CreateFixture(body, PhysicsMaterial{}, providerB);
 
 	mock->sink->OnContactEnd(fixtureA, fixtureB);
 
-	REQUIRE(providerA.exitInfos.size() == 1);
-	REQUIRE(providerB.exitInfos.size() == 1);
+	REQUIRE(providerA->exitInfos.size() == 1);
+	REQUIRE(providerB->exitInfos.size() == 1);
 
-	CHECK(providerA.exitInfos[0].contactPoint.x == doctest::Approx(0.0f));
-	CHECK(providerA.exitInfos[0].contactPoint.y == doctest::Approx(0.0f));
-	CHECK(providerA.exitInfos[0].normal.x == doctest::Approx(0.0f));
-	CHECK(providerA.exitInfos[0].normal.y == doctest::Approx(0.0f));
+	CHECK(providerA->exitInfos[0].contactPoint.x == doctest::Approx(0.0f));
+	CHECK(providerA->exitInfos[0].contactPoint.y == doctest::Approx(0.0f));
+	CHECK(providerA->exitInfos[0].normal.x == doctest::Approx(0.0f));
+	CHECK(providerA->exitInfos[0].normal.y == doctest::Approx(0.0f));
 }
 
 
@@ -295,17 +313,44 @@ TEST_CASE("Contacts with unknown fixture ids are ignored")
 	MockPhysicsBackend* mock = nullptr;
 	auto physicsEngine = MakePhysicsEngine(mock);
 
-	FakeContactProvider provider;
+	std::shared_ptr<ComponentBucket> bucket;
+	auto provider = MakeProvider(bucket);
 
 	auto body = physicsEngine->CreateBody(BodyDefinition2D{});
 
-	auto fixture = physicsEngine->CreateFixture(body, PhysicsMaterial{}, &provider);
+	auto fixture = physicsEngine->CreateFixture(body, PhysicsMaterial{}, provider);
 
 	mock->sink->OnContactBegin(fixture, 999, Vector2F(1.0f, 1.0f), Vector2F(0.0f, 1.0f));
 	mock->sink->OnContactEnd(999, fixture);
 
-	CHECK(provider.enterInfos.empty());
-	CHECK(provider.exitInfos.empty());
+	CHECK(provider->enterInfos.empty());
+	CHECK(provider->exitInfos.empty());
+}
+
+
+TEST_CASE("Contacts involving a destroyed provider are skipped")
+{
+	MockPhysicsBackend* mock = nullptr;
+	auto physicsEngine = MakePhysicsEngine(mock);
+
+	std::shared_ptr<ComponentBucket> bucket;
+	auto providerA = MakeProvider(bucket);
+	auto providerB = MakeProvider(bucket);
+
+	auto body = physicsEngine->CreateBody(BodyDefinition2D{});
+
+	auto fixtureA = physicsEngine->CreateFixture(body, PhysicsMaterial{}, providerA);
+	auto fixtureB = physicsEngine->CreateFixture(body, PhysicsMaterial{}, providerB);
+
+	// The provider component dies while its fixture record still exists
+	bucket->RemoveComponent(providerA);
+
+	mock->sink->OnContactBegin(fixtureA, fixtureB, Vector2F(1.0f, 1.0f), Vector2F(0.0f, 1.0f));
+	mock->sink->OnContactEnd(fixtureA, fixtureB);
+
+	// The stale handle resolves to null, so neither side is invoked and nothing crashes
+	CHECK(providerB->enterInfos.empty());
+	CHECK(providerB->exitInfos.empty());
 }
 
 
@@ -314,13 +359,14 @@ TEST_CASE("DestroyFixture purges the record before the backend call")
 	MockPhysicsBackend* mock = nullptr;
 	auto physicsEngine = MakePhysicsEngine(mock);
 
-	FakeContactProvider providerA;
-	FakeContactProvider providerB;
+	std::shared_ptr<ComponentBucket> bucket;
+	auto providerA = MakeProvider(bucket);
+	auto providerB = MakeProvider(bucket);
 
 	auto body = physicsEngine->CreateBody(BodyDefinition2D{});
 
-	auto fixtureA = physicsEngine->CreateFixture(body, PhysicsMaterial{}, &providerA);
-	auto fixtureB = physicsEngine->CreateFixture(body, PhysicsMaterial{}, &providerB);
+	auto fixtureA = physicsEngine->CreateFixture(body, PhysicsMaterial{}, providerA);
+	auto fixtureB = physicsEngine->CreateFixture(body, PhysicsMaterial{}, providerB);
 
 	// Emulate Box2D firing an end contact for the dying fixture during destruction
 	mock->destroyFixtureFiresEndContact = true;
@@ -332,8 +378,8 @@ TEST_CASE("DestroyFixture purges the record before the backend call")
 	CHECK(mock->destroyedFixtures[0] == fixtureA);
 
 	// The record was purged before the backend call, so no provider is invoked
-	CHECK(providerA.exitInfos.empty());
-	CHECK(providerB.exitInfos.empty());
+	CHECK(providerA->exitInfos.empty());
+	CHECK(providerB->exitInfos.empty());
 }
 
 
@@ -353,16 +399,17 @@ TEST_CASE("DestroyBody purges all fixture records belonging to that body")
 	MockPhysicsBackend* mock = nullptr;
 	auto physicsEngine = MakePhysicsEngine(mock);
 
-	FakeContactProvider providerA;
-	FakeContactProvider providerB;
-	FakeContactProvider providerC;
+	std::shared_ptr<ComponentBucket> bucket;
+	auto providerA = MakeProvider(bucket);
+	auto providerB = MakeProvider(bucket);
+	auto providerC = MakeProvider(bucket);
 
 	auto bodyA = physicsEngine->CreateBody(BodyDefinition2D{});
 	auto bodyB = physicsEngine->CreateBody(BodyDefinition2D{});
 
-	auto fixtureA = physicsEngine->CreateFixture(bodyA, PhysicsMaterial{}, &providerA);
-	auto fixtureB = physicsEngine->CreateFixture(bodyA, PhysicsMaterial{}, &providerB);
-	auto fixtureC = physicsEngine->CreateFixture(bodyB, PhysicsMaterial{}, &providerC);
+	auto fixtureA = physicsEngine->CreateFixture(bodyA, PhysicsMaterial{}, providerA);
+	auto fixtureB = physicsEngine->CreateFixture(bodyA, PhysicsMaterial{}, providerB);
+	auto fixtureC = physicsEngine->CreateFixture(bodyB, PhysicsMaterial{}, providerC);
 
 	physicsEngine->DestroyBody(bodyA);
 
@@ -370,18 +417,18 @@ TEST_CASE("DestroyBody purges all fixture records belonging to that body")
 	mock->sink->OnContactBegin(fixtureA, fixtureC, Vector2F(1.0f, 1.0f), Vector2F(0.0f, 1.0f));
 	mock->sink->OnContactEnd(fixtureB, fixtureC);
 
-	CHECK(providerA.enterInfos.empty());
-	CHECK(providerB.exitInfos.empty());
-	CHECK(providerC.enterInfos.empty());
-	CHECK(providerC.exitInfos.empty());
+	CHECK(providerA->enterInfos.empty());
+	CHECK(providerB->exitInfos.empty());
+	CHECK(providerC->enterInfos.empty());
+	CHECK(providerC->exitInfos.empty());
 
 	// The surviving body's fixture still routes contacts against other live fixtures
-	auto fixtureD = physicsEngine->CreateFixture(bodyB, PhysicsMaterial{}, &providerA);
+	auto fixtureD = physicsEngine->CreateFixture(bodyB, PhysicsMaterial{}, providerA);
 
 	mock->sink->OnContactBegin(fixtureC, fixtureD, Vector2F(2.0f, 2.0f), Vector2F(1.0f, 0.0f));
 
-	CHECK(providerC.enterInfos.size() == 1);
-	CHECK(providerA.enterInfos.size() == 1);
+	CHECK(providerC->enterInfos.size() == 1);
+	CHECK(providerA->enterInfos.size() == 1);
 }
 
 
@@ -457,6 +504,7 @@ TEST_CASE("GetPhysicsConfig exposes the injected configuration")
 	CHECK(physicsEngine->GetPhysicsConfig().velocityIterations == 6);
 	CHECK(physicsEngine->GetPhysicsConfig().positionIterations == 2);
 	CHECK(physicsEngine->GetPhysicsConfig().pixelPerMeter == doctest::Approx(40.0f));
+	CHECK(physicsEngine->GetPhysicsConfig().debugDrawEnabled == true);
 }
 
 
@@ -486,6 +534,31 @@ TEST_CASE("SetDebugDrawEnabled false suppresses debug drawing")
 	system->EndDraw();
 
 	CHECK(mock->debugDrawCount == 0);
+}
+
+
+TEST_CASE("Config can disable debug drawing at startup")
+{
+	auto mock = std::make_unique<MockPhysicsBackend>();
+	auto* mockPtr = mock.get();
+
+	auto config = MakePhysicsConfig();
+	config.debugDrawEnabled = false;
+
+	auto physicsEngine = std::make_unique<PhysicsEngine2D>(config, MakeCollisionMasks(), std::move(mock));
+
+	ICoreSystem* system = physicsEngine.get();
+
+	system->EndDraw();
+
+	CHECK(mockPtr->debugDrawCount == 0);
+
+	// Runtime override still wins over the configured default
+	physicsEngine->SetDebugDrawEnabled(true);
+
+	system->EndDraw();
+
+	CHECK(mockPtr->debugDrawCount == 1);
 }
 
 
