@@ -9,6 +9,7 @@ namespace DF2D::Internal::ServiceContextIterator
 	{
 		func(ctx.eventManager);
 		func(ctx.frameTimer);
+		func(ctx.systemDialogBox);
 		func(ctx.sceneManager);
 	}
 }
