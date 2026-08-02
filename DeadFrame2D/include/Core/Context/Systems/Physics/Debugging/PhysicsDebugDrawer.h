@@ -45,7 +45,7 @@ namespace DF2D::Core
 
 		void DrawSegment(const Vector2F& p1, const Vector2F& p2, const Color& color) override;
 
-		void DrawCircle(const Vector2F& center, float radius, const Color& color) override;
+		void DrawCircle(const Vector2F& center, float radius, bool filled, const Color& color) override;
 
 		void DrawPoint(const Vector2F& position, float size, const Color& color) override;
 

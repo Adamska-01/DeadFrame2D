@@ -81,7 +81,7 @@ namespace DF2D::Engine
 					physicsMaterial.restitution = layer.GetFloatProperty(TiledPropertyNames::RESTITUTION, 0.0f);
 					physicsMaterial.restitutionThreshold = layer.GetFloatProperty(TiledPropertyNames::RESTITUTION_THRESHOLD, 1.0f);
 
-					fixtures.push_back(rigidBody->CreateFixture(physicsMaterial, this));
+					fixtures.push_back(rigidBody->CreateFixture(physicsMaterial, GetHandleAs<ContactEventProvider>()));
 				}
 			}
 		}

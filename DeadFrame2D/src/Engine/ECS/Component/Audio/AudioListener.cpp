@@ -67,7 +67,7 @@ namespace DF2D::Engine
 			}
 		};
 
-		collisionFixture = physicsEngine->CreateFixture(collisionBody, physicsMat, this);
+		collisionFixture = physicsEngine->CreateFixture(collisionBody, physicsMat, GetHandleAs<ContactEventProvider>());
 
 		lastTransformPosition = transform->GetWorldPosition();
 		lastTransformRotation = transform->GetWorldRotation();

@@ -73,7 +73,7 @@ namespace DF2D::Engine
 		void LateUpdate(float deltaTime) override;
 
 
-		Data::FixtureID CreateFixture(const Data::PhysicsMaterial& physicsMaterial, ContactEventProvider* contactEventProvider);
+		Data::FixtureID CreateFixture(const Data::PhysicsMaterial& physicsMaterial, const ComponentHandle<ContactEventProvider>& contactEventProvider);
 
 		void ChangeBodyType(Data::BodyType2D newBodyType);
 

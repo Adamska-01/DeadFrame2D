@@ -106,7 +106,7 @@ namespace DF2D::Engine
 		lastTransformRotation = transform->GetWorldRotation();
 	}
 
-	FixtureID RigidBody2D::CreateFixture(const PhysicsMaterial& physicsMaterial, ContactEventProvider* contactEventProvider)
+	FixtureID RigidBody2D::CreateFixture(const PhysicsMaterial& physicsMaterial, const ComponentHandle<ContactEventProvider>& contactEventProvider)
 	{
 		return physicsEngine->CreateFixture(body, physicsMaterial, contactEventProvider);
 	}

@@ -17,7 +17,7 @@ namespace DF2D::Core
 
 		virtual void DrawSegment(const Vector2F& p1, const Vector2F& p2, const Color& color) = 0;
 
-		virtual void DrawCircle(const Vector2F& center, float radius, const Color& color) = 0;
+		virtual void DrawCircle(const Vector2F& center, float radius, bool filled, const Color& color) = 0;
 
 		virtual void DrawPoint(const Vector2F& position, float size, const Color& color) = 0;
 	};

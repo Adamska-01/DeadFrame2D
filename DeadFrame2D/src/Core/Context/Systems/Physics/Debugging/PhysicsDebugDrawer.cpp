@@ -28,13 +28,13 @@ namespace DF2D::Core
 		lineBatchData.lineBatch.push_back(lineRenderData);
 	}
 
-	void PhysicsDebugDrawer::DrawCircle(const Vector2F& center, float radius, const Color& color)
+	void PhysicsDebugDrawer::DrawCircle(const Vector2F& center, float radius, bool filled, const Color& color)
 	{
 		auto circleRenderData = CircleRenderData
 		{
 			.center = center,
 			.radius = radius,
-			.filled = false,
+			.filled = filled,
 			.color = color
 		};
 

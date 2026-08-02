@@ -19,7 +19,7 @@ namespace DF2D::Core
 		debugDrawer(std::make_unique<PhysicsDebugDrawer>()),
 		physicsConfig(physicsConfig),
 		collisionMasks(std::move(collisionMasks)),
-		isDebugDrawEnabled(true)
+		isDebugDrawEnabled(physicsConfig.debugDrawEnabled)
 	{
 		Guard::AgainstNull(this->backend.get(), NAME_OF(backend));
 
@@ -68,8 +68,8 @@ namespace DF2D::Core
 		if (recordA == fixtureRecords.end() || recordB == fixtureRecords.end())
 			return;
 
-		auto* providerA = recordA->second.provider;
-		auto* providerB = recordB->second.provider;
+		auto* providerA = recordA->second.provider();
+		auto* providerB = recordB->second.provider();
 
 		if (providerA == nullptr || providerB == nullptr)
 			return;
@@ -102,8 +102,8 @@ namespace DF2D::Core
 		if (recordA == fixtureRecords.end() || recordB == fixtureRecords.end())
 			return;
 
-		auto* providerA = recordA->second.provider;
-		auto* providerB = recordB->second.provider;
+		auto* providerA = recordA->second.provider();
+		auto* providerB = recordB->second.provider();
 
 		if (providerA == nullptr || providerB == nullptr)
 			return;
@@ -160,7 +160,7 @@ namespace DF2D::Core
 		backend->DestroyBody(body);
 	}
 
-	FixtureID PhysicsEngine2D::CreateFixture(BodyID body, const PhysicsMaterial& physicsMaterial, ContactEventProvider* contactEventProvider)
+	FixtureID PhysicsEngine2D::CreateFixture(BodyID body, const PhysicsMaterial& physicsMaterial, const ComponentHandle<ContactEventProvider>& contactEventProvider)
 	{
 		if (body == 0)
 			return 0;

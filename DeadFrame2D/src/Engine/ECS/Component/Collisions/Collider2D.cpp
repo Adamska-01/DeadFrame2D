@@ -44,7 +44,7 @@ namespace DF2D::Engine
 		if (rigidBody == nullptr)
 			return;
 
-		fixture = rigidBody->CreateFixture(physicsMaterial, this);
+		fixture = rigidBody->CreateFixture(physicsMaterial, GetHandleAs<ContactEventProvider>());
 
 		isDirty = false;
 	}

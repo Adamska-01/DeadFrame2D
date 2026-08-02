@@ -6,6 +6,179 @@
 #include <variant>
 
 
+// -------------------------------------------------------------
+// -------------------------- Helpers --------------------------
+// -------------------------------------------------------------
+namespace DF2D::Internal
+{
+	using namespace DF2D::Core;
+	using namespace DF2D::Data;
+	using namespace DF2D::Models;
+
+
+	class Box2DContactAdapter : public b2ContactListener
+	{
+	private:
+		IPhysicsContactSink* sink = nullptr;
+
+		float pixelPerMeter = 1.0f;
+
+
+		static std::pair<FixtureID, FixtureID> GetFixtureIDsFromContact(b2Contact* contact)
+		{
+			auto fixtureA = static_cast<FixtureID>(contact->GetFixtureA()->GetUserData().pointer);
+			auto fixtureB = static_cast<FixtureID>(contact->GetFixtureB()->GetUserData().pointer);
+
+			return { fixtureA, fixtureB };
+		}
+
+
+	public:
+		Box2DContactAdapter(float pixelPerMeter)
+			: pixelPerMeter(pixelPerMeter)
+		{
+		}
+
+
+		void SetSink(IPhysicsContactSink* newSink)
+		{
+			sink = newSink;
+		}
+
+
+		void BeginContact(b2Contact* contact) override
+		{
+			if (sink == nullptr)
+				return;
+
+			auto [fixtureA, fixtureB] = GetFixtureIDsFromContact(contact);
+
+			b2WorldManifold worldManifold;
+			contact->GetWorldManifold(&worldManifold);
+
+			auto contactPoint = Vector2F(worldManifold.points[0].x * pixelPerMeter, worldManifold.points[0].y * pixelPerMeter);
+			auto normal = Vector2F(worldManifold.normal.x, worldManifold.normal.y);
+
+			sink->OnContactBegin(fixtureA, fixtureB, contactPoint, normal);
+		}
+
+		void EndContact(b2Contact* contact) override
+		{
+			if (sink == nullptr)
+				return;
+
+			auto [fixtureA, fixtureB] = GetFixtureIDsFromContact(contact);
+
+			sink->OnContactEnd(fixtureA, fixtureB);
+		}
+	};
+
+
+	class Box2DDebugDrawAdapter : public b2Draw
+	{
+	private:
+		IPhysicsDebugDraw* target = nullptr;
+
+		float pixelPerMeter = 1.0f;
+
+
+		Vector2F ToPixels(const b2Vec2& point) const
+		{
+			return Vector2F(point.x * pixelPerMeter, point.y * pixelPerMeter);
+		}
+
+		static Color ToColor(const b2Color& color)
+		{
+			return Color
+			{
+				.r = uint8_t(color.r * 255),
+				.g = uint8_t(color.g * 255),
+				.b = uint8_t(color.b * 255),
+				.a = uint8_t(color.a * 255)
+			};
+		}
+
+
+	public:
+		Box2DDebugDrawAdapter(float pixelPerMeter)
+			: pixelPerMeter(pixelPerMeter)
+		{
+			SetFlags(
+				b2Draw::e_shapeBit |
+				b2Draw::e_jointBit |
+				b2Draw::e_aabbBit |
+				b2Draw::e_pairBit |
+				b2Draw::e_centerOfMassBit);
+		}
+
+
+		void SetTarget(IPhysicsDebugDraw* newTarget)
+		{
+			target = newTarget;
+		}
+
+
+		void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override
+		{
+			if (target == nullptr)
+				return;
+
+			auto lineColor = ToColor(color);
+
+			for (int32 i = 0; i < vertexCount; ++i)
+			{
+				auto p1 = vertices[i];
+				auto p2 = vertices[(i + 1) % vertexCount];
+
+				target->DrawSegment(ToPixels(p1), ToPixels(p2), lineColor);
+			}
+		}
+
+		void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override
+		{
+			DrawPolygon(vertices, vertexCount, color);
+		}
+
+		void DrawCircle(const b2Vec2& center, float radius, const b2Color& color) override
+		{
+			if (target == nullptr)
+				return;
+
+			target->DrawCircle(ToPixels(center), radius * pixelPerMeter, /*filled*/ false, ToColor(color));
+		}
+
+		void DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color) override
+		{
+			if (target == nullptr)
+				return;
+
+			target->DrawCircle(ToPixels(center), radius * pixelPerMeter, /*filled*/ false, ToColor(color));
+		}
+
+		void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color) override
+		{
+			if (target == nullptr)
+				return;
+
+			target->DrawSegment(ToPixels(p1), ToPixels(p2), ToColor(color));
+		}
+
+		void DrawTransform(const b2Transform& xf) override
+		{
+			DrawPoint(xf.p, 2.0f, b2Color{ 1.0f, 1.0f, 1.0f, 1.0f });
+		}
+
+		void DrawPoint(const b2Vec2& p, float size, const b2Color& color) override
+		{
+			if (target == nullptr)
+				return;
+
+			target->DrawPoint(ToPixels(p), size, ToColor(color));
+		}
+	};
+}
+
+
 namespace DF2D::Internal
 {
 	using namespace DF2D::Core;
@@ -264,174 +437,4 @@ namespace DF2D::Internal
 
 		debugDrawAdapter->SetTarget(nullptr);
 	}
-}
-
-
-// -------------------------------------------------------------
-// -------------------------- Helpers --------------------------
-// -------------------------------------------------------------
-namespace DF2D::Internal
-{
-	using namespace DF2D::Core;
-	using namespace DF2D::Data;
-	using namespace DF2D::Models;
-
-
-	class Box2DContactAdapter : public b2ContactListener
-	{
-	private:
-		IPhysicsContactSink* sink = nullptr;
-
-		float pixelPerMeter = 1.0f;
-
-
-		static std::pair<FixtureID, FixtureID> GetFixtureIDsFromContact(b2Contact* contact)
-		{
-			auto fixtureA = static_cast<FixtureID>(contact->GetFixtureA()->GetUserData().pointer);
-			auto fixtureB = static_cast<FixtureID>(contact->GetFixtureB()->GetUserData().pointer);
-
-			return { fixtureA, fixtureB };
-		}
-
-
-	public:
-		Box2DContactAdapter(float pixelPerMeter)
-			: pixelPerMeter(pixelPerMeter)
-		{
-		}
-
-
-		void SetSink(IPhysicsContactSink* newSink)
-		{
-			sink = newSink;
-		}
-
-
-		void BeginContact(b2Contact* contact) override
-		{
-			if (sink == nullptr)
-				return;
-
-			auto [fixtureA, fixtureB] = GetFixtureIDsFromContact(contact);
-
-			b2WorldManifold worldManifold;
-			contact->GetWorldManifold(&worldManifold);
-
-			auto contactPoint = Vector2F(worldManifold.points[0].x * pixelPerMeter, worldManifold.points[0].y * pixelPerMeter);
-			auto normal = Vector2F(worldManifold.normal.x, worldManifold.normal.y);
-
-			sink->OnContactBegin(fixtureA, fixtureB, contactPoint, normal);
-		}
-
-		void EndContact(b2Contact* contact) override
-		{
-			if (sink == nullptr)
-				return;
-
-			auto [fixtureA, fixtureB] = GetFixtureIDsFromContact(contact);
-
-			sink->OnContactEnd(fixtureA, fixtureB);
-		}
-	};
-
-
-	class Box2DDebugDrawAdapter : public b2Draw
-	{
-	private:
-		IPhysicsDebugDraw* target = nullptr;
-
-		float pixelPerMeter = 1.0f;
-
-
-		Vector2F ToPixels(const b2Vec2& point) const
-		{
-			return Vector2F(point.x * pixelPerMeter, point.y * pixelPerMeter);
-		}
-
-		static Color ToColor(const b2Color& color)
-		{
-			return Color
-			{
-				.r = uint8_t(color.r * 255),
-				.g = uint8_t(color.g * 255),
-				.b = uint8_t(color.b * 255),
-				.a = uint8_t(color.a * 255)
-			};
-		}
-
-
-	public:
-		Box2DDebugDrawAdapter(float pixelPerMeter)
-			: pixelPerMeter(pixelPerMeter)
-		{
-			SetFlags(
-				b2Draw::e_shapeBit |
-				b2Draw::e_jointBit |
-				b2Draw::e_aabbBit |
-				b2Draw::e_pairBit |
-				b2Draw::e_centerOfMassBit);
-		}
-
-
-		void SetTarget(IPhysicsDebugDraw* newTarget)
-		{
-			target = newTarget;
-		}
-
-
-		void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override
-		{
-			if (target == nullptr)
-				return;
-
-			auto lineColor = ToColor(color);
-
-			for (int32 i = 0; i < vertexCount; ++i)
-			{
-				auto p1 = vertices[i];
-				auto p2 = vertices[(i + 1) % vertexCount];
-
-				target->DrawSegment(ToPixels(p1), ToPixels(p2), lineColor);
-			}
-		}
-
-		void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override
-		{
-			DrawPolygon(vertices, vertexCount, color);
-		}
-
-		void DrawCircle(const b2Vec2& center, float radius, const b2Color& color) override
-		{
-			if (target == nullptr)
-				return;
-
-			target->DrawCircle(ToPixels(center), radius * pixelPerMeter, ToColor(color));
-		}
-
-		void DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color) override
-		{
-			DrawCircle(center, radius, color);
-		}
-
-		void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color) override
-		{
-			if (target == nullptr)
-				return;
-
-			target->DrawSegment(ToPixels(p1), ToPixels(p2), ToColor(color));
-		}
-
-		void DrawTransform(const b2Transform& xf) override
-		{
-			DrawPoint(xf.p, 2.0f, b2Color{ 1.0f, 1.0f, 1.0f, 1.0f });
-		}
-
-		void DrawPoint(const b2Vec2& p, float size, const b2Color& color) override
-		{
-			if (target == nullptr)
-				return;
-
-			target->DrawPoint(ToPixels(p), size, ToColor(color));
-		}
-	};
 }

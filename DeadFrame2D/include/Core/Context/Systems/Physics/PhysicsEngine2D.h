@@ -4,6 +4,7 @@
 #include "Core/Context/Systems/Physics/Abstractions/IPhysicsContactSink.h"
 #include "Core/Math/Vector2.h"
 #include "DF2D_API.h"
+#include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Models/Physics/Masks/CollisionMasks.h"
 #include "Models/Physics/PhysicsConfig.h"
 #include <memory>
@@ -26,7 +27,7 @@ namespace DF2D::Core
 	private:
 		struct FixtureRecord
 		{
-			Engine::ContactEventProvider* provider = nullptr;
+			Engine::ComponentHandle<Engine::ContactEventProvider> provider;
 
 			Data::BodyID body = 0;
 		};
@@ -78,7 +79,7 @@ namespace DF2D::Core
 
 		void DestroyBody(Data::BodyID body);
 
-		Data::FixtureID CreateFixture(Data::BodyID body, const Data::PhysicsMaterial& physicsMaterial, Engine::ContactEventProvider* contactEventProvider);
+		Data::FixtureID CreateFixture(Data::BodyID body, const Data::PhysicsMaterial& physicsMaterial, const Engine::ComponentHandle<Engine::ContactEventProvider>& contactEventProvider);
 
 		void DestroyFixture(Data::FixtureID fixture);
 
