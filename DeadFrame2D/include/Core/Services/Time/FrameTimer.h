@@ -1,42 +1,52 @@
 #pragma once
+#include "Core/Services/Time/Abstractions/IClock.h"
+#include "Core/Services/Time/Abstractions/ITimeProvider.h"
 #include "DF2D_API.h"
 #include <chrono>
+#include <memory>
 #include <optional>
 
 
 namespace DF2D::Core
 {
-	class DF2D_API FrameTimer
+	class DF2D_API FrameTimer : public ITimeProvider
 	{
 	private:
-		static float deltaTime;
+		std::unique_ptr<IClock> clock;
 
-		static float timeScale;
+		std::chrono::nanoseconds start;
 
-		static int currentFPS;
+		std::chrono::duration<float> frameDuration;
 
-		static std::chrono::duration<float> workTime;
+		float timeScale;
 
-
-		std::chrono::system_clock::time_point start;
-
-		std::chrono::system_clock::time_point end;
-
-
-		int countedFrames;
+		float targetFrameTime;
 
 		float counterDelay;
 
-		float frameTime;
+		int countedFrames;
+
+		int currentFPS;
 
 		bool isFpsLocked;
 
 
+		void AccumulateFrame(float seconds);
+
+
 	public:
-		FrameTimer(std::optional<int> targetFramerate);
+		FrameTimer(std::optional<int> targetFramerate, std::unique_ptr<IClock> clock);
 
+		~FrameTimer() override = default;
 
-		void CalculateFPS();
+		FrameTimer(const FrameTimer&) = delete;
+
+		FrameTimer(FrameTimer&&) = delete;
+
+		FrameTimer& operator=(const FrameTimer&) = delete;
+
+		FrameTimer& operator=(FrameTimer&&) = delete;
+
 
 		void StartClock();
 
@@ -44,19 +54,23 @@ namespace DF2D::Core
 
 		void DelayByFrameTime();
 
+
 		void SetTargetFramerate(unsigned int fps);
 
 		void UnlockFramerate();
 
+		bool IsFramerateLocked() const;
 
-		static float DeltaTime();
+		int Framerate() const;
 
-		static float DeltaTimeUnscaled();
 
-		static int Framerate();
+		void SetTimeScale(float scale);
 
-		static void SetTimeScale(float scale);
+		float GetTimeScale() const;
 
-		static float GetTimeScale();
+
+		float DeltaTime() const override;
+
+		float DeltaTimeUnscaled() const override;
 	};
 }

@@ -1,33 +1,37 @@
 #include "Core/Services/Time/FrameTimer.h"
+#include "Utilities/Debugging/Guards.h"
 #include <algorithm>
-#include <thread>
 
 
 namespace DF2D::Core
 {
 	using namespace std::chrono;
+	using namespace DF2D::Utilities;
 
 
-	float FrameTimer::deltaTime = 0;
+	constexpr float DEFAULT_TARGET_FRAMERATE = 60.0f;
 
-	float FrameTimer::timeScale = 1.0f;
-
-	int FrameTimer::currentFPS = 0;
-
-	std::chrono::duration<float> FrameTimer::workTime;
+	constexpr float FPS_SAMPLE_WINDOW_SECONDS = 1.0f;
 
 
-	FrameTimer::FrameTimer(std::optional<int> targetFramerate)
-		: countedFrames(0),
-		counterDelay(0),
-		isFpsLocked(true)
+	FrameTimer::FrameTimer(std::optional<int> targetFramerate, std::unique_ptr<IClock> clock)
+		: clock(std::move(clock)),
+		start(nanoseconds::zero()),
+		frameDuration(0.0f),
+		timeScale(1.0f),
+		targetFrameTime(1.0f / DEFAULT_TARGET_FRAMERATE),
+		counterDelay(0.0f),
+		countedFrames(0),
+		currentFPS(0),
+		isFpsLocked(false)
 	{
-		start = system_clock::now();
-		end = start;
+		Guard::AgainstNull(this->clock.get(), NAME_OF(clock));
 
-		if (targetFramerate.has_value())
+		start = this->clock->Now();
+
+		if (targetFramerate.has_value() && *targetFramerate > 0)
 		{
-			SetTargetFramerate(*targetFramerate);
+			SetTargetFramerate(static_cast<unsigned int>(*targetFramerate));
 		}
 		else
 		{
@@ -35,43 +39,33 @@ namespace DF2D::Core
 		}
 	}
 
-	void FrameTimer::CalculateFPS()
+
+	void FrameTimer::AccumulateFrame(float seconds)
 	{
-		countedFrames++;
-		counterDelay += workTime.count();
+		counterDelay += seconds;
 
-		if (counterDelay >= 1000.0f)
-		{
-			deltaTime = (1.0f / countedFrames);
-			currentFPS = countedFrames - 1;
+		if (counterDelay < FPS_SAMPLE_WINDOW_SECONDS)
+			return;
 
-			counterDelay = 0;
-			countedFrames = 0;
-		}
+		currentFPS = countedFrames;
+
+		countedFrames = 0;
+		counterDelay = 0.0f;
 	}
+
 
 	void FrameTimer::StartClock()
 	{
-		start = system_clock::now();
+		start = clock->Now();
 	}
 
 	void FrameTimer::EndClock()
 	{
-		end = system_clock::now();
+		frameDuration = duration_cast<duration<float>>(clock->Now() - start);
 
-		workTime = duration<float>(end - start); // seconds
-		deltaTime = workTime.count() * timeScale;
-
-		// Update FPS
 		countedFrames++;
-		counterDelay += workTime.count();
 
-		if (counterDelay >= 1.0f) // 1 second
-		{
-			currentFPS = countedFrames;
-			countedFrames = 0;
-			counterDelay = 0.0f;
-		}
+		AccumulateFrame(frameDuration.count());
 	}
 
 	void FrameTimer::DelayByFrameTime()
@@ -79,24 +73,28 @@ namespace DF2D::Core
 		if (!isFpsLocked)
 			return;
 
-		auto targetDelta = frameTime; // seconds per frame
-		auto remainingTime = targetDelta - workTime.count();
+		auto remainingTime = targetFrameTime - frameDuration.count();
 
-		if (remainingTime > 0.0f)
-		{
-			auto sleepDuration = duration<float>(remainingTime);
+		if (remainingTime <= 0.0f)
+			return;
 
-			std::this_thread::sleep_for(duration_cast<milliseconds>(sleepDuration));
+		auto sleepDuration = duration<float>(remainingTime);
 
-			workTime += duration<float>(remainingTime);
+		clock->SleepFor(duration_cast<nanoseconds>(sleepDuration));
 
-			deltaTime = workTime.count() * timeScale;
-		}
+		// The slept time is part of the frame, so both the frame delta and the FPS window must see it
+		frameDuration += sleepDuration;
+
+		AccumulateFrame(remainingTime);
 	}
+
 
 	void FrameTimer::SetTargetFramerate(unsigned int fps)
 	{
-		frameTime = 1.0f / static_cast<float>(fps); // seconds per frame
+		if (fps == 0)
+			return;
+
+		targetFrameTime = 1.0f / static_cast<float>(fps); // seconds per frame
 
 		isFpsLocked = true;
 	}
@@ -106,28 +104,35 @@ namespace DF2D::Core
 		isFpsLocked = false;
 	}
 
-	float FrameTimer::DeltaTime()
+	bool FrameTimer::IsFramerateLocked() const
 	{
-		return deltaTime * timeScale;
+		return isFpsLocked;
 	}
 
-	float FrameTimer::DeltaTimeUnscaled()
-	{
-		return workTime.count();
-	}
-
-	int FrameTimer::Framerate()
+	int FrameTimer::Framerate() const
 	{
 		return currentFPS;
 	}
+
 
 	void FrameTimer::SetTimeScale(float scale)
 	{
 		timeScale = std::max(0.0f, scale);
 	}
 
-	float FrameTimer::GetTimeScale()
+	float FrameTimer::GetTimeScale() const
 	{
 		return timeScale;
+	}
+
+
+	float FrameTimer::DeltaTime() const
+	{
+		return frameDuration.count() * timeScale;
+	}
+
+	float FrameTimer::DeltaTimeUnscaled() const
+	{
+		return frameDuration.count();
 	}
 }
