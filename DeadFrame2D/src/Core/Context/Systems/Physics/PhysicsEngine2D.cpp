@@ -18,8 +18,7 @@ namespace DF2D::Core
 		: backend(std::move(backend)),
 		debugDrawer(std::make_unique<PhysicsDebugDrawer>()),
 		physicsConfig(physicsConfig),
-		collisionMasks(std::move(collisionMasks)),
-		isDebugDrawEnabled(physicsConfig.debugDrawEnabled)
+		collisionMasks(std::move(collisionMasks))
 	{
 		Guard::AgainstNull(this->backend.get(), NAME_OF(backend));
 
@@ -52,7 +51,7 @@ namespace DF2D::Core
 
 	void PhysicsEngine2D::EndDraw()
 	{
-		if (!isDebugDrawEnabled)
+		if (!physicsConfig.debugDrawEnabled)
 			return;
 
 		backend->DebugDraw(*debugDrawer);
@@ -252,6 +251,6 @@ namespace DF2D::Core
 
 	void PhysicsEngine2D::SetDebugDrawEnabled(bool isEnabled)
 	{
-		isDebugDrawEnabled = isEnabled;
+		physicsConfig.debugDrawEnabled = isEnabled;
 	}
 }

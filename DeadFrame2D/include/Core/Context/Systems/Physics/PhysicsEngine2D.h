@@ -43,8 +43,6 @@ namespace DF2D::Core
 
 		std::unordered_map<Data::FixtureID, FixtureRecord> fixtureRecords;
 
-		bool isDebugDrawEnabled;
-
 
 		void BeginFrame() override;
 

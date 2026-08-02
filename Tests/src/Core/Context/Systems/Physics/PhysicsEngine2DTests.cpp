@@ -534,6 +534,7 @@ TEST_CASE("SetDebugDrawEnabled false suppresses debug drawing")
 	system->EndDraw();
 
 	CHECK(mock->debugDrawCount == 0);
+	CHECK(physicsEngine->GetPhysicsConfig().debugDrawEnabled == false);
 }
 
 
