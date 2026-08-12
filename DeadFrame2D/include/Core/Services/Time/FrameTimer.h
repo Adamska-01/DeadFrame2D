@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Services/Time/Abstractions/IClock.h"
+#include "Core/Services/Time/Abstractions/IFrameCycle.h"
 #include "Core/Services/Time/Abstractions/ITimeProvider.h"
 #include "DF2D_API.h"
 #include <chrono>
@@ -9,7 +10,7 @@
 
 namespace DF2D::Core
 {
-	class DF2D_API FrameTimer : public ITimeProvider
+	class DF2D_API FrameTimer : public ITimeProvider, public IFrameCycle
 	{
 	private:
 		std::unique_ptr<IClock> clock;
@@ -26,12 +27,32 @@ namespace DF2D::Core
 
 		int countedFrames;
 
-		int currentFPS;
+		float currentFPS;
 
 		bool isFpsLocked;
 
+		// Self-calibrating estimate of how much SleepFor overshoots its requested duration on
+		// this machine, so the limiter can sleep for the safe portion of the budget and spin
+		// only the calibrated tail instead of guessing a fixed margin.
+		float sleepOvershootEstimate;
+
+		float sleepOvershootMean;
+
+		float sleepOvershootM2;
+
+		int sleepSampleCount;
+
+
+		void BeginFrame() override;
+
+		void EndFrame() override;
+
+
+		void DelayByFrameTime();
 
 		void AccumulateFrame(float seconds);
+
+		void UpdateSleepOvershootEstimate(float observedOvershoot);
 
 
 	public:
@@ -48,25 +69,18 @@ namespace DF2D::Core
 		FrameTimer& operator=(FrameTimer&&) = delete;
 
 
-		void StartClock();
+		void SetTargetFramerate(unsigned int fps) override;
 
-		void EndClock();
+		void UnlockFramerate() override;
 
-		void DelayByFrameTime();
+		bool IsFramerateLocked() const override;
 
-
-		void SetTargetFramerate(unsigned int fps);
-
-		void UnlockFramerate();
-
-		bool IsFramerateLocked() const;
-
-		int Framerate() const;
+		float Framerate() const override;
 
 
-		void SetTimeScale(float scale);
+		void SetTimeScale(float scale) override;
 
-		float GetTimeScale() const;
+		float GetTimeScale() const override;
 
 
 		float DeltaTime() const override;

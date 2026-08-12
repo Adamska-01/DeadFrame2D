@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Context/Abstractions/ICoreSystem.h"
+#include "Core/Services/Time/Abstractions/IFrameCycle.h"
 #include "Data/Services/ServiceContext.h"
 #include "DF2D_API.h"
 #include "Models/SystemConfig.h"

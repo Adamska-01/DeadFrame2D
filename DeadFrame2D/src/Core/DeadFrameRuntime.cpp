@@ -77,11 +77,12 @@ namespace DF2D::Core
 
 		auto serviceCtx = serviceInitializer->GetServiceContext();
 		auto frameTimer = serviceCtx.frameTimer;
+		IFrameCycle* frameCycle = static_cast<FrameTimer*>(frameTimer);
 		auto eventManager = serviceCtx.eventManager;
 
 		while (elapsedTime < totalDuration)
 		{
-			frameTimer->StartClock();
+			frameCycle->BeginFrame();
 
 			if (const auto ecode = eventManager->ProcessEvents())
 				return *ecode;
@@ -108,8 +109,7 @@ namespace DF2D::Core
 
 			coreCtx.renderer->ClearAndPresentBuffer();
 
-			frameTimer->EndClock();
-			frameTimer->DelayByFrameTime();
+			frameCycle->EndFrame();
 		}
 
 		return std::nullopt;
@@ -123,12 +123,13 @@ namespace DF2D::Core
 		auto coreCtx = systemInitializer->GetCoreContext();
 		auto serviceCtx = serviceInitializer->GetServiceContext();
 		auto frameTimer = serviceCtx.frameTimer;
+		IFrameCycle* frameCycle = static_cast<FrameTimer*>(frameTimer);
 		auto eventManager = serviceCtx.eventManager;
 		auto sceneManager = serviceCtx.sceneManager;
 
 		while (true)
 		{
-			frameTimer->StartClock();
+			frameCycle->BeginFrame();
 
 			auto deltaTime = frameTimer->DeltaTime();
 
@@ -153,8 +154,7 @@ namespace DF2D::Core
 
 			sceneManager->LoadNewSceneIfAvailable();
 
-			frameTimer->EndClock();
-			frameTimer->DelayByFrameTime();
+			frameCycle->EndFrame();
 		}
 	}
 }

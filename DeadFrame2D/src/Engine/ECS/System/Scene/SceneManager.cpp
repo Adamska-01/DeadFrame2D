@@ -1,7 +1,7 @@
 #include "Core/Context/Systems/Coroutines/CoroutineScheduler.h"
-#include "Core/Services/Time/FrameTimer.h"
-#include "Engine/ECS/System/Scene/SceneManager.h"
+#include "Core/Services/Time/Abstractions/ITimeProvider.h"
 #include "Engine/ECS/System/Scene/Scene.h"
+#include "Engine/ECS/System/Scene/SceneManager.h"
 
 
 namespace DF2D::Engine
