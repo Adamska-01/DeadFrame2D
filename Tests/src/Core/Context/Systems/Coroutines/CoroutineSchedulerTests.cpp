@@ -1,6 +1,7 @@
 #include "Core/Context/Abstractions/ICoreSystem.h"
 #include "Core/Context/Systems/Coroutines/CoroutineScheduler.h"
 #include "Core/Context/Systems/Coroutines/Task.h"
+#include "Mocks/Services/Time/MockTimeProvider.h"
 #include "Utilities/Helpers/Coroutines/CoroutineHelpers.h"
 #include <doctest.h>
 
@@ -45,6 +46,13 @@ static Task WaitSecondsTask(float seconds)
 	co_await CoroutineHelpers::WaitSeconds(seconds);
 }
 
+static Task WaitSecondsUnscaledTask(float seconds, bool& resumed)
+{
+	co_await CoroutineHelpers::WaitSecondsUnscaled(seconds);
+
+	resumed = true;
+}
+
 
 TEST_SUITE_BEGIN("CoroutineScheduler");
 
@@ -53,7 +61,8 @@ TEST_CASE("StartCoroutine_ImmediatelyResumesCoroutine")
 {
 	auto flag = false;
 
-	CoroutineScheduler scheduler;
+	MockTimeProvider timeProvider;
+	CoroutineScheduler scheduler(&timeProvider);
 
 	scheduler.StartCoroutine(FlagTask(flag));
 
@@ -65,7 +74,8 @@ TEST_CASE("PreUpdate_RemovesDoneTasks")
 {
 	auto resumed = false;
 
-	CoroutineScheduler scheduler;
+	MockTimeProvider timeProvider;
+	CoroutineScheduler scheduler(&timeProvider);
 
 	scheduler.StartCoroutine(WaitFrameTask(resumed));
 
@@ -81,7 +91,8 @@ TEST_CASE("PreUpdate_RemovesCancelledTasks")
 {
 	auto resumed = false;
 
-	CoroutineScheduler scheduler;
+	MockTimeProvider timeProvider;
+	CoroutineScheduler scheduler(&timeProvider);
 
 	auto& task = scheduler.StartCoroutine(WaitSecondsTask(10.0f, resumed));
 
@@ -99,7 +110,8 @@ TEST_CASE("PreUpdate_HandlesMultipleTasks")
 	auto resumed2 = false;
 	auto resumed3 = false;
 
-	CoroutineScheduler scheduler;
+	MockTimeProvider timeProvider;
+	CoroutineScheduler scheduler(&timeProvider);
 
 	scheduler.StartCoroutine(WaitFrameTask(resumed1));
 	scheduler.StartCoroutine(WaitFrameTask(resumed2));
@@ -117,7 +129,8 @@ TEST_CASE("PreUpdate_WaitForSeconds_RespectsScaledDt")
 {
 	auto resumed = false;
 
-	CoroutineScheduler scheduler;
+	MockTimeProvider timeProvider;
+	CoroutineScheduler scheduler(&timeProvider);
 
 	scheduler.StartCoroutine(WaitSecondsTask(1.0f, resumed));
 
@@ -135,7 +148,8 @@ TEST_CASE("PreUpdate_WaitForSeconds_FinishesInSingleTick")
 {
 	bool resumed = false;
 
-	CoroutineScheduler scheduler;
+	MockTimeProvider timeProvider;
+	CoroutineScheduler scheduler(&timeProvider);
 
 	scheduler.StartCoroutine(WaitSecondsTask(1.0f, resumed));
 
@@ -148,7 +162,8 @@ TEST_CASE("PreUpdate_WaitForSeconds_FinishesInSingleTick")
 TEST_CASE("Destructor_CleansUpAllTasks")
 {
 	{
-		CoroutineScheduler scheduler;
+		MockTimeProvider timeProvider;
+		CoroutineScheduler scheduler(&timeProvider);
 
 		scheduler.StartCoroutine(WaitSecondsTask(10.0f));
 		scheduler.StartCoroutine(WaitSecondsTask(10.0f));
@@ -162,7 +177,8 @@ TEST_CASE("StartCoroutine_WaitFrameTask_CompletesInOnePreUpdate")
 {
 	auto resumed = false;
 
-	CoroutineScheduler scheduler;
+	MockTimeProvider timeProvider;
+	CoroutineScheduler scheduler(&timeProvider);
 
 	scheduler.StartCoroutine(WaitFrameTask(resumed));
 
@@ -176,7 +192,8 @@ TEST_CASE("StartCoroutine_WaitFrameTask_CompletesInOnePreUpdate")
 
 TEST_CASE("StartCoroutine_EmptyTask_CompletesImmediately")
 {
-	CoroutineScheduler scheduler;
+	MockTimeProvider timeProvider;
+	CoroutineScheduler scheduler(&timeProvider);
 
 	scheduler.StartCoroutine(EmptyTask());
 
@@ -186,7 +203,8 @@ TEST_CASE("StartCoroutine_EmptyTask_CompletesImmediately")
 
 TEST_CASE("PreUpdate_DoneTasksAreRemoved")
 {
-	CoroutineScheduler scheduler;
+	MockTimeProvider timeProvider;
+	CoroutineScheduler scheduler(&timeProvider);
 
 	scheduler.StartCoroutine(WaitFrameTask());
 
@@ -202,7 +220,8 @@ TEST_CASE("PreUpdate_PendingTasksRemainAfterTick")
 {
 	bool resumed = false;
 
-	CoroutineScheduler scheduler;
+	MockTimeProvider timeProvider;
+	CoroutineScheduler scheduler(&timeProvider);
 
 	scheduler.StartCoroutine(WaitSecondsTask(1.0f, resumed));
 
@@ -216,6 +235,41 @@ TEST_CASE("PreUpdate_PendingTasksRemainAfterTick")
 
 	CHECK(resumed);
 	CHECK_EQ(scheduler.GetActiveTaskCount(), 0);
+}
+
+
+TEST_CASE("PreUpdate_WaitForSecondsUnscaled_UsesTheTimeProvider")
+{
+	auto resumed = false;
+
+	MockTimeProvider timeProvider;
+	timeProvider.deltaTimeUnscaled = 0.5f;
+
+	CoroutineScheduler scheduler(&timeProvider);
+
+	scheduler.StartCoroutine(WaitSecondsUnscaledTask(1.0f, resumed));
+
+	static_cast<ICoreSystem*>(&scheduler)->PreUpdate(0.0f);
+
+	CHECK_FALSE(resumed);
+
+	static_cast<ICoreSystem*>(&scheduler)->PreUpdate(0.0f);
+
+	CHECK(resumed);
+}
+
+
+TEST_CASE("PreUpdate_WithoutTimeProvider_FallsBackToTheScaledDelta")
+{
+	auto resumed = false;
+
+	CoroutineScheduler scheduler(nullptr);
+
+	scheduler.StartCoroutine(WaitSecondsUnscaledTask(1.0f, resumed));
+
+	static_cast<ICoreSystem*>(&scheduler)->PreUpdate(1.0f);
+
+	CHECK(resumed);
 }
 
 
