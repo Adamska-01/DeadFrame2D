@@ -36,7 +36,7 @@ namespace DF2D::Core
 
 		if (targetFramerate.has_value() && *targetFramerate > 0)
 		{
-			SetTargetFramerate(static_cast<unsigned int>(180));
+			SetTargetFramerate(static_cast<unsigned int>(*targetFramerate));
 		}
 		else
 		{
