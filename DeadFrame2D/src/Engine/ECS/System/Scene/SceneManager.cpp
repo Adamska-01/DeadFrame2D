@@ -1,7 +1,9 @@
 #include "Core/Context/Systems/Coroutines/CoroutineScheduler.h"
 #include "Core/Services/Time/Abstractions/ITimeProvider.h"
-#include "Engine/ECS/System/Scene/Scene.h"
+// Order matters: SceneManager.h must precede Scene.h here, or the circular include between
+// them resolves with Scene still incomplete when SceneManager's templates need it (C2027).
 #include "Engine/ECS/System/Scene/SceneManager.h"
+#include "Engine/ECS/System/Scene/Scene.h"
 
 
 namespace DF2D::Engine
