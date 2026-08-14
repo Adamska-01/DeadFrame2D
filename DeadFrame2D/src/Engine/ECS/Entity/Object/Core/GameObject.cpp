@@ -32,12 +32,12 @@ namespace DF2D::Engine
 			if (child == nullptr || child->isDestroyed)
 				continue;
 
-			bool oldState = child->IsActive();
+			auto oldState = child->IsActive();
 
 			// Update child's parent state before re-evaluating
 			child->hasActiveParent = IsActive();
 
-			bool newState = child->IsActive();
+			auto newState = child->IsActive();
 
 			if (oldState != newState)
 			{
