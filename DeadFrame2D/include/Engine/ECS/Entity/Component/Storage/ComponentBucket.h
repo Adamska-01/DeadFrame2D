@@ -23,6 +23,8 @@ namespace DF2D::Engine
 	{
 		friend class Scene;
 
+		friend class GameObject;
+
 		template<typename T>
 		friend class ComponentHandle;
 

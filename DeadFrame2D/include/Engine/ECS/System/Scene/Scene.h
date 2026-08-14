@@ -127,14 +127,7 @@ namespace DF2D::Engine
 		auto handle = ObjectHandle<T>(shared_from_this(), index, entry.generation);
 
 		// Set dependencies
-		entry.object->SetThisHandle(handle);
-		entry.object->SetContexts(coreCtx, serviceCtx);
-
-		// Every GameObject starts with a Transform, which needs to be linked to the owner post-creation.
-		entry.object->componentBucket->ForEach([&handle, obj = entry.object.get()](GameComponent& comp)
-			{
-				obj->componentBucket->LinkComponentToOwner(handle, &comp);
-			});
+		entry.object->BindToScene(handle, coreCtx, serviceCtx);
 
 		handle->ConstructGameObject();
 

@@ -15,14 +15,10 @@ namespace DF2D::Engine
 	 */
 	class DF2D_API IGameContextProvider
 	{
-		friend class Scene;
-
-
-	private:
+	protected:
 		void SetContexts(Data::CoreContext coreCtx, Data::ServiceContext serviceCtx);
 
 
-	protected:
 		Data::CoreContext coreCtx;
 
 		Data::ServiceContext serviceCtx;

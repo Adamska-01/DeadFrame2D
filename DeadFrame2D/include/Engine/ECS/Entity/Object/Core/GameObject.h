@@ -6,6 +6,14 @@
 #include <memory>
 
 
+namespace DF2D::Data
+{
+	struct CoreContext;
+
+	struct ServiceContext;
+}
+
+
 namespace DF2D::Engine
 {
 	class Transform;
@@ -39,6 +47,11 @@ namespace DF2D::Engine
 
 
 		virtual void ConstructGameObject();
+
+		/**
+		 * @brief Wires a freshly constructed GameObject to its owning scene.
+		 */
+		void BindToScene(const ObjectHandle<GameObject>& handle, Data::CoreContext coreCtx, Data::ServiceContext serviceCtx);
 
 
 	public:
@@ -208,7 +221,7 @@ namespace DF2D::Engine
 	template<typename T>
 	inline void GameObject::RemoveComponent(const ComponentHandle<T>& handle)
 	{
-		OnComponentRemoved(handle);
+		OnComponentRemoved.Broadcast(ComponentHandle<GameComponent>::From(handle));
 
 		componentBucket->RemoveComponent<T>(handle);
 	}

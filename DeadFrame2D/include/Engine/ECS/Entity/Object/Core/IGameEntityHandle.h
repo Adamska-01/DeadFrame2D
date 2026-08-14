@@ -18,14 +18,10 @@ namespace DF2D::Engine
 	 */
 	class DF2D_API IGameEntityHandle
 	{
-		friend class Scene;
-
-
-	private:
+	protected:
 		void SetThisHandle(ObjectHandle<GameObject> thisGameObject);
 
 
-	protected:
 		ObjectHandle<GameObject> thisGameObject;
 
 		ObjectHandle<GameObject> parent;

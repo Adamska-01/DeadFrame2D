@@ -53,6 +53,17 @@ namespace DF2D::Engine
 		// Meant for prefabs/blueprints
 	}
 
+	void GameObject::BindToScene(const ObjectHandle<GameObject>& handle, Data::CoreContext coreCtx, Data::ServiceContext serviceCtx)
+	{
+		SetThisHandle(handle);
+		SetContexts(coreCtx, serviceCtx);
+
+		componentBucket->ForEach([this, &handle](GameComponent& comp)
+			{
+				componentBucket->LinkComponentToOwner(handle, &comp);
+			});
+	}
+
 	bool GameObject::IsChildOf(ObjectHandle<GameObject> potentialChild, bool recursive) const
 	{
 		if (potentialChild == nullptr)
