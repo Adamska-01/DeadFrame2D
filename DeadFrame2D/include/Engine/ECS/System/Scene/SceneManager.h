@@ -12,6 +12,12 @@
 #include <vector>
 
 
+namespace DF2D::Core
+{
+	class DeadFrameRuntime;
+}
+
+
 namespace DF2D::Engine
 {
 	class Scene;
@@ -20,6 +26,8 @@ namespace DF2D::Engine
 	class DF2D_API SceneManager
 	{
 		friend class GameObject;
+
+		friend class Core::DeadFrameRuntime;
 
 
 	private:
@@ -41,12 +49,7 @@ namespace DF2D::Engine
 		static SceneManager& Active();
 
 
-	public:
-		SceneManager();
-
-		~SceneManager();
-
-
+	protected:
 		void SetContexts(Data::CoreContext coreCtx, Data::ServiceContext serviceCtx);
 
 		void UpdateScene(float deltaTime) const;
@@ -56,6 +59,12 @@ namespace DF2D::Engine
 		void DrawScene() const;
 
 		bool LoadNewSceneIfAvailable();
+
+
+	public:
+		SceneManager();
+
+		~SceneManager();
 
 
 		template<typename TScene, typename... Args>
