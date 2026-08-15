@@ -2,6 +2,7 @@
 #include "Data/Services/ServiceContext.h"
 #include "Data/Systems/CoreContext.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
+#include "Engine/ECS/Entity/Object/Core/GameObjectConstructionContext.h"
 #include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
 #include "Engine/ECS/System/Scene/Abstractions/ISceneHandleProvider.h"
 #include <memory>
@@ -9,9 +10,12 @@
 
 
 // Minimal stand-in for Scene: owns GameObjects behind ISceneHandleProvider so
-// ObjectHandle<T> resolves without a real Scene/SceneManager. T must expose
-// BindToScene/ConstructGameObject (see TestGameObject).
-class FakeSceneHandleProvider : public DF2D::Engine::ISceneHandleProvider, public std::enable_shared_from_this<FakeSceneHandleProvider>
+// ObjectHandle<T> resolves without a real Scene/SceneManager. Mirrors
+// Scene::Instantiate's allocate-then-placement-construct sequence so a GameObject's
+// own constructor can resolve its handle (see GameObjectConstructionContext).
+class FakeSceneHandleProvider
+	: public DF2D::Engine::ISceneHandleProvider,
+	public std::enable_shared_from_this<FakeSceneHandleProvider>
 {
 private:
 	struct Entry
@@ -46,15 +50,29 @@ inline DF2D::Engine::ObjectHandle<T> FakeSceneHandleProvider::Create(Args&&... a
 
 	auto index = static_cast<uint32_t>(entries.size() - 1);
 	auto& entry = entries[index];
-
-	auto* typed = new T(std::forward<Args>(args)...);
-	entry.object = std::unique_ptr<DF2D::Engine::GameObject>(typed);
 	entry.alive = true;
+
+	// Reserve raw storage and register it before construction, so T's own constructor
+	// can resolve its own handle (mirrors Scene::Instantiate).
+	void* storage = ::operator new(sizeof(T));
+	entry.object = std::unique_ptr<DF2D::Engine::GameObject>(static_cast<DF2D::Engine::GameObject*>(static_cast<T*>(storage)));
 
 	auto handle = DF2D::Engine::ObjectHandle<T>(weak_from_this(), index, entry.generation);
 
-	typed->BindToScene(handle, DF2D::Data::CoreContext{}, DF2D::Data::ServiceContext{});
-	typed->ConstructGameObject();
+	DF2D::Engine::GameObjectConstructionContext constructionContext(handle, DF2D::Data::CoreContext{}, DF2D::Data::ServiceContext{});
+
+	try
+	{
+		new (storage) T(std::forward<Args>(args)...);
+	}
+	catch (...)
+	{
+		entry.object.release();
+		::operator delete(storage);
+		entry.alive = false;
+
+		throw;
+	}
 
 	return handle;
 }
