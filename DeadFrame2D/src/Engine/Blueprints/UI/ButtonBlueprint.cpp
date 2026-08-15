@@ -13,11 +13,6 @@ namespace DF2D::Engine
 	ButtonBlueprint::ButtonBlueprint(const ButtonBlueprintModel& buttonBlueprintConfiguration)
 		: buttonBlueprintConfiguration(buttonBlueprintConfiguration)
 	{
-	
-	}
-
-	void ButtonBlueprint::ConstructGameObject()
-	{
 		AddComponent<Button>(buttonBlueprintConfiguration.buttonComponentModel);
 
 		auto textMeshObject = GameObject::Instantiate<GameObject>();

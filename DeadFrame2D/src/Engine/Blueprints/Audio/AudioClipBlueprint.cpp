@@ -15,10 +15,6 @@ namespace DF2D::Engine
 		isMusic(isMusic),
 		loop(loop)
 	{
-	}
-
-	void AudioClipBlueprint::ConstructGameObject()
-	{
 		transform->SetWorldPosition(position);
 
 		audioSource = AddComponent<AudioSource>();

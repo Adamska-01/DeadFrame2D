@@ -1,5 +1,6 @@
 #include "Engine/ECS/Component/Transform.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
+#include "Engine/ECS/Entity/Object/Core/GameObjectConstructionContext.h"
 #include "Engine/ECS/System/Events/EventDispatcher.h"
 #include "Engine/Events/GameObject/GameObjectDestroyedEvent.h"
 #include "Engine/Events/GameObject/GameObjectHierarchyChangeEvent.h"
@@ -21,6 +22,14 @@ namespace DF2D::Engine
 		children.clear();
 
 		componentBucket = std::make_shared<ComponentBucket>();
+
+		const auto* ctx = GameObjectConstructionContext::Current();
+
+		if (ctx != nullptr)
+		{
+			SetThisHandle(ObjectHandle<GameObject>(ctx->handle));
+			SetContexts(ctx->coreCtx, ctx->serviceCtx);
+		}
 
 		transform = AddComponent<Transform>();
 	}
@@ -46,22 +55,6 @@ namespace DF2D::Engine
 				child->PropagateActiveStateToChildren();
 			}
 		}
-	}
-
-	void GameObject::ConstructGameObject()
-	{
-		// Meant for prefabs/blueprints
-	}
-
-	void GameObject::BindToScene(const ObjectHandle<GameObject>& handle, Data::CoreContext coreCtx, Data::ServiceContext serviceCtx)
-	{
-		SetThisHandle(handle);
-		SetContexts(coreCtx, serviceCtx);
-
-		componentBucket->ForEach([this, &handle](GameComponent& comp)
-			{
-				componentBucket->LinkComponentToOwner(handle, &comp);
-			});
 	}
 
 	bool GameObject::IsChildOf(ObjectHandle<GameObject> potentialChild, bool recursive) const

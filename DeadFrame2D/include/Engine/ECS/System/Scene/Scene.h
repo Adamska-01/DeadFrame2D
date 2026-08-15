@@ -4,6 +4,7 @@
 #include "Data/Systems/CoreContext.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
+#include "Engine/ECS/Entity/Object/Core/GameObjectConstructionContext.h"
 #include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
 #include "Engine/ECS/System/Scene/Abstractions/ISceneHandleProvider.h"
 #include <type_traits>
@@ -121,15 +122,35 @@ namespace DF2D::Engine
 		auto index = FindFreeSlot();
 
 		auto& entry = entries[index];
-		entry.object = std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 		entry.state = ObjectEntryState::ALIVE;
+
+		// Reserve raw storage and register it before construction, so a T under
+		// construction can resolve its own handle (see GameObjectConstructionContext)
+		// and e.g. parent freshly spawned children to itself from its own constructor.
+		void* storage = ::operator new(sizeof(T));
+		entry.object = std::unique_ptr<GameObject>(static_cast<GameObject*>(static_cast<T*>(storage)));
 
 		auto handle = ObjectHandle<T>(shared_from_this(), index, entry.generation);
 
-		// Set dependencies
-		entry.object->BindToScene(handle, coreCtx, serviceCtx);
+		GameObjectConstructionContext constructionContext(handle, coreCtx, serviceCtx);
 
-		handle->ConstructGameObject();
+		try
+		{
+			new (storage) T(std::forward<Args>(args)...);
+		}
+		catch (...)
+		{
+			// The already-constructed base subobjects were destroyed by the language
+			// as part of unwinding out of the placement-new expression above; only
+			// release the raw storage, don't run GameObject's destructor a second time.
+			entry.object.release();
+			::operator delete(storage);
+
+			entry.state = ObjectEntryState::DEAD;
+			freeSlots.push_back(index);
+
+			throw;
+		}
 
 		gameObjectRoots.push_back(index);
 

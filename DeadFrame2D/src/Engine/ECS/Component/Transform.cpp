@@ -203,7 +203,7 @@ namespace DF2D::Engine
 	void Transform::SetWorldPosition(const Vector2F& worldPos)
 	{
 		auto gameObject = GetGameObject();
-		auto parent = gameObject->GetParent();
+		auto parent = gameObject != nullptr ? gameObject->GetParent() : ObjectHandle<GameObject>();
 		auto parentTransform = parent != nullptr ? parent->GetTransform() : ComponentHandle<Transform>();
 
 		if (parentTransform == nullptr)

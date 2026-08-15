@@ -6,14 +6,6 @@
 #include <memory>
 
 
-namespace DF2D::Data
-{
-	struct CoreContext;
-
-	struct ServiceContext;
-}
-
-
 namespace DF2D::Engine
 {
 	class Transform;
@@ -44,14 +36,6 @@ namespace DF2D::Engine
 
 
 		GameObject();
-
-
-		virtual void ConstructGameObject();
-
-		/**
-		 * @brief Wires a freshly constructed GameObject to its owning scene.
-		 */
-		void BindToScene(const ObjectHandle<GameObject>& handle, Data::CoreContext coreCtx, Data::ServiceContext serviceCtx);
 
 
 	public:

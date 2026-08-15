@@ -16,8 +16,5 @@ namespace DF2D::Engine
 		ButtonBlueprint(const Data::ButtonBlueprintModel& buttonBlueprintConfiguration);
 
 		virtual ~ButtonBlueprint() override = default;
-
-
-		virtual void ConstructGameObject() override;
 	};
 }

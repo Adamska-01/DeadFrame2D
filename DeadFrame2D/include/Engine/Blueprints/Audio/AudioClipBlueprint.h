@@ -36,9 +36,6 @@ namespace DF2D::Engine
 			bool loop = false);
 
 
-		virtual void ConstructGameObject() override;
-
-
 		ComponentHandle<AudioSource> GetAudioSource();
 	};
 }
