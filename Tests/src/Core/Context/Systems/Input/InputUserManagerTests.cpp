@@ -2,12 +2,14 @@
 #include "Constants/Input/DefaultDeviceIDs.h"
 #include "Core/Context/Systems/Input/User/InputUser.h"
 #include "Core/Context/Systems/Input/User/InputUserManager.h"
+#include "Engine/ECS/System/Events/EventDispatcher.h"
 #include <vector>
 
 
 using namespace DF2D::Constants;
 using namespace DF2D::Core;
 using namespace DF2D::Data;
+using namespace DF2D::Engine;
 
 
 TEST_SUITE_BEGIN("InputUserManager");
@@ -15,7 +17,8 @@ TEST_SUITE_BEGIN("InputUserManager");
 
 TEST_CASE("CreateUser assigns ids, names and auto-pairs keyboard and mouse to the first user")
 {
-	InputUserManager manager;
+	EventDispatcher dispatcher;
+	InputUserManager manager(dispatcher);
 
 	auto* first = manager.CreateUser("PlayerOne");
 
@@ -33,7 +36,8 @@ TEST_CASE("CreateUser assigns ids, names and auto-pairs keyboard and mouse to th
 
 TEST_CASE("GetUserIDFromPairedDevice resolves pairings")
 {
-	InputUserManager manager;
+	EventDispatcher dispatcher;
+	InputUserManager manager(dispatcher);
 
 	auto* user = manager.CreateUser();
 
@@ -48,7 +52,8 @@ TEST_CASE("GetUserIDFromPairedDevice resolves pairings")
 
 TEST_CASE("PairDeviceToUser and UnpairDevice update pairings")
 {
-	InputUserManager manager;
+	EventDispatcher dispatcher;
+	InputUserManager manager(dispatcher);
 
 	auto* user = manager.CreateUser();
 
@@ -65,7 +70,8 @@ TEST_CASE("PairDeviceToUser and UnpairDevice update pairings")
 
 TEST_CASE("DestroyUser removes the user and all its pairings")
 {
-	InputUserManager manager;
+	EventDispatcher dispatcher;
+	InputUserManager manager(dispatcher);
 
 	auto* user = manager.CreateUser();
 	auto userID = user->ID();
@@ -85,7 +91,9 @@ TEST_CASE("Lifecycle hooks fire on create and destroy")
 	std::vector<InputUserID> created;
 	std::vector<InputUserID> destroyed;
 
+	EventDispatcher dispatcher;
 	InputUserManager manager(
+		dispatcher,
 		[&](InputUserID id) { created.push_back(id); },
 		[&](InputUserID id) { destroyed.push_back(id); });
 
@@ -103,7 +111,8 @@ TEST_CASE("Lifecycle hooks fire on create and destroy")
 
 TEST_CASE("GetAllUsers returns every live user")
 {
-	InputUserManager manager;
+	EventDispatcher dispatcher;
+	InputUserManager manager(dispatcher);
 
 	manager.CreateUser("A");
 	manager.CreateUser("B");
@@ -114,7 +123,8 @@ TEST_CASE("GetAllUsers returns every live user")
 
 TEST_CASE("Destroying an unknown user is a safe no-op")
 {
-	InputUserManager manager;
+	EventDispatcher dispatcher;
+	InputUserManager manager(dispatcher);
 
 	manager.DestroyUser(1234);
 

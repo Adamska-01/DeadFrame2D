@@ -4,12 +4,14 @@
 #include "Core/Context/Systems/Input/Devices/DeviceTypes/ControllerInputDevice.h"
 #include "Core/Context/Systems/Input/Devices/DeviceTypes/KeyboardInputDevice.h"
 #include "Core/Context/Systems/Input/Devices/DeviceTypes/MouseInputDevice.h"
+#include "Engine/ECS/System/Events/EventDispatcher.h"
 #include "Mocks/Context/Systems/Input/MockInputActionHandler.h"
 
 
 using namespace DF2D::Constants;
 using namespace DF2D::Core;
 using namespace DF2D::Data;
+using namespace DF2D::Engine;
 using namespace DF2D::Models;
 
 
@@ -19,7 +21,8 @@ TEST_SUITE_BEGIN("DeviceManager");
 TEST_CASE("Keyboard and mouse always exist")
 {
 	MockInputActionHandler handler;
-	DeviceManager manager(&handler);
+	EventDispatcher dispatcher;
+	DeviceManager manager(&handler, dispatcher);
 
 	CHECK(manager.Keyboard() != nullptr);
 	CHECK(manager.Mouse() != nullptr);
@@ -32,7 +35,8 @@ TEST_CASE("Keyboard and mouse always exist")
 TEST_CASE("Key events are routed to the keyboard device")
 {
 	MockInputActionHandler handler;
-	DeviceManager manager(&handler);
+	EventDispatcher dispatcher;
+	DeviceManager manager(&handler, dispatcher);
 	ISystemEventSink& sink = manager;
 
 	sink.OnSystemEvent(KeyEvent{ KeyboardKeyCode::W, true });
@@ -44,7 +48,8 @@ TEST_CASE("Key events are routed to the keyboard device")
 TEST_CASE("Mouse events are routed to the mouse device")
 {
 	MockInputActionHandler handler;
-	DeviceManager manager(&handler);
+	EventDispatcher dispatcher;
+	DeviceManager manager(&handler, dispatcher);
 	ISystemEventSink& sink = manager;
 
 	sink.OnSystemEvent(MouseMoveEvent{ { 50.0f, 60.0f }, { 1.0f, 1.0f } });
@@ -61,7 +66,8 @@ TEST_CASE("Mouse events are routed to the mouse device")
 TEST_CASE("Controller connect creates a device and becomes current")
 {
 	MockInputActionHandler handler;
-	DeviceManager manager(&handler);
+	EventDispatcher dispatcher;
+	DeviceManager manager(&handler, dispatcher);
 	ISystemEventSink& sink = manager;
 
 	sink.OnSystemEvent(ControllerConnectedEvent{ 5, "Pad" });
@@ -78,7 +84,8 @@ TEST_CASE("Controller connect creates a device and becomes current")
 TEST_CASE("Controller button events route by device id and update current")
 {
 	MockInputActionHandler handler;
-	DeviceManager manager(&handler);
+	EventDispatcher dispatcher;
+	DeviceManager manager(&handler, dispatcher);
 	ISystemEventSink& sink = manager;
 
 	sink.OnSystemEvent(ControllerConnectedEvent{ 5, "PadOne" });
@@ -95,7 +102,8 @@ TEST_CASE("Controller button events route by device id and update current")
 TEST_CASE("Events for unknown controllers are ignored")
 {
 	MockInputActionHandler handler;
-	DeviceManager manager(&handler);
+	EventDispatcher dispatcher;
+	DeviceManager manager(&handler, dispatcher);
 	ISystemEventSink& sink = manager;
 
 	sink.OnSystemEvent(ControllerButtonEvent{ 42, ControllerButtonCode::A, true });
@@ -109,7 +117,8 @@ TEST_CASE("Events for unknown controllers are ignored")
 TEST_CASE("Controller disconnect removes the device and clears current")
 {
 	MockInputActionHandler handler;
-	DeviceManager manager(&handler);
+	EventDispatcher dispatcher;
+	DeviceManager manager(&handler, dispatcher);
 	ISystemEventSink& sink = manager;
 
 	sink.OnSystemEvent(ControllerConnectedEvent{ 5, "Pad" });
@@ -124,11 +133,13 @@ TEST_CASE("Controller disconnect removes the device and clears current")
 TEST_CASE("Device removed hook fires with the removed id")
 {
 	MockInputActionHandler handler;
+	EventDispatcher dispatcher;
 
 	std::vector<InputDeviceID> removed;
 
 	DeviceManager manager(
 		&handler,
+		dispatcher,
 		[&](InputDeviceID deviceID)
 		{
 			removed.push_back(deviceID);
@@ -147,7 +158,8 @@ TEST_CASE("Device removed hook fires with the removed id")
 TEST_CASE("Controller lookups never alias keyboard or mouse ids")
 {
 	MockInputActionHandler handler;
-	DeviceManager manager(&handler);
+	EventDispatcher dispatcher;
+	DeviceManager manager(&handler, dispatcher);
 
 	CHECK(manager.Controller(DefaultDeviceIDs::KEYBOARD) == nullptr);
 	CHECK(manager.Controller(DefaultDeviceIDs::MOUSE) == nullptr);
@@ -157,7 +169,8 @@ TEST_CASE("Controller lookups never alias keyboard or mouse ids")
 TEST_CASE("BeginFrame reaches every device")
 {
 	MockInputActionHandler handler;
-	DeviceManager manager(&handler);
+	EventDispatcher dispatcher;
+	DeviceManager manager(&handler, dispatcher);
 	ISystemEventSink& sink = manager;
 	IInputFrameLifecycle& lifecycle = manager;
 
