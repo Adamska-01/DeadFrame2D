@@ -5,6 +5,7 @@
 #include "Engine/Events/GameObject/GameObjectCreatedEvent.h"
 #include "Engine/Events/GameObject/GameObjectDestroyedEvent.h"
 #include "Engine/Events/GameObject/GameObjectHierarchyChangeEvent.h"
+#include "Utilities/Debugging/Guards.h"
 #include <algorithm>
 #include <cassert>
 
@@ -12,26 +13,30 @@
 namespace DF2D::Engine
 {
 	using namespace DF2D::Data;
+	using namespace DF2D::Utilities;
 
 
-	Scene::Scene()
+	Scene::Scene(EventDispatcher* eventDispatcher)
+		: eventDispatcher(*Guard::AgainstNullAssignment(
+			eventDispatcher ? eventDispatcher : SceneManager::GetServiceContext().eventDispatcher,
+			NAME_OF(eventDispatcher)))
 	{
 		isRunning = false;
 
 		Exit();
 
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), this, &Scene::GameObjectDestroyedHandler);
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameObjectHierarchyChangeEvent)), this, &Scene::GameObjectHierarchyChangeHandler);
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(GameComponentAddedEvent)), this, &Scene::GameComponentAddedHandler);
+		this->eventDispatcher.RegisterEventHandler<GameObjectDestroyedEvent>(this, &Scene::GameObjectDestroyedHandler);
+		this->eventDispatcher.RegisterEventHandler<GameObjectHierarchyChangeEvent>(this, &Scene::GameObjectHierarchyChangeHandler);
+		this->eventDispatcher.RegisterEventHandler<GameComponentAddedEvent>(this, &Scene::GameComponentAddedHandler);
 	}
 
 	Scene::~Scene()
 	{
 		Exit();
 
-		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectDestroyedEvent)), this);
-		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameObjectHierarchyChangeEvent)), this);
-		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(GameComponentAddedEvent)), this);
+		eventDispatcher.DeregisterEventHandler<GameObjectDestroyedEvent>(this);
+		eventDispatcher.DeregisterEventHandler<GameObjectHierarchyChangeEvent>(this);
+		eventDispatcher.DeregisterEventHandler<GameComponentAddedEvent>(this);
 	}
 
 	uint32_t Scene::FindFreeSlot()
@@ -144,7 +149,7 @@ namespace DF2D::Engine
 
 	void Scene::SendGameObjectCreatedEvent(const ObjectHandle<GameObject>& obj)
 	{
-		EventDispatcher::SendEvent(std::make_shared<GameObjectCreatedEvent>(obj));
+		eventDispatcher.SendEvent(std::make_shared<GameObjectCreatedEvent>(obj));
 	}
 
 	void Scene::ProcessPendingDestructions()
@@ -226,9 +231,9 @@ namespace DF2D::Engine
 					continue;
 
 				obj->componentBucket->ForEach([](auto& comp)
-				{
-					comp.Init();
-				});
+					{
+						comp.Init();
+					});
 
 				initialized.push_back(obj->GetObjectHandle());
 			}
@@ -242,9 +247,9 @@ namespace DF2D::Engine
 				continue;
 
 			obj->componentBucket->ForEach([](auto& comp)
-			{
-				comp.Start();
-			});
+				{
+					comp.Start();
+				});
 		}
 	}
 
@@ -256,22 +261,21 @@ namespace DF2D::Engine
 
 		for (const auto& entryIndex : frameSnapshot)
 		{
-			auto& entry = entries[entryIndex];
-			auto* obj = entry.object.get();
+			auto* obj = entries[entryIndex].object.get();
 
 			if (obj->componentBucket == nullptr)
 				continue;
 
-			obj->componentBucket->ForEach([&entry, entryIndex, deltaTime, this](auto& comp)
-			{
-				if (!IsValid(entryIndex, entry.generation))
-					return;
+			obj->componentBucket->ForEach([entryIndex, deltaTime, this](auto& comp)
+				{
+					if (!IsValid(entryIndex, entries[entryIndex].generation))
+						return;
 
-				if (!comp.IsActive())
-					return;
+					if (!comp.IsActive())
+						return;
 
-				comp.Update(deltaTime);
-			});
+					comp.Update(deltaTime);
+				});
 		}
 	}
 
@@ -279,22 +283,21 @@ namespace DF2D::Engine
 	{
 		for (const auto& entryIndex : frameSnapshot)
 		{
-			auto& entry = entries[entryIndex];
-			auto* obj = entry.object.get();
+			auto* obj = entries[entryIndex].object.get();
 
 			if (obj->componentBucket == nullptr)
 				continue;
 
-			obj->componentBucket->ForEach([&entry, entryIndex, deltaTime, this](auto& comp)
-			{
-				if (!IsValid(entryIndex, entry.generation))
-					return;
+			obj->componentBucket->ForEach([entryIndex, deltaTime, this](auto& comp)
+				{
+					if (!IsValid(entryIndex, entries[entryIndex].generation))
+						return;
 
-				if (!comp.IsActive())
-					return;
+					if (!comp.IsActive())
+						return;
 
-				comp.LateUpdate(deltaTime);
-			});
+					comp.LateUpdate(deltaTime);
+				});
 		}
 	}
 
@@ -302,22 +305,21 @@ namespace DF2D::Engine
 	{
 		for (const auto& entryIndex : frameSnapshot)
 		{
-			auto& entry = entries[entryIndex];
-			auto* obj = entry.object.get();
+			auto* obj = entries[entryIndex].object.get();
 
 			if (obj->componentBucket == nullptr)
 				continue;
 
-			obj->componentBucket->ForEach([&entry, entryIndex, this](auto& comp)
-			{
-				if (!IsValid(entryIndex, entry.generation))
-					return;
+			obj->componentBucket->ForEach([entryIndex, this](auto& comp)
+				{
+					if (!IsValid(entryIndex, entries[entryIndex].generation))
+						return;
 
-				if (!comp.IsActive())
-					return;
+					if (!comp.IsActive())
+						return;
 
-				comp.Draw();
-			});
+					comp.Draw();
+				});
 		}
 	}
 }

@@ -12,12 +12,6 @@
 #include <vector>
 
 
-namespace DF2D::Core 
-{ 
-	class DeadFrameRuntime; 
-}
-
-
 namespace DF2D::Engine
 {
 	class Scene;
@@ -26,18 +20,34 @@ namespace DF2D::Engine
 	class DF2D_API SceneManager
 	{
 		friend class GameObject;
-		friend Core::DeadFrameRuntime;
 
 
 	private:
-		static std::shared_ptr<Scene> currentScene;
+		static SceneManager* activeInstance;
 
-		static std::function<std::shared_ptr<Scene>()> newSceneFactory;
 
-		static Data::CoreContext coreCtx;
+		std::shared_ptr<Scene> currentScene;
 
-		static Data::ServiceContext serviceCtx;
+		std::function<std::shared_ptr<Scene>()> newSceneFactory;
 
+		Data::CoreContext coreCtx;
+
+		Data::ServiceContext serviceCtx;
+
+
+		template<typename T, typename... Args>
+		static ObjectHandle<T> Instantiate(Args&&... args);
+
+		static SceneManager& Active();
+
+
+	public:
+		SceneManager();
+
+		~SceneManager();
+
+
+		void SetContexts(Data::CoreContext coreCtx, Data::ServiceContext serviceCtx);
 
 		void UpdateScene(float deltaTime) const;
 
@@ -46,19 +56,6 @@ namespace DF2D::Engine
 		void DrawScene() const;
 
 		bool LoadNewSceneIfAvailable();
-
-
-		template<typename T, typename... Args>
-		static ObjectHandle<T> Instantiate(Args&&... args);
-
-
-		void SetContexts(Data::CoreContext coreCtx, Data::ServiceContext serviceCtx);
-
-
-	public:
-		SceneManager() = default;
-
-		~SceneManager();
 
 
 		template<typename TScene, typename... Args>
@@ -74,6 +71,8 @@ namespace DF2D::Engine
 		static const Scene* GetActiveScene();
 
 		static Data::CoreContext GetCoreContext();
+
+		static Data::ServiceContext GetServiceContext();
 	};
 }
 
@@ -88,12 +87,14 @@ namespace DF2D::Engine
 	{
 		static_assert(std::is_base_of<GameObject, T>::value, "T must derive from GameObject");
 
-		if (!currentScene)
+		auto& instance = Active();
+
+		if (!instance.currentScene)
 		{
 			throw std::runtime_error("There is no active scene! Load a scene before instantiating a GameObject!");
 		}
 
-		return currentScene->template Instantiate<T>(coreCtx, serviceCtx, std::forward<Args>(args)...);
+		return instance.currentScene->template Instantiate<T>(instance.coreCtx, instance.serviceCtx, std::forward<Args>(args)...);
 	}
 
 	template<typename TScene, typename ...Args>
@@ -101,7 +102,7 @@ namespace DF2D::Engine
 	{
 		static_assert(std::is_base_of_v<Scene, TScene>, "TScene must derive from Scene");
 
-		newSceneFactory = [argsTuple = std::make_tuple(std::forward<Args>(args)...)]() mutable
+		Active().newSceneFactory = [argsTuple = std::make_tuple(std::forward<Args>(args)...)]() mutable
 			{
 				return std::apply([](auto&&... unpackedArgs)
 					{
@@ -114,16 +115,20 @@ namespace DF2D::Engine
 	template<typename T>
 	inline ComponentHandle<T> SceneManager::FindObjectOfType()
 	{
-		return currentScene
-			? currentScene->template FindObjectOfType<T>()
+		auto& instance = Active();
+
+		return instance.currentScene
+			? instance.currentScene->template FindObjectOfType<T>()
 			: ComponentHandle<T>();
 	}
 
 	template<typename T>
 	inline std::vector<ComponentHandle<T>> SceneManager::FindObjectsOfType()
 	{
-		return currentScene
-			? currentScene->template FindObjectsOfType<T>()
+		auto& instance = Active();
+
+		return instance.currentScene
+			? instance.currentScene->template FindObjectsOfType<T>()
 			: std::vector<ComponentHandle<T>>();
 	}
 }

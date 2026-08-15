@@ -4,23 +4,45 @@
 // them resolves with Scene still incomplete when SceneManager's templates need it (C2027).
 #include "Engine/ECS/System/Scene/SceneManager.h"
 #include "Engine/ECS/System/Scene/Scene.h"
+#include "Utilities/Debugging/Guards.h"
 
 
 namespace DF2D::Engine
 {
 	using namespace DF2D::Core;
 	using namespace DF2D::Data;
+	using namespace DF2D::Utilities;
 
 
-	std::shared_ptr<Scene> SceneManager::currentScene = nullptr;
-	std::function<std::shared_ptr<Scene>()> SceneManager::newSceneFactory = {};
-	Data::CoreContext SceneManager::coreCtx;
-	Data::ServiceContext SceneManager::serviceCtx;
+	SceneManager* SceneManager::activeInstance = nullptr;
 
+
+	SceneManager::SceneManager()
+		: coreCtx{},
+		serviceCtx{}
+	{
+		if (activeInstance != nullptr)
+		{
+			throw std::runtime_error("A SceneManager instance is already active - only one may exist at a time.");
+		}
+
+		activeInstance = this;
+	}
 
 	SceneManager::~SceneManager()
 	{
 		currentScene.reset();
+
+		if (activeInstance == this)
+		{
+			activeInstance = nullptr;
+		}
+	}
+
+
+	SceneManager& SceneManager::Active()
+	{
+		return *Guard::AgainstNullAssignment(activeInstance, NAME_OF(activeInstance));
 	}
 
 
@@ -81,12 +103,17 @@ namespace DF2D::Engine
 
 	const Scene* SceneManager::GetActiveScene()
 	{
-		return currentScene.get();
+		return Active().currentScene.get();
 	}
 
 
 	Data::CoreContext DF2D::Engine::SceneManager::GetCoreContext()
 	{
-		return coreCtx;
+		return Active().coreCtx;
+	}
+
+	Data::ServiceContext DF2D::Engine::SceneManager::GetServiceContext()
+	{
+		return Active().serviceCtx;
 	}
 }

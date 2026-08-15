@@ -4,20 +4,19 @@
 
 namespace DF2D::Engine
 {
-	std::unordered_map<std::type_index, EventHandler> EventDispatcher::eventHandlers;
-
-
 	void EventDispatcher::SendEvent(std::shared_ptr<DispatchableEvent> event)
 	{
 		auto type = std::type_index(typeid(*event));
-	
-		if (eventHandlers.find(type) == eventHandlers.end())
+
+		auto it = eventHandlers.find(type);
+
+		if (it == eventHandlers.end())
 		{
 			std::cout << "No handler registered for event type: " << type.name() << std::endl;
-		
+
 			return;
 		}
 
-		eventHandlers[type].Broadcast(event);
+		it->second.Broadcast(event);
 	}
 }

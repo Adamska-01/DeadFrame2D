@@ -63,8 +63,16 @@ namespace DF2D::Engine
 		return entry.alive && entry.generation == generation;
 	}
 
-	void ComponentBucket::SendGameComponentAddedEvent(ComponentHandle<GameComponent> newComponent) const
+	void ComponentBucket::SendGameComponentAddedEvent(const ObjectHandle<GameObject>& owner, ComponentHandle<GameComponent> newComponent) const
 	{
-		EventDispatcher::SendEvent(std::make_shared<GameComponentAddedEvent>(newComponent));
+		if (owner == nullptr)
+			return;
+
+		auto* dispatcher = owner->ServiceContext().eventDispatcher;
+
+		if (dispatcher == nullptr)
+			return;
+
+		dispatcher->SendEvent(std::make_shared<GameComponentAddedEvent>(newComponent));
 	}
 }

@@ -5,7 +5,7 @@
 #include "Engine/ECS/System/Events/EventDispatcher.h"
 #include "Engine/Events/Context/Renderer/RenderTargetSizeChangedEvent.h"
 #include "Utilities/Debugging/Guards.h"
-#include <typeindex>
+#include "Utilities/Helpers/Events/EventHelpers.h"
 
 
 namespace DF2D::Engine
@@ -19,19 +19,16 @@ namespace DF2D::Engine
 
 
 	Camera::Camera()
-		: normalizedViewport({ 0.0f, 0.0f, 1.0f, 1.0f }),
+		: renderer(nullptr),
+		normalizedViewport({ 0.0f, 0.0f, 1.0f, 1.0f }),
 		renderTarget(0),
 		zoom(1.0f)
 	{
 		cameras.push_back(this);
-
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), this, &Camera::RenderTargetSizeChangedEventHandler);
 	}
 
 	Camera::~Camera()
 	{
-		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), this);
-
 		if (renderTarget != 0 && renderer != nullptr)
 		{
 			renderer->DestroyTexture(renderTarget);
@@ -66,6 +63,10 @@ namespace DF2D::Engine
 		transform = Guard::AgainstNullAssignment(GetGameObject()->GetTransform(), NAME_OF(transform));
 
 		renderer = GetGameObject()->CoreContext().renderer;
+
+		auto* eventDispatcher = Guard::AgainstNullAssignment(GetGameObject()->ServiceContext().eventDispatcher, NAME_OF(eventDispatcher));
+
+		eventDispatcher->RegisterEventHandler<RenderTargetSizeChangedEvent>(GetHandle(), EventHelpers::BindFunction(this, &Camera::RenderTargetSizeChangedEventHandler));
 
 		if (renderer != nullptr)
 		{

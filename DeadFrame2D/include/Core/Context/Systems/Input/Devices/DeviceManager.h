@@ -11,6 +11,12 @@
 #include <vector>
 
 
+namespace DF2D::Engine
+{
+	class EventDispatcher;
+}
+
+
 namespace DF2D::Core
 {
 	class IInputActionHandler;
@@ -19,12 +25,13 @@ namespace DF2D::Core
 
 
 	/**
-	 * @brief Routes engine input events to devices and keeps devices keyed by
-	 * instance id. Also holds the keyboard and mouse singletons.
+	 * @brief Routes engine input events to connected devices.
 	 */
 	class DF2D_API DeviceManager : public IInputDeviceProvider, public ISystemEventSink, public IInputFrameLifecycle
 	{
 	private:
+		Engine::EventDispatcher& eventDispatcher;
+
 		std::unordered_map<Data::InputDeviceID, std::unique_ptr<InputDevice>> devices;
 
 		KeyboardInputDevice* keyboard = nullptr;
@@ -51,7 +58,7 @@ namespace DF2D::Core
 
 
 	public:
-		DeviceManager(IInputActionHandler* actionHandler, std::function<void(Data::InputDeviceID)> onDeviceRemoved = {});
+		DeviceManager(IInputActionHandler* actionHandler, Engine::EventDispatcher& eventDispatcher, std::function<void(Data::InputDeviceID)> onDeviceRemoved = {});
 
 		~DeviceManager() override;
 

@@ -109,7 +109,10 @@ namespace DF2D::Engine
 			child->Destroy();
 		}
 
-		EventDispatcher::SendEvent(std::make_shared<GameObjectDestroyedEvent>(thisGameObject));
+		if (serviceCtx.eventDispatcher)
+		{
+			serviceCtx.eventDispatcher->SendEvent(std::make_shared<GameObjectDestroyedEvent>(thisGameObject));
+		}
 
 		isDestroyed = true;
 	}
@@ -236,7 +239,9 @@ namespace DF2D::Engine
 			}
 		}
 
-		// Event
-		EventDispatcher::SendEvent(std::make_shared<GameObjectHierarchyChangeEvent>(thisGameObject, oldParent, newParent));
+		if (serviceCtx.eventDispatcher)
+		{
+			serviceCtx.eventDispatcher->SendEvent(std::make_shared<GameObjectHierarchyChangeEvent>(thisGameObject, oldParent, newParent));
+		}
 	}
 }

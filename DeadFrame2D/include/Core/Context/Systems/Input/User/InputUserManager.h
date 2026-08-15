@@ -11,11 +11,19 @@
 #include <vector>
 
 
+namespace DF2D::Engine
+{
+	class EventDispatcher;
+}
+
+
 namespace DF2D::Core
 {
 	class DF2D_API InputUserManager : public IInputUsers, public IUserDevicePairings
 	{
 	private:
+		Engine::EventDispatcher& eventDispatcher;
+
 		Data::InputUserID nextID;
 
 		std::unordered_map<Data::InputUserID, std::unique_ptr<InputUser>> users;
@@ -34,7 +42,7 @@ namespace DF2D::Core
 		 * @brief Lifecycle hooks are invoked before the matching engine events are
 		 * broadcast; they are wired once at construction (by the Input system).
 		 */
-		InputUserManager(std::function<void(Data::InputUserID)> onUserCreated = {}, std::function<void(Data::InputUserID)> onUserDestroyed = {});
+		InputUserManager(Engine::EventDispatcher& eventDispatcher, std::function<void(Data::InputUserID)> onUserCreated = {}, std::function<void(Data::InputUserID)> onUserDestroyed = {});
 
 		~InputUserManager() override;
 

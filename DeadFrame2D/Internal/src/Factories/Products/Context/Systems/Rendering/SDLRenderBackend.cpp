@@ -20,7 +20,8 @@ namespace DF2D::Internal
 	using namespace DF2D::Internal::RenderingConversions;
 
 
-	SDLRenderBackend::SDLRenderBackend(SDL_Window* window, const Models::RendererConfig& config)
+	SDLRenderBackend::SDLRenderBackend(SDL_Window* window, const Models::RendererConfig& config, EventDispatcher& eventDispatcher)
+		: eventDispatcher(eventDispatcher)
 	{
 		renderer = SDL_CreateRenderer(
 			window,
@@ -381,6 +382,6 @@ namespace DF2D::Internal
 
 		resolutionTarget = targetResolution;
 
-		EventDispatcher::SendEvent(std::make_shared<RenderTargetSizeChangedEvent>(Vector2I(width, height)));
+		eventDispatcher.SendEvent(std::make_shared<RenderTargetSizeChangedEvent>(Vector2I(width, height)));
 	}
 }

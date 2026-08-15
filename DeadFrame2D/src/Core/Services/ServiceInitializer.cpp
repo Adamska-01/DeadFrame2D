@@ -2,6 +2,7 @@
 #include "Core/Services/Messaging/SystemDialogBox.h"
 #include "Core/Services/ServiceInitializer.h"
 #include "Core/Services/Time/FrameTimer.h"
+#include "Engine/ECS/System/Events/EventDispatcher.h"
 #include "Engine/ECS/System/Scene/SceneManager.h"
 #include "Factories/Concretions/Services/Events/EventSourceFactory.h"
 #include "Factories/Concretions/Services/Messaging/DialogBackendFactory.h"
@@ -24,7 +25,8 @@ namespace DF2D::Core
 			.eventManager = new EventManager(Factories::EventSourceFactory().CreateProduct()),
 			.frameTimer = new FrameTimer(config.rendering.targetFramerate, Factories::ClockFactory().CreateProduct()),
 			.systemDialogBox = new SystemDialogBox(Factories::DialogBackendFactory().CreateProduct()),
-			.sceneManager = new SceneManager()
+			.sceneManager = new SceneManager(),
+			.eventDispatcher = new EventDispatcher()
 		};
 	}
 

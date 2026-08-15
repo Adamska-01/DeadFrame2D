@@ -6,6 +6,7 @@
 #include "Engine/ECS/System/Events/EventDispatcher.h"
 #include "Engine/Events/Context/Renderer/RenderTargetSizeChangedEvent.h"
 #include "Utilities/Debugging/Guards.h"
+#include "Utilities/Helpers/Events/EventHelpers.h"
 #include <algorithm>
 #include <limits>
 
@@ -30,8 +31,6 @@ namespace DF2D::Engine
 			std::numeric_limits<float>::infinity(),
 			std::numeric_limits<float>::infinity()
 		};
-
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), this, &CameraFollow::RenderTargetSizeChangedEventHandler);
 	}
 
 	void CameraFollow::Init()
@@ -42,11 +41,14 @@ namespace DF2D::Engine
 		{
 			resolutionTarget = renderer->GetResolutionTarget();
 		}
+
+		auto* eventDispatcher = Guard::AgainstNullAssignment(GetGameObject()->ServiceContext().eventDispatcher, NAME_OF(eventDispatcher));
+
+		eventDispatcher->RegisterEventHandler<RenderTargetSizeChangedEvent>(GetHandle(), EventHelpers::BindFunction(this, &CameraFollow::RenderTargetSizeChangedEventHandler));
 	}
 
 	CameraFollow::~CameraFollow()
 	{
-		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), this);
 	}
 
 	void CameraFollow::RenderTargetSizeChangedEventHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)

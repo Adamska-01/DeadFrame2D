@@ -13,6 +13,8 @@ namespace DF2D::Core
 
 namespace DF2D::Engine
 {
+	class EventDispatcher;
+
 	class SceneManager;
 }
 
@@ -28,5 +30,7 @@ namespace DF2D::Data
 		Core::SystemDialogBox* systemDialogBox;
 
 		Engine::SceneManager* sceneManager;
+
+		Engine::EventDispatcher* eventDispatcher;
 	};
 }

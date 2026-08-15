@@ -11,11 +11,12 @@ namespace DF2D::Core
 {
 	using namespace DF2D::Constants;
 	using namespace DF2D::Data;
+	using namespace DF2D::Engine;
 	using namespace DF2D::Models;
 	using namespace DF2D::Utilities;
 
 
-	Input::Input()
+	Input::Input(EventDispatcher& eventDispatcher)
 	{
 		if (!JsonSerializer::IsSerializable<InputActionMapBucket>())
 			throw std::runtime_error("[Input] InputActionMapBucket is not serializable. Cannot load input configuration...");
@@ -26,6 +27,7 @@ namespace DF2D::Core
 		// Per-user action tables are managed through direct calls, not the event bus,
 		// so their lifetime is ordered before any InputUserCreated/Destroyed broadcast.
 		userManager = std::make_unique<InputUserManager>(
+			eventDispatcher,
 			[this](InputUserID userID)
 			{
 				actionResolver->AddUser(userID);
@@ -40,6 +42,7 @@ namespace DF2D::Core
 		// Same for device pairings: unpaired before the DeviceRemovedEvent broadcast.
 		deviceManager = std::make_unique<DeviceManager>(
 			actionResolver.get(),
+			eventDispatcher,
 			[this](InputDeviceID deviceID)
 			{
 				userManager->UnpairDevice(userManager->GetUserFromPairedDevice(deviceID), deviceID);

@@ -8,10 +8,12 @@
 #include "Core/Context/Systems/Rendering/Renderer.h"
 #include "Core/Context/Systems/UI/UIManager.h"
 #include "Core/Context/Systems/Window/Window.h"
+#include "Engine/ECS/System/Events/EventDispatcher.h"
 #include "Factories/Concretions/Context/Systems/Audio/AudioBackendFactory.h"
 #include "Factories/Concretions/Context/Systems/Graphics/GraphicsBackendFactory.h"
 #include "Factories/Concretions/Context/Systems/Physics/PhysicsBackendFactory.h"
 #include "Helpers/Context/CoreContextIterator.h"
+#include "Utilities/Debugging/Guards.h"
 #include "Utilities/IO/Serialization/JsonSerializer.h"
 
 
@@ -27,14 +29,16 @@ namespace DF2D::Core
 
 	SystemInitializer::SystemInitializer(SystemConfig config, ServiceContext serviceCtx)
 	{
-		auto graphicsBackends = GraphicsBackendFactory().CreateProduct(config.window, config.rendering);
+		auto& eventDispatcher = *Guard::AgainstNullAssignment(serviceCtx.eventDispatcher, NAME_OF(serviceCtx.eventDispatcher));
+
+		auto graphicsBackends = GraphicsBackendFactory().CreateProduct(config.window, config.rendering, eventDispatcher);
 
 		ctx = CoreContext
 		{
 			.audioManager = new AudioManager(config.audio, AudioBackendFactory().CreateProduct(config.audio)),
 			.coroutineScheduler = new CoroutineScheduler(serviceCtx.frameTimer),
 			.textureManager = new TextureManager(std::move(graphicsBackends.textureBackend)),
-			.input = new Input(),
+			.input = new Input(eventDispatcher),
 			.physicsEngine = new PhysicsEngine2D(
 				config.physics,
 				JsonSerializer::DeserializeFromFile<CollisionMasks>(Paths::Files::COLLISION_MASKS),

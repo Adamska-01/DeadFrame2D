@@ -16,6 +16,7 @@ namespace DF2D::Engine
 	class GameObject;
 	class ComponentBucket;
 	class DispatchableEvent;
+	class EventDispatcher;
 	class GameComponent;
 
 
@@ -26,6 +27,8 @@ namespace DF2D::Engine
 
 	private:
 		bool isRunning;
+
+		EventDispatcher& eventDispatcher;
 
 		std::vector<uint32_t> gameObjectsToInitialize;
 
@@ -48,9 +51,6 @@ namespace DF2D::Engine
 		bool IsValid(uint32_t index, uint32_t generation) const override;
 
 
-		template<typename T, typename... Args>
-		ObjectHandle<T> Instantiate(Data::CoreContext coreCtx, Data::ServiceContext serviceCtx, Args&&... args);
-
 		template<typename Fn>
 		void TraverseRoots(bool includeInactive, Fn&& fn);
 
@@ -71,8 +71,15 @@ namespace DF2D::Engine
 		void Exit();
 
 
+	protected:
+		template<typename T, typename... Args>
+		ObjectHandle<T> Instantiate(Data::CoreContext coreCtx, Data::ServiceContext serviceCtx, Args&&... args);
+
+
 	public:
-		Scene();
+		// eventDispatcher: nullptr in production (resolved from SceneManager::GetServiceContext()).
+		// Tests pass an explicit instance to isolate a Scene from SceneManager's shared state entirely.
+		explicit Scene(EventDispatcher* eventDispatcher = nullptr);
 
 		virtual ~Scene();
 
@@ -131,6 +138,10 @@ namespace DF2D::Engine
 		entry.object = std::unique_ptr<GameObject>(static_cast<GameObject*>(static_cast<T*>(storage)));
 
 		auto handle = ObjectHandle<T>(shared_from_this(), index, entry.generation);
+
+		// Every object spawned by this Scene carries the SAME dispatcher this Scene
+		// registered its handlers against, regardless of where it was resolved from.
+		serviceCtx.eventDispatcher = &eventDispatcher;
 
 		GameObjectConstructionContext constructionContext(handle, coreCtx, serviceCtx);
 
@@ -239,7 +250,7 @@ namespace DF2D::Engine
 
 		std::vector<ComponentHandle<T>> results;
 
-		TraverseScene(includeInactive, [&](uint32_t, GameObject& obj)
+		TraverseRoots(includeInactive, [&](uint32_t, GameObject& obj)
 		{
 			auto component = obj.GetComponent<T>();
 

@@ -5,6 +5,7 @@
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Engine/ECS/System/Events/EventDispatcher.h"
 #include "Engine/Events/Context/Renderer/RenderTargetSizeChangedEvent.h"
+#include "Utilities/Debugging/Guards.h"
 #include "Utilities/Helpers/Events/EventHelpers.h"
 
 
@@ -19,13 +20,10 @@ namespace DF2D::Engine
 		: SpriteRenderer(textureSource), scrollDirection(scrollDirection), scrollSpeed(scrollSpeed)
 	{
 		scrollOffset = 0;
-
-		EventDispatcher::RegisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), this, &ImageScroller::RenderTargetSizeChangedHandler);
 	}
 
 	ImageScroller::~ImageScroller()
 	{
-		EventDispatcher::DeregisterEventHandler(std::type_index(typeid(RenderTargetSizeChangedEvent)), this);
 	}
 
 	void ImageScroller::Init()
@@ -36,6 +34,10 @@ namespace DF2D::Engine
 		{
 			renderTargetSize = renderer->GetResolutionTarget();
 		}
+
+		auto* eventDispatcher = Guard::AgainstNullAssignment(GetGameObject()->ServiceContext().eventDispatcher, NAME_OF(eventDispatcher));
+
+		eventDispatcher->RegisterEventHandler<RenderTargetSizeChangedEvent>(GetHandle(), EventHelpers::BindFunction(this, &ImageScroller::RenderTargetSizeChangedHandler));
 	}
 
 	void ImageScroller::RenderTargetSizeChangedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)

@@ -41,7 +41,7 @@ namespace DF2D::Engine
 
 		DF2D_API bool IsValid(uint32_t index, uint32_t generation) const;
 
-		DF2D_API void SendGameComponentAddedEvent(ComponentHandle<GameComponent> newComponent) const;
+		DF2D_API void SendGameComponentAddedEvent(const ObjectHandle<GameObject>& owner, ComponentHandle<GameComponent> newComponent) const;
 
 
 		template<typename F> // Forward rvalue or lvalue without allocation
@@ -144,7 +144,7 @@ namespace DF2D::Engine
 			LinkComponentToOwner(owner, entry.instance.get());
 		}
 
-		SendGameComponentAddedEvent(ComponentHandle<GameComponent>::From(handle));
+		SendGameComponentAddedEvent(owner, ComponentHandle<GameComponent>::From(handle));
 
 		return handle;
 	}

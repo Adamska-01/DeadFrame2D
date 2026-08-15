@@ -10,11 +10,19 @@ struct SDL_Renderer;
 struct SDL_Window;
 
 
+namespace DF2D::Engine
+{
+	class EventDispatcher;
+}
+
+
 namespace DF2D::Internal
 {
 	class DF2D_API SDLRenderBackend : public Core::IRenderBackend
 	{
 	private:
+		Engine::EventDispatcher& eventDispatcher;
+
 		SDL_Renderer* renderer = nullptr;
 
 		TextureRegistry textureRegistry;
@@ -23,7 +31,7 @@ namespace DF2D::Internal
 
 
 	public:
-		SDLRenderBackend(SDL_Window* window, const Models::RendererConfig& config);
+		SDLRenderBackend(SDL_Window* window, const Models::RendererConfig& config, Engine::EventDispatcher& eventDispatcher);
 
 		~SDLRenderBackend() override;
 

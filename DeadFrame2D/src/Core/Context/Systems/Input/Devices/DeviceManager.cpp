@@ -20,8 +20,9 @@ namespace DF2D::Core
 	using namespace DF2D::Utilities;
 
 
-	DeviceManager::DeviceManager(IInputActionHandler* actionHandler, std::function<void(InputDeviceID)> onDeviceRemoved)
-		: onDeviceRemoved(std::move(onDeviceRemoved))
+	DeviceManager::DeviceManager(IInputActionHandler* actionHandler, EventDispatcher& eventDispatcher, std::function<void(InputDeviceID)> onDeviceRemoved)
+		: eventDispatcher(eventDispatcher),
+		onDeviceRemoved(std::move(onDeviceRemoved))
 	{
 		this->actionHandler = Guard::AgainstNullAssignment(actionHandler, NAME_OF(actionHandler));
 
@@ -94,7 +95,7 @@ namespace DF2D::Core
 
 		std::cout << "[Input] Device added: " << devicePtr->Name() << " (ID: " << devicePtr->ID() << ")" << std::endl;
 
-		EventDispatcher::SendEvent(std::make_shared<DeviceAddedEvent>(devicePtr->ID(), devicePtr->Name()));
+		eventDispatcher.SendEvent(std::make_shared<DeviceAddedEvent>(devicePtr->ID(), devicePtr->Name()));
 	}
 
 	void DeviceManager::RemoveController(InputDeviceID instanceID)
@@ -118,7 +119,7 @@ namespace DF2D::Core
 
 		std::cout << "[Input] Device removed: " << removedDevice->Name() << " (ID: " << removedDevice->ID() << ")" << std::endl;
 
-		EventDispatcher::SendEvent(std::make_shared<DeviceRemovedEvent>(removedDevice->ID(), removedDevice->Name()));
+		eventDispatcher.SendEvent(std::make_shared<DeviceRemovedEvent>(removedDevice->ID(), removedDevice->Name()));
 
 		devices.erase(it);
 	}

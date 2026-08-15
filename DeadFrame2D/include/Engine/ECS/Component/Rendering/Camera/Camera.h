@@ -34,7 +34,7 @@ namespace DF2D::Engine
 
 		ComponentHandle<Transform> transform;
 
-		Core::Renderer* renderer = nullptr;
+		Core::Renderer* renderer;
 
 		Core::Vector2I resolutionTarget;
 

@@ -15,8 +15,9 @@ namespace DF2D::Core
 	using namespace DF2D::Engine;
 
 
-	InputUserManager::InputUserManager(std::function<void(InputUserID)> onUserCreated, std::function<void(InputUserID)> onUserDestroyed)
-		: nextID(0),
+	InputUserManager::InputUserManager(EventDispatcher& eventDispatcher, std::function<void(InputUserID)> onUserCreated, std::function<void(InputUserID)> onUserDestroyed)
+		: eventDispatcher(eventDispatcher),
+		nextID(0),
 		onUserCreated(std::move(onUserCreated)),
 		onUserDestroyed(std::move(onUserDestroyed))
 	{
@@ -53,7 +54,7 @@ namespace DF2D::Core
 
 		std::cout << "[Input] User created: " << userPtr->Name() << " (ID: " << userPtr->ID() << ")" << std::endl;
 
-		EventDispatcher::SendEvent(std::make_shared<InputUserCreatedEvent>(userPtr->ID(), userPtr->Name()));
+		eventDispatcher.SendEvent(std::make_shared<InputUserCreatedEvent>(userPtr->ID(), userPtr->Name()));
 
 		return userPtr;
 	}
@@ -105,7 +106,7 @@ namespace DF2D::Core
 
 		std::cout << "[Input] User destroyed: " << userToDestroyPtr->Name() << " (ID: " << userToDestroyPtr->ID() << ")" << std::endl;
 
-		EventDispatcher::SendEvent(std::make_shared<InputUserDestroyedEvent>(userToDestroyPtr->ID(), userToDestroyPtr->Name()));
+		eventDispatcher.SendEvent(std::make_shared<InputUserDestroyedEvent>(userToDestroyPtr->ID(), userToDestroyPtr->Name()));
 
 		users.erase(it);
 	}

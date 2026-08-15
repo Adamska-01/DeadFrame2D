@@ -5,6 +5,12 @@
 #include <memory>
 
 
+namespace DF2D::Engine
+{
+	class EventDispatcher;
+}
+
+
 namespace DF2D::Core
 {
 	class IInputActions;
@@ -28,7 +34,7 @@ namespace DF2D::Core
 		std::unique_ptr<InputUserManager> userManager;
 
 
-		Input();
+		explicit Input(Engine::EventDispatcher& eventDispatcher);
 
 		Input(const Input&) = delete;
 
