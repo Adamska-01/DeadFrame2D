@@ -10,9 +10,6 @@ namespace DF2D::Data
 		/** @brief Current frame index (can be fractional for smooth interpolation). */
 		float currentFrame = 0.0f;
 
-		/** @brief Indicates whether the animation has started playing. */
-		bool started = false;
-
 		/** @brief Optional flip state. */
 		RenderFlip flipState = RenderFlip::NONE;
 	};

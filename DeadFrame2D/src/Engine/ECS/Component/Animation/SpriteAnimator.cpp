@@ -33,13 +33,14 @@ namespace DF2D::Engine
 
 		transform = Guard::AgainstNullAssignment(gameObject->GetTransform(), NAME_OF(transform));
 		sprite = Guard::AgainstNullAssignment(gameObject->GetComponent<SpriteRenderer>(), NAME_OF(sprite));
-
-		if (sprite == nullptr)
-			return;
-
-		textureManager = gameObject->CoreContext().textureManager;
+		textureManager = Guard::AgainstNullAssignment(gameObject->CoreContext().textureManager, NAME_OF(textureManager));
 
 		sprite->SetActive(false);
+
+		if (!animations.empty())
+		{
+			sprite->LoadSprite(animations.at(currentAnimationID).spriteSource);
+		}
 	}
 
 	void SpriteAnimator::Update(float dt)
@@ -55,20 +56,9 @@ namespace DF2D::Engine
 
 		if (animState.currentFrame >= props.columnCount)
 		{
-			if (props.loop)
-			{
-				animState.currentFrame = 0;
-			}
-			else
-			{
-				animState.currentFrame = static_cast<float>(props.columnCount - 1);
-				animState.started = false;
-			}
-		}
-		else if (!props.loop && !animState.started)
-		{
-			animState.currentFrame = 0;
-			animState.started = true;
+			animState.currentFrame = props.loop 
+				? 0.0f
+				: static_cast<float>(props.columnCount - 1);
 		}
 	}
 
@@ -120,6 +110,12 @@ namespace DF2D::Engine
 		if (properties.name.empty())
 			return;
 
+		if (properties.columnCount <= 0 || properties.rowCount <= 0)
+			return;
+
+		if (properties.sourceRowNumber < 0 || properties.sourceRowNumber >= properties.rowCount)
+			return;
+
 		animations[properties.name] = properties;
 
 		if (animations.size() == 1)
@@ -127,6 +123,11 @@ namespace DF2D::Engine
 			currentAnimationID = properties.name;
 
 			animState = SpriteAnimationState();
+
+			if (sprite != nullptr)
+			{
+				sprite->LoadSprite(properties.spriteSource);
+			}
 		}
 	}
 
