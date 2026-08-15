@@ -29,12 +29,16 @@ private:
 
 	std::vector<Entry> entries;
 
+	DF2D::Data::CoreContext defaultCoreContext{};
+
 
 public:
 	template<typename T, typename... Args>
 	DF2D::Engine::ObjectHandle<T> Create(Args&&... args);
 
 	void Destroy(uint32_t index);
+
+	void SetCoreContext(DF2D::Data::CoreContext coreCtx);
 
 
 	DF2D::Engine::GameObject* GetAt(uint32_t index) const override;
@@ -59,7 +63,7 @@ inline DF2D::Engine::ObjectHandle<T> FakeSceneHandleProvider::Create(Args&&... a
 
 	auto handle = DF2D::Engine::ObjectHandle<T>(weak_from_this(), index, entry.generation);
 
-	DF2D::Engine::GameObjectConstructionContext constructionContext(handle, DF2D::Data::CoreContext{}, DF2D::Data::ServiceContext{});
+	DF2D::Engine::GameObjectConstructionContext constructionContext(handle, defaultCoreContext, DF2D::Data::ServiceContext{});
 
 	try
 	{
@@ -93,6 +97,11 @@ inline bool FakeSceneHandleProvider::IsValid(uint32_t index, uint32_t generation
 	const auto& entry = entries[index];
 
 	return entry.alive && entry.generation == generation;
+}
+
+inline void FakeSceneHandleProvider::SetCoreContext(DF2D::Data::CoreContext coreCtx)
+{
+	defaultCoreContext = coreCtx;
 }
 
 inline void FakeSceneHandleProvider::Destroy(uint32_t index)
