@@ -128,6 +128,14 @@ namespace DF2D::Core
 		return backend->IsMusicPlaying();
 	}
 
+	bool AudioManager::IsChannelPlaying(int channel)
+	{
+		if (channel == -1)
+			return false;
+
+		return backend->IsChannelPlaying(channel);
+	}
+
 	void AudioManager::SetMasterVolume(float v)
 	{
 		audioConfig.masterVolume = std::clamp(v, 0.0f, 1.0f);

@@ -62,6 +62,8 @@ namespace DF2D::Core
 
 		bool IsMusicPlaying();
 
+		bool IsChannelPlaying(int channel);
+
 
 		void SetMasterVolume(float v);
 
