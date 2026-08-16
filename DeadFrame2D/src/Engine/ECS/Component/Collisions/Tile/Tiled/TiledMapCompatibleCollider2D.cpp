@@ -32,16 +32,21 @@ namespace DF2D::Engine
 
 	void TiledMapCompatibleCollider2D::DeleteFixtures()
 	{
-		if (fixtures.size() <= 0 || rigidBody == nullptr)
+		if (fixtures.empty())
 			return;
 
-		for (auto fixture : fixtures)
+		if (rigidBody != nullptr)
 		{
-			if (fixture == 0)
-				continue;
+			for (auto fixture : fixtures)
+			{
+				if (fixture == 0)
+					continue;
 
-			rigidBody->DestroyFixture(fixture);
+				rigidBody->DestroyFixture(fixture);
+			}
 		}
+
+		fixtures.clear();
 	}
 
 	void TiledMapCompatibleCollider2D::RebuildFixture()
@@ -52,8 +57,6 @@ namespace DF2D::Engine
 
 		if (rigidBody == nullptr)
 			return;
-
-		fixtures.clear();
 
 		auto angle = transform->GetWorldRotation() * (MathConstants::PI_f / 180.0f);
 
