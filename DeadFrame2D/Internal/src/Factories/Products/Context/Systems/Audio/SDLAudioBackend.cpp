@@ -140,4 +140,9 @@ namespace DF2D::Internal
 	{
 		return Mix_PlayingMusic();
 	}
+
+	bool SDLAudioBackend::IsChannelPlaying(int channel)
+	{
+		return Mix_Playing(channel) != 0;
+	}
 }

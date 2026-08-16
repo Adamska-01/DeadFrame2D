@@ -50,5 +50,7 @@ namespace DF2D::Internal
 		void SetChannelVolume(int channel, float volume) override;
 
 		bool IsMusicPlaying() override;
+
+		bool IsChannelPlaying(int channel) override;
 	};
 }
