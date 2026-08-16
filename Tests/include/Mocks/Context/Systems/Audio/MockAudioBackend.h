@@ -45,6 +45,10 @@ struct MockAudioBackend : DF2D::Core::IAudioBackend
 
 	bool isMusicPlayingResult{false};
 
+	bool isChannelPlayingResult{true};
+
+	int lastQueriedChannel{-2};
+
 
 	DF2D::Data::AudioResourceID LoadMusic(const std::string&) override
 	{
@@ -123,5 +127,12 @@ struct MockAudioBackend : DF2D::Core::IAudioBackend
 	bool IsMusicPlaying() override
 	{
 		return isMusicPlayingResult;
+	}
+
+	bool IsChannelPlaying(int channel) override
+	{
+		lastQueriedChannel = channel;
+
+		return isChannelPlayingResult;
 	}
 };
