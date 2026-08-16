@@ -271,30 +271,41 @@ TEST_CASE("Exiting contact with a non-tracked listener leaves attenuation active
 {
 	AudioFixture fixture;
 
+	// InvokeCollisionEnter/Exit are physics-only (protected + friend PhysicsEngine2D),
+	// so contacts are driven through the real dispatch path via the contact sink,
+	// exactly as PhysicsEngine2D itself would on a real Box2D contact.
 	auto owner = fixture.scene->Create<TestGameObject>();
 	auto source = owner->AddComponent<AudioSource>("jump.wav", /*isMusic*/ false, 1.0f);
 	source->Init();
+	source->Update(0.016f); // builds the source's sensor fixture
+
+	auto sourceFixture = fixture.physicsBackend->createdFixtures.back();
 
 	auto listenerAOwner = fixture.scene->Create<TestGameObject>();
 	auto listenerA = listenerAOwner->AddComponent<AudioListener>();
 	listenerA->Init();
+	listenerA->Update(0.016f);
+
+	auto listenerAFixture = fixture.physicsBackend->createdFixtures.back();
 
 	auto listenerBOwner = fixture.scene->Create<TestGameObject>();
 	auto listenerB = listenerBOwner->AddComponent<AudioListener>();
 	listenerB->Init();
+	listenerB->Update(0.016f);
+
+	auto listenerBFixture = fixture.physicsBackend->createdFixtures.back();
 
 	source->Play();
 
-	auto enterA = CollisionInfo{ .otherGameObject = listenerAOwner };
-	source->InvokeCollisionEnter(enterA);
+	auto zero = Vector2F(0.0f, 0.0f);
+
+	fixture.physicsBackend->sink->OnContactBegin(sourceFixture, listenerAFixture, zero, zero);
 
 	// B enters after A; B becomes the tracked listener
-	auto enterB = CollisionInfo{ .otherGameObject = listenerBOwner };
-	source->InvokeCollisionEnter(enterB);
+	fixture.physicsBackend->sink->OnContactBegin(sourceFixture, listenerBFixture, zero, zero);
 
 	// A leaves contact even though B (the tracked listener) is still in range
-	auto exitA = CollisionInfo{ .otherGameObject = listenerAOwner };
-	source->InvokeCollisionExit(exitA);
+	fixture.physicsBackend->sink->OnContactEnd(sourceFixture, listenerAFixture);
 
 	fixture.audioBackend->lastSFXVolume = -1.0f; // sentinel
 
@@ -304,8 +315,7 @@ TEST_CASE("Exiting contact with a non-tracked listener leaves attenuation active
 	CHECK(fixture.audioBackend->lastSFXVolume != doctest::Approx(-1.0f));
 
 	// B (the actually tracked listener) now leaves contact
-	auto exitB = CollisionInfo{ .otherGameObject = listenerBOwner };
-	source->InvokeCollisionExit(exitB);
+	fixture.physicsBackend->sink->OnContactEnd(sourceFixture, listenerBFixture);
 
 	fixture.audioBackend->lastSFXVolume = -1.0f;
 
