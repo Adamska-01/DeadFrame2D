@@ -40,6 +40,8 @@ namespace DF2D::Engine
 
 		Data::AudioResourceID musicTrack;
 
+		std::string pendingAudioSourcePath;
+
 		// Using the physics engine to detect audio source collisions with audio listeners
 		Data::BodyID collisionBody;
 
@@ -102,5 +104,7 @@ namespace DF2D::Engine
 		void SetMinDistance(float newMinDistance);
 
 		float GetVolume() const;
+
+		bool IsPlaying() const;
 	};
 }
