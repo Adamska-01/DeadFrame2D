@@ -50,12 +50,12 @@ namespace DF2D::Engine
 
 	void ContactEventProvider::DeregisterContactExitHandler(const ObjectHandleBase& listener)
 	{
-		onContactEnter.RemoveByListener(&listener);
+		onContactExit.RemoveByListener(&listener);
 	}
 
 	void ContactEventProvider::DeregisterContactExitHandler(const ComponentHandleBase& listener)
 	{
-		onContactEnter.RemoveByListener(&listener);
+		onContactExit.RemoveByListener(&listener);
 	}
 
 	void ContactEventProvider::InvokeCollisionEnter(const CollisionInfo& info)
