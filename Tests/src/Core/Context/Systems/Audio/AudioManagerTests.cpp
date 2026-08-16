@@ -417,6 +417,34 @@ TEST_CASE("IsMusicPlaying reflects play/stop/pause/resume state")
 }
 
 
+TEST_CASE("IsChannelPlaying delegates to the backend")
+{
+	AudioConfig config;
+	MockAudioBackend* mock = nullptr;
+	auto manager = MakeManager(config, mock);
+
+	mock->isChannelPlayingResult = true;
+	CHECK(manager->IsChannelPlaying(3) == true);
+	CHECK(mock->lastQueriedChannel == 3);
+
+	mock->isChannelPlayingResult = false;
+	CHECK(manager->IsChannelPlaying(3) == false);
+}
+
+TEST_CASE("IsChannelPlaying treats channel -1 as never playing without touching the backend")
+{
+	AudioConfig config;
+	MockAudioBackend* mock = nullptr;
+	auto manager = MakeManager(config, mock);
+
+	mock->isChannelPlayingResult = true;
+	mock->lastQueriedChannel = -2; // sentinel
+
+	CHECK(manager->IsChannelPlaying(-1) == false);
+	CHECK(mock->lastQueriedChannel == -2);
+}
+
+
 TEST_CASE("ICoreSystem lifecycle methods are safe no-ops")
 {
 	AudioConfig config;
