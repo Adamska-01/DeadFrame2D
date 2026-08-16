@@ -134,7 +134,7 @@ TEST_CASE("IsPlaying reflects channel state, and LateUpdate clears a channel onc
 	CHECK_FALSE(source->IsPlaying());
 }
 
-TEST_CASE("Stop does not halt a channel that already finished naturally (regression: stale channel numbers must not be reused)")
+TEST_CASE("Stop does not halt a channel that already finished naturally")
 {
 	AudioFixture fixture;
 	auto owner = fixture.scene->Create<TestGameObject>();
@@ -234,7 +234,7 @@ TEST_CASE("SetMaxDistance rebuilds the fixture with the new radius")
 	CHECK(circle->radius == doctest::Approx(200.0f));
 }
 
-TEST_CASE("SetMinDistance does not rebuild the fixture (regression: min distance is not fixture geometry)")
+TEST_CASE("SetMinDistance does not rebuild the fixture")
 {
 	AudioFixture fixture;
 	auto owner = fixture.scene->Create<TestGameObject>();
@@ -267,7 +267,7 @@ TEST_CASE("LateUpdate moves the body and wakes it when the transform changes")
 	CHECK(fixture.physicsBackend->lastBodyAwake == true);
 }
 
-TEST_CASE("Exiting contact with a non-tracked listener leaves attenuation active (regression for the fixed multi-listener bug)")
+TEST_CASE("Exiting contact with a non-tracked listener leaves attenuation active")
 {
 	AudioFixture fixture;
 
