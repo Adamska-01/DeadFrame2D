@@ -20,6 +20,6 @@ namespace DF2D::Engine
 		{
 		}
 
-		virtual ~TileCollider2D() = default;
+		virtual ~TileCollider2D() override = default;
 	};
 }
