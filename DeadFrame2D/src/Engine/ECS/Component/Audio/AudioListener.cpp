@@ -38,7 +38,7 @@ namespace DF2D::Engine
 		{
 			auto bodyDef = BodyDefinition2D
 			{
-				.type = BodyType2D::Dynamic,
+				.type = BodyType2D::Kinematic,
 				.gravityScale = 0.0f
 			};
 
