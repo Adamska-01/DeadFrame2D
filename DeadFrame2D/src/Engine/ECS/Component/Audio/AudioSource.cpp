@@ -31,7 +31,8 @@ namespace DF2D::Engine
 		loops(0),
 		playingChannel(-1),
 		lastTransformPosition(Vector2F::Zero),
-		lastTransformRotation(0.0f)
+		lastTransformRotation(0.0f),
+		pendingAudioSourcePath()
 	{
 	}
 
@@ -41,7 +42,7 @@ namespace DF2D::Engine
 		this->isMusic = isMusic;
 		this->volume = std::clamp(volume, 0.0f, 1.0f);
 
-		LoadAudio(audioSource, isMusic);
+		pendingAudioSourcePath = audioSource;
 	}
 
 	AudioSource::~AudioSource()
@@ -84,7 +85,10 @@ namespace DF2D::Engine
 		if (audioListener == nullptr)
 			return;
 
-		audioListenerInContact = nullptr;
+		if (audioListenerInContact == audioListener)
+		{
+			audioListenerInContact = nullptr;
+		}
 	}
 
 	void AudioSource::RebuildFixture()
@@ -142,6 +146,13 @@ namespace DF2D::Engine
 		audioManager = Guard::AgainstNullAssignment(GetGameObject()->CoreContext().audioManager, NAME_OF(audioManager));
 		physicsEngine = Guard::AgainstNullAssignment(GetGameObject()->CoreContext().physicsEngine, NAME_OF(physicsEngine));
 
+		if (!pendingAudioSourcePath.empty())
+		{
+			LoadAudio(pendingAudioSourcePath, isMusic);
+
+			pendingAudioSourcePath.clear();
+		}
+
 		isDirty = true;
 	}
 
@@ -155,8 +166,6 @@ namespace DF2D::Engine
 
 	void AudioSource::LateUpdate(float deltaTime)
 	{
-		auto safeDelta = std::max(deltaTime, std::numeric_limits<float>::epsilon());
-
 		auto currentTransformPosition = transform->GetWorldPosition();
 		auto currentTransformRotation = transform->GetWorldRotation();
 
@@ -168,10 +177,16 @@ namespace DF2D::Engine
 			physicsEngine->SetBodyAwake(collisionBody, true);
 		}
 
+		// A finished one-shot no longer owns its channel number.
+		if (!isMusic && playingChannel != -1 && !audioManager->IsChannelPlaying(playingChannel))
+		{
+			playingChannel = -1;
+		}
+
 		if (playingChannel == -1)
 			return;
 
-		// Audio attenuation logic 
+		// Audio attenuation logic
 		if (audioListenerInContact == nullptr || sfxClip == 0)
 			return;
 
@@ -254,6 +269,8 @@ namespace DF2D::Engine
 		else if (playingChannel != -1)
 		{
 			audioManager->StopChannel(playingChannel);
+
+			playingChannel = -1;
 		}
 	}
 
@@ -281,12 +298,18 @@ namespace DF2D::Engine
 	void AudioSource::SetMinDistance(float newMinDistance)
 	{
 		minReachingDistance = newMinDistance;
-	
-		isDirty = true;
 	}
 
 	float AudioSource::GetVolume() const
 	{
 		return volume;
+	}
+
+	bool AudioSource::IsPlaying() const
+	{
+		if (isMusic)
+			return audioManager->IsMusicPlaying();
+
+		return playingChannel != -1;
 	}
 }
