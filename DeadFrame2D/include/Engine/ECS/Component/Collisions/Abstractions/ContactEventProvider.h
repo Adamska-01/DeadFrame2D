@@ -6,17 +6,30 @@
 #include <functional>
 
 
+namespace DF2D::Core
+{
+	class PhysicsEngine2D;
+}
+
+
 namespace DF2D::Engine
 {
 	class DF2D_API ContactEventProvider : public GameComponent
 	{
 		TYPE_INFO(ContactEventProvider, GameComponent);
 
+		friend class Core::PhysicsEngine2D;
+
 
 	protected:
 		Utilities::MulticastDelegate<const Data::CollisionInfo&> onContactEnter;
 
 		Utilities::MulticastDelegate<const Data::CollisionInfo&> onContactExit;
+
+
+		virtual void InvokeCollisionEnter(const Data::CollisionInfo& info);
+
+		virtual void InvokeCollisionExit(const Data::CollisionInfo& info);
 
 
 	public:
@@ -36,10 +49,5 @@ namespace DF2D::Engine
 
 		void DeregisterContactExitHandler(const ObjectHandleBase& listener);
 		void DeregisterContactExitHandler(const ComponentHandleBase& listener);
-
-
-		virtual void InvokeCollisionEnter(const Data::CollisionInfo& info);
-
-		virtual void InvokeCollisionExit(const Data::CollisionInfo& info);
 	};
 }
