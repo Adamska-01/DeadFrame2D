@@ -24,7 +24,7 @@ namespace DF2D::Engine
 
 	Collider2D::~Collider2D()
 	{
-		if (fixture <= 0 || rigidBody == nullptr)
+		if (fixture == 0 || rigidBody == nullptr)
 			return;
 
 		rigidBody->DestroyFixture(fixture);
@@ -32,9 +32,12 @@ namespace DF2D::Engine
 
 	void Collider2D::RebuildFixture()
 	{
-		if (fixture > 0 && rigidBody != nullptr)
+		if (fixture != 0)
 		{
-			rigidBody->DestroyFixture(fixture);
+			if (rigidBody != nullptr)
+			{
+				rigidBody->DestroyFixture(fixture);
+			}
 
 			fixture = 0;
 		}
@@ -91,7 +94,7 @@ namespace DF2D::Engine
 		return transform;
 	}
 
-	const PhysicsMaterial& Collider2D::GetPhysicsMaterial()
+	const PhysicsMaterial& Collider2D::GetPhysicsMaterial() const
 	{
 		return physicsMaterial;
 	}

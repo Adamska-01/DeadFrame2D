@@ -51,6 +51,6 @@ namespace DF2D::Engine
 
 		ComponentHandle<Transform> GetTranform() const;
 
-		const Data::PhysicsMaterial& GetPhysicsMaterial();
+		const Data::PhysicsMaterial& GetPhysicsMaterial() const;
 	};
 }
