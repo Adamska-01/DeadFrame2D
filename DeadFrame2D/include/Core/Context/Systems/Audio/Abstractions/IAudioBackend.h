@@ -39,5 +39,7 @@ namespace DF2D::Core
 		virtual void SetChannelVolume(int channel, float volume) = 0;
 
 		virtual bool IsMusicPlaying() = 0;
+
+		virtual bool IsChannelPlaying(int channel) = 0;
 	};
 }
