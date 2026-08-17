@@ -28,6 +28,8 @@ namespace DF2D::Engine
 
 	void ImageScroller::Init()
 	{
+		SpriteRenderer::Init();
+
 		auto renderer = GetGameObject()->CoreContext().renderer;
 
 		if (renderer != nullptr)
@@ -59,26 +61,32 @@ namespace DF2D::Engine
 		auto scaledTileWidth = static_cast<int>(spriteSize.x * scale.x);
 		auto scaledTileHeight = static_cast<int>(spriteSize.y * scale.y);
 
-		scrollOffset += scrollSpeed * deltaTime;
-
 		if (scrollDirection == ScrollDirection::HORIZONTAL)
 		{
-			if (scrollOffset >= scaledTileWidth)
+			if (scaledTileWidth <= 0)
+				return;
+
+			while (scrollOffset >= scaledTileWidth)
 			{
 				scrollOffset -= scaledTileWidth;
 			}
-			else if (scrollOffset < 0)
+
+			while (scrollOffset < 0)
 			{
 				scrollOffset += scaledTileWidth;
 			}
 		}
 		else
 		{
-			if (scrollOffset >= scaledTileHeight)
+			if (scaledTileHeight <= 0)
+				return;
+
+			while (scrollOffset >= scaledTileHeight)
 			{
 				scrollOffset -= scaledTileHeight;
 			}
-			else if (scrollOffset < 0)
+
+			while (scrollOffset < 0)
 			{
 				scrollOffset += scaledTileHeight;
 			}
@@ -92,14 +100,21 @@ namespace DF2D::Engine
 
 		auto position = transform->GetWorldPosition();
 		auto scale = transform->GetWorldScale();
+		auto rotation = transform->GetWorldRotation();
 
 		auto scaledTileWidth = static_cast<int>(spriteSize.x * scale.x);
 		auto scaledTileHeight = static_cast<int>(spriteSize.y * scale.y);
+
+		if (scaledTileWidth <= 0 || scaledTileHeight <= 0)
+			return;
 
 		auto tilesX = (renderTargetSize.x / scaledTileWidth) + 2;
 		auto tilesY = (renderTargetSize.y / scaledTileHeight) + 2;
 
 		auto isHorizontal = scrollDirection == ScrollDirection::HORIZONTAL;
+
+		auto batchData = SpriteBatchRenderData();
+		batchData.spriteBatch.reserve(isHorizontal ? tilesX : tilesY);
 
 		for (auto y = 0; y < (isHorizontal ? 1 : tilesY); ++y)
 		{
@@ -113,15 +128,22 @@ namespace DF2D::Engine
 					.h = static_cast<float>(scaledTileHeight)
 				};
 
-				renderTask.renderData = SpriteRenderData
+				batchData.spriteBatch.push_back(SpriteRenderData
 				{
 					.texture = spriteTexture,
 					.destRect = destRect,
-					.rotation = transform->GetWorldRotation(),
-				};
-
-				RenderSystem::Submit(renderTask);
+					.rotation = rotation,
+				});
 			}
 		}
+
+		renderTask.renderData = std::move(batchData);
+
+		RenderSystem::Submit(renderTask);
+	}
+
+	float ImageScroller::GetScrollOffset() const
+	{
+		return scrollOffset;
 	}
 }

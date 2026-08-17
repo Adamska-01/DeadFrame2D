@@ -40,5 +40,8 @@ namespace DF2D::Engine
 		virtual void Update(float deltaTime) override;
 
 		virtual void Draw() override;
+
+
+		float GetScrollOffset() const;
 	};
 }
