@@ -111,7 +111,15 @@ namespace DF2D::Engine
 	void PlayerInput::DeregisterActionByID(const std::string& actionMapName, const std::string& actionName, ListenerID listenerID)
 	{
 		if (input == nullptr)
+		{
+			pendingOperations.push_back(
+				[this, actionMapName, actionName, listenerID]()
+				{
+					DeregisterActionByID(actionMapName, actionName, listenerID);
+				});
+
 			return;
+		}
 
 		input->Actions()->DeregisterActionByID(userID, actionMapName, actionName, listenerID);
 
