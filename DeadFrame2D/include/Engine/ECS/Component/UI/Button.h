@@ -89,6 +89,8 @@ namespace DF2D::Engine
 
 		Core::RectF GetBoundingBox() const;
 
+		Data::TextureID GetCurrentButtonImage() const;
+
 		Core::Color GetIdleFillColor() const;
 
 		Core::Color GetHoveredFillColor() const;

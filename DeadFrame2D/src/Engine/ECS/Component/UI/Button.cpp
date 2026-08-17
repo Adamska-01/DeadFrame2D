@@ -204,7 +204,7 @@ namespace DF2D::Engine
 		}
 		else
 		{
-			currentButtonImage = buttonPressedImage;
+			currentButtonImage = buttonIdleImage;
 		}
 	}
 
@@ -231,6 +231,11 @@ namespace DF2D::Engine
 			.w = scaledSize.x,
 			.h = scaledSize.y
 		};
+	}
+
+	TextureID Button::GetCurrentButtonImage() const
+	{
+		return currentButtonImage;
 	}
 
 	Color Button::GetIdleFillColor() const
