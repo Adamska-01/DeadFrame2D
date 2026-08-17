@@ -20,8 +20,6 @@ namespace DF2D::Engine
 		physicsEngine(nullptr),
 		bodyDefinition(bodyDefinition),
 		body(0),
-		velocity(Vector2F::Zero),
-		acceleration(Vector2F::Zero),
 		lastTransformPosition(Vector2F::Zero),
 		lastTransformRotation(0.0f)
 	{

@@ -41,10 +41,6 @@ namespace DF2D::Engine
 
 		Data::BodyID body;
 
-		mutable Core::Vector2F velocity;
-
-		mutable Core::Vector2F acceleration;
-
 		Utilities::MultiCastVoid pendingActions;
 
 		Core::Vector2F lastTransformPosition;
