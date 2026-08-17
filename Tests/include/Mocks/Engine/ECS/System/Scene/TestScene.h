@@ -7,6 +7,10 @@
 
 class TestScene : public DF2D::Engine::Scene
 {
+private:
+	DF2D::Data::CoreContext coreContext{};
+
+
 public:
 	explicit TestScene(DF2D::Engine::EventDispatcher* eventDispatcher)
 		: DF2D::Engine::Scene(eventDispatcher)
@@ -17,9 +21,14 @@ public:
 	{
 	}
 
+	void SetCoreContext(DF2D::Data::CoreContext coreCtx)
+	{
+		coreContext = coreCtx;
+	}
+
 	template<typename T, typename... Args>
 	DF2D::Engine::ObjectHandle<T> Spawn(Args&&... args)
 	{
-		return Instantiate<T>(DF2D::Data::CoreContext{}, DF2D::Data::ServiceContext{}, std::forward<Args>(args)...);
+		return Instantiate<T>(coreContext, DF2D::Data::ServiceContext{}, std::forward<Args>(args)...);
 	}
 };
