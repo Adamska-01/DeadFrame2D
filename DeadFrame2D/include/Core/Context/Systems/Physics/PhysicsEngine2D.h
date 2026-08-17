@@ -86,7 +86,7 @@ namespace DF2D::Core
 
 		void SetBodyType(Data::BodyID body, Data::BodyType2D newBodyType);
 
-		void SetBodyTransform(Data::BodyID body, const Vector2F& position, float angle);
+		void SetBodyTransform(Data::BodyID body, const Vector2F& position, float angleRad);
 
 		Data::BodyTransform2D GetBodyTransform(Data::BodyID body) const;
 

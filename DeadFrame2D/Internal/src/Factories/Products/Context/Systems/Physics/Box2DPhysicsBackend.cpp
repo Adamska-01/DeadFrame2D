@@ -336,14 +336,14 @@ namespace DF2D::Internal
 		b2body->SetType(Physics::ToB2BodyType(newBodyType));
 	}
 
-	void Box2DPhysicsBackend::SetBodyTransform(BodyID body, const Vector2F& position, float angle)
+	void Box2DPhysicsBackend::SetBodyTransform(BodyID body, const Vector2F& position, float angleRad)
 	{
 		auto b2body = FindBody(body);
 
 		if (b2body == nullptr)
 			return;
 
-		b2body->SetTransform(b2Vec2(position.x * meterPerPixel, position.y * meterPerPixel), angle);
+		b2body->SetTransform(b2Vec2(position.x * meterPerPixel, position.y * meterPerPixel), angleRad);
 	}
 
 	BodyTransform2D Box2DPhysicsBackend::GetBodyTransform(BodyID body)

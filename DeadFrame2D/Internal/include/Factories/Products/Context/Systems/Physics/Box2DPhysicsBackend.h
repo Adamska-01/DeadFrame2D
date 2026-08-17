@@ -65,7 +65,7 @@ namespace DF2D::Internal
 
 		void SetBodyType(Data::BodyID body, Data::BodyType2D newBodyType) override;
 
-		void SetBodyTransform(Data::BodyID body, const Core::Vector2F& position, float angle) override;
+		void SetBodyTransform(Data::BodyID body, const Core::Vector2F& position, float angleRad) override;
 
 		Data::BodyTransform2D GetBodyTransform(Data::BodyID body) override;
 

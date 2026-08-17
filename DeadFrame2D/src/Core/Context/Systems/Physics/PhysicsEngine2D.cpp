@@ -199,9 +199,9 @@ namespace DF2D::Core
 		backend->SetBodyType(body, newBodyType);
 	}
 
-	void PhysicsEngine2D::SetBodyTransform(BodyID body, const Vector2F& position, float angle)
+	void PhysicsEngine2D::SetBodyTransform(BodyID body, const Vector2F& position, float angleRad)
 	{
-		backend->SetBodyTransform(body, position, angle);
+		backend->SetBodyTransform(body, position, angleRad);
 	}
 
 	BodyTransform2D PhysicsEngine2D::GetBodyTransform(BodyID body) const
