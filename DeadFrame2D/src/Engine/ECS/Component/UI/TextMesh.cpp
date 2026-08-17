@@ -81,6 +81,8 @@ namespace DF2D::Engine
 	void TextMesh::SetFontSize(int newFontSize)
 	{
 		fontSize = newFontSize;
+
+		RebuildTextTexture();
 	}
 
 	void TextMesh::SetTextColor(Color newColor)
