@@ -31,7 +31,7 @@ namespace DF2D::Engine
 
 		if (extendMapToRenderTarget && renderer != nullptr)
 		{
-			renderer->SetResolutionTarget({ tileMap->width * tileMap->tileSize + 32, tileMap->height * tileMap->tileSize });
+			renderer->SetResolutionTarget({ tileMap->width * tileMap->tileSize, tileMap->height * tileMap->tileSize });
 		}
 
 		auto size = static_cast<int>(tileMap->tileSets.size());
@@ -89,12 +89,12 @@ namespace DF2D::Engine
 						.h = static_cast<float>(tileSetSize)
 					};
 
-				auto renderData = SpriteRenderData
-				{
-					.texture = tileSet.tileSetTexture,
-						.srcRect = src,
-						.destRect = dest,
-						.rotation = rotation
+					auto renderData = SpriteRenderData
+					{
+						.texture = tileSet.tileSetTexture,
+							.srcRect = src,
+							.destRect = dest,
+							.rotation = rotation
 					};
 
 					batchData.spriteBatch.push_back(renderData);
