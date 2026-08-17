@@ -13,6 +13,7 @@ namespace DF2D::Core
 		ClearCache();
 	}
 
+
 	void TextureManager::BeginFrame()
 	{
 
@@ -33,26 +34,24 @@ namespace DF2D::Core
 
 	}
 
+
 	Data::TextureID TextureManager::LoadTexture(std::string_view filename)
 	{
-		return LoadTextureImpl(std::string(filename));
-	}
+		auto filenameString = std::string(filename);
 
-	Data::TextureID TextureManager::LoadTextureImpl(const std::string& filename)
-	{
-		auto it = filenameToID.find(filename);
+		auto it = filenameToID.find(filenameString);
 
 		if (it != filenameToID.end())
 			return it->second;
 
-		auto id = backend->LoadFromFile(filename);
+		auto id = backend->LoadFromFile(filenameString);
 
 		if (id == 0)
 			return Data::TextureID{};
 
 		auto size = backend->GetTextureSize(id);
 		textureSizes[id] = size;
-		filenameToID[filename] = id;
+		filenameToID[filenameString] = id;
 
 		return id;
 	}

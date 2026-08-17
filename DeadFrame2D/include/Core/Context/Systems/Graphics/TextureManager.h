@@ -29,9 +29,6 @@ namespace DF2D::Core
 		void EndDraw() override;
 
 
-		Data::TextureID LoadTextureImpl(const std::string& filename);
-
-
 	public:
 		TextureManager(std::unique_ptr<ITextureBackend> backend);
 
