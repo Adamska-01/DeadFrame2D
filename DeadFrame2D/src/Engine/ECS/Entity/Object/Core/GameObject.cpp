@@ -218,12 +218,9 @@ namespace DF2D::Engine
 			current->OnChildGameObjectAdded.Broadcast(thisGameObject);
 		}
 
-		// Notify children of parent change
+		// Notify this object and its children of the parent change
 		std::stack<ObjectHandle<GameObject>> stack;
-		for (auto& child : children)
-		{
-			stack.push(child);
-		}
+		stack.push(thisGameObject);
 
 		while (!stack.empty())
 		{
