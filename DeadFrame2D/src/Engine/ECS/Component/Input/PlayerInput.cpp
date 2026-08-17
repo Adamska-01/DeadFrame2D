@@ -34,6 +34,7 @@ namespace DF2D::Engine
 		input->Users()->DestroyUser(userID);
 	}
 
+
 	void PlayerInput::Init()
 	{
 		GameComponent::Init();
