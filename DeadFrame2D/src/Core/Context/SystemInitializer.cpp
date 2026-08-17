@@ -13,6 +13,7 @@
 #include "Factories/Concretions/Context/Systems/Graphics/GraphicsBackendFactory.h"
 #include "Factories/Concretions/Context/Systems/Physics/PhysicsBackendFactory.h"
 #include "Helpers/Context/CoreContextIterator.h"
+#include "Models/Input/ActionMap/InputActionMapBucket.h"
 #include "Utilities/Debugging/Guards.h"
 #include "Utilities/IO/Serialization/JsonSerializer.h"
 
@@ -33,12 +34,14 @@ namespace DF2D::Core
 
 		auto graphicsBackends = GraphicsBackendFactory().CreateProduct(config.window, config.rendering, eventDispatcher);
 
+		auto actionMapBucket = JsonSerializer::DeserializeFromFile<InputActionMapBucket>(Paths::Files::INPUT_CONTROLS);
+
 		ctx = CoreContext
 		{
 			.audioManager = new AudioManager(config.audio, AudioBackendFactory().CreateProduct(config.audio)),
 			.coroutineScheduler = new CoroutineScheduler(serviceCtx.frameTimer),
 			.textureManager = new TextureManager(std::move(graphicsBackends.textureBackend)),
-			.input = new Input(eventDispatcher),
+			.input = new Input(actionMapBucket, eventDispatcher),
 			.physicsEngine = new PhysicsEngine2D(
 				config.physics,
 				JsonSerializer::DeserializeFromFile<CollisionMasks>(Paths::Files::COLLISION_MASKS),

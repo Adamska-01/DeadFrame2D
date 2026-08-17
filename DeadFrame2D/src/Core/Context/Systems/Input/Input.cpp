@@ -1,28 +1,19 @@
-#include "Constants/Paths/ResourcePaths.h"
 #include "Core/Context/Systems/Input/Actions/InputActionResolver.h"
 #include "Core/Context/Systems/Input/Devices/DeviceManager.h"
 #include "Core/Context/Systems/Input/Input.h"
 #include "Core/Context/Systems/Input/User/InputUserManager.h"
 #include "Models/Input/ActionMap/InputActionMapBucket.h"
-#include "Utilities/IO/Serialization/JsonSerializer.h"
 
 
 namespace DF2D::Core
 {
-	using namespace DF2D::Constants;
 	using namespace DF2D::Data;
 	using namespace DF2D::Engine;
 	using namespace DF2D::Models;
-	using namespace DF2D::Utilities;
 
 
-	Input::Input(EventDispatcher& eventDispatcher)
+	Input::Input(InputActionMapBucket actionMapBucket, EventDispatcher& eventDispatcher)
 	{
-		if (!JsonSerializer::IsSerializable<InputActionMapBucket>())
-			throw std::runtime_error("[Input] InputActionMapBucket is not serializable. Cannot load input configuration...");
-
-		auto actionMapBucket = JsonSerializer::DeserializeFromFile<InputActionMapBucket>(Paths::Files::INPUT_CONTROLS);
-
 		// Hooks capture this and are only invoked after construction completes.
 		// Per-user action tables are managed through direct calls, not the event bus,
 		// so their lifetime is ordered before any InputUserCreated/Destroyed broadcast.

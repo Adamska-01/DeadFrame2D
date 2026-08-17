@@ -11,6 +11,12 @@ namespace DF2D::Engine
 }
 
 
+namespace DF2D::Models
+{
+	struct InputActionMapBucket;
+}
+
+
 namespace DF2D::Core
 {
 	class IInputActions;
@@ -23,26 +29,12 @@ namespace DF2D::Core
 
 	class DF2D_API Input : public ICoreSystem, public ISystemEventSink
 	{
-		friend class SystemInitializer;
-
-
 	private:
 		std::unique_ptr<InputActionResolver> actionResolver;
 
 		std::unique_ptr<DeviceManager> deviceManager;
 
 		std::unique_ptr<InputUserManager> userManager;
-
-
-		explicit Input(Engine::EventDispatcher& eventDispatcher);
-
-		Input(const Input&) = delete;
-
-		Input(Input&&) = delete;
-
-		Input& operator=(const Input&) = delete;
-
-		Input& operator=(Input&&) = delete;
 
 
 		void BeginFrame() override;
@@ -58,7 +50,17 @@ namespace DF2D::Core
 
 
 	public:
+		Input(Models::InputActionMapBucket actionMapBucket, Engine::EventDispatcher& eventDispatcher);
+
 		~Input() override;
+
+		Input(const Input&) = delete;
+
+		Input(Input&&) = delete;
+
+		Input& operator=(const Input&) = delete;
+
+		Input& operator=(Input&&) = delete;
 
 
 		IInputDeviceProvider* Devices();
