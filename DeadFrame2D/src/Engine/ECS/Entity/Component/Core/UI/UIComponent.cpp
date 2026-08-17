@@ -54,6 +54,9 @@ namespace DF2D::Engine
 
 	Vector2F UIComponent::GetWidgetSize() const
 	{
+		if (transform == nullptr)
+			return widgetSize;
+
 		return widgetSize * transform->GetWorldScale();
 	}
 }
