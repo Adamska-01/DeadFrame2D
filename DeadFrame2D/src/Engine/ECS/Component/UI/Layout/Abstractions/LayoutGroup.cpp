@@ -1,35 +1,14 @@
 #include "Engine/ECS/Component/UI/Layout/Abstractions/LayoutGroup.h"
-#include "Engine/ECS/System/Events/DispatchableEvent.h"
-#include "Engine/Events/GameObject/GameObjectDestroyedEvent.h"
 
 
 namespace DF2D::Engine
 {
-	using namespace DF2D::Core;
 	using namespace DF2D::Data;
-	using namespace DF2D::Utilities;
 
 
 	LayoutGroup::LayoutGroup(float layoutSpacing, LayoutPadding layoutPadding)
 		: layoutSpacing(layoutSpacing), layoutPadding(layoutPadding)
 	{
-	}
-
-	void LayoutGroup::GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
-	{
-		auto gameObjEvent = DispatchableEvent::SafeCast<GameObjectDestroyedEvent>(dispatchableEvent);
-
-		if (!gameObjEvent || gameObjEvent->gameObjectDestroyed == nullptr)
-			return;
-
-		auto target = gameObjEvent->gameObjectDestroyed;
-
-		if (!target->IsChildOf(GetGameObject()))
-			return;
-
-		DeregisterAllHandlers(target);
-
-		MarkDirty();
 	}
 
 	void LayoutGroup::OnChildActiveStateChangedHandler(const ObjectHandle<GameObject>& child, bool activeState)

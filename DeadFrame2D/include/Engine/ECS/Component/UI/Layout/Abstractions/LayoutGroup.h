@@ -2,12 +2,10 @@
 #include "Data/Components/UI/Layout/LayoutPadding.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/GameComponent.h"
-#include <memory>
 
 
 namespace DF2D::Engine
 {
-	class DispatchableEvent;
 	class UIComponent;
 
 
@@ -15,10 +13,6 @@ namespace DF2D::Engine
 	class DF2D_API LayoutGroup : public GameComponent
 	{
 		TYPE_INFO(LayoutGroup, GameComponent);
-
-
-	private:
-		void GameObjectDestroyedHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
 
 
 	protected:
