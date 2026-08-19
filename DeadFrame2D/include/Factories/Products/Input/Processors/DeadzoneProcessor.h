@@ -7,6 +7,9 @@ namespace DF2D::Factories
 	class DF2D_API DeadzoneProcessor final : public IInputProcessor
 	{
 	private:
+		static constexpr float MAX_THRESHOLD = 0.999f;
+
+
 		float threshold;
 
 

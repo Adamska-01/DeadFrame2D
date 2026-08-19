@@ -8,7 +8,7 @@ namespace DF2D::Factories
 
 
 	DeadzoneProcessor::DeadzoneProcessor(const float threshold)
-		: threshold(threshold)
+		: threshold(std::clamp(threshold, 0.0f, MAX_THRESHOLD))
 	{
 	}
 
@@ -63,6 +63,6 @@ namespace DF2D::Factories
 
 	void DeadzoneProcessor::SetThreshold(const float threshold)
 	{
-		this->threshold = threshold;
+		this->threshold = std::clamp(threshold, 0.0f, MAX_THRESHOLD);
 	}
 }
