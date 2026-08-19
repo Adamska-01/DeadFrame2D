@@ -59,19 +59,17 @@ namespace DF2D::Core
 			if (!camera->IsActive())
 				continue;
 
-			auto cameraHandle = camera->GetHandleAs<Camera>();
-
 			switch (renderTask.renderPhase)
 			{
 			case RenderPhase::WORLD:
 			case RenderPhase::DEBUG_WORLD:
-				cullAndAddRenderTask(cameraHandle);
+				cullAndAddRenderTask(camera);
 				break;
 
 			case RenderPhase::SCREEN_SPACE_CAMERA_UI:
-				if (renderTask.canvas->GetRenderCamera() == cameraHandle)
+				if (renderTask.canvas->GetRenderCamera() == camera)
 				{
-					cullAndAddRenderTask(cameraHandle);
+					cullAndAddRenderTask(camera);
 				}
 				break;
 

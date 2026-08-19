@@ -29,17 +29,19 @@ namespace DF2D::Core
 				std::vector<RenderTask>>, 
 			(int)RenderPhase::RENDER_PHASE_COUNT>& renderTasks)
 	{
-		for (auto camera : Camera::GetCameras())
+		for (const auto& camera : Camera::GetCameras())
 		{
-			renderBackend.SetRenderTarget(camera->GetRenderTarget());
+			if (!camera->IsActive())
+				continue;
 
-			auto cameraHandle = camera->GetHandleAs<Camera>();
+			renderBackend.SetRenderTarget(camera->GetRenderTarget());
+			renderBackend.ClearCurrentRenderTarget();
 
 			for (auto phase : phasesInOrder)
 			{
 				auto key = static_cast<int>(phase);
 
-				auto phaseTasksIT = renderTasks[key].find(camera);
+				auto phaseTasksIT = renderTasks[key].find(camera());
 
 				if (phaseTasksIT == renderTasks[key].end())
 					continue;
@@ -64,7 +66,7 @@ namespace DF2D::Core
 							RenderResolver<T>::Render(
 								renderBackend,
 								data,
-								cameraHandle,
+								camera,
 								task.renderPhase != RenderPhase::SCREEN_SPACE_CAMERA_UI);
 						},
 						task.renderData);
