@@ -29,7 +29,7 @@ namespace DF2D::Engine
 
 
 	private:
-		static std::vector<Camera*> cameras;
+		static std::vector<ComponentHandle<Camera>> cameras;
 
 
 		ComponentHandle<Transform> transform;
@@ -81,6 +81,6 @@ namespace DF2D::Engine
 		Core::Vector2F ScreenToWorld(const Core::Vector2F& screenPos) const;
 
 
-		static const std::vector<Camera*>& GetCameras();
+		static const std::vector<ComponentHandle<Camera>>& GetCameras();
 	};
 }

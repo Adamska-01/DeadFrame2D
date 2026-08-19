@@ -15,7 +15,7 @@ namespace DF2D::Engine
 	using namespace DF2D::Utilities;
 
 
-	std::vector<Camera*> Camera::cameras = {};
+	std::vector<ComponentHandle<Camera>> Camera::cameras = {};
 
 
 	Camera::Camera()
@@ -24,7 +24,6 @@ namespace DF2D::Engine
 		renderTarget(0),
 		zoom(1.0f)
 	{
-		cameras.push_back(this);
 	}
 
 	Camera::~Camera()
@@ -35,7 +34,10 @@ namespace DF2D::Engine
 			renderTarget = 0;
 		}
 
-		std::erase(cameras, this);
+		// GetHandleAs<Camera>() can't be used here: by the time this destructor runs, the owning
+		// unique_ptr has already nulled its internal pointer, so bucket-lookup-based handle
+		// resolution fails. GetHandle() is a plain member copy with no bucket lookup, so it's safe.
+		std::erase(cameras, ComponentHandle<Camera>(GetHandle()));
 	}
 
 	void Camera::RenderTargetSizeChangedEventHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
@@ -77,6 +79,8 @@ namespace DF2D::Engine
 				renderTarget = renderer->CreateRenderTarget(resolutionTarget.x, resolutionTarget.y);
 			}
 		}
+
+		cameras.push_back(GetHandleAs<Camera>());
 	}
 
 	void Camera::SetZoom(float zoom)
@@ -147,7 +151,7 @@ namespace DF2D::Engine
 		return transform->GetWorldPosition() + Vector2(localX, localY);
 	}
 
-	const std::vector<Camera*>& Camera::GetCameras()
+	const std::vector<ComponentHandle<Camera>>& Camera::GetCameras()
 	{
 		return cameras;
 	}
