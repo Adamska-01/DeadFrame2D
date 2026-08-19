@@ -1,5 +1,6 @@
 #pragma once
 #include <nlohmann/json.hpp>
+#include <stdexcept>
 
 
 namespace DF2D::Models
@@ -44,6 +45,9 @@ namespace DF2D::Models
 		j.at("pixelPerMeter").get_to(binding.pixelPerMeter);
 
 		binding.debugDrawEnabled = j.value("debugDrawEnabled", true);
+
+		if (binding.pixelPerMeter <= 0.0f)
+			throw std::runtime_error("PhysicsConfig: pixelPerMeter must be a positive number");
 
 		// Compute derived property automatically
 		binding.meterPerPixel = 1.0f / binding.pixelPerMeter;
