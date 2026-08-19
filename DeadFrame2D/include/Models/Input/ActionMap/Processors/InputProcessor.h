@@ -5,6 +5,7 @@
 #include "Models/Input/ActionMap/Processors/Settings/NormalizeProcessorSettings.h"
 #include "Models/Input/ActionMap/Processors/Settings/ScaleProcessorSettings.h"
 #include "Models/Input/ActionMap/Types/ProcessorType.h"
+#include <stdexcept>
 #include <variant>
 
 
@@ -33,24 +34,15 @@ namespace DF2D::Models
 				using T = std::decay_t<decltype(arg)>;
 				if constexpr (std::is_same_v<T, ClampProcessorSettings>)
 				{
-					j["min"] = arg.min;
-					j["max"] = arg.max;
+					j["settings"] = { { "min", arg.min }, { "max", arg.max } };
 				}
 				else if constexpr (std::is_same_v<T, DeadzoneProcessorSettings>)
 				{
-					j["threshold"] = arg.threshold;
-				}
-				else if constexpr (std::is_same_v<T, InvertProcessorSettings>)
-				{
-					j = nlohmann::json::object();
-				}
-				else if constexpr (std::is_same_v<T, NormalizeProcessorSettings>)
-				{
-					j = nlohmann::json::object();
+					j["settings"] = { { "threshold", arg.threshold } };
 				}
 				else if constexpr (std::is_same_v<T, ScaleProcessorSettings>)
 				{
-					j["factor"] = arg.factor;
+					j["settings"] = { { "factor", arg.factor } };
 				}
 			},
 			p.settings);
@@ -102,7 +94,10 @@ namespace DF2D::Models
 				.max = settingsObj.at("max").get<float>()
 			};
 			break;
-		}	
+		}
+
+		default:
+			throw std::runtime_error("Unknown ProcessorType in InputProcessor");
 		}
 	}
 }
