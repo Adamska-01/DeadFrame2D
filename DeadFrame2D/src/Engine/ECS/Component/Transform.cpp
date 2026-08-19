@@ -13,6 +13,7 @@ namespace DF2D::Engine
 	Transform::Transform(Vector2F position, Vector2F scale, float angle)
 		: localPosition(position), localScale(scale), localRotation(angle)
 	{
+		MarkDirty();
 	}
 
 	void Transform::RecalculateWorldTransform() const
@@ -139,7 +140,7 @@ namespace DF2D::Engine
 
 	void Transform::Update(float dt)
 	{
-		startFramePosition = position;
+		startFramePosition = GetWorldPosition();
 	}
 
 	Vector2F Transform::GetStartFramePosition() const
