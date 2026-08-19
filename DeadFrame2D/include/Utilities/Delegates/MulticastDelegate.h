@@ -24,8 +24,18 @@ namespace DF2D::Utilities
 
 		ListenerID nextID = 0;
 
+		bool isBroadcasting = false;
+
+		std::vector<std::unique_ptr<IListener<Args...>>> pendingAdds;
+
+		std::vector<std::function<void()>> pendingOps;
+
 
 		void PruneExpired();
+
+		void RegisterListener(std::unique_ptr<IListener<Args...>> listener);
+
+		void FlushPending();
 
 
 	public:
@@ -119,6 +129,33 @@ namespace DF2D::Utilities
 
 
 	template<typename ...Args>
+	inline void MulticastDelegate<Args...>::RegisterListener(std::unique_ptr<IListener<Args...>> listener)
+	{
+		if (isBroadcasting)
+		{
+			pendingAdds.push_back(std::move(listener));
+		}
+		else
+		{
+			listeners.push_back(std::move(listener));
+		}
+	}
+
+	template<typename ...Args>
+	inline void MulticastDelegate<Args...>::FlushPending()
+	{
+		for (auto& op : pendingOps)
+			op();
+
+		pendingOps.clear();
+
+		for (auto& listener : pendingAdds)
+			listeners.push_back(std::move(listener));
+
+		pendingAdds.clear();
+	}
+
+	template<typename ...Args>
 	template<typename T>
 	inline ListenerID MulticastDelegate<Args...>::AddRaw(T* instance, void(T::* func)(Args...))
 	{
@@ -126,8 +163,8 @@ namespace DF2D::Utilities
 
 		auto listener = std::make_unique<RawListener<T, Args...>>(instance, func);
 		listener->SetID(id);
-		
-		listeners.push_back(std::move(listener));
+
+		RegisterListener(std::move(listener));
 
 		return id;
 	}
@@ -137,11 +174,11 @@ namespace DF2D::Utilities
 	inline ListenerID MulticastDelegate<Args...>::AddShared(const std::shared_ptr<T>& instance, void(T::* func)(Args...))
 	{
 		auto id = nextID++;
-		
+
 		auto listener = std::make_unique<SharedPtrListener<T, Args...>>(instance, func);
 		listener->SetID(id);
 
-		listeners.push_back(std::move(listener));
+		RegisterListener(std::move(listener));
 
 		return id;
 	}
@@ -150,11 +187,11 @@ namespace DF2D::Utilities
 	inline ListenerID MulticastDelegate<Args...>::AddLambda(std::function<void(Args...)> func)
 	{
 		auto id = nextID++;
-		
+
 		auto listener = std::make_unique<LambdaListener<Args...>>(std::move(func));
 		listener->SetID(id);
 
-		listeners.push_back(std::move(listener));
+		RegisterListener(std::move(listener));
 
 		return id;
 	}
@@ -167,7 +204,7 @@ namespace DF2D::Utilities
 		auto listener = std::make_unique<HandleListener<Args...>>(handle, std::move(func));
 		listener->SetID(id);
 
-		listeners.push_back(std::move(listener));
+		RegisterListener(std::move(listener));
 
 		return id;
 	}
@@ -180,7 +217,7 @@ namespace DF2D::Utilities
 		auto listener = std::make_unique<HandleListener<Args...>>(handle, std::move(func));
 		listener->SetID(id);
 
-		listeners.push_back(std::move(listener));
+		RegisterListener(std::move(listener));
 
 		return id;
 	}
@@ -190,21 +227,44 @@ namespace DF2D::Utilities
 	{
 		PruneExpired();
 
-		for (auto& listener : listeners)
+		isBroadcasting = true;
+
+		try
 		{
-			listener->Invoke(args...);
+			for (auto& listener : listeners)
+			{
+				listener->Invoke(args...);
+			}
 		}
+		catch (...)
+		{
+			isBroadcasting = false;
+			FlushPending();
+
+			throw;
+		}
+
+		isBroadcasting = false;
+
+		FlushPending();
 	}
 
 	template<typename ...Args>
 	template<typename T>
 	inline void MulticastDelegate<Args...>::RemoveByListener(const T* listener)
 	{
+		if (isBroadcasting)
+		{
+			pendingOps.push_back([this, listener]() { RemoveByListener(listener); });
+
+			return;
+		}
+
 		listeners.erase(
 			std::remove_if(
-				listeners.begin(), 
+				listeners.begin(),
 				listeners.end(),
-				[&](const auto& l) 
+				[&](const auto& l)
 				{
 					return l->Matches(*listener);
 				}),
@@ -214,9 +274,16 @@ namespace DF2D::Utilities
 	template<typename ...Args>
 	inline void MulticastDelegate<Args...>::RemoveByID(ListenerID id)
 	{
+		if (isBroadcasting)
+		{
+			pendingOps.push_back([this, id]() { RemoveByID(id); });
+
+			return;
+		}
+
 		listeners.erase(
 			std::remove_if(
-				listeners.begin(), 
+				listeners.begin(),
 				listeners.end(),
 				[id](const auto& l)
 				{
@@ -228,6 +295,13 @@ namespace DF2D::Utilities
 	template<typename ...Args>
 	void MulticastDelegate<Args...>::Clear()
 	{
+		if (isBroadcasting)
+		{
+			pendingOps.push_back([this]() { Clear(); });
+
+			return;
+		}
+
 		listeners.clear();
 	}
 
