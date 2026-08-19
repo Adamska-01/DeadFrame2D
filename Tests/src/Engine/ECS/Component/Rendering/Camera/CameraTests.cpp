@@ -159,7 +159,7 @@ TEST_CASE("GetCameras includes a camera while it is alive")
 
 	const auto& cameras = Camera::GetCameras();
 
-	CHECK(std::find(cameras.begin(), cameras.end(), fixture.camera()) != cameras.end());
+	CHECK(std::find(cameras.begin(), cameras.end(), fixture.camera) != cameras.end());
 }
 
 
