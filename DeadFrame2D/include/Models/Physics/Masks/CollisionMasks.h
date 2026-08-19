@@ -1,5 +1,6 @@
 #pragma once
 #include "Models/Physics/Masks/NamedBitflag.h"
+#include <iostream>
 #include <nlohmann/json.hpp>
 #include <vector>
 
