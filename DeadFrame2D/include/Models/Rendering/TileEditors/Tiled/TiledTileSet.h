@@ -45,6 +45,6 @@ namespace DF2D::Models
 		bool IsValid() const;
 
 
-		friend std::ostream& operator<<(std::ostream& os, const TiledTileSet& tileSet);
+		friend DF2D_API std::ostream& operator<<(std::ostream& os, const TiledTileSet& tileSet);
 	};
 }
