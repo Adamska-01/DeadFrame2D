@@ -1,4 +1,5 @@
 #pragma once
+#include "DF2D_API.h"
 #include "Factories/Abstractions/IFactoryWithInitialiser.h"
 #include "Factories/Products/Input/Processors/Abstractions/IInputProcessor.h"
 #include "Models/Input/ActionMap/Processors/InputProcessor.h"
@@ -7,7 +8,7 @@
 
 namespace DF2D::Factories
 {
-	class InputProcessorFactory : public IFactoryWithInitialiser<std::unique_ptr<IInputProcessor>, const Models::InputProcessor&>
+	class DF2D_API InputProcessorFactory : public IFactoryWithInitialiser<std::unique_ptr<IInputProcessor>, const Models::InputProcessor&>
 	{
 	public:
 		std::unique_ptr<IInputProcessor> CreateProduct(const Models::InputProcessor& inputProcessorModel) override;

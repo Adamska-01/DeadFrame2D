@@ -1,7 +1,8 @@
 #pragma once
+#include "Data/Systems/Graphics/GraphicsBackendSet.h"
+#include "DF2D_API.h"
 #include "Models/Rendering/RendererConfig.h"
 #include "Models/Window/WindowConfig.h"
-#include "Data/Systems/Graphics/GraphicsBackendSet.h"
 
 
 namespace DF2D::Engine
@@ -12,7 +13,7 @@ namespace DF2D::Engine
 
 namespace DF2D::Factories
 {
-	class GraphicsBackendFactory
+	class DF2D_API GraphicsBackendFactory
 	{
 	public:
 		Data::GraphicsBackendSet CreateProduct(
