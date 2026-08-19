@@ -280,7 +280,7 @@ namespace DF2D::Internal
 
 	void SDLRenderBackend::SetRenderTarget(Data::TextureID renderTarget)
 	{
-		if (renderTarget == 0)
+		if (renderTarget <= 0)
 		{
 			SDL_SetRenderTarget(renderer, nullptr);
 		}
