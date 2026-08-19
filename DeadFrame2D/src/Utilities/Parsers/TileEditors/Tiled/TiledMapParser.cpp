@@ -27,14 +27,34 @@ namespace DF2D::Utilities
 
 	TiledTileSet TiledMapParser::ParseTileSet(XMLElement* xmlTileset)
 	{
+		auto firstId = xmlTileset->IntAttribute("firstgid");
+		auto columns = xmlTileset->IntAttribute("columns");
+		auto tileCount = xmlTileset->IntAttribute("tilecount");
+
+		// `columns` missing/zero would otherwise divide-by-zero; treat it as "no rows known".
+		auto rowCount = columns > 0 ? tileCount / columns : 0;
+
+		auto source = std::string();
+		auto* imageElement = xmlTileset->FirstChildElement();
+
+		if (imageElement != nullptr)
+		{
+			auto* sourceAttr = imageElement->Attribute("source");
+
+			if (sourceAttr != nullptr)
+			{
+				source = "App/Assets/Sprites/" + std::filesystem::path(sourceAttr).filename().string();
+			}
+		}
+
 		return TiledTileSet(
-			xmlTileset->IntAttribute("firstgid"),
-			xmlTileset->IntAttribute("firstgid") + xmlTileset->IntAttribute("tilecount") - 1,
-			xmlTileset->IntAttribute("tilecount") / xmlTileset->IntAttribute("columns"),
-			xmlTileset->IntAttribute("columns"),
-			xmlTileset->IntAttribute("tilecount"),
+			firstId,
+			firstId + tileCount - 1,
+			rowCount,
+			columns,
+			tileCount,
 			xmlTileset->IntAttribute("tilewidth"),
-			"App/Assets/Sprites/" + std::filesystem::path(xmlTileset->FirstChildElement()->Attribute("source")).filename().string(),
+			source,
 			textureManager);
 	}
 
@@ -42,28 +62,34 @@ namespace DF2D::Utilities
 	{
 		TiledLayer layer;
 
-		layer.name = xmlLayer->Attribute("name");
+		auto* nameAttr = xmlLayer->Attribute("name");
+		layer.name = nameAttr != nullptr ? nameAttr : "";
 
 		// Parse the tile map data
 		auto data = xmlLayer->FirstChildElement("data");
 		layer.Data.resize(rowCount, std::vector<int>(colCount, 0));
 		if (data != nullptr)
 		{
-			std::istringstream iss(data->GetText());
-			std::string id;
+			auto* text = data->GetText();
 
-			for (auto row = 0; row < rowCount; ++row)
+			if (text != nullptr)
 			{
-				for (auto col = 0; col < colCount; ++col)
-				{
-					if (!std::getline(iss, id, ','))
-						break;
+				std::istringstream iss(text);
+				std::string id;
 
-					layer.Data[row][col] = std::stoi(id);
+				for (auto row = 0; row < rowCount; ++row)
+				{
+					for (auto col = 0; col < colCount; ++col)
+					{
+						if (!std::getline(iss, id, ','))
+							break;
+
+						layer.Data[row][col] = std::stoi(id);
+					}
 				}
 			}
 		}
-	
+
 		// Parse the properties associated with the current layer;
 		auto properties = xmlLayer->FirstChildElement("properties");
 		if (properties != nullptr)
@@ -72,26 +98,32 @@ namespace DF2D::Utilities
 			{
 				TiledProperty property;
 
-				property.Name = elem->Attribute("name");
-				property.Type = elem->Attribute("type");
+				auto* propNameAttr = elem->Attribute("name");
+				auto* propTypeAttr = elem->Attribute("type");
+
+				property.Name = propNameAttr != nullptr ? propNameAttr : "";
+				property.Type = propTypeAttr != nullptr ? propTypeAttr : "";
 
 				auto value = elem->Attribute("value");
 
-				if (property.Type == "float") 
+				if (value != nullptr)
 				{
-					property.Value = std::stof(value);
-				}
-				else if (property.Type == "int") 
-				{
-					property.Value = std::stoi(value);
-				}
-				else if (property.Type == "bool") 
-				{
-					property.Value = (std::string(value) == "true");
-				}
-				else if (property.Type == "string") 
-				{
-					property.Value = std::string(value);
+					if (property.Type == "float")
+					{
+						property.Value = std::stof(value);
+					}
+					else if (property.Type == "int")
+					{
+						property.Value = std::stoi(value);
+					}
+					else if (property.Type == "bool")
+					{
+						property.Value = (std::string(value) == "true");
+					}
+					else if (property.Type == "string")
+					{
+						property.Value = std::string(value);
+					}
 				}
 
 				layer.Properties[property.Name] = property;
@@ -105,7 +137,8 @@ namespace DF2D::Utilities
 	{
 		TiledObjectGroup group;
 
-		group.name = xmlObjectGroup->Attribute("name");
+		auto* nameAttr = xmlObjectGroup->Attribute("name");
+		group.name = nameAttr != nullptr ? nameAttr : "";
 
 		for (auto objElem = xmlObjectGroup->FirstChildElement("object"); objElem; objElem = objElem->NextSiblingElement("object"))
 		{
