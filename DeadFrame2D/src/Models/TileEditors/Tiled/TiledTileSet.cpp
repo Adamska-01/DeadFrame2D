@@ -1,6 +1,7 @@
 #include "Core/Context/Systems/Graphics/TextureManager.h"
 #include "Models/Rendering/TileEditors/Tiled/TiledTileSet.h"
 #include <ostream>
+#include <stdexcept>
 #include <string>
 
 
@@ -26,9 +27,8 @@ namespace DF2D::Models
 		tileSize(tileSize),
 		source(source)
 	{
-		// Throw ?
 		if (!IsValid())
-			return;
+			throw std::invalid_argument("TiledTileSet: invalid tile set parameters");
 
 		if (tm)
 		{
