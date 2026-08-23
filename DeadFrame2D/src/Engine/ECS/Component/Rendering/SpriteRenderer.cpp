@@ -41,19 +41,22 @@ namespace DF2D::Engine
 		auto worldScale = transform->GetWorldScale();
 		auto worldRotation = transform->GetWorldRotation();
 
+		auto drawSize = overrideDrawSize.value_or(spriteSize);
+
 		auto scaledDest = RectF
 		{
-			.x = worldPosition.x - (spriteSize.x * worldScale.x) / 2.0f,
-			.y = worldPosition.y - (spriteSize.y * worldScale.y) / 2.0f,
-			.w = spriteSize.x * worldScale.x,
-			.h = spriteSize.y * worldScale.y
+			.x = worldPosition.x - (drawSize.x * worldScale.x) / 2.0f,
+			.y = worldPosition.y - (drawSize.y * worldScale.y) / 2.0f,
+			.w = drawSize.x * worldScale.x,
+			.h = drawSize.y * worldScale.y
 		};
 
 		renderTask.renderData = SpriteRenderData
 		{
 			.texture = spriteTexture,
-			.srcRect = std::nullopt,
+			.srcRect = overrideSrcRect,
 			.destRect = scaledDest,
+			.flip = flipState,
 			.rotation = worldRotation
 		};
 
@@ -85,5 +88,35 @@ namespace DF2D::Engine
 	void SpriteRenderer::SetSortOrder(int sortOrder)
 	{
 		renderTask.sortOrder = sortOrder;
+	}
+
+	std::optional<RectI> SpriteRenderer::GetSourceRect() const
+	{
+		return overrideSrcRect;
+	}
+
+	void SpriteRenderer::SetSourceRect(std::optional<RectI> srcRect)
+	{
+		overrideSrcRect = srcRect;
+	}
+
+	Vector2I SpriteRenderer::GetDrawSize() const
+	{
+		return overrideDrawSize.value_or(spriteSize);
+	}
+
+	void SpriteRenderer::SetDrawSize(std::optional<Vector2I> size)
+	{
+		overrideDrawSize = size;
+	}
+
+	RenderFlip SpriteRenderer::GetFlipState() const
+	{
+		return flipState;
+	}
+
+	void SpriteRenderer::SetFlipState(RenderFlip flip)
+	{
+		flipState = flip;
 	}
 }
