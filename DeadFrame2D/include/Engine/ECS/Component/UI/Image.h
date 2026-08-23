@@ -3,7 +3,6 @@
 #include "Data/Systems/Graphics/TextureID.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
-#include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include <string_view>
 
 
@@ -40,6 +39,8 @@ namespace DF2D::Engine
 
 
 		void LoadSprite(std::string_view texturePath);
+
+		void SetColor(DF2D::Core::Color color);
 
 		void SetColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 	};

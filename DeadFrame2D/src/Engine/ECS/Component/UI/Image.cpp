@@ -4,6 +4,7 @@
 #include "Engine/ECS/Component/Transform.h"
 #include "Engine/ECS/Component/UI/Canvas.h"
 #include "Engine/ECS/Component/UI/Image.h"
+#include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
 
 
@@ -84,6 +85,11 @@ namespace DF2D::Engine
 
 		widgetSize.x = static_cast<float>(size.x);
 		widgetSize.y = static_cast<float>(size.y);
+	}
+
+	void Image::SetColor(Color color)
+	{
+		this->color = color;
 	}
 
 	void Image::SetColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
