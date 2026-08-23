@@ -77,15 +77,27 @@ TEST_CASE("The implicit upcast conversion operator produces an equivalent base h
 	CHECK(asBase.GetIndex() == derived.GetIndex());
 }
 
-TEST_CASE("A handle constructed from a ComponentHandleBase of the wrong type is invalid")
+TEST_CASE("SafeCast from a ComponentHandleBase of the wrong type is invalid")
 {
 	auto bucket = std::make_shared<ComponentBucket>();
 	auto other = bucket->AddComponent<OtherDummyGameComponent>(ObjectHandle<GameObject>{});
 
 	ComponentHandleBase base = other;
-	auto wrongType = ComponentHandle<DummyGameComponent>::From(base);
+	auto wrongType = ComponentHandle<DummyGameComponent>::SafeCast(base);
 
 	CHECK(wrongType == nullptr);
+}
+
+TEST_CASE("SafeCast from a ComponentHandleBase of the right type resolves correctly")
+{
+	auto bucket = std::make_shared<ComponentBucket>();
+	auto derived = bucket->AddComponent<DerivedDummyGameComponent>(ObjectHandle<GameObject>{});
+
+	ComponentHandleBase base = derived;
+	auto asBase = ComponentHandle<DummyGameComponent>::SafeCast(base);
+
+	CHECK(asBase != nullptr);
+	CHECK(asBase.GetIndex() == derived.GetIndex());
 }
 
 TEST_CASE("GetBucket returns the owning bucket for a valid handle and null for a default one")

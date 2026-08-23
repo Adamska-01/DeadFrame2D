@@ -80,14 +80,39 @@ namespace
 TEST_SUITE_BEGIN("SpriteAnimator");
 
 
-TEST_CASE("Init throws when the owning GameObject has no SpriteRenderer")
+TEST_CASE("A SpriteRenderer added after Init() binds reactively via OnNewComponentAddedHandler")
 {
+	auto mock = std::make_unique<MockTextureBackend>();
+	auto backend = mock.get();
+	auto textureManager = std::make_unique<TextureManager>(std::move(mock));
+
 	auto scene = std::make_shared<FakeSceneHandleProvider>();
+	scene->SetCoreContext(CoreContext{ .textureManager = textureManager.get() });
+
 	auto owner = scene->Create<TestGameObject>();
 
 	auto animator = owner->AddComponent<SpriteAnimator>();
 
-	CHECK_THROWS_AS(animator->Init(), std::invalid_argument);
+	animator->Init();
+	animator->AddAnimation(MakeProps("Idle", "idle.png", 4, 1, 0, 1.0f, /*loop*/ true));
+	animator->PlayAnimation("Idle");
+
+	// SpriteRenderer still doesn't exist yet: nothing to push the frame onto.
+	auto spriteRenderer = owner->AddComponent<SpriteRenderer>("");
+
+	// AddComponent fires OnNewComponentAddedHandler synchronously, binding `sprite` —
+	// but SpriteRenderer::Init() (deferred by Scene in real usage) hasn't run yet, so
+	// the reactive LoadSprite silently no-ops at this point.
+	CHECK(spriteRenderer->GetTexture() == 0);
+
+	spriteRenderer->Init();
+
+	// Nothing re-triggers a load automatically; Update() is what retries and catches up.
+	animator->Update(0.0f);
+
+	CHECK(spriteRenderer->GetTexture() != 0);
+	CHECK(backend->lastLoadedFile == "idle.png");
+	CHECK(spriteRenderer->GetSourceRect().has_value());
 }
 
 TEST_CASE("Init throws when CoreContext has no TextureManager")
@@ -101,11 +126,11 @@ TEST_CASE("Init throws when CoreContext has no TextureManager")
 	CHECK_THROWS_AS(animator->Init(), std::invalid_argument);
 }
 
-TEST_CASE("Init deactivates the SpriteRenderer so nothing draws before an animation plays")
+TEST_CASE("Init leaves the SpriteRenderer active, since it is now the one that draws")
 {
 	SpriteAnimatorFixture fixture;
 
-	CHECK_FALSE(fixture.spriteRenderer->IsActive());
+	CHECK(fixture.spriteRenderer->IsActive());
 }
 
 TEST_CASE("AddAnimation/PlayAnimation called before Init (blueprint constructor order) do not crash, and Init loads the texture")
@@ -317,15 +342,38 @@ TEST_CASE("GetAnimationProgressRatio is 0 when no animation has been added")
 	CHECK(fixture.animator->GetAnimationProgressRatio() == doctest::Approx(0.0f));
 }
 
-TEST_CASE("Draw does not throw once an animation is playing")
+TEST_CASE("PlayAnimation pushes the starting frame onto the SpriteRenderer immediately")
 {
 	SpriteAnimatorFixture fixture;
 
+	fixture.backend->nextSize = Vector2I{ 64, 16 };
 	fixture.animator->AddAnimation(MakeProps("Idle", "idle.png", 4, 1, 0, 1.0f, /*loop*/ true));
 	fixture.animator->PlayAnimation("Idle");
-	fixture.animator->Update(0.1f);
 
-	CHECK_NOTHROW(fixture.animator->Draw());
+	auto srcRect = fixture.spriteRenderer->GetSourceRect();
+
+	REQUIRE(srcRect.has_value());
+	CHECK(srcRect->x == 0);
+	CHECK(srcRect->w == 16);
+	CHECK(fixture.spriteRenderer->GetDrawSize().x == 16);
+	CHECK(fixture.spriteRenderer->GetDrawSize().y == 16);
+}
+
+TEST_CASE("Update pushes the current frame's source rect onto the SpriteRenderer")
+{
+	SpriteAnimatorFixture fixture;
+
+	fixture.backend->nextSize = Vector2I{ 64, 16 };
+	fixture.animator->AddAnimation(MakeProps("Idle", "idle.png", 4, 1, 0, 4.0f, /*loop*/ true));
+	fixture.animator->PlayAnimation("Idle");
+
+	fixture.animator->Update(0.5f); // currentFrame = 4.0 * 0.5 = 2.0
+
+	auto srcRect = fixture.spriteRenderer->GetSourceRect();
+
+	REQUIRE(srcRect.has_value());
+	CHECK(srcRect->x == 32); // frameWidth(16) * frameIndex(2)
+	CHECK(srcRect->w == 16);
 }
 
 
