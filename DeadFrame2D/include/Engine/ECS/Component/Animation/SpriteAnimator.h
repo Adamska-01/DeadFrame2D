@@ -2,7 +2,6 @@
 #include "Core/Math/Rect.h"
 #include "Data/Components/Animation/SpriteAnimationProperties.h"
 #include "Data/Components/Animation/SpriteAnimationState.h"
-#include "Data/Systems/Rendering/Pipeline/RenderTask.h"
 #include "Data/Systems/Rendering/RenderFlip.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/GameComponent.h"
@@ -31,7 +30,7 @@ namespace DF2D::Engine
 	protected:
 		ComponentHandle<Transform> transform;
 
-		ComponentHandle<SpriteRenderer> sprite;
+		ComponentHandle<SpriteRenderer> spriteRenderer;
 
 		Core::TextureManager* textureManager = nullptr;
 
@@ -41,18 +40,23 @@ namespace DF2D::Engine
 
 		Data::SpriteAnimationState animState;
 
-		Data::RenderTask renderTask;
+
+		virtual void OnNewComponentAddedHandler(const ComponentHandle<GameComponent>& comp) override;
+
+		// Pushes the current frame's source rect/size/flip onto the SpriteRenderer.
+		// Only safe to call once `sprite` is bound (see Init/AddAnimation/PlayAnimation).
+		void SyncCurrentFrame();
 
 
 	public:
 		SpriteAnimator();
 
+		virtual ~SpriteAnimator() override;
+
 
 		virtual void Init() override;
 
 		virtual void Update(float dt) override;
-
-		virtual void Draw() override;
 
 
 		void AddAnimation(const Data::SpriteAnimationProperties& properties);
