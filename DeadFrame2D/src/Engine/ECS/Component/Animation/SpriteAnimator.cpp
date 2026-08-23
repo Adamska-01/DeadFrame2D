@@ -56,9 +56,15 @@ namespace DF2D::Engine
 
 		if (animState.currentFrame >= props.columnCount)
 		{
-			animState.currentFrame = props.loop 
-				? 0.0f
-				: static_cast<float>(props.columnCount - 1);
+			if (props.loop)
+			{
+				animState.currentFrame = 0.0f;
+			}
+			else
+			{
+				animState.currentFrame = static_cast<float>(props.columnCount - 1);
+				animState.finished = true;
+			}
 		}
 	}
 
@@ -160,6 +166,9 @@ namespace DF2D::Engine
 	{
 		if (animations.empty())
 			return 0.0f;
+
+		if (animState.finished)
+			return 1.0f;
 
 		const auto& props = animations.at(currentAnimationID);
 
