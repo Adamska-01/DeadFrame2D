@@ -275,7 +275,7 @@ TEST_CASE("Update wraps a looping animation back to frame 0 once it reaches colu
 	CHECK(fixture.animator->GetAnimationProgressRatio() == doctest::Approx(0.0f));
 }
 
-TEST_CASE("Update clamps a non-looping animation to its last frame and keeps it there")
+TEST_CASE("Update clamps a non-looping animation's rendered frame but reports full progress once finished")
 {
 	SpriteAnimatorFixture fixture;
 
@@ -284,16 +284,15 @@ TEST_CASE("Update clamps a non-looping animation to its last frame and keeps it 
 
 	fixture.animator->Update(5.0f);
 
-	auto expectedRatio = 2.0f / 3.0f; // clamped to columnCount - 1
-
-	CHECK(fixture.animator->GetAnimationProgressRatio() == doctest::Approx(expectedRatio));
+	// Progress reports 100% complete even though the rendered frame clamps to columnCount - 1.
+	CHECK(fixture.animator->GetAnimationProgressRatio() == doctest::Approx(1.0f));
 
 	// Regression: a finished non-looping animation must not silently restart on later ticks.
 	fixture.animator->Update(5.0f);
-	CHECK(fixture.animator->GetAnimationProgressRatio() == doctest::Approx(expectedRatio));
+	CHECK(fixture.animator->GetAnimationProgressRatio() == doctest::Approx(1.0f));
 
 	fixture.animator->Update(5.0f);
-	CHECK(fixture.animator->GetAnimationProgressRatio() == doctest::Approx(expectedRatio));
+	CHECK(fixture.animator->GetAnimationProgressRatio() == doctest::Approx(1.0f));
 }
 
 
