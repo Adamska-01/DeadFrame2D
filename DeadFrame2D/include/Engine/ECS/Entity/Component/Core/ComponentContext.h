@@ -73,6 +73,6 @@ namespace DF2D::Engine
 		static_assert(std::is_base_of_v<ComponentContext, T>,
 			"T must derive from ComponentContext");
 
-		return ComponentHandle<T>::From(selfHandle);
+		return ComponentHandle<T>::SafeCast(selfHandle);
 	}
 }

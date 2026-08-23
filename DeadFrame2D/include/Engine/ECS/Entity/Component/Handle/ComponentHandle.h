@@ -30,7 +30,7 @@ namespace DF2D::Engine
 		template<typename U>
 		static ComponentHandle<T> From(const ComponentHandle<U>& other);
 
-		static ComponentHandle<T> From(const ComponentHandleBase& base);
+		static ComponentHandle<T> SafeCast(const ComponentHandleBase& base);
 
 
 		T* operator->() const;
@@ -97,7 +97,7 @@ namespace DF2D::Engine
 	}
 
 	template<typename T>
-	inline ComponentHandle<T> ComponentHandle<T>::From(const ComponentHandleBase& base)
+	inline ComponentHandle<T> ComponentHandle<T>::SafeCast(const ComponentHandleBase& base)
 	{
 		return ValidateAndReturnHandle(base);
 	}
