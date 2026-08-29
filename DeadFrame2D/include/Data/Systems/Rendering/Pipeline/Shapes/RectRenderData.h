@@ -2,6 +2,7 @@
 #include "Constants/CommonColors.h"
 #include "Core/Math/Color.h"
 #include "Core/Math/Rect.h"
+#include "Data/Systems/Rendering/BlendMode.h"
 
 
 namespace DF2D::Data
@@ -15,5 +16,7 @@ namespace DF2D::Data
 		float rotation = 0.0f;
 
 		Core::Color color = Constants::CommonColors::WHITE;
+
+		Data::BlendMode blendMode = Data::BlendMode::ALPHA;
 	};
 }

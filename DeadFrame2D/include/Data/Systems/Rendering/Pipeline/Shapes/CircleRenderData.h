@@ -2,6 +2,7 @@
 #include "Constants/CommonColors.h"
 #include "Core/Math/Color.h"
 #include "Core/Math/Vector2.h"
+#include "Data/Systems/Rendering/BlendMode.h"
 
 
 namespace DF2D::Data
@@ -15,5 +16,7 @@ namespace DF2D::Data
 		bool filled = true;
 
 		Core::Color color = Constants::CommonColors::WHITE;
+
+		Data::BlendMode blendMode = Data::BlendMode::ALPHA;
 	};
 }
