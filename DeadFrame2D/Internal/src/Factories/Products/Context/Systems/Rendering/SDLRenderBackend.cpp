@@ -3,6 +3,7 @@
 #endif
 #include "Constants/MathConstants.h"
 #include "Constants/Rendering/DrawConstants.h"
+#include "Core/Math/MathUtils.h"
 #include "Converters/Rendering/RenderingConversions.h"
 #include "Engine/ECS/System/Events/EventDispatcher.h"
 #include "Engine/Events/Context/Renderer/RenderTargetSizeChangedEvent.h"
@@ -116,7 +117,7 @@ namespace DF2D::Internal
 		const auto cx = rect.x + rect.w * 0.5f;
 		const auto cy = rect.y + rect.h * 0.5f;
 
-		const auto angleRad = angleDegrees * (MathConstants::PI_f / 180.0f);
+		const auto angleRad = Core::MathUtils::ToRadians(angleDegrees);
 		const auto cosA = cosf(angleRad);
 		const auto sinA = sinf(angleRad);
 
