@@ -4,6 +4,7 @@
 #include "Core/Math/Rect.h"
 #include "Core/Math/Vector2.h"
 #include "Data/Systems/Graphics/TextureID.h"
+#include "Data/Systems/Rendering/BlendMode.h"
 #include "Data/Systems/Rendering/RenderFlip.h"
 #include <optional>
 
@@ -25,5 +26,7 @@ namespace DF2D::Data
 		std::optional<Core::Vector2F> rotationOrigin = std::nullopt;
 
 		Core::Color colorMod = Constants::CommonColors::WHITE;
+
+		Data::BlendMode blendMode = Data::BlendMode::ALPHA;
 	};
 }
