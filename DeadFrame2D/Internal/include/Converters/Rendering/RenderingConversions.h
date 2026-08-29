@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Math/Color.h"
 #include "Core/Math/Rect.h"
+#include "Data/Systems/Rendering/BlendMode.h"
 #include "Data/Systems/Rendering/RenderFlip.h"
 #include <SDL_pixels.h>
 #include <SDL_rect.h>
@@ -49,6 +50,16 @@ namespace DF2D::Internal::RenderingConversions
 		case Data::RenderFlip::HORIZONTAL:	return SDL_FLIP_HORIZONTAL;
 		case Data::RenderFlip::VERTICAL:	return SDL_FLIP_VERTICAL;
 		default:							return SDL_FLIP_NONE;
+		}
+	}
+
+	inline SDL_BlendMode ToSDLBlendMode(Data::BlendMode m)
+	{
+		switch (m)
+		{
+		case Data::BlendMode::NONE:		return SDL_BLENDMODE_NONE;
+		case Data::BlendMode::ADDITIVE:	return SDL_BLENDMODE_ADD;
+		default:						return SDL_BLENDMODE_BLEND;
 		}
 	}
 
