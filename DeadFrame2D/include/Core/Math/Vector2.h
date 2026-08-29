@@ -8,7 +8,7 @@
 namespace DF2D::Core
 {
 	template <typename T>
-	class Vector2
+	class Vector2 final
 	{
 	public:
 		T x;
@@ -32,8 +32,6 @@ namespace DF2D::Core
 		Vector2() : x(0), y(0) {}
 
 		Vector2(T x, T y) : x(x), y(y) {}
-
-		virtual	~Vector2() = default;
 
 
 		constexpr T Distance(const Vector2<T>& other) const;
@@ -61,8 +59,6 @@ namespace DF2D::Core
 
 		static constexpr Vector2<T> Lerp(const Vector2<T>& a, const Vector2<T>& b, T t);
 
-
-		constexpr Vector2<T>& operator=(const Vector2<T>& other);
 
 		constexpr Vector2<T> operator+(const Vector2<T>& other) const;
 
@@ -218,15 +214,6 @@ namespace DF2D::Core
 	inline constexpr Vector2<T> Vector2<T>::Lerp(const Vector2<T>& a, const Vector2<T>& b, T t)
 	{
 		return a + (b - a) * t;
-	}
-
-	template<typename T>
-	inline constexpr Vector2<T>& Vector2<T>::operator=(const Vector2<T>& other)
-	{
-		x = other.x;
-		y = other.y;
-
-		return *this;
 	}
 
 	template<typename T>
