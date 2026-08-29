@@ -39,4 +39,62 @@ TEST_CASE("Inequality triggers on any differing channel")
 }
 
 
+TEST_CASE("Color Lerp returns the start colour at t equal to zero")
+{
+	auto from = Color{ .r = 10, .g = 20, .b = 30, .a = 40 };
+	auto to = Color{ .r = 200, .g = 210, .b = 220, .a = 230 };
+
+	CHECK(Color::Lerp(from, to, 0.0f) == from);
+}
+
+
+TEST_CASE("Color Lerp returns the end colour at t equal to one")
+{
+	auto from = Color{ .r = 10, .g = 20, .b = 30, .a = 40 };
+	auto to = Color{ .r = 200, .g = 210, .b = 220, .a = 230 };
+
+	CHECK(Color::Lerp(from, to, 1.0f) == to);
+}
+
+
+TEST_CASE("Color Lerp interpolates every channel including alpha")
+{
+	auto from = Color{ .r = 0, .g = 0, .b = 0, .a = 0 };
+	auto to = Color{ .r = 100, .g = 200, .b = 50, .a = 255 };
+
+	auto result = Color::Lerp(from, to, 0.5f);
+
+	CHECK(result.r == 50);
+	CHECK(result.g == 100);
+	CHECK(result.b == 25);
+	CHECK(result.a == 128);
+}
+
+
+TEST_CASE("Color Lerp clamps t outside the zero to one range")
+{
+	auto from = Color{ .r = 10, .g = 20, .b = 30, .a = 40 };
+	auto to = Color{ .r = 200, .g = 210, .b = 220, .a = 230 };
+
+	CHECK(Color::Lerp(from, to, -3.0f) == from);
+	CHECK(Color::Lerp(from, to, 4.0f) == to);
+}
+
+
+TEST_CASE("Color Lerp between black and white does not overflow the byte channels")
+{
+	auto black = Color{ .r = 0, .g = 0, .b = 0, .a = 255 };
+	auto white = Color{ .r = 255, .g = 255, .b = 255, .a = 255 };
+
+	for (auto step = 0; step <= 100; ++step)
+	{
+		auto result = Color::Lerp(black, white, static_cast<float>(step) / 100.0f);
+
+		CHECK(result.a == 255);
+		CHECK(result.r == result.g);
+		CHECK(result.g == result.b);
+	}
+}
+
+
 TEST_SUITE_END();
