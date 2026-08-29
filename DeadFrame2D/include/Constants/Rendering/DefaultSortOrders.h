@@ -5,6 +5,8 @@ namespace DF2D::Constants::DefaultSortOrders
 {
 	constexpr int SPRITE_RENDERER = 0;
 
+	constexpr int PARTICLE_RENDERER = 1;
+
 	constexpr int TILE_RENDERER = -1;
 
 	constexpr int UI_RENDERER = 0;
