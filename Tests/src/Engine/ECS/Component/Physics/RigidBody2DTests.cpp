@@ -2,6 +2,7 @@
 #include "Core/Context/Abstractions/ICoreSystem.h"
 #include "Core/Context/Systems/Coroutines/CoroutineScheduler.h"
 #include "Core/Context/Systems/Physics/PhysicsEngine2D.h"
+#include "Core/Math/MathUtils.h"
 #include "Engine/ECS/Component/Physics/RigidBody2D.h"
 #include "Engine/ECS/Component/Transform.h"
 #include "Mocks/Context/Systems/Physics/MockPhysicsBackend.h"
@@ -110,7 +111,7 @@ TEST_CASE("Init places the new body at the GameObject's current world transform"
 
 	CHECK(fixture.physicsBackend->lastBodyPosition.x == doctest::Approx(64.0f));
 	CHECK(fixture.physicsBackend->lastBodyPosition.y == doctest::Approx(32.0f));
-	CHECK(fixture.physicsBackend->lastBodyAngle == doctest::Approx(90.0f * MathConstants::PI_f / 180.0f));
+	CHECK(fixture.physicsBackend->lastBodyAngle == doctest::Approx(MathUtils::ToRadians(90.0f)));
 }
 
 TEST_CASE("Removing the component destroys the body it created")
