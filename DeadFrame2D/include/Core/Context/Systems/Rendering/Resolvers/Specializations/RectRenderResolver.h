@@ -36,7 +36,8 @@ namespace DF2D::Core
 				destRect,
 				renderData.rotation,
 				renderData.color,
-				renderData.filled);
+				renderData.filled,
+				renderData.blendMode);
 		}
 
 		static std::optional<Data::RectRenderData> Cull(

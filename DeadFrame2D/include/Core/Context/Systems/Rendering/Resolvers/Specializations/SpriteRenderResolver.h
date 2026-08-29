@@ -44,7 +44,8 @@ namespace DF2D::Core
 				renderData.rotationOrigin,
 				renderData.rotation,
 				renderData.flip,
-				renderData.colorMod);
+				renderData.colorMod,
+				renderData.blendMode);
 		}
 
 		static std::optional<Data::SpriteRenderData> Cull(

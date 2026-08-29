@@ -29,7 +29,7 @@ namespace DF2D::Core
 				p2 = camera->WorldToScreen(renderData.p2);
 			}
 
-			renderBackend.DrawLine(p1, p2, renderData.color);
+			renderBackend.DrawLine(p1, p2, renderData.color, renderData.blendMode);
 		}
 
 		static std::optional<Data::LineRenderData> Cull(

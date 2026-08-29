@@ -34,7 +34,8 @@ namespace DF2D::Core
 				pos,
 				radius,
 				renderData.color,
-				renderData.filled);
+				renderData.filled,
+				renderData.blendMode);
 		}
 
 

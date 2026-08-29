@@ -31,7 +31,7 @@ namespace DF2D::Core
 					p2 = camera->WorldToScreen(p2);
 				}
 
-				renderBackend.DrawLine(p1, p2, line.color);
+				renderBackend.DrawLine(p1, p2, line.color, line.blendMode);
 			}
 		}
 

@@ -26,7 +26,7 @@ namespace DF2D::Core
 				pos = camera->WorldToScreen(renderData.pos);
 			}
 
-			renderBackend.DrawPixel(pos, renderData.color);
+			renderBackend.DrawPixel(pos, renderData.color, renderData.blendMode);
 		}
 
 		static std::optional<Data::PointRenderData> Cull(

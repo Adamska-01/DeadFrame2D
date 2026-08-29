@@ -46,7 +46,8 @@ namespace DF2D::Core
 					sprite.rotationOrigin,
 					sprite.rotation,
 					sprite.flip,
-					sprite.colorMod);
+					sprite.colorMod,
+					sprite.blendMode);
 			}
 		}
 

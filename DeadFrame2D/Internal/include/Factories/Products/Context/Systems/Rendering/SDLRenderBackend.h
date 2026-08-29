@@ -29,6 +29,11 @@ namespace DF2D::Internal
 
 		Core::Vector2I resolutionTarget;
 
+		Data::BlendMode currentDrawBlendMode = Data::BlendMode::ALPHA;
+
+
+		void ApplyDrawBlendMode(Data::BlendMode blendMode);
+
 
 	public:
 		SDLRenderBackend(SDL_Window* window, const Models::RendererConfig& config, Engine::EventDispatcher& eventDispatcher);
@@ -44,13 +49,30 @@ namespace DF2D::Internal
 		SDLRenderBackend& operator=(SDLRenderBackend&&) = delete;
 
 
-		void DrawPixel(const Core::Vector2F& pixelPos, Core::Color color = Constants::CommonColors::WHITE) override;
+		void DrawPixel(
+			const Core::Vector2F& pixelPos,
+			Core::Color color = Constants::CommonColors::WHITE,
+			Data::BlendMode blendMode = Data::BlendMode::ALPHA) override;
 
-		void DrawLine(const Core::Vector2F& p1, const Core::Vector2F& p2, Core::Color color = Constants::CommonColors::WHITE) override;
+		void DrawLine(
+			const Core::Vector2F& p1,
+			const Core::Vector2F& p2,
+			Core::Color color = Constants::CommonColors::WHITE,
+			Data::BlendMode blendMode = Data::BlendMode::ALPHA) override;
 
-		void DrawRect(Core::RectF rect, float angleDegrees, Core::Color color = Constants::CommonColors::WHITE, bool filled = false) override;
+		void DrawRect(
+			Core::RectF rect,
+			float angleDegrees,
+			Core::Color color = Constants::CommonColors::WHITE,
+			bool filled = false,
+			Data::BlendMode blendMode = Data::BlendMode::ALPHA) override;
 
-		void DrawCircle(const Core::Vector2F& center, float radius, Core::Color color, bool filled) override;
+		void DrawCircle(
+			const Core::Vector2F& center,
+			float radius,
+			Core::Color color,
+			bool filled,
+			Data::BlendMode blendMode = Data::BlendMode::ALPHA) override;
 
 		void DrawTexture(
 			Data::TextureID textureID,
@@ -59,7 +81,8 @@ namespace DF2D::Internal
 			const std::optional<Core::Vector2F>& rotationOrigin = std::nullopt,
 			float angle = 0.0f,
 			Data::RenderFlip flip = Data::RenderFlip::NONE,
-			Core::Color colorMod = Constants::CommonColors::WHITE) override;
+			Core::Color colorMod = Constants::CommonColors::WHITE,
+			Data::BlendMode blendMode = Data::BlendMode::ALPHA) override;
 
 		void SetRenderTarget(Data::TextureID renderTarget) override;
 

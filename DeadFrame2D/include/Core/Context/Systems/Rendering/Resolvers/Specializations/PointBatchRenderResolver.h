@@ -29,7 +29,7 @@ namespace DF2D::Core
 					pos = camera->WorldToScreen(pos);
 				}
 
-				renderBackend.DrawPixel(pos, point.color);
+				renderBackend.DrawPixel(pos, point.color, point.blendMode);
 			}
 		}
 

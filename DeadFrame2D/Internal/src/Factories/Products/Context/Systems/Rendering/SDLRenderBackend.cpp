@@ -64,10 +64,22 @@ namespace DF2D::Internal
 	}
 
 
-	void SDLRenderBackend::DrawPixel(const Vector2F& pixelPos, Color color)
+	void SDLRenderBackend::ApplyDrawBlendMode(Data::BlendMode blendMode)
+	{
+		if (blendMode == currentDrawBlendMode)
+			return;
+
+		SDL_SetRenderDrawBlendMode(renderer, ToSDLBlendMode(blendMode));
+
+		currentDrawBlendMode = blendMode;
+	}
+
+	void SDLRenderBackend::DrawPixel(const Vector2F& pixelPos, Color color, Data::BlendMode blendMode)
 	{
 		if (renderer == nullptr)
 			return;
+
+		ApplyDrawBlendMode(blendMode);
 
 		auto previousBackgroundColor = GetDisplayColor();
 
@@ -78,10 +90,12 @@ namespace DF2D::Internal
 		SetDisplayColor(previousBackgroundColor.r, previousBackgroundColor.g, previousBackgroundColor.b, previousBackgroundColor.a);
 	}
 
-	void SDLRenderBackend::DrawLine(const Vector2F& p1, const Vector2F& p2, Color color)
+	void SDLRenderBackend::DrawLine(const Vector2F& p1, const Vector2F& p2, Color color, Data::BlendMode blendMode)
 	{
 		if (renderer == nullptr)
 			return;
+
+		ApplyDrawBlendMode(blendMode);
 
 		auto previousBackgroundColor = GetDisplayColor();
 
@@ -92,10 +106,12 @@ namespace DF2D::Internal
 		SetDisplayColor(previousBackgroundColor.r, previousBackgroundColor.g, previousBackgroundColor.b, previousBackgroundColor.a);
 	}
 
-	void SDLRenderBackend::DrawRect(RectF rect, float angleDegrees, Color color, bool filled)
+	void SDLRenderBackend::DrawRect(RectF rect, float angleDegrees, Color color, bool filled, Data::BlendMode blendMode)
 	{
 		if (renderer == nullptr)
 			return;
+
+		ApplyDrawBlendMode(blendMode);
 
 		const auto cx = rect.x + rect.w * 0.5f;
 		const auto cy = rect.y + rect.h * 0.5f;
@@ -157,10 +173,12 @@ namespace DF2D::Internal
 		}
 	}
 
-	void SDLRenderBackend::DrawCircle(const Vector2F& center, float radius, Color color, bool filled)
+	void SDLRenderBackend::DrawCircle(const Vector2F& center, float radius, Color color, bool filled, Data::BlendMode blendMode)
 	{
 		if (renderer == nullptr)
 			return;
+
+		ApplyDrawBlendMode(blendMode);
 
 		const auto segments = DrawConstants::CIRCLE_SEGMENTS;
 
@@ -215,7 +233,15 @@ namespace DF2D::Internal
 		}
 	}
 
-	void SDLRenderBackend::DrawTexture(Data::TextureID textureID, const std::optional<RectI>& srcRect, const std::optional<RectF>& dstRect, const std::optional<Vector2F>& rotationOrigin, float angle, Data::RenderFlip flip, Color colorMod)
+	void SDLRenderBackend::DrawTexture(
+		Data::TextureID textureID,
+		const std::optional<RectI>& srcRect,
+		const std::optional<RectF>& dstRect,
+		const std::optional<Vector2F>& rotationOrigin,
+		float angle,
+		Data::RenderFlip flip,
+		Color colorMod,
+		Data::BlendMode blendMode)
 	{
 		auto* texture = textureRegistry.GetTexture(textureID);
 
@@ -242,6 +268,8 @@ namespace DF2D::Internal
 		auto sdlColorMod = ToSDLColor(colorMod);
 		SDL_SetTextureAlphaMod(texture, sdlColorMod.a);
 		SDL_SetTextureColorMod(texture, sdlColorMod.r, sdlColorMod.g, sdlColorMod.b);
+
+		SDL_SetTextureBlendMode(texture, ToSDLBlendMode(blendMode));
 
 		SDL_FPoint fallbackOrigin
 		{
@@ -297,6 +325,8 @@ namespace DF2D::Internal
 
 	void SDLRenderBackend::ClearCurrentRenderTarget()
 	{
+		ApplyDrawBlendMode(Data::BlendMode::NONE);
+
 		SDL_RenderClear(renderer);
 	}
 

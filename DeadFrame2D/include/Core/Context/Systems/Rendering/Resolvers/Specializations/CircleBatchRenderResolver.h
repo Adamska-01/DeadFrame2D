@@ -36,7 +36,8 @@ namespace DF2D::Core
 					pos,
 					radius,
 					circle.color,
-					circle.filled);
+					circle.filled,
+					circle.blendMode);
 			}
 		}
 

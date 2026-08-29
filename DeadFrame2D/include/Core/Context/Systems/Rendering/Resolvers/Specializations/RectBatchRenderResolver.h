@@ -38,7 +38,8 @@ namespace DF2D::Core
 					destRect,
 					rect.rotation,
 					rect.color,
-					rect.filled);
+					rect.filled,
+					rect.blendMode);
 			}
 		}
 
