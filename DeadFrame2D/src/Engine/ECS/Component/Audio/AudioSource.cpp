@@ -1,5 +1,6 @@
 #include "Core/Context/Systems/Audio/AudioManager.h"
 #include "Core/Context/Systems/Physics/PhysicsEngine2D.h"
+#include "Core/Math/MathUtils.h"
 #include "Engine/ECS/Component/Audio/AudioListener.h"
 #include "Engine/ECS/Component/Audio/AudioSource.h"
 #include "Engine/ECS/Component/Transform.h"
@@ -130,7 +131,7 @@ namespace DF2D::Engine
 		lastTransformPosition = transform->GetWorldPosition();
 		lastTransformRotation = transform->GetWorldRotation();
 
-		auto angleRad = lastTransformRotation * (MathConstants::PI_f / 180.0f);
+		auto angleRad = MathUtils::ToRadians(lastTransformRotation);
 
 		physicsEngine->SetBodyTransform(collisionBody, lastTransformPosition, angleRad);
 
@@ -171,7 +172,7 @@ namespace DF2D::Engine
 
 		if (currentTransformPosition != lastTransformPosition || currentTransformRotation != lastTransformRotation)
 		{
-			auto angleRad = currentTransformRotation * (MathConstants::PI_f / 180.0f);
+			auto angleRad = MathUtils::ToRadians(currentTransformRotation);
 
 			physicsEngine->SetBodyTransform(collisionBody, currentTransformPosition, angleRad);
 			physicsEngine->SetBodyAwake(collisionBody, true);

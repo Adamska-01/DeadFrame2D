@@ -1,4 +1,5 @@
 #include "Constants/TiledPropertyNames.h"
+#include "Core/Math/MathUtils.h"
 #include "Engine/ECS/Component/Collisions/Tile/Tiled/TiledMapCompatibleCollider2D.h"
 #include "Engine/ECS/Component/Physics/RigidBody2D.h"
 #include "Engine/ECS/Component/Transform.h"
@@ -58,7 +59,7 @@ namespace DF2D::Engine
 		if (rigidBody == nullptr)
 			return;
 
-		auto angle = transform->GetWorldRotation() * (MathConstants::PI_f / 180.0f);
+		auto angle = MathUtils::ToRadians(transform->GetWorldRotation());
 
 		for (const auto& layer : collisionLayers)
 		{

@@ -1,4 +1,4 @@
-#include "Constants/MathConstants.h"
+#include "Core/Math/MathUtils.h"
 #include "Engine/ECS/Component/Transform.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
@@ -126,7 +126,7 @@ namespace DF2D::Engine
 
 	void Transform::RotateByRadians(float radian)
 	{
-		localRotation += radian * (180.0f / MathConstants::PI_f);
+		localRotation += MathUtils::ToDegrees(radian);
 
 		MarkDirty();
 	}
@@ -189,7 +189,7 @@ namespace DF2D::Engine
 
 	Vector2F Transform::GetForward() const
 	{
-		auto radians = GetWorldRotation() * (MathConstants::PI_f / 180.0f);
+		auto radians = MathUtils::ToRadians(GetWorldRotation());
 
 		return Vector2F(cosf(radians), sinf(radians));
 	}

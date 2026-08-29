@@ -1,5 +1,6 @@
 #include "Core/Context/Systems/Coroutines/CoroutineScheduler.h"
 #include "Core/Context/Systems/Physics/PhysicsEngine2D.h"
+#include "Core/Math/MathUtils.h"
 #include "Engine/ECS/Component/Physics/RigidBody2D.h"
 #include "Engine/ECS/Component/Transform.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
@@ -61,7 +62,7 @@ namespace DF2D::Engine
 		lastTransformPosition = transform->GetWorldPosition();
 		lastTransformRotation = transform->GetWorldRotation();
 
-		auto angleRad = lastTransformRotation * (MathConstants::PI_f / 180.0f);
+		auto angleRad = MathUtils::ToRadians(lastTransformRotation);
 
 		physicsEngine->SetBodyTransform(body, lastTransformPosition, angleRad);
 	}
@@ -89,7 +90,7 @@ namespace DF2D::Engine
 				bodyTransform.position = currentTransformPosition;
 
 			if (currentTransformRotation != lastTransformRotation)
-				bodyTransform.angle = currentTransformRotation * (MathConstants::PI_f / 180.0f);
+				bodyTransform.angle = MathUtils::ToRadians(currentTransformRotation);
 
 			physicsEngine->SetBodyTransform(body, bodyTransform.position, bodyTransform.angle);
 		}
@@ -98,7 +99,7 @@ namespace DF2D::Engine
 
 		// Sync transform to physics body
 		transform->SetWorldPosition(bodyTransform.position);
-		transform->SetLocalRotation(bodyTransform.angle * (180.0f / MathConstants::PI_f));
+		transform->SetLocalRotation(MathUtils::ToDegrees(bodyTransform.angle));
 
 		lastTransformPosition = transform->GetWorldPosition();
 		lastTransformRotation = transform->GetWorldRotation();
