@@ -1,5 +1,6 @@
 #pragma once
 #include "Constants/MathConstants.h"
+#include "Core/Math/MathUtils.h"
 #include <cmath>
 #include <iostream>
 #include <tuple>
@@ -174,7 +175,7 @@ namespace DF2D::Core
 	template<typename T>
 	inline constexpr Vector2<T> Vector2<T>::Rotated(float angleInDegrees) const
 	{
-		auto radians = (angleInDegrees * Constants::MathConstants::PI_f) / 180.0f;
+		auto radians = MathUtils::ToRadians(angleInDegrees);
 		auto cosA = cosf(radians);
 		auto sinA = sinf(radians);
 
