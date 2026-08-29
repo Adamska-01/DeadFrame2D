@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Context/Systems/Rendering/Abstractions/IRenderBackend.h"
+#include <vector>
 
 
 struct MockRenderBackend : DF2D::Core::IRenderBackend
@@ -21,6 +22,10 @@ struct MockRenderBackend : DF2D::Core::IRenderBackend
 
 	int drawCount{0};
 
+	DF2D::Data::BlendMode lastBlendMode{DF2D::Data::BlendMode::ALPHA};
+
+	std::vector<DF2D::Data::BlendMode> blendModes;
+
 	DF2D::Core::Vector2I lastRenderTargetSize{};
 
 	DF2D::Data::TextureID lastDestroyedTexture{0};
@@ -28,24 +33,38 @@ struct MockRenderBackend : DF2D::Core::IRenderBackend
 	DF2D::Core::RectI lastViewport{};
 
 
-	void DrawPixel(const DF2D::Core::Vector2F&, DF2D::Core::Color) override
+	void RecordBlendMode(DF2D::Data::BlendMode blendMode)
 	{
-		drawCount++;
+		lastBlendMode = blendMode;
+		blendModes.push_back(blendMode);
 	}
 
-	void DrawLine(const DF2D::Core::Vector2F&, const DF2D::Core::Vector2F&, DF2D::Core::Color) override
+	void DrawPixel(const DF2D::Core::Vector2F&, DF2D::Core::Color, DF2D::Data::BlendMode blendMode) override
 	{
 		drawCount++;
+
+		RecordBlendMode(blendMode);
 	}
 
-	void DrawRect(DF2D::Core::RectF, float, DF2D::Core::Color, bool) override
+	void DrawLine(const DF2D::Core::Vector2F&, const DF2D::Core::Vector2F&, DF2D::Core::Color, DF2D::Data::BlendMode blendMode) override
 	{
 		drawCount++;
+
+		RecordBlendMode(blendMode);
 	}
 
-	void DrawCircle(const DF2D::Core::Vector2F&, float, DF2D::Core::Color, bool) override
+	void DrawRect(DF2D::Core::RectF, float, DF2D::Core::Color, bool, DF2D::Data::BlendMode blendMode) override
 	{
 		drawCount++;
+
+		RecordBlendMode(blendMode);
+	}
+
+	void DrawCircle(const DF2D::Core::Vector2F&, float, DF2D::Core::Color, bool, DF2D::Data::BlendMode blendMode) override
+	{
+		drawCount++;
+
+		RecordBlendMode(blendMode);
 	}
 
 	void DrawTexture(
@@ -55,9 +74,12 @@ struct MockRenderBackend : DF2D::Core::IRenderBackend
 		const std::optional<DF2D::Core::Vector2F>&,
 		float,
 		DF2D::Data::RenderFlip,
-		DF2D::Core::Color) override
+		DF2D::Core::Color,
+		DF2D::Data::BlendMode blendMode) override
 	{
 		drawCount++;
+
+		RecordBlendMode(blendMode);
 	}
 
 	void SetRenderTarget(DF2D::Data::TextureID) override
