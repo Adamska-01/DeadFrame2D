@@ -86,14 +86,19 @@ TEST_CASE("Color Lerp between black and white does not overflow the byte channel
 	auto black = Color{ .r = 0, .g = 0, .b = 0, .a = 255 };
 	auto white = Color{ .r = 255, .g = 255, .b = 255, .a = 255 };
 
+	auto staysWithinRange = true;
+
 	for (auto step = 0; step <= 100; ++step)
 	{
 		auto result = Color::Lerp(black, white, static_cast<float>(step) / 100.0f);
 
-		CHECK(result.a == 255);
-		CHECK(result.r == result.g);
-		CHECK(result.g == result.b);
+		if (result.a != 255 || result.r != result.g || result.g != result.b)
+		{
+			staysWithinRange = false;
+		}
 	}
+
+	CHECK(staysWithinRange);
 }
 
 
