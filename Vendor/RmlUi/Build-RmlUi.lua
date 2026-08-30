@@ -18,7 +18,10 @@ project "RmlUi"
 
 	defines {
 		"RMLUI_STATIC_LIB",
-		"RMLUI_VERSION=\"6.3\""
+		"RMLUI_VERSION=\"6.3\"",
+		-- Compiles in the default FreeType font engine AND registers it at Initialise. Without this the
+		-- FontEngineDefault sources still build, but no font engine is installed and Initialise fails.
+		"RMLUI_FONT_ENGINE_FREETYPE"
 	}
 
 	files {

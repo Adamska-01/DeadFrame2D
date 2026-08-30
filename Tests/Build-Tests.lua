@@ -25,12 +25,11 @@ project "Tests"
 		"../Vendor/Box2D/Module/include",
 		"../Vendor/SDL/SDL2-2.30.10/include", 
 		"../Vendor/SDL/SDL2_image-2.8.2/include", 
-		"../Vendor/SDL/SDL2_ttf-2.22.0/include", 
 		"../Vendor/SDL/SDL2_mixer-2.8.0/include",
 		"../Vendor/Doctest/Module/doctest"
 	}
 
-	links { "DeadFrame2D", "SDL2", "SDL2_image", "SDL2_ttf", "SDL2_mixer", "Box2D", "tinyxml2" }
+	links { "DeadFrame2D", "SDL2", "SDL2_image", "SDL2_mixer", "Box2D", "tinyxml2" }
 
 
 	function configure_platform_libs(osName, arch)
@@ -47,7 +46,6 @@ project "Tests"
 		local libs = {
 			SDL2       = "2.30.10",
 			SDL2_image = "2.8.2",
-			SDL2_ttf   = "2.22.0",
 			SDL2_mixer = "2.8.0"
 		}
 		local engineDir = "../DeadFrame2D/Binaries/" .. osName .. "-" .. "%{cfg.architecture}" .. "/%{cfg.buildcfg}/"

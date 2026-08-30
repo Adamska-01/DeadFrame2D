@@ -31,11 +31,10 @@ project "DeadFrame2D"
 		"../Vendor/RmlUi/Module/Include",
 		"../Vendor/SDL/SDL2-2.30.10/include", 
 		"../Vendor/SDL/SDL2_image-2.8.2/include", 
-		"../Vendor/SDL/SDL2_ttf-2.22.0/include", 
 		"../Vendor/SDL/SDL2_mixer-2.8.0/include" 
 	}
 
-	links { "Box2D", "FreeType", "RmlUi", "tinyxml2", "SDL2", "SDL2_image", "SDL2_ttf", "SDL2_mixer" }
+	links { "Box2D", "FreeType", "RmlUi", "tinyxml2", "SDL2", "SDL2_image", "SDL2_mixer" }
 
 
 	-- Utility to configure platform + arch libdirs in a single call
