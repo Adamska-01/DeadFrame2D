@@ -37,21 +37,24 @@ namespace DF2D::Core
 
 	Data::TextureID TextureManager::LoadTexture(std::string_view filename)
 	{
-		auto filenameString = std::string(filename);
+		auto source = std::string(filename);
 
-		auto it = filenameToID.find(filenameString);
+		auto cached = sourceToID.find(source);
 
-		if (it != filenameToID.end())
-			return it->second;
+		if (cached != sourceToID.end())
+			return cached->second;
 
-		auto id = backend->LoadFromFile(filenameString);
+		auto id = backend->LoadFromFile(source);
 
 		if (id == 0)
 			return Data::TextureID{};
 
-		auto size = backend->GetTextureSize(id);
-		textureSizes[id] = size;
-		filenameToID[filenameString] = id;
+		textures[id] = TextureRecord
+		{
+			.size = backend->GetTextureSize(id),
+			.source = source
+		};
+		sourceToID[source] = id;
 
 		return id;
 	}
@@ -63,48 +66,48 @@ namespace DF2D::Core
 		if (id == 0)
 			return Data::TextureID{};
 
-		textureSizes[id] = size;
+		// No source path: generated textures are owned by their caller and never deduped.
+		textures[id] = TextureRecord
+		{
+			.size = size,
+			.source = {}
+		};
 
 		return id;
 	}
 
 	void TextureManager::UnloadTexture(Data::TextureID id)
 	{
-		if (id == 0)
+		auto it = textures.find(id);
+
+		if (it == textures.end())
 			return;
+
+		if (!it->second.source.empty())
+		{
+			sourceToID.erase(it->second.source);
+		}
 
 		backend->UnloadTexture(id);
 
-		textureSizes.erase(id);
-
-		// Generated textures are not in the path cache, so this only matters for file-backed ones:
-		// leaving a stale entry behind would hand out a destroyed ID on the next LoadTexture.
-		for (auto it = filenameToID.begin(); it != filenameToID.end(); ++it)
-		{
-			if (it->second != id)
-				continue;
-
-			filenameToID.erase(it);
-
-			break;
-		}
+		textures.erase(it);
 	}
 
 	Vector2I TextureManager::GetTextureSize(Data::TextureID id)
 	{
-		auto it = textureSizes.find(id);
+		auto it = textures.find(id);
 
-		return it != textureSizes.end() ? it->second : Vector2I::Zero;
+		return it != textures.end() ? it->second.size : Vector2I::Zero;
 	}
 
 	void TextureManager::ClearCache()
 	{
-		for (const auto& [filename, id] : filenameToID)
+		for (const auto& [id, record] : textures)
 		{
 			backend->UnloadTexture(id);
 		}
 
-		filenameToID.clear();
-		textureSizes.clear();
+		textures.clear();
+		sourceToID.clear();
 	}
 }

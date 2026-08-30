@@ -15,9 +15,18 @@ namespace DF2D::Core
 	class DF2D_API TextureManager : public ICoreSystem
 	{
 	private:
-		std::unordered_map<std::string, Data::TextureID> filenameToID;
+		/** @brief Everything known about one live texture. The source path is empty for generated ones. */
+		struct TextureRecord
+		{
+			Vector2I size;
 
-		std::unordered_map<Data::TextureID, Vector2I> textureSizes;
+			std::string source;
+		};
+
+
+		std::unordered_map<Data::TextureID, TextureRecord> textures;
+
+		std::unordered_map<std::string, Data::TextureID> sourceToID;
 
 		std::unique_ptr<ITextureBackend> backend;
 
