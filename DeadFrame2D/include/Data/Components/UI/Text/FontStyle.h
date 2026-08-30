@@ -4,26 +4,30 @@
 
 namespace DF2D::Data
 {
-	// Values match TTF_STYLE_* so SDL backends can forward them directly.
-	enum FontStyle
+	/**
+	 * @brief Typographic styles that can be combined on a run of text.
+	 */
+	enum class FontStyle : uint8_t
 	{
-		NORMAL			= 0x00,
+		NORMAL			= 0,
 
-		BOLD			= 0x01,
+		BOLD			= 1 << 0,
 
-		ITALIC			= 0x02,
+		ITALIC			= 1 << 1,
 
-		UNDERLINE		= 0x04,
+		UNDERLINE		= 1 << 2,
 
-		STRIKETHROUGH	= 0x08
+		STRIKETHROUGH	= 1 << 3
 	};
-}
 
 
-namespace DF2D::Data
-{
-	inline FontStyle operator|(FontStyle lhs, FontStyle rhs)
+	inline constexpr FontStyle operator|(FontStyle lhs, FontStyle rhs)
 	{
 		return static_cast<FontStyle>(static_cast<uint8_t>(lhs) | static_cast<uint8_t>(rhs));
+	}
+
+	inline constexpr bool HasFontStyle(FontStyle value, FontStyle flag)
+	{
+		return (static_cast<uint8_t>(value) & static_cast<uint8_t>(flag)) != 0;
 	}
 }

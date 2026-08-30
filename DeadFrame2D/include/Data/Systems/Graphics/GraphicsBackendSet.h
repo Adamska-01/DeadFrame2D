@@ -1,7 +1,6 @@
 #pragma once
 #include "Core/Context/Systems/Graphics/Abstractions/ITextureBackend.h"
 #include "Core/Context/Systems/Rendering/Abstractions/IRenderBackend.h"
-#include "Core/Context/Systems/UI/Abstractions/ITextBackend.h"
 #include "Core/Context/Systems/Window/Abstractions/IWindowBackend.h"
 #include <memory>
 
@@ -15,7 +14,5 @@ namespace DF2D::Data
 		std::unique_ptr<Core::IRenderBackend> renderBackend;
 
 		std::unique_ptr<Core::ITextureBackend> textureBackend;
-
-		std::unique_ptr<Core::ITextBackend> textBackend;
 	};
 }
