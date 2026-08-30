@@ -1,6 +1,7 @@
 #pragma once
 #include "Data/Systems/Rendering/Pipeline/Shapes/CircleBatchRenderData.h"
 #include "Data/Systems/Rendering/Pipeline/Shapes/CircleRenderData.h"
+#include "Data/Systems/Rendering/Pipeline/Shapes/GeometryRenderData.h"
 #include "Data/Systems/Rendering/Pipeline/Shapes/LineBatchRenderData.h"
 #include "Data/Systems/Rendering/Pipeline/Shapes/LineRenderData.h"
 #include "Data/Systems/Rendering/Pipeline/Shapes/PointBatchRenderData.h"
@@ -22,5 +23,6 @@ namespace DF2D::Data
 		PointBatchRenderData,
 		LineBatchRenderData,
 		CircleBatchRenderData,
-		SpriteBatchRenderData>;
+		SpriteBatchRenderData,
+		GeometryRenderData>;
 }
