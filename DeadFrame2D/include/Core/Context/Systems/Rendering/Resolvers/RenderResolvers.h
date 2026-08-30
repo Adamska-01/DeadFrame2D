@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Context/Systems/Rendering/Resolvers/Specializations/CircleBatchRenderResolver.h"
 #include "Core/Context/Systems/Rendering/Resolvers/Specializations/CircleRenderResolver.h"
+#include "Core/Context/Systems/Rendering/Resolvers/Specializations/GeometryRenderResolver.h"
 #include "Core/Context/Systems/Rendering/Resolvers/Specializations/LineBatchRenderResolver.h"
 #include "Core/Context/Systems/Rendering/Resolvers/Specializations/LineRenderResolver.h"
 #include "Core/Context/Systems/Rendering/Resolvers/Specializations/PointBatchRenderResolver.h"
