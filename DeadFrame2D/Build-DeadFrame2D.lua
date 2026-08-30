@@ -8,9 +8,9 @@ project "DeadFrame2D"
 	objdir ("./Binaries/Intermediates/" .. OutputDir)
 	debugdir "../" -- Set working directory to the root of the solution
 
-	defines { "DF2D_DYNAMIC", "DF2D_DYNAMIC_BUILD" }
+	defines { "DF2D_DYNAMIC", "DF2D_DYNAMIC_BUILD", "RMLUI_STATIC_LIB" }
 
-	dependson { "Box2D", "tinyxml2" }
+	dependson { "Box2D", "FreeType", "RmlUi", "tinyxml2" }
 
 	files { 
 		"include/**.h", 
@@ -27,13 +27,15 @@ project "DeadFrame2D"
 		"../Vendor/nlohmann-3.11.3", 
 		"../Vendor/tinyxml2-10.0.0", 
 		"../Vendor/Box2D/Module/include",
+		"../Vendor/FreeType/Module/include",
+		"../Vendor/RmlUi/Module/Include",
 		"../Vendor/SDL/SDL2-2.30.10/include", 
 		"../Vendor/SDL/SDL2_image-2.8.2/include", 
 		"../Vendor/SDL/SDL2_ttf-2.22.0/include", 
 		"../Vendor/SDL/SDL2_mixer-2.8.0/include" 
 	}
 
-	links { "SDL2", "SDL2_image", "SDL2_ttf", "SDL2_mixer", "Box2D", "tinyxml2" }
+	links { "Box2D", "FreeType", "RmlUi", "tinyxml2", "SDL2", "SDL2_image", "SDL2_ttf", "SDL2_mixer" }
 
 
 	-- Utility to configure platform + arch libdirs in a single call
@@ -41,6 +43,8 @@ project "DeadFrame2D"
 		libdirs(table.join(
 			get_sdl_libdirs("../Vendor/SDL/", osName, arch),
 			get_libdir("../Vendor/Box2D/Binaries/"),
+			get_libdir("../Vendor/FreeType/Binaries/"),
+			get_libdir("../Vendor/RmlUi/Binaries/"),
 			get_libdir("../Vendor/tinyxml2-10.0.0/Binaries/")
 		))
 	end
