@@ -9,6 +9,7 @@
 #include "Engine/Events/Context/Renderer/RenderTargetSizeChangedEvent.h"
 #include "Factories/Products/Context/Systems/Rendering/SDLRenderBackend.h"
 #include <SDL.h>
+#include <cstddef>
 #include <iostream>
 
 
@@ -18,7 +19,7 @@ namespace DF2D::Internal
 	using namespace DF2D::Core;
 	using namespace DF2D::Data;
 	using namespace DF2D::Engine;
-	using namespace DF2D::Internal::RenderingConversions;
+	using namespace DF2D::Internal;
 
 
 	SDLRenderBackend::SDLRenderBackend(SDL_Window* window, const Models::RendererConfig& config, EventDispatcher& eventDispatcher)
@@ -70,7 +71,7 @@ namespace DF2D::Internal
 		if (blendMode == currentDrawBlendMode)
 			return;
 
-		SDL_SetRenderDrawBlendMode(renderer, ToSDLBlendMode(blendMode));
+		SDL_SetRenderDrawBlendMode(renderer, RenderingConversions::ToSDLBlendMode(blendMode));
 
 		currentDrawBlendMode = blendMode;
 	}
@@ -138,7 +139,7 @@ namespace DF2D::Internal
 			p.y = y;
 		}
 
-		auto sdlColor = ToSDLColor(color);
+		auto sdlColor = RenderingConversions::ToSDLColor(color);
 
 		if (filled)
 		{
@@ -183,7 +184,7 @@ namespace DF2D::Internal
 
 		const auto segments = DrawConstants::CIRCLE_SEGMENTS;
 
-		auto sdlColor = ToSDLColor(color);
+		auto sdlColor = RenderingConversions::ToSDLColor(color);
 
 		if (filled)
 		{
@@ -252,7 +253,7 @@ namespace DF2D::Internal
 		SDL_FRect dest{};
 		if (dstRect.has_value())
 		{
-			dest = ToSDLFRect(*dstRect);
+			dest = RenderingConversions::ToSDLFRect(*dstRect);
 		}
 		else
 		{
@@ -266,11 +267,11 @@ namespace DF2D::Internal
 		SDL_GetTextureAlphaMod(texture, &oldAlpha);
 		SDL_GetTextureColorMod(texture, &oldR, &oldG, &oldB);
 
-		auto sdlColorMod = ToSDLColor(colorMod);
+		auto sdlColorMod = RenderingConversions::ToSDLColor(colorMod);
 		SDL_SetTextureAlphaMod(texture, sdlColorMod.a);
 		SDL_SetTextureColorMod(texture, sdlColorMod.r, sdlColorMod.g, sdlColorMod.b);
 
-		SDL_SetTextureBlendMode(texture, ToSDLBlendMode(blendMode));
+		SDL_SetTextureBlendMode(texture, RenderingConversions::ToSDLBlendMode(blendMode));
 
 		SDL_FPoint fallbackOrigin
 		{
@@ -290,7 +291,7 @@ namespace DF2D::Internal
 		SDL_Rect* srcPtr = nullptr;
 		if (srcRect.has_value())
 		{
-			sdlSrcRect = ToSDLRect(*srcRect);
+			sdlSrcRect = RenderingConversions::ToSDLRect(*srcRect);
 			srcPtr = &sdlSrcRect;
 		}
 
@@ -301,10 +302,88 @@ namespace DF2D::Internal
 			&dest,
 			angle,
 			originPtr ? originPtr : &fallbackOrigin,
-			ToSDLRenderFlip(flip));
+			RenderingConversions::ToSDLRenderFlip(flip));
 
 		SDL_SetTextureAlphaMod(texture, oldAlpha);
 		SDL_SetTextureColorMod(texture, oldR, oldG, oldB);
+	}
+
+	void SDLRenderBackend::DrawGeometry(
+		Data::TextureID textureID,
+		std::span<const Vertex2D> vertices,
+		std::span<const uint32_t> indices,
+		const Vector2F& translation,
+		Data::BlendMode blendMode)
+	{
+		if (renderer == nullptr || vertices.empty() || indices.empty())
+			return;
+
+		// SDL reads the three vertex channels as independent strided arrays, so Vertex2D can be handed
+		// over directly instead of being unpacked into parallel buffers. That only holds while the
+		// engine types match SDL's layout byte for byte.
+		static_assert(sizeof(Core::Color) == sizeof(SDL_Color), "Color must match SDL_Color layout");
+		static_assert(offsetof(Vertex2D, position) == 0, "Vertex2D.position must lead the struct");
+		static_assert(sizeof(Vector2F) == 2 * sizeof(float), "Vector2F must be two tightly packed floats");
+
+		auto* texture = textureRegistry.GetTexture(textureID);
+
+		// Blending is taken from the texture when one is bound and from the renderer otherwise, so
+		// both are set rather than guessing which path SDL will take.
+		if (texture != nullptr)
+		{
+			SDL_SetTextureBlendMode(texture, RenderingConversions::ToSDLBlendMode(blendMode));
+		}
+
+		ApplyDrawBlendMode(blendMode);
+
+		// SDL_RenderGeometryRaw applies no transform of its own, so a translated command needs its
+		// positions materialised. An untranslated one streams straight out of the vertex span.
+		const auto* positions = &vertices[0].position.x;
+		auto positionStride = static_cast<int>(sizeof(Vertex2D));
+
+		if (!translation.IsZero())
+		{
+			translatedPositions.resize(vertices.size());
+
+			for (size_t i = 0; i < vertices.size(); ++i)
+			{
+				translatedPositions[i] = vertices[i].position + translation;
+			}
+
+			positions = &translatedPositions[0].x;
+			positionStride = static_cast<int>(sizeof(Vector2F));
+		}
+
+		SDL_RenderGeometryRaw(
+			renderer,
+			texture,
+			positions,
+			positionStride,
+			reinterpret_cast<const SDL_Color*>(&vertices[0].color),
+			static_cast<int>(sizeof(Vertex2D)),
+			&vertices[0].texCoord.x,
+			static_cast<int>(sizeof(Vertex2D)),
+			static_cast<int>(vertices.size()),
+			indices.data(),
+			static_cast<int>(indices.size()),
+			static_cast<int>(sizeof(uint32_t)));
+	}
+
+	void SDLRenderBackend::SetClipRect(const std::optional<RectI>& clipRect)
+	{
+		if (renderer == nullptr)
+			return;
+
+		if (!clipRect.has_value())
+		{
+			SDL_RenderSetClipRect(renderer, nullptr);
+
+			return;
+		}
+
+		auto sdlClipRect = RenderingConversions::ToSDLRect(*clipRect);
+
+		SDL_RenderSetClipRect(renderer, &sdlClipRect);
 	}
 
 	void SDLRenderBackend::SetRenderTarget(Data::TextureID renderTarget)
@@ -379,7 +458,7 @@ namespace DF2D::Internal
 
 	void SDLRenderBackend::SetViewport(RectI viewPort)
 	{
-		auto sdlRect = ToSDLRect(viewPort);
+		auto sdlRect = RenderingConversions::ToSDLRect(viewPort);
 
 		SDL_RenderSetViewport(renderer, &sdlRect);
 	}

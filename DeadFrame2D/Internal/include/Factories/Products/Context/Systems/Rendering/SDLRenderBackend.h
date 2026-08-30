@@ -3,6 +3,7 @@
 #include "Data/TextureRegistry.h"
 #include "DF2D_API.h"
 #include "Models/Rendering/RendererConfig.h"
+#include <vector>
 
 
 struct SDL_Renderer;
@@ -30,6 +31,10 @@ namespace DF2D::Internal
 		Core::Vector2I resolutionTarget;
 
 		Data::BlendMode currentDrawBlendMode = Data::BlendMode::ALPHA;
+
+		// Reused across DrawGeometry calls so replaying a draw list of many commands does not
+		// reallocate once per command. Only populated when a command carries a translation.
+		std::vector<Core::Vector2F> translatedPositions;
 
 
 		void ApplyDrawBlendMode(Data::BlendMode blendMode);
@@ -83,6 +88,16 @@ namespace DF2D::Internal
 			Data::RenderFlip flip = Data::RenderFlip::NONE,
 			Core::Color colorMod = Constants::CommonColors::WHITE,
 			Data::BlendMode blendMode = Data::BlendMode::ALPHA) override;
+
+
+		void DrawGeometry(
+			Data::TextureID textureID,
+			std::span<const Data::Vertex2D> vertices,
+			std::span<const uint32_t> indices,
+			const Core::Vector2F& translation = Core::Vector2F::Zero,
+			Data::BlendMode blendMode = Data::BlendMode::ALPHA) override;
+
+		void SetClipRect(const std::optional<Core::RectI>& clipRect) override;
 
 		void SetRenderTarget(Data::TextureID renderTarget) override;
 
