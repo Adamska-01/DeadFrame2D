@@ -4,3 +4,9 @@
 [submodule "Vendor/Doctest/Module"]
 	path = Vendor/Doctest/Module
 	url = https://github.com/doctest/doctest.git
+[submodule "Vendor/RmlUi/Module"]
+	path = Vendor/RmlUi/Module
+	url = https://github.com/mikke89/RmlUi.git
+[submodule "Vendor/FreeType/Module"]
+	path = Vendor/FreeType/Module
+	url = https://github.com/freetype/freetype.git
