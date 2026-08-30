@@ -59,6 +59,14 @@ namespace DF2D::Internal::RenderingConversions
 		{
 		case Data::BlendMode::NONE:		return SDL_BLENDMODE_NONE;
 
+		case Data::BlendMode::PREMULTIPLIED_ALPHA:
+			// Source color is already scaled by its own alpha, so it must be added as-is rather
+			// than multiplied by alpha again. Destination alpha accumulates the same way as in
+			// ADDITIVE so that drawing onto a transparent render target still raises its alpha.
+			return SDL_ComposeCustomBlendMode(
+				SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD,
+				SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+
 		case Data::BlendMode::ADDITIVE:
 			// Stock SDL_BLENDMODE_ADD leaves destination alpha untouched (dstA = dstA), so
 			// additive draws onto a transparent target (e.g. a camera's off-screen render
