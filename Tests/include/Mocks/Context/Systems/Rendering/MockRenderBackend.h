@@ -1,5 +1,8 @@
 #pragma once
 #include "Core/Context/Systems/Rendering/Abstractions/IRenderBackend.h"
+#include <cstdint>
+#include <optional>
+#include <span>
 #include <vector>
 
 
@@ -31,6 +34,20 @@ struct MockRenderBackend : DF2D::Core::IRenderBackend
 	DF2D::Data::TextureID lastDestroyedTexture{0};
 
 	DF2D::Core::RectI lastViewport{};
+
+	int drawGeometryCount{0};
+
+	std::vector<DF2D::Data::TextureID> geometryTextures;
+
+	std::vector<size_t> geometryVertexCounts;
+
+	std::vector<size_t> geometryIndexCounts;
+
+	std::vector<DF2D::Core::Vector2F> geometryTranslations;
+
+	std::vector<std::optional<DF2D::Core::RectI>> clipRects;
+
+	std::optional<DF2D::Core::RectI> lastClipRect;
 
 
 	void RecordBlendMode(DF2D::Data::BlendMode blendMode)
@@ -80,6 +97,30 @@ struct MockRenderBackend : DF2D::Core::IRenderBackend
 		drawCount++;
 
 		RecordBlendMode(blendMode);
+	}
+
+	void DrawGeometry(
+		DF2D::Data::TextureID textureID,
+		std::span<const DF2D::Data::Vertex2D> vertices,
+		std::span<const uint32_t> indices,
+		const DF2D::Core::Vector2F& translation,
+		DF2D::Data::BlendMode blendMode) override
+	{
+		drawCount++;
+		drawGeometryCount++;
+
+		geometryTextures.push_back(textureID);
+		geometryVertexCounts.push_back(vertices.size());
+		geometryIndexCounts.push_back(indices.size());
+		geometryTranslations.push_back(translation);
+
+		RecordBlendMode(blendMode);
+	}
+
+	void SetClipRect(const std::optional<DF2D::Core::RectI>& clipRect) override
+	{
+		clipRects.push_back(clipRect);
+		lastClipRect = clipRect;
 	}
 
 	void SetRenderTarget(DF2D::Data::TextureID) override

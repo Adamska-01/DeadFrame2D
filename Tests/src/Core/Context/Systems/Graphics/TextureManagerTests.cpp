@@ -1,6 +1,8 @@
 #include <doctest.h>
 #include "Core/Context/Systems/Graphics/TextureManager.h"
 #include "Mocks/Context/Systems/Graphics/MockTextureBackend.h"
+#include <cstdint>
+#include <vector>
 
 
 using namespace DF2D::Core;
@@ -162,6 +164,106 @@ TEST_CASE("ClearCache unloads from backend and forces reload")
 
 	manager->LoadTexture("test.png");
 	CHECK(mockPtr->loadCount == 2);
+}
+
+
+TEST_CASE("CreateTexture delegates raw pixels to the backend and records the size")
+{
+	auto mock = std::make_unique<MockTextureBackend>();
+	auto mockPtr = mock.get();
+
+	auto manager = std::make_unique<TextureManager>(std::move(mock));
+
+	auto pixels = std::vector<uint8_t>(4 * 2 * 4, 0xFF);
+
+	auto tex = manager->CreateTexture(pixels, Vector2I(4, 2));
+
+	CHECK(tex != 0);
+	CHECK(mockPtr->createFromPixelsCount == 1);
+	CHECK(mockPtr->lastCreatedSize == Vector2I(4, 2));
+	CHECK(mockPtr->lastCreatedByteCount == pixels.size());
+	CHECK(manager->GetTextureSize(tex) == Vector2I(4, 2));
+}
+
+
+TEST_CASE("CreateTexture returns 0 when the backend fails")
+{
+	auto mock = std::make_unique<MockTextureBackend>();
+	auto mockPtr = mock.get();
+
+	mockPtr->failNextCreate = true;
+
+	auto manager = std::make_unique<TextureManager>(std::move(mock));
+
+	auto pixels = std::vector<uint8_t>(4, 0);
+
+	CHECK(manager->CreateTexture(pixels, Vector2I(1, 1)) == 0);
+}
+
+
+TEST_CASE("Generated textures are not entered into the path cache")
+{
+	auto mock = std::make_unique<MockTextureBackend>();
+	auto mockPtr = mock.get();
+
+	auto manager = std::make_unique<TextureManager>(std::move(mock));
+
+	auto pixels = std::vector<uint8_t>(4, 0);
+
+	manager->CreateTexture(pixels, Vector2I(1, 1));
+	manager->CreateTexture(pixels, Vector2I(1, 1));
+
+	// Two creates from identical pixels must be two distinct textures; only file loads dedupe.
+	CHECK(mockPtr->createFromPixelsCount == 2);
+}
+
+
+TEST_CASE("UnloadTexture releases a single texture and forgets its size")
+{
+	auto mock = std::make_unique<MockTextureBackend>();
+	auto mockPtr = mock.get();
+
+	auto manager = std::make_unique<TextureManager>(std::move(mock));
+
+	auto pixels = std::vector<uint8_t>(4, 0);
+	auto tex = manager->CreateTexture(pixels, Vector2I(1, 1));
+
+	manager->UnloadTexture(tex);
+
+	CHECK(mockPtr->unloadCount == 1);
+	CHECK(manager->GetTextureSize(tex) == Vector2I::Zero);
+}
+
+
+TEST_CASE("UnloadTexture ignores the invalid id")
+{
+	auto mock = std::make_unique<MockTextureBackend>();
+	auto mockPtr = mock.get();
+
+	auto manager = std::make_unique<TextureManager>(std::move(mock));
+
+	manager->UnloadTexture(0);
+
+	CHECK(mockPtr->unloadCount == 0);
+}
+
+
+TEST_CASE("Unloading a file texture drops it from the path cache so it reloads")
+{
+	auto mock = std::make_unique<MockTextureBackend>();
+	auto mockPtr = mock.get();
+
+	auto manager = std::make_unique<TextureManager>(std::move(mock));
+
+	auto first = manager->LoadTexture("atlas.png");
+
+	manager->UnloadTexture(first);
+
+	// A stale cache entry here would hand back the destroyed id instead of loading again.
+	auto second = manager->LoadTexture("atlas.png");
+
+	CHECK(mockPtr->loadCount == 2);
+	CHECK(second != first);
 }
 
 

@@ -1,5 +1,8 @@
 #pragma once
 #include "Core/Context/Systems/Graphics/Abstractions/ITextureBackend.h"
+#include <cstdint>
+#include <span>
+#include <unordered_map>
 
 
 struct MockTextureBackend : DF2D::Core::ITextureBackend
@@ -9,6 +12,8 @@ struct MockTextureBackend : DF2D::Core::ITextureBackend
 
 	bool failNextLoad{false};
 
+	bool failNextCreate{false};
+
 	DF2D::Core::Vector2I nextSize{64, 64};
 
 
@@ -16,6 +21,12 @@ struct MockTextureBackend : DF2D::Core::ITextureBackend
 	int loadCount{0};
 
 	int unloadCount{0};
+
+	int createFromPixelsCount{0};
+
+	DF2D::Core::Vector2I lastCreatedSize{};
+
+	size_t lastCreatedByteCount{0};
 
 	std::string lastLoadedFile;
 
@@ -31,6 +42,20 @@ struct MockTextureBackend : DF2D::Core::ITextureBackend
 
 		auto id = nextId++;
 		sizes[id] = nextSize;
+
+		return id;
+	}
+
+	DF2D::Data::TextureID CreateFromPixels(std::span<const uint8_t> rgba, DF2D::Core::Vector2I size) override
+	{
+		createFromPixelsCount++;
+		lastCreatedSize = size;
+		lastCreatedByteCount = rgba.size();
+
+		if (failNextCreate) return 0;
+
+		auto id = nextId++;
+		sizes[id] = size;
 
 		return id;
 	}
