@@ -33,6 +33,8 @@ namespace DF2D::Internal
 
 		Data::TextureID LoadFromFile(const std::string& filename) override;
 
+		Data::TextureID CreateFromPixels(std::span<const uint8_t> rgba, Core::Vector2I size) override;
+
 		void UnloadTexture(Data::TextureID id) override;
 
 		Core::Vector2I GetTextureSize(Data::TextureID id) override;

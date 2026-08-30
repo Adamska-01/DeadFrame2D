@@ -59,6 +59,49 @@ namespace DF2D::Internal
 		return registry->AddTexture(texture);
 	}
 
+	Data::TextureID SDLTextureBackend::CreateFromPixels(std::span<const uint8_t> rgba, Vector2I size)
+	{
+		if (renderer == nullptr || size.x <= 0 || size.y <= 0)
+			return 0;
+
+		const auto expectedBytes = static_cast<size_t>(size.x) * static_cast<size_t>(size.y) * 4u;
+
+		if (rgba.size() < expectedBytes)
+		{
+			std::cerr << "Refusing to create a " << size.x << "x" << size.y << " texture from "
+				<< rgba.size() << " bytes, expected " << expectedBytes << std::endl;
+
+			return 0;
+		}
+
+		auto* texture = SDL_CreateTexture(
+			renderer,
+			SDL_PIXELFORMAT_RGBA32,
+			SDL_TEXTUREACCESS_STATIC,
+			size.x,
+			size.y);
+
+		if (texture == nullptr)
+		{
+			std::cerr << "Failed to create texture from pixels: " << SDL_GetError() << std::endl;
+
+			return 0;
+		}
+
+		if (SDL_UpdateTexture(texture, nullptr, rgba.data(), size.x * 4) != 0)
+		{
+			std::cerr << "Failed to upload texture pixels: " << SDL_GetError() << std::endl;
+
+			SDL_DestroyTexture(texture);
+
+			return 0;
+		}
+
+		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+
+		return registry->AddTexture(texture);
+	}
+
 	void SDLTextureBackend::UnloadTexture(Data::TextureID id)
 	{
 		registry->RemoveTexture(id, true);
