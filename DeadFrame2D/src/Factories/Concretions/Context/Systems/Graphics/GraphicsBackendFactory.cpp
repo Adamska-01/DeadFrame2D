@@ -1,7 +1,6 @@
 #include "Factories/Concretions/Context/Systems/Graphics/GraphicsBackendFactory.h"
 #include "Factories/Products/Context/Systems/Graphics/SDLTextureBackend.h"
 #include "Factories/Products/Context/Systems/Rendering/SDLRenderBackend.h"
-#include "Factories/Products/Context/Systems/UI/SDLTextBackend.h"
 #include "Factories/Products/Context/Systems/Window/SDLWindowBackend.h"
 
 
@@ -27,14 +26,11 @@ namespace DF2D::Factories
 
 		auto textureBackend = std::make_unique<SDLTextureBackend>(sdlRenderer, textureRegistry);
 
-		auto textBackend = std::make_unique<SDLTextBackend>(sdlRenderer, textureRegistry);
-
 		return GraphicsBackendSet
 		{
 			.windowBackend = std::move(windowBackend),
 			.renderBackend = std::move(renderBackend),
-			.textureBackend = std::move(textureBackend),
-			.textBackend = std::move(textBackend)
+			.textureBackend = std::move(textureBackend)
 		};
 	}
 }
