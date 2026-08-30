@@ -267,4 +267,39 @@ TEST_CASE("Unloading a file texture drops it from the path cache so it reloads")
 }
 
 
+TEST_CASE("ClearCache releases generated textures, not just file-backed ones")
+{
+	auto mock = std::make_unique<MockTextureBackend>();
+	auto mockPtr = mock.get();
+
+	auto manager = std::make_unique<TextureManager>(std::move(mock));
+
+	auto pixels = std::vector<uint8_t>(4, 0);
+
+	manager->LoadTexture("atlas.png");
+	manager->CreateTexture(pixels, Vector2I(1, 1));
+
+	manager->ClearCache();
+
+	// Teardown driven off the path index would only ever see the file-backed one and strand the
+	// generated texture until the render backend is destroyed.
+	CHECK(mockPtr->unloadCount == 2);
+}
+
+
+TEST_CASE("ClearCache forgets sizes for every texture it released")
+{
+	auto mock = std::make_unique<MockTextureBackend>();
+
+	auto manager = std::make_unique<TextureManager>(std::move(mock));
+
+	auto pixels = std::vector<uint8_t>(4, 0);
+	auto generated = manager->CreateTexture(pixels, Vector2I(3, 5));
+
+	manager->ClearCache();
+
+	CHECK(manager->GetTextureSize(generated) == Vector2I::Zero);
+}
+
+
 TEST_SUITE_END();
