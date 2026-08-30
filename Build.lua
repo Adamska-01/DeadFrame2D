@@ -66,5 +66,7 @@ workspace "Project"
 	-- Include Core build scripts
 	include "DeadFrame2D/Build-DeadFrame2D.lua"
 	include "Vendor/Box2D/Build-Box2D.lua"
+	include "Vendor/FreeType/Build-FreeType.lua"
+	include "Vendor/RmlUi/Build-RmlUi.lua"
 	include "Vendor/tinyxml2-10.0.0/Build-tinyxml2.lua"
 	include "Tests/Build-Tests.lua"
