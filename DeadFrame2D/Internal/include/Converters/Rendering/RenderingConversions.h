@@ -58,7 +58,19 @@ namespace DF2D::Internal::RenderingConversions
 		switch (m)
 		{
 		case Data::BlendMode::NONE:		return SDL_BLENDMODE_NONE;
-		case Data::BlendMode::ADDITIVE:	return SDL_BLENDMODE_ADD;
+
+		case Data::BlendMode::ADDITIVE:
+			// Stock SDL_BLENDMODE_ADD leaves destination alpha untouched (dstA = dstA), so
+			// additive draws onto a transparent target (e.g. a camera's off-screen render
+			// target, cleared to alpha 0) never raise that alpha above zero. When that target
+			// is later alpha-composited onto the screen, those pixels are still read as fully
+			// transparent and the additive content silently disappears despite correct RGB.
+			// Compose the same color-add behaviour but also raise destination alpha wherever
+			// something was actually drawn, so compositing can see it.
+			return SDL_ComposeCustomBlendMode(
+				SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD,
+				SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD);
+
 		default:						return SDL_BLENDMODE_BLEND;
 		}
 	}
