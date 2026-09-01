@@ -1,23 +1,41 @@
+#include "Constants/Paths/ResourcePaths.h"
 #include "Core/Context/Systems/UI/UIManager.h"
-#include <sstream>
+#include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
+#include <iostream>
 
 
 namespace DF2D::Core
 {
 	using namespace DF2D::Data;
+	using namespace DF2D::Engine;
 
 
-	UIManager::UIManager(std::unique_ptr<ITextBackend> backend)
+	namespace
+	{
+		// Must match the font-family in the engine default stylesheet.
+		constexpr std::string_view DefaultFontFamily = "DeadFrame";
+	}
+
+
+	UIManager::UIManager(std::unique_ptr<IUIBackend> backend)
 		: backend(std::move(backend))
 	{
+		this->backend->SetEventSink(this);
+
+		// Registered under an engine-owned family name rather than whatever is baked into the file, so
+		// the default stylesheet keeps resolving even if the shipped font is swapped out.
+		LoadFont(Constants::Paths::Files::CONSOLAS_FONT, DefaultFontFamily, true);
 	}
 
 	UIManager::~UIManager()
 	{
-		fontCache.clear();
+		elementOwners.clear();
+		objectElements.clear();
+		activeContexts.clear();
 
 		backend.reset();
 	}
+
 
 	void UIManager::BeginFrame()
 	{
@@ -31,7 +49,12 @@ namespace DF2D::Core
 
 	void UIManager::EndUpdate(float deltaTime)
 	{
-
+		// Layout resolves here, after components have finished writing style properties in Update and
+		// before LateUpdate, which is where they read resolved rectangles back.
+		for (auto context : activeContexts)
+		{
+			backend->UpdateContext(context);
+		}
 	}
 
 	void UIManager::EndDraw()
@@ -39,81 +62,128 @@ namespace DF2D::Core
 
 	}
 
-	FontID UIManager::LoadFont(std::string_view fontSource, int fontSize)
+
+	void UIManager::OnUIEvent(UIElementID element, UIEventType eventType, const UIEventPayload& payload)
 	{
-		auto key = std::make_pair(std::string(fontSource), fontSize);
-		auto it = fontCache.find(key);
+		auto it = elementOwners.find(element);
 
-		if (it != fontCache.end())
-			return it->second;
-
-		auto font = backend->LoadFont(key.first, fontSize);
-
-		if (font == 0)
-			return 0;
-
-		fontCache[key] = font;
-
-		return font;
-	}
-
-	void UIManager::SetFontStyle(std::string_view fontSource, int fontSize, FontStyle style)
-	{
-		auto font = LoadFont(fontSource, fontSize);
-
-		if (font == 0)
+		if (it == elementOwners.end() || it->second == nullptr)
 			return;
 
-		backend->SetFontStyle(font, style);
+		it->second->HandleUIEvent(eventType, payload);
 	}
 
-	TextTexture UIManager::LoadText(std::string_view fontSource, int fontSize, std::string text, Color color, bool centerText)
+
+	bool UIManager::LoadFont(std::string_view path, std::string_view family, bool fallbackFace)
 	{
-		if (text.empty())
+		auto pathString = std::string(path);
+
+		if (loadedFonts.contains(pathString))
+			return true;
+
+		if (!backend->LoadFontFace(pathString, std::string(family), fallbackFace))
+			return false;
+
+		loadedFonts.insert(std::move(pathString));
+
+		return true;
+	}
+
+	IUIBackend& UIManager::Backend()
+	{
+		return *backend;
+	}
+
+	UIContextID UIManager::CreateContext(Vector2I size)
+	{
+		auto context = backend->CreateContext(size);
+
+		if (context == 0)
+			return 0;
+
+		activeContexts.insert(context);
+
+		return context;
+	}
+
+	void UIManager::DestroyContext(UIContextID context)
+	{
+		if (context == 0)
+			return;
+
+		activeContexts.erase(context);
+
+		backend->DestroyContext(context);
+	}
+
+	GeometryDrawList UIManager::RenderContext(UIContextID context)
+	{
+		if (context == 0)
 			return {};
 
-		auto font = LoadFont(fontSource, fontSize);
+		return backend->RenderContext(context);
+	}
 
-		if (font == 0)
-			return {};
+	UIElementID UIManager::AcquireElement(UIContextID context, const void* owningObject, UIElementType type)
+	{
+		if (context == 0 || owningObject == nullptr)
+			return 0;
 
-		auto ExpandTabs = [](const std::string& line, int tabWidth = 4) -> std::string
-			{
-				std::string result;
-				auto col = 0;
+		auto it = objectElements.find(owningObject);
 
-				for (auto ch : line)
-				{
-					if (ch == '\t')
-					{
-						auto spaces = tabWidth - (col % tabWidth);
-						result.append(spaces, ' ');
-						col += spaces;
-					}
-					else
-					{
-						result += ch;
-						++col;
-					}
-				}
-
-				return result;
-			};
-
-		std::vector<std::string> lines;
-		std::istringstream stream(text);
-		std::string line;
-
-		while (std::getline(stream, line))
+		if (it != objectElements.end())
 		{
-			if (line.empty())
+			if (it->second.type != type)
 			{
-				line = " ";
+				std::cerr << "A UI object already has an element of a different kind; keeping the existing one."
+					<< " Split the components across two objects if both kinds are needed." << std::endl;
 			}
 
-			lines.push_back(ExpandTabs(line));
+			it->second.referenceCount++;
+
+			return it->second.element;
 		}
 
-		return backend->CreateTextTexture(font, lines, color, centerText);
+		auto element = backend->CreateElement(context, type);
+
+		if (element == 0)
+			return 0;
+
+		objectElements[owningObject] = SharedElement
+		{
+			.element = element,
+			.type = type,
+			.referenceCount = 1
+		};
+
+		return element;
+	}
+
+	void UIManager::ReleaseElement(const void* owningObject)
+	{
+		auto it = objectElements.find(owningObject);
+
+		if (it == objectElements.end())
+			return;
+
+		if (--it->second.referenceCount > 0)
+			return;
+
+		backend->DestroyElement(it->second.element);
+
+		objectElements.erase(it);
+	}
+
+	void UIManager::RegisterElementOwner(UIElementID element, UIComponent* owner)
+	{
+		if (element == 0 || owner == nullptr)
+			return;
+
+		elementOwners[element] = owner;
+	}
+
+	void UIManager::UnregisterElementOwner(UIElementID element)
+	{
+		elementOwners.erase(element);
 	}
 }

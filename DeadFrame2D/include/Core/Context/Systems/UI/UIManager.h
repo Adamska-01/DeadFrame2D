@@ -1,27 +1,68 @@
 #pragma once
 #include "Core/Context/Abstractions/ICoreSystem.h"
-#include "Core/Context/Systems/UI/Abstractions/ITextBackend.h"
-#include "Core/Math/Color.h"
-#include "Data/Components/UI/Text/FontStyle.h"
-#include "Data/Systems/Graphics/TextureID.h"
-#include "Data/Systems/UI/FontID.h"
-#include "Data/Systems/UI/TextTexture.h"
+#include "Core/Context/Systems/UI/Abstractions/IUIBackend.h"
+#include "Core/Context/Systems/UI/Abstractions/IUIEventSink.h"
+#include "Core/Math/Vector2.h"
+#include "Data/Systems/Rendering/Pipeline/GeometryDrawList.h"
+#include "Data/Systems/UI/UIContextID.h"
+#include "Data/Systems/UI/UIElementID.h"
+#include "Data/Systems/UI/UIElementType.h"
 #include "DF2D_API.h"
-#include "Utilities/Hashing/PairHash.h"
 #include <memory>
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <unordered_set>
+
+
+namespace DF2D::Engine
+{
+	class UIComponent;
+
+	template<typename T>
+	class ComponentHandle;
+}
 
 
 namespace DF2D::Core
 {
-	class DF2D_API UIManager : public ICoreSystem
+	/**
+	 * @brief Owns the UI backend and routes between it and the component layer.
+	 *
+	 * Pure orchestration: it caches which fonts have been loaded, tracks which component owns which
+	 * element so backend events can be delivered, and drives the per-frame update and render points.
+	 * Every call that touches the underlying UI library goes through IUIBackend.
+	 */
+	class DF2D_API UIManager : public ICoreSystem, public IUIEventSink
 	{
 	private:
-		std::unique_ptr<ITextBackend> backend;
+		struct SharedElement
+		{
+			Data::UIElementID element = 0;
 
-		std::unordered_map<std::pair<std::string, int>, Data::FontID, Utilities::PairHash> fontCache;
+			Data::UIElementType type = Data::UIElementType::PANEL;
+
+			int referenceCount = 0;
+		};
+
+
+		std::unique_ptr<IUIBackend> backend;
+
+		std::unordered_set<std::string> loadedFonts;
+
+		/**
+		 * @brief Which component owns which element, for delivering backend events.
+		 *
+		 * Raw pointers, not handles: an entry only exists between a component registering in Init and
+		 * unregistering in its destructor, so it can never outlive its component.
+		 */
+		std::unordered_map<Data::UIElementID, Engine::UIComponent*> elementOwners;
+
+		/** @brief Live contexts, so every canvas can be updated without the scene walking them. */
+		std::unordered_set<Data::UIContextID> activeContexts;
+
+		/** @brief One element per UI GameObject, shared by every UI component sitting on it. */
+		std::unordered_map<const void*, SharedElement> objectElements;
 
 
 		void BeginFrame() override;
@@ -33,8 +74,11 @@ namespace DF2D::Core
 		void EndDraw() override;
 
 
+		void OnUIEvent(Data::UIElementID element, Data::UIEventType eventType, const Data::UIEventPayload& payload) override;
+
+
 	public:
-		UIManager(std::unique_ptr<ITextBackend> backend);
+		UIManager(std::unique_ptr<IUIBackend> backend);
 
 		~UIManager() override;
 
@@ -47,10 +91,39 @@ namespace DF2D::Core
 		UIManager& operator=(UIManager&&) = delete;
 
 
-		Data::FontID LoadFont(std::string_view fontSource, int fontSize);
+		/**
+		 * @brief Registers a font file so styling can select it by family name.
+		 *
+		 * @param family: Family name to register the face under; empty keeps the name inside the file.
+		 * @param fallbackFace: Whether the face may supply glyphs missing from other faces.
+		 */
+		bool LoadFont(std::string_view path, std::string_view family = "", bool fallbackFace = false);
 
-		void SetFontStyle(std::string_view fontSource, int fontSize, Data::FontStyle style);
 
-		Data::TextTexture LoadText(std::string_view fontSource, int fontSize, std::string text, Color color, bool centerText = false);
+		/** @brief Direct access to the backend for the UI components that drive it. */
+		IUIBackend& Backend();
+
+		Data::UIContextID CreateContext(Vector2I size);
+
+		void DestroyContext(Data::UIContextID context);
+
+		/** @brief Renders one context into a draw list, ready to be submitted as a render task. */
+		Data::GeometryDrawList RenderContext(Data::UIContextID context);
+
+		/**
+		 * @brief Returns the element backing a UI GameObject, creating it on first request.
+		 *
+		 * The element belongs to the GameObject, not to the component that asked: a single object
+		 * carrying a RectTransform, an Image and a Text is one styled element, not three siblings.
+		 * Its type is fixed by whichever UI component asks first.
+		 */
+		Data::UIElementID AcquireElement(Data::UIContextID context, const void* owningObject, Data::UIElementType type);
+
+		/** @brief Drops one reference to a GameObject element, destroying it when the last one goes. */
+		void ReleaseElement(const void* owningObject);
+
+		void RegisterElementOwner(Data::UIElementID element, Engine::UIComponent* owner);
+
+		void UnregisterElementOwner(Data::UIElementID element);
 	};
 }
