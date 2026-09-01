@@ -23,6 +23,8 @@ namespace DF2D::Constants::Paths
 
 		inline constexpr std::string_view SHARED_OTHER_CONFIG_ALIAS = "shared_other_config";
 
+		inline constexpr std::string_view SHARED_UI_ALIAS = "shared_ui";
+
 		inline constexpr std::string_view LOGOS_ALIAS = "logos";
 
 
@@ -40,12 +42,17 @@ namespace DF2D::Constants::Paths
 
 		inline static const Utilities::ResourceMount SHARED_OTHER_CONFIGS{ std::string(SHARED_OTHER_CONFIG_ALIAS), "Resources/Configurations/Other/" };
 
+		inline static const Utilities::ResourceMount SHARED_UI{ std::string(SHARED_UI_ALIAS), "Resources/UI/" };
+
 		inline static const Utilities::ResourceMount LOGOS{ std::string(LOGOS_ALIAS), "Resources/Logos/" };
 	}
 
 	namespace Files
 	{
 		static const Utilities::ResolvedPath CONSOLAS_FONT{ std::string(Folders::SHARED_FONTS_ALIAS), "consola.ttf" };
+
+
+		static const Utilities::ResolvedPath DEFAULT_UI_STYLESHEET{ std::string(Folders::SHARED_UI_ALIAS), "DeadFrame2D.rcss" };
 
 
 		static const Utilities::ResolvedPath WINDOW_ICON{ std::string(Folders::LOGOS_ALIAS), "Window_Icon.png" };
