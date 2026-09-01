@@ -1,244 +1,213 @@
-#include <doctest.h>
 #include "Core/Context/Systems/UI/UIManager.h"
-#include "Mocks/Context/Systems/UI/MockTextBackend.h"
+#include "Mocks/Context/Systems/UI/MockUIBackend.h"
+#include <doctest.h>
+#include <memory>
 
 
 using namespace DF2D::Core;
 using namespace DF2D::Data;
 
 
-static std::unique_ptr<UIManager> MakeManager(MockTextBackend*& outMock)
+namespace
 {
-	auto mock = std::make_unique<MockTextBackend>();
-	outMock = mock.get();
+	struct Fixture
+	{
+		MockUIBackend* mock = nullptr;
 
-	return std::make_unique<UIManager>(std::move(mock));
+		std::unique_ptr<UIManager> manager;
+
+
+		/** @brief Fonts already registered by the constructor, so tests can measure their own deltas. */
+		size_t baselineFontCount = 0;
+
+
+		Fixture()
+		{
+			auto owned = std::make_unique<MockUIBackend>();
+
+			mock = owned.get();
+			manager = std::make_unique<UIManager>(std::move(owned));
+
+			baselineFontCount = mock->loadedFonts.size();
+		}
+	};
+
+
+	// Stand-ins for GameObjects: AcquireElement only ever uses the address as an identity.
+	int firstObject = 0;
+	int secondObject = 0;
 }
 
 
 TEST_SUITE_BEGIN("UIManager");
 
 
-TEST_CASE("LoadFont delegates path and size to backend")
+TEST_CASE("The manager registers itself as the backend event sink")
 {
-	MockTextBackend* mock = nullptr;
-	auto manager = MakeManager(mock);
+	auto fixture = Fixture();
 
-	auto font = manager->LoadFont("font.ttf", 24);
-
-	CHECK(font == 1);
-	CHECK(mock->loadFontCount == 1);
-	CHECK(mock->lastFontPath == "font.ttf");
-	CHECK(mock->lastFontSize == 24);
+	CHECK(fixture.mock->sink != nullptr);
 }
 
 
-TEST_CASE("LoadFont caches by source and size")
+TEST_CASE("The constructor registers a default face under the engine font family")
 {
-	MockTextBackend* mock = nullptr;
-	auto manager = MakeManager(mock);
+	auto fixture = Fixture();
 
-	auto font1 = manager->LoadFont("font.ttf", 24);
-	auto font2 = manager->LoadFont("font.ttf", 24);
-
-	CHECK(font1 == font2);
-	CHECK(mock->loadFontCount == 1);
+	// The default stylesheet names a family, so something has to supply it before any text renders.
+	REQUIRE(fixture.mock->loadedFonts.size() == 1);
+	CHECK(fixture.mock->loadedFontFamilies[0] == "DeadFrame");
 }
 
 
-TEST_CASE("Same source with different sizes produces separate cache entries")
+TEST_CASE("LoadFont delegates to the backend")
 {
-	MockTextBackend* mock = nullptr;
-	auto manager = MakeManager(mock);
+	auto fixture = Fixture();
 
-	auto small = manager->LoadFont("font.ttf", 12);
-	auto large = manager->LoadFont("font.ttf", 48);
-
-	CHECK(small != large);
-	CHECK(mock->loadFontCount == 2);
+	CHECK(fixture.manager->LoadFont("Fonts/other.ttf"));
+	CHECK(fixture.mock->loadedFonts.size() == fixture.baselineFontCount + 1);
+	CHECK(fixture.mock->loadedFonts.back() == "Fonts/other.ttf");
 }
 
 
-TEST_CASE("LoadFont failure returns 0 and is not cached")
+TEST_CASE("Loading the same font twice only reaches the backend once")
 {
-	MockTextBackend* mock = nullptr;
-	auto manager = MakeManager(mock);
+	auto fixture = Fixture();
 
-	mock->failNextFontLoad = true;
+	fixture.manager->LoadFont("Fonts/other.ttf");
+	fixture.manager->LoadFont("Fonts/other.ttf");
 
-	auto font1 = manager->LoadFont("font.ttf", 24);
-
-	CHECK(font1 == 0);
-	CHECK(mock->loadFontCount == 1);
-
-	mock->failNextFontLoad = false;
-
-	auto font2 = manager->LoadFont("font.ttf", 24);
-
-	CHECK(font2 != 0); // Not cached — re-attempted
-	CHECK(mock->loadFontCount == 2);
+	CHECK(fixture.mock->loadedFonts.size() == fixture.baselineFontCount + 1);
 }
 
 
-TEST_CASE("SetFontStyle resolves font and forwards style")
+TEST_CASE("A failed font load is not cached, so a later attempt retries")
 {
-	MockTextBackend* mock = nullptr;
-	auto manager = MakeManager(mock);
+	auto fixture = Fixture();
 
-	manager->SetFontStyle("font.ttf", 24, FontStyle::BOLD);
+	fixture.mock->failNextFontLoad = true;
 
-	CHECK(mock->setFontStyleCount == 1);
-	CHECK(mock->lastStyledFont == 1);
-	CHECK(mock->lastStyle == FontStyle::BOLD);
+	CHECK_FALSE(fixture.manager->LoadFont("Fonts/missing.ttf"));
+
+	fixture.mock->failNextFontLoad = false;
+
+	CHECK(fixture.manager->LoadFont("Fonts/missing.ttf"));
+	CHECK(fixture.mock->loadedFonts.size() == fixture.baselineFontCount + 2);
 }
 
 
-TEST_CASE("SetFontStyle with failing font does not call backend")
+TEST_CASE("CreateContext returns 0 and tracks nothing when the backend fails")
 {
-	MockTextBackend* mock = nullptr;
-	auto manager = MakeManager(mock);
+	auto fixture = Fixture();
 
-	mock->failNextFontLoad = true;
+	fixture.mock->failNextContext = true;
 
-	manager->SetFontStyle("missing.ttf", 24, FontStyle::ITALIC);
-
-	CHECK(mock->setFontStyleCount == 0);
+	CHECK(fixture.manager->CreateContext(Vector2I(800, 600)) == 0);
 }
 
 
-TEST_CASE("LoadText with empty text returns zero-texture without touching backend")
+TEST_CASE("Live contexts are updated once per frame")
 {
-	MockTextBackend* mock = nullptr;
-	auto manager = MakeManager(mock);
+	auto fixture = Fixture();
 
-	auto result = manager->LoadText("font.ttf", 24, "", {255, 255, 255, 255});
+	fixture.manager->CreateContext(Vector2I(800, 600));
+	fixture.manager->CreateContext(Vector2I(800, 600));
 
-	CHECK(result.textureID == 0);
-	CHECK(result.size.x == 0);
-	CHECK(result.size.y == 0);
-	CHECK(mock->loadFontCount == 0);
-	CHECK(mock->createTextTextureCount == 0);
+	static_cast<ICoreSystem*>(fixture.manager.get())->EndUpdate(0.016f);
+
+	CHECK(fixture.mock->updateContextCount == 2);
 }
 
 
-TEST_CASE("LoadText with failing font returns zero-texture and does not render")
+TEST_CASE("A destroyed context stops being updated")
 {
-	MockTextBackend* mock = nullptr;
-	auto manager = MakeManager(mock);
+	auto fixture = Fixture();
 
-	mock->failNextFontLoad = true;
+	auto context = fixture.manager->CreateContext(Vector2I(800, 600));
 
-	auto result = manager->LoadText("font.ttf", 24, "Hello", {255, 255, 255, 255});
+	fixture.manager->DestroyContext(context);
 
-	CHECK(result.textureID == 0);
-	CHECK(result.size.x == 0);
-	CHECK(result.size.y == 0);
-	CHECK(mock->createTextTextureCount == 0);
+	static_cast<ICoreSystem*>(fixture.manager.get())->EndUpdate(0.016f);
+
+	CHECK(fixture.mock->destroyContextCount == 1);
+	CHECK(fixture.mock->updateContextCount == 0);
 }
 
 
-TEST_CASE("LoadText renders single line and returns backend texture with size")
+TEST_CASE("Two UI components on one object share a single element")
 {
-	MockTextBackend* mock = nullptr;
-	auto manager = MakeManager(mock);
+	auto fixture = Fixture();
 
-	mock->nextTextureId = 55;
-	mock->nextTextureSize = { 320, 48 };
+	auto context = fixture.manager->CreateContext(Vector2I(800, 600));
 
-	auto result = manager->LoadText("font.ttf", 24, "Hello", {255, 0, 0, 255});
+	auto first = fixture.manager->AcquireElement(context, &firstObject, UIElementType::PANEL);
+	auto second = fixture.manager->AcquireElement(context, &firstObject, UIElementType::PANEL);
 
-	CHECK(result.textureID == 55);
-	CHECK(result.size.x == 320);
-	CHECK(result.size.y == 48);
-	CHECK(mock->createTextTextureCount == 1);
-	CHECK(mock->lastTextFont == 1);
-
-	REQUIRE(mock->lastLines.size() == 1);
-	CHECK(mock->lastLines[0] == "Hello");
-	CHECK(mock->lastColor == Color{255, 0, 0, 255});
+	CHECK(first == second);
+	CHECK(fixture.mock->createElementCount == 1);
 }
 
 
-TEST_CASE("LoadText splits text into lines")
+TEST_CASE("Different objects get different elements")
 {
-	MockTextBackend* mock = nullptr;
-	auto manager = MakeManager(mock);
+	auto fixture = Fixture();
 
-	manager->LoadText("font.ttf", 24, "first\nsecond", {});
+	auto context = fixture.manager->CreateContext(Vector2I(800, 600));
 
-	REQUIRE(mock->lastLines.size() == 2);
-	CHECK(mock->lastLines[0] == "first");
-	CHECK(mock->lastLines[1] == "second");
+	auto first = fixture.manager->AcquireElement(context, &firstObject, UIElementType::PANEL);
+	auto second = fixture.manager->AcquireElement(context, &secondObject, UIElementType::PANEL);
+
+	CHECK(first != second);
+	CHECK(fixture.mock->createElementCount == 2);
 }
 
 
-TEST_CASE("LoadText replaces empty lines with a space")
+TEST_CASE("A shared element survives until its last holder releases it")
 {
-	MockTextBackend* mock = nullptr;
-	auto manager = MakeManager(mock);
+	auto fixture = Fixture();
 
-	manager->LoadText("font.ttf", 24, "a\n\nb", {});
+	auto context = fixture.manager->CreateContext(Vector2I(800, 600));
 
-	REQUIRE(mock->lastLines.size() == 3);
-	CHECK(mock->lastLines[0] == "a");
-	CHECK(mock->lastLines[1] == " ");
-	CHECK(mock->lastLines[2] == "b");
+	fixture.manager->AcquireElement(context, &firstObject, UIElementType::PANEL);
+	fixture.manager->AcquireElement(context, &firstObject, UIElementType::PANEL);
+
+	fixture.manager->ReleaseElement(&firstObject);
+
+	CHECK(fixture.mock->destroyElementCount == 0);
+
+	fixture.manager->ReleaseElement(&firstObject);
+
+	CHECK(fixture.mock->destroyElementCount == 1);
 }
 
 
-TEST_CASE("LoadText expands tabs to the next tab stop")
+TEST_CASE("Releasing an object that never acquired anything is a no-op")
 {
-	MockTextBackend* mock = nullptr;
-	auto manager = MakeManager(mock);
+	auto fixture = Fixture();
 
-	manager->LoadText("font.ttf", 24, "\tx\nab\tc", {});
+	fixture.manager->ReleaseElement(&firstObject);
 
-	REQUIRE(mock->lastLines.size() == 2);
-	CHECK(mock->lastLines[0] == "    x");  // Tab at column 0 -> 4 spaces
-	CHECK(mock->lastLines[1] == "ab  c");  // Tab at column 2 -> 2 spaces
+	CHECK(fixture.mock->destroyElementCount == 0);
 }
 
 
-TEST_CASE("LoadText forwards centerText flag")
+TEST_CASE("AcquireElement refuses an invalid context")
 {
-	MockTextBackend* mock = nullptr;
-	auto manager = MakeManager(mock);
+	auto fixture = Fixture();
 
-	manager->LoadText("font.ttf", 24, "Hello", {}, true);
-	CHECK(mock->lastCenterText == true);
-
-	manager->LoadText("font.ttf", 24, "Hello", {}, false);
-	CHECK(mock->lastCenterText == false);
+	CHECK(fixture.manager->AcquireElement(0, &firstObject, UIElementType::PANEL) == 0);
+	CHECK(fixture.mock->createElementCount == 0);
 }
 
 
-TEST_CASE("LoadText reuses cached font across calls")
+TEST_CASE("RenderContext refuses the invalid context without reaching the backend")
 {
-	MockTextBackend* mock = nullptr;
-	auto manager = MakeManager(mock);
+	auto fixture = Fixture();
 
-	manager->LoadText("font.ttf", 24, "one", {});
-	manager->LoadText("font.ttf", 24, "two", {});
+	auto drawList = fixture.manager->RenderContext(0);
 
-	CHECK(mock->loadFontCount == 1);
-	CHECK(mock->createTextTextureCount == 2);
-}
-
-
-TEST_CASE("ICoreSystem lifecycle methods are safe no-ops")
-{
-	MockTextBackend* mock = nullptr;
-	auto manager = MakeManager(mock);
-
-	ICoreSystem* system = manager.get();
-
-	system->BeginFrame();
-	system->PreUpdate(0.0f);
-	system->EndUpdate(0.0f);
-	system->EndDraw();
-
-	CHECK(mock->loadFontCount == 0);
-	CHECK(mock->createTextTextureCount == 0);
+	CHECK(drawList.commands.empty());
+	CHECK(fixture.mock->renderContextCount == 0);
 }
 
 
