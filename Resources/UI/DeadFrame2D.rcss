@@ -1,0 +1,27 @@
+/*
+	Engine defaults for the element tree the UI components build.
+
+	Loaded into every canvas before any game stylesheet, so a game theme layers on top of this and
+	inline properties set by components still win over both.
+*/
+
+body
+{
+	font-family: DeadFrame;
+	font-size: 16dp;
+	color: #ffffffff;
+}
+
+div
+{
+	/*
+		Components position themselves absolutely through RectTransform. Blocks that do not carry a
+		RectTransform still need a sane default, and this keeps a bare container out of the way.
+	*/
+	display: block;
+}
+
+img
+{
+	display: block;
+}
