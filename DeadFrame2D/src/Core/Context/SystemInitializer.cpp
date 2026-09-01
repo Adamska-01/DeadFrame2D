@@ -12,6 +12,7 @@
 #include "Factories/Concretions/Context/Systems/Audio/AudioBackendFactory.h"
 #include "Factories/Concretions/Context/Systems/Graphics/GraphicsBackendFactory.h"
 #include "Factories/Concretions/Context/Systems/Physics/PhysicsBackendFactory.h"
+#include "Factories/Concretions/Context/Systems/UI/UIBackendFactory.h"
 #include "Helpers/Context/CoreContextIterator.h"
 #include "Models/Input/ActionMap/InputActionMapBucket.h"
 #include "Utilities/Debugging/Guards.h"
@@ -36,18 +37,24 @@ namespace DF2D::Core
 
 		auto actionMapBucket = JsonSerializer::DeserializeFromFile<InputActionMapBucket>(Paths::Files::INPUT_CONTROLS);
 
+		// The UI backend needs an assembled texture manager rather than a raw backend, so that one is
+		// built up front and the context is filled from it.
+		auto* textureManager = new TextureManager(std::move(graphicsBackends.textureBackend));
+
 		ctx = CoreContext
 		{
 			.audioManager = new AudioManager(config.audio, AudioBackendFactory().CreateProduct(config.audio)),
 			.coroutineScheduler = new CoroutineScheduler(serviceCtx.frameTimer),
-			.textureManager = new TextureManager(std::move(graphicsBackends.textureBackend)),
+			.textureManager = textureManager,
 			.input = new Input(actionMapBucket, eventDispatcher),
 			.physicsEngine = new PhysicsEngine2D(
 				config.physics,
 				JsonSerializer::DeserializeFromFile<CollisionMasks>(Paths::Files::COLLISION_MASKS),
 				PhysicsBackendFactory().CreateProduct(config.physics)),
 			.renderer = new Renderer(std::move(graphicsBackends.renderBackend)),
-			.uiManager = new UIManager(std::move(graphicsBackends.textBackend)),
+			// Platform services (cursor, clipboard, text entry) arrive with the input work; until then
+			// the UI backend runs without a platform and null-checks it.
+			.uiManager = new UIManager(UIBackendFactory().CreateProduct(textureManager, nullptr)),
 			.window = new Window(std::move(graphicsBackends.windowBackend))
 		};
 	}
