@@ -1,6 +1,7 @@
 #include "Constants/Paths/ResourcePaths.h"
 #include "Core/Context/Systems/UI/UIManager.h"
 #include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
+#include <algorithm>
 #include <iostream>
 
 
@@ -67,10 +68,20 @@ namespace DF2D::Core
 	{
 		auto it = elementOwners.find(element);
 
-		if (it == elementOwners.end() || it->second == nullptr)
+		if (it == elementOwners.end())
 			return;
 
-		it->second->HandleUIEvent(eventType, payload);
+		// Copied, because a handler is free to destroy components or reparent objects, either of which
+		// would mutate the list being walked.
+		auto owners = it->second;
+
+		for (auto& owner : owners)
+		{
+			if (owner == nullptr)
+				continue;
+
+			owner->HandleUIEvent(eventType, payload);
+		}
 	}
 
 
@@ -174,16 +185,37 @@ namespace DF2D::Core
 		objectElements.erase(it);
 	}
 
-	void UIManager::RegisterElementOwner(UIElementID element, UIComponent* owner)
+	void UIManager::RegisterElementOwner(UIElementID element, const ComponentHandle<UIComponent>& owner)
 	{
 		if (element == 0 || owner == nullptr)
 			return;
 
-		elementOwners[element] = owner;
+		elementOwners[element].push_back(owner);
 	}
 
-	void UIManager::UnregisterElementOwner(UIElementID element)
+	void UIManager::UnregisterElementOwner(UIElementID element, const ComponentHandleBase& owner)
 	{
-		elementOwners.erase(element);
+		auto it = elementOwners.find(element);
+
+		if (it == elementOwners.end())
+			return;
+
+		auto& owners = it->second;
+
+		owners.erase(
+			std::remove_if(
+				owners.begin(),
+				owners.end(),
+				[&owner](const ComponentHandleBase& entry)
+				{
+					// Expired entries go at the same time
+					return entry == owner || !entry.IsValid();
+				}),
+			owners.end());
+
+		if (owners.empty())
+		{
+			elementOwners.erase(it);
+		}
 	}
 }

@@ -31,10 +31,6 @@ namespace DF2D::Engine
 		if (uiManager == nullptr || context == 0)
 			return;
 
-		// Clearing the element handle first stops the base destructor releasing an element that the
-		// context is about to free anyway.
-		element = 0;
-
 		uiManager->DestroyContext(context);
 	}
 

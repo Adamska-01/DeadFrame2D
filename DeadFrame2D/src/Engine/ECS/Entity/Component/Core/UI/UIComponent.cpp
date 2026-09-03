@@ -22,7 +22,9 @@ namespace DF2D::Engine
 		if (uiManager == nullptr || element == 0)
 			return;
 
-		uiManager->UnregisterElementOwner(element);
+		// The stored handle is used rather than asking for a fresh one: resolving a handle runs a type
+		// check against an object that is already being destroyed.
+		uiManager->UnregisterElementOwner(element, selfUIHandle);
 
 		// Released rather than destroyed: the element is shared with any other UI component on this
 		// same GameObject, and only goes away once the last of them lets go.
@@ -89,7 +91,9 @@ namespace DF2D::Engine
 		if (element == 0)
 			return;
 
-		uiManager->RegisterElementOwner(element, this);
+		selfUIHandle = GetHandleAs<UIComponent>();
+
+		uiManager->RegisterElementOwner(element, selfUIHandle);
 
 		SyncElementParent();
 

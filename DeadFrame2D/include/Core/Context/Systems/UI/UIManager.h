@@ -8,11 +8,13 @@
 #include "Data/Systems/UI/UIElementID.h"
 #include "Data/Systems/UI/UIElementType.h"
 #include "DF2D_API.h"
+#include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include <memory>
 #include <string>
 #include <string_view>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
 
 namespace DF2D::Engine
@@ -51,12 +53,12 @@ namespace DF2D::Core
 		std::unordered_set<std::string> loadedFonts;
 
 		/**
-		 * @brief Which component owns which element, for delivering backend events.
+		 * @brief Which components own which element, for delivering backend events.
 		 *
-		 * Raw pointers, not handles: an entry only exists between a component registering in Init and
-		 * unregistering in its destructor, so it can never outlive its component.
+		 * A list per element, not a single owner: one element is shared by every UI component sitting on
+		 * the same GameObject, so a Text and an Image on one object both need to hear about it.
 		 */
-		std::unordered_map<Data::UIElementID, Engine::UIComponent*> elementOwners;
+		std::unordered_map<Data::UIElementID, std::vector<Engine::ComponentHandle<Engine::UIComponent>>> elementOwners;
 
 		/** @brief Live contexts, so every canvas can be updated without the scene walking them. */
 		std::unordered_set<Data::UIContextID> activeContexts;
@@ -122,8 +124,10 @@ namespace DF2D::Core
 		/** @brief Drops one reference to a GameObject element, destroying it when the last one goes. */
 		void ReleaseElement(const void* owningObject);
 
-		void RegisterElementOwner(Data::UIElementID element, Engine::UIComponent* owner);
+		/** @brief Adds a component to the list that receives events for an element. */
+		void RegisterElementOwner(Data::UIElementID element, const Engine::ComponentHandle<Engine::UIComponent>& owner);
 
-		void UnregisterElementOwner(Data::UIElementID element);
+		/** @brief Removes one component from an element's owner list, dropping the list when it empties. */
+		void UnregisterElementOwner(Data::UIElementID element, const Engine::ComponentHandleBase& owner);
 	};
 }

@@ -63,6 +63,8 @@ namespace DF2D::Engine
 
 		Data::UIElementID element = 0;
 
+		ComponentHandle<UIComponent> selfUIHandle;
+
 
 		/** @brief The element kind this component needs. Called once, during Init. */
 		virtual Data::UIElementType GetElementType() const;
