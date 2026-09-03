@@ -7,16 +7,17 @@
 using namespace DF2D::Core;
 using namespace DF2D::Data;
 using namespace DF2D::Utilities;
+using namespace DF2D::Utilities;
 
 
 namespace
 {
-	std::string ValueOf(const std::vector<ResolvedStyleProperty>& resolved, UIStyleProperty property)
+	std::string ValueOf(const std::vector<RectTransformResolver::ResolvedStyleProperty>& resolved, UIStyleProperty property)
 	{
 		auto it = std::find_if(
 			resolved.begin(),
 			resolved.end(),
-			[property](const ResolvedStyleProperty& entry)
+			[property](const RectTransformResolver::ResolvedStyleProperty& entry)
 			{
 				return entry.property == property;
 			});
