@@ -11,6 +11,7 @@ namespace DF2D::Data
 		MouseButtonEvent,
 		MouseMoveEvent,
 		MouseWheelEvent,
+		TextInputEvent,
 		ControllerButtonEvent,
 		ControllerAxisEvent,
 		ControllerConnectedEvent,

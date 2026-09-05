@@ -8,3 +8,4 @@
 #include "Data/Systems/Events/Input/MouseButtonEvent.h"
 #include "Data/Systems/Events/Input/MouseMoveEvent.h"
 #include "Data/Systems/Events/Input/MouseWheelEvent.h"
+#include "Data/Systems/Events/Input/TextInputEvent.h"
