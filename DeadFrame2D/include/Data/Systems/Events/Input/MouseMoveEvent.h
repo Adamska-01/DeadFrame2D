@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Math/Vector2.h"
+#include "Data/Systems/UI/KeyModifiers.h"
 
 
 namespace DF2D::Data
@@ -9,5 +10,7 @@ namespace DF2D::Data
 		Core::Vector2F position;
 
 		Core::Vector2F delta;
+
+		KeyModifiers modifiers = KeyModifiers::NONE;
 	};
 }
