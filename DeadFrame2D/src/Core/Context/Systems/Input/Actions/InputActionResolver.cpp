@@ -12,10 +12,35 @@ namespace DF2D::Core
 	using namespace DF2D::Utilities;
 
 
-	InputActionResolver::InputActionResolver(InputActionMapBucket actionMapBucket, const IUserDevicePairings& userPairings)
+	InputActionResolver::InputActionResolver(
+		InputActionMapBucket actionMapBucket,
+		const IUserDevicePairings& userPairings,
+		const IInputCaptureSource* captureSource)
 		: actionMapBucket(std::move(actionMapBucket)),
-		userPairings(&userPairings)
+		userPairings(&userPairings),
+		captureSource(captureSource)
 	{
+	}
+
+	bool InputActionResolver::IsCapturedBy(const InputDevice& device) const
+	{
+		if (captureSource == nullptr)
+			return false;
+
+		switch (device.Type())
+		{
+		case InputDeviceType::MOUSE:
+			return captureSource->CapturesPointer();
+
+		case InputDeviceType::KEYBOARD:
+			return captureSource->CapturesKeyboard();
+
+		default:
+			// Controllers are deliberately never blocked. Menu navigation is driven through actions
+			// rather than raw input, so gating them on UI focus would disable the very actions that
+			// move focus around a menu.
+			return false;
+		}
 	}
 
 
@@ -247,6 +272,11 @@ namespace DF2D::Core
 
 	void InputActionResolver::ProcessBinding(const InputDevice& device, InputControlType inputControlType, int controlID)
 	{
+		// The device has already recorded this input, so its state stays truthful; what is suppressed
+		// here is only the gameplay action the input would otherwise fire.
+		if (IsCapturedBy(device))
+			return;
+
 		auto userID = userPairings->GetUserIDFromPairedDevice(device.ID());
 		if (!userID.has_value())
 			return;
