@@ -5,6 +5,9 @@
 
 namespace DF2D::Core
 {
+	/**
+	 * @brief Receives platform events pumped by the event manager.
+	 */
 	class DF2D_API ISystemEventSink
 	{
 	public:
