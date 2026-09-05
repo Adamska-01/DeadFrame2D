@@ -24,7 +24,9 @@ namespace DF2D::Core
 		 */
 		virtual void SetCursor(Data::CursorType cursor) = 0;
 
-		/** @brief Replaces the system clipboard contents. */
+		/**
+		 * @brief Replaces the system clipboard contents.
+		 */
 		virtual void SetClipboardText(const std::string& text) = 0;
 
 		/**
@@ -44,7 +46,9 @@ namespace DF2D::Core
 		 */
 		virtual void StartTextInput(const RectI& caretRect) = 0;
 
-		/** @brief Ends text entry, dismissing any IME or on-screen keyboard. */
+		/**
+		 * @brief Ends text entry, dismissing any IME or on-screen keyboard.
+		 */
 		virtual void StopTextInput() = 0;
 	};
 }
