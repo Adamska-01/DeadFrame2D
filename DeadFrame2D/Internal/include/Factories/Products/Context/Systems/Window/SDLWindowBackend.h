@@ -1,8 +1,10 @@
 #pragma once
 #include "Core/Context/Systems/Window/Abstractions/IWindowBackend.h"
 #include "DF2D_API.h"
+#include <unordered_map>
 
 
+struct SDL_Cursor;
 struct SDL_Window;
 
 
@@ -12,6 +14,11 @@ namespace DF2D::Internal
 	{
 	private:
 		SDL_Window* window = nullptr;
+
+		// Cursors are created once and reused
+		std::unordered_map<Data::CursorType, SDL_Cursor*> cursors;
+
+		Data::CursorType activeCursor;
 
 
 	public:
@@ -37,6 +44,16 @@ namespace DF2D::Internal
 		void SetWindowMode(Data::WindowMode mode) override;
 
 		bool SetResolution(Core::Vector2I resolution) override;
+
+		void SetCursor(Data::CursorType cursor) override;
+
+		void SetClipboardText(const std::string& text) override;
+
+		std::string GetClipboardText() override;
+
+		void StartTextInput(const Core::RectI& caretRect) override;
+
+		void StopTextInput() override;
 
 
 		SDL_Window* GetSDLWindow();

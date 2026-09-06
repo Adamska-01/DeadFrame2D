@@ -1,3 +1,4 @@
+#include "Converters/UI/CursorConversions.h"
 #if DEBUG
 #include <cassert>
 #endif
@@ -13,7 +14,9 @@
 namespace DF2D::Internal
 {
 	using namespace DF2D::Core;
+	using namespace DF2D::Data;
 	using namespace DF2D::Constants;
+	using namespace DF2D::Internal;
 
 
 	namespace
@@ -59,6 +62,7 @@ namespace DF2D::Internal
 
 
 	SDLWindowBackend::SDLWindowBackend(const std::string& title, int width, int height, bool fullscreen)
+		: activeCursor(CursorType::ARROW)
 	{
 		if (SDL_Init(SDL_INIT_VIDEO) < 0)
 		{
@@ -104,6 +108,13 @@ namespace DF2D::Internal
 
 	SDLWindowBackend::~SDLWindowBackend()
 	{
+		for (auto& [type, cursor] : cursors)
+		{
+			SDL_FreeCursor(cursor);
+		}
+
+		cursors.clear();
+
 		if (window == nullptr)
 		{
 			std::cout << "[Info] Window backend is already nullptr, nothing to destroy." << std::endl;
@@ -237,5 +248,65 @@ namespace DF2D::Internal
 	SDL_Window* SDLWindowBackend::GetSDLWindow()
 	{
 		return window;
+	}
+
+	void SDLWindowBackend::SetCursor(Data::CursorType cursor)
+	{
+		if (cursor == activeCursor)
+			return;
+
+		activeCursor = cursor;
+
+		auto it = cursors.find(cursor);
+
+		if (it == cursors.end())
+		{
+			auto* created = SDL_CreateSystemCursor(CursorConversions::ToSDLSystemCursor(cursor));
+
+			if (created == nullptr)
+				return;
+
+			it = cursors.emplace(cursor, created).first;
+		}
+
+		SDL_SetCursor(it->second);
+	}
+
+	void SDLWindowBackend::SetClipboardText(const std::string& text)
+	{
+		SDL_SetClipboardText(text.c_str());
+	}
+
+	std::string SDLWindowBackend::GetClipboardText()
+	{
+		auto* text = SDL_GetClipboardText();
+
+		if (text == nullptr)
+			return {};
+
+		auto copied = std::string(text);
+
+		SDL_free(text);
+
+		return copied;
+	}
+
+	void SDLWindowBackend::StartTextInput(const Core::RectI& caretRect)
+	{
+		auto rect = SDL_Rect
+		{
+			.x = caretRect.x,
+			.y = caretRect.y,
+			.w = caretRect.w,
+			.h = caretRect.h
+		};
+
+		SDL_SetTextInputRect(&rect);
+		SDL_StartTextInput();
+	}
+
+	void SDLWindowBackend::StopTextInput()
+	{
+		SDL_StopTextInput();
 	}
 }
