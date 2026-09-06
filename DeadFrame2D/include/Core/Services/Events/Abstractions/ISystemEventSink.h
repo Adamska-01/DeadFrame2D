@@ -14,6 +14,9 @@ namespace DF2D::Core
 		virtual ~ISystemEventSink() = default;
 
 
+		/**
+		 * @brief Feeds a platform event into every live ISystemEventSink.
+		 */
 		virtual void OnSystemEvent(const Data::SystemEvent& systemEvent) = 0;
 	};
 }
