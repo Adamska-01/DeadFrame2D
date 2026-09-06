@@ -102,11 +102,9 @@ namespace DF2D::Internal
 		RmlUIBackend& operator=(RmlUIBackend&&) = delete;
 
 
-		/** @brief Advances the UI clock. Fed unscaled delta so a paused game still animates its UI. */
-		void Advance(float deltaTime);
-
-
 		void SetEventSink(Core::IUIEventSink* sink) override;
+
+		void Advance(float deltaTime) override;
 
 		Data::UIContextID CreateContext(Core::Vector2I size) override;
 
@@ -134,6 +132,8 @@ namespace DF2D::Internal
 
 		void SetElementAttribute(Data::UIElementID element, Data::UIAttribute attribute, const std::string& value) override;
 
+		void RemoveElementAttribute(Data::UIElementID element, Data::UIAttribute attribute) override;
+
 		void SetElementText(Data::UIElementID element, const std::string& text) override;
 
 		void SetElementClass(Data::UIElementID element, const std::string& className, bool enabled) override;
@@ -149,6 +149,20 @@ namespace DF2D::Internal
 		Core::RectF GetElementRect(Data::UIElementID element) const override;
 
 		Core::Vector2F GetElementContentSize(Data::UIElementID element) const override;
+
+		int AddDropdownOption(Data::UIElementID dropdown, const std::string& text, const std::string& value) override;
+
+		void ClearDropdownOptions(Data::UIElementID dropdown) override;
+
+		void SetDropdownSelection(Data::UIElementID dropdown, int index) override;
+
+		int GetDropdownSelection(Data::UIElementID dropdown) const override;
+
+		void SetElementScrollOffset(Data::UIElementID element, Core::Vector2F offset) override;
+
+		Core::Vector2F GetElementScrollOffset(Data::UIElementID element) const override;
+
+		Core::Vector2F GetElementScrollSize(Data::UIElementID element) const override;
 
 		void ProcessMouseMove(Data::UIContextID context, Core::Vector2F position, Data::KeyModifiers modifiers) override;
 

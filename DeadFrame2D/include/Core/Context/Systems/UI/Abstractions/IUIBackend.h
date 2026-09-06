@@ -39,6 +39,18 @@ namespace DF2D::Core
 		virtual void SetEventSink(IUIEventSink* sink) = 0;
 
 		/**
+		 * @brief Advances the UI clock by one frame.
+		 *
+		 * The backend times smooth scrolling, animations, transitions and the caret blink against this,
+		 * so it must be called every frame: a clock that does not move leaves anything mid-animation
+		 * stuck where it was, and further input only piles onto a target it can never reach.
+		 *
+		 * @param deltaTime: Seconds since the last frame, unscaled. A paused game still animates its UI,
+		 * so this must not be the delta gameplay sees.
+		 */
+		virtual void Advance(float deltaTime) = 0;
+
+		/**
 		 * @brief Creates an independent UI context with its own element tree and its own styling (UI Canvas).
 		 *
 		 * @param size: Surface size in pixels that percentage lengths resolve against.
@@ -157,8 +169,14 @@ namespace DF2D::Core
 		virtual void SetElementAttribute(Data::UIElementID element, Data::UIAttribute attribute, const std::string& value) = 0;
 
 		/**
-		 * @brief Replaces the element's text content.
+		 * @brief Drops an attribute entirely.
+		 *
+		 * Distinct from setting it to an empty string: some attributes are read by their presence
+		 * alone, so an empty value still reads as set.
 		 */
+		virtual void RemoveElementAttribute(Data::UIElementID element, Data::UIAttribute attribute) = 0;
+
+		/** @brief Replaces the element's text content. */
 		virtual void SetElementText(Data::UIElementID element, const std::string& text) = 0;
 
 		/**
@@ -171,9 +189,7 @@ namespace DF2D::Core
 		 */
 		virtual void SetElementClass(Data::UIElementID element, const std::string& className, bool enabled) = 0;
 
-		/**
-		* @brief Whether the element currently carries the given style class.
-		*/
+		/** @brief Whether the element currently carries the given style class. */
 		virtual bool HasElementClass(Data::UIElementID element, const std::string& className) const = 0;
 
 		/**
@@ -212,6 +228,32 @@ namespace DF2D::Core
 		 * Used for content-driven sizing, such as growing a label to fit its text.
 		 */
 		virtual Vector2F GetElementContentSize(Data::UIElementID element) const = 0;
+
+		/**
+		 * @brief Appends an option to a dropdown and returns its index, or -1 if it could not be added.
+		 *
+		 * Options are not elements the engine hands out handles for. A dropdown keeps its options in a
+		 * popup of its own making, so they are addressed by index and managed through the dropdown.
+		 */
+		virtual int AddDropdownOption(Data::UIElementID dropdown, const std::string& text, const std::string& value) = 0;
+
+		/** @brief Removes every option from a dropdown. */
+		virtual void ClearDropdownOptions(Data::UIElementID dropdown) = 0;
+
+		/** @brief Selects an option by index. An out-of-range index clears the selection. */
+		virtual void SetDropdownSelection(Data::UIElementID dropdown, int index) = 0;
+
+		/** @brief The selected option's index, or -1 when nothing is selected. */
+		virtual int GetDropdownSelection(Data::UIElementID dropdown) const = 0;
+
+		/** @brief Scrolls the element's content to an offset, clamped by the backend to what exists. */
+		virtual void SetElementScrollOffset(Data::UIElementID element, Vector2F offset) = 0;
+
+		/** @brief How far the element's content is currently scrolled. */
+		virtual Vector2F GetElementScrollOffset(Data::UIElementID element) const = 0;
+
+		/** @brief The full size of the element's content, which is what it scrolls within. */
+		virtual Vector2F GetElementScrollSize(Data::UIElementID element) const = 0;
 
 		/**
 		 * @brief Feeds pointer motion in, updating hover state.

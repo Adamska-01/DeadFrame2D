@@ -7,6 +7,7 @@
 #include "Factories/Products/Context/Systems/UI/RmlUIBackend.h"
 #include <iostream>
 #include <RmlUi/Core.h>
+#include <RmlUi/Core/Elements/ElementFormControlSelect.h>
 
 
 namespace DF2D::Internal
@@ -43,7 +44,8 @@ namespace DF2D::Internal
 			Rml::EventId::Focus,
 			Rml::EventId::Blur,
 			Rml::EventId::Change,
-			Rml::EventId::Submit
+			Rml::EventId::Submit,
+			Rml::EventId::Scroll
 		};
 	}
 
@@ -407,6 +409,16 @@ namespace DF2D::Internal
 		raw->SetAttribute(ToAttributeName(attribute), value);
 	}
 
+	void RmlUIBackend::RemoveElementAttribute(UIElementID element, UIAttribute attribute)
+	{
+		auto* raw = FindElement(element);
+
+		if (raw == nullptr)
+			return;
+
+		raw->RemoveAttribute(ToAttributeName(attribute));
+	}
+
 	void RmlUIBackend::SetElementText(UIElementID element, const std::string& text)
 	{
 		auto* raw = FindElement(element);
@@ -487,6 +499,76 @@ namespace DF2D::Internal
 		auto size = raw->GetBox().GetSize(Rml::BoxArea::Content);
 
 		return Vector2F(size.x, size.y);
+	}
+
+	int RmlUIBackend::AddDropdownOption(UIElementID dropdown, const std::string& text, const std::string& value)
+	{
+		auto* raw = rmlui_dynamic_cast<Rml::ElementFormControlSelect*>(FindElement(dropdown));
+
+		if (raw == nullptr)
+			return -1;
+
+		// Encoded for the same reason element text is: an option's caption is game data and must not be
+		// able to inject markup into the tree.
+		return raw->Add(Rml::StringUtilities::EncodeRml(text), value);
+	}
+
+	void RmlUIBackend::ClearDropdownOptions(UIElementID dropdown)
+	{
+		auto* raw = rmlui_dynamic_cast<Rml::ElementFormControlSelect*>(FindElement(dropdown));
+
+		if (raw == nullptr)
+			return;
+
+		raw->RemoveAll();
+	}
+
+	void RmlUIBackend::SetDropdownSelection(UIElementID dropdown, int index)
+	{
+		auto* raw = rmlui_dynamic_cast<Rml::ElementFormControlSelect*>(FindElement(dropdown));
+
+		if (raw == nullptr)
+			return;
+
+		raw->SetSelection(index);
+	}
+
+	int RmlUIBackend::GetDropdownSelection(UIElementID dropdown) const
+	{
+		auto* raw = rmlui_dynamic_cast<Rml::ElementFormControlSelect*>(FindElement(dropdown));
+
+		return raw != nullptr ? raw->GetSelection() : -1;
+	}
+
+	void RmlUIBackend::SetElementScrollOffset(UIElementID element, Vector2F offset)
+	{
+		auto* raw = FindElement(element);
+
+		if (raw == nullptr)
+			return;
+
+		raw->SetScrollLeft(offset.x);
+		raw->SetScrollTop(offset.y);
+	}
+
+	Vector2F RmlUIBackend::GetElementScrollOffset(UIElementID element) const
+	{
+		auto* raw = FindElement(element);
+
+		if (raw == nullptr)
+			return Vector2F::Zero;
+
+		return Vector2F(raw->GetScrollLeft(), raw->GetScrollTop());
+	}
+
+	Vector2F RmlUIBackend::GetElementScrollSize(UIElementID element) const
+	{
+		auto* raw = FindElement(element);
+
+		if (raw == nullptr)
+			return Vector2F::Zero;
+
+		return Vector2F(raw->GetScrollWidth(), raw->GetScrollHeight());
 	}
 
 
