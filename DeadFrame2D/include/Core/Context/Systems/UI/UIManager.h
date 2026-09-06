@@ -3,7 +3,7 @@
 #include "Core/Context/Systems/Input/Abstractions/IInputCaptureState.h"
 #include "Core/Context/Systems/UI/Abstractions/IUIBackend.h"
 #include "Core/Context/Systems/UI/Abstractions/IUIEventSink.h"
-#include "Core/Context/Systems/UI/UIContext.h"
+#include "Core/Context/Systems/UI/Context/UIContext.h"
 #include "Core/Math/Vector2.h"
 #include "Core/Services/Events/Abstractions/ISystemEventSink.h"
 #include "Core/Services/Time/Abstractions/ITimeProvider.h"
@@ -41,7 +41,9 @@ namespace DF2D::Core
 	class DF2D_API UIManager : public ICoreSystem, public IUIEventSink, public ISystemEventSink, public IInputCaptureState
 	{
 		friend class UIContext;
+		friend class UIDropdown;
 		friend class UIElement;
+		friend class UIScrollable;
 
 
 	private:
