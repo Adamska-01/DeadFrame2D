@@ -1,4 +1,5 @@
 #pragma once
+#include "Core/Math/Vector2.h"
 #include <string>
 
 
@@ -20,5 +21,8 @@ namespace DF2D::Data
 
 		/** @brief Current selection or on/off state, for toggles and dropdowns. */
 		int index = 0;
+
+		/** @brief Two-dimensional value, for SCROLL. */
+		Core::Vector2F offset;
 	};
 }
