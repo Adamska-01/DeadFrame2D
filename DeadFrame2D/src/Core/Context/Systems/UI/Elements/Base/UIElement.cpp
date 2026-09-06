@@ -1,4 +1,4 @@
-#include "Core/Context/Systems/UI/UIElement.h"
+#include "Core/Context/Systems/UI/Elements/Base/UIElement.h"
 #include "Core/Context/Systems/UI/UIManager.h"
 
 
@@ -34,6 +34,17 @@ namespace DF2D::Core
 	{
 		return id;
 	}
+
+	UIDropdown UIElement::AsDropdown() const
+	{
+		return UIDropdown(manager, id);
+	}
+
+	UIScrollable UIElement::AsScrollable() const
+	{
+		return UIScrollable(manager, id);
+	}
+
 
 	void UIElement::SetProperty(UIStyleProperty property, const std::string& value)
 	{
@@ -117,50 +128,6 @@ namespace DF2D::Core
 	Vector2F UIElement::GetContentSize() const
 	{
 		return IsValid() ? manager->GetElementContentSize(id) : Vector2F::Zero;
-	}
-
-	Vector2F UIElement::GetScrollOffset() const
-	{
-		return IsValid() ? manager->GetElementScrollOffset(id) : Vector2F::Zero;
-	}
-
-	void UIElement::SetScrollOffset(Vector2F offset)
-	{
-		if (IsValid())
-		{
-			manager->SetElementScrollOffset(id, offset);
-		}
-	}
-
-	Vector2F UIElement::GetScrollSize() const
-	{
-		return IsValid() ? manager->GetElementScrollSize(id) : Vector2F::Zero;
-	}
-
-	int UIElement::AddDropdownOption(const std::string& text, const std::string& value)
-	{
-		return IsValid() ? manager->AddDropdownOption(id, text, value) : -1;
-	}
-
-	void UIElement::ClearDropdownOptions()
-	{
-		if (IsValid())
-		{
-			manager->ClearDropdownOptions(id);
-		}
-	}
-
-	void UIElement::SetDropdownSelection(int index)
-	{
-		if (IsValid())
-		{
-			manager->SetDropdownSelection(id, index);
-		}
-	}
-
-	int UIElement::GetDropdownSelection() const
-	{
-		return IsValid() ? manager->GetDropdownSelection(id) : -1;
 	}
 
 	void UIElement::RegisterOwner(const Engine::ComponentHandle<Engine::UIComponent>& owner)

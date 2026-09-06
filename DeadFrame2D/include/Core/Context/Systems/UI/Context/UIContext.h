@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/Context/Systems/UI/UIElement.h"
+#include "Core/Context/Systems/UI/Elements/Base/UIElement.h"
 #include "Core/Math/Vector2.h"
 #include "Data/Systems/Rendering/Pipeline/GeometryDrawList.h"
 #include "Data/Systems/UI/UIContextID.h"
@@ -11,6 +11,8 @@
 
 namespace DF2D::Engine
 {
+	class Canvas;
+
 	class GameObject;
 }
 
@@ -27,6 +29,9 @@ namespace DF2D::Core
 	 */
 	class DF2D_API UIContext
 	{
+		// Only the canvas that owns a surface may destroy it; everyone else holds a handle to one.
+		friend class Engine::Canvas;
+
 		friend class UIManager;
 
 
@@ -37,6 +42,14 @@ namespace DF2D::Core
 
 
 		UIContext(UIManager* manager, Data::UIContextID id);
+
+		/**
+		 * @brief Destroys the surface and every element in it. The handle is inert afterwards.
+		 *
+		 * Private on purpose: a surface outlives every handle to it except the canvas's, so letting
+		 * any holder destroy it would leave the rest pointing at nothing.
+		 */
+		void Destroy();
 
 
 	public:
@@ -64,9 +77,6 @@ namespace DF2D::Core
 
 		/** @brief Renders the surface into an ordered draw list, ready to submit as a render task. */
 		Data::GeometryDrawList Render();
-
-		/** @brief Destroys the surface and every element in it. The handle is inert afterwards. */
-		void Destroy();
 
 
 		/**

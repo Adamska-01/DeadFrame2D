@@ -1,4 +1,6 @@
 #pragma once
+#include "Core/Context/Systems/UI/Elements/UIDropdown.h"
+#include "Core/Context/Systems/UI/Elements/UIScrollable.h"
 #include "Core/Math/Rect.h"
 #include "Core/Math/Vector2.h"
 #include "Data/Systems/UI/UIAttribute.h"
@@ -52,6 +54,10 @@ namespace DF2D::Core
 
 		Data::UIElementID Id() const;
 
+		UIDropdown AsDropdown() const;
+
+		UIScrollable AsScrollable() const;
+
 
 		void SetProperty(Data::UIStyleProperty property, const std::string& value);
 
@@ -76,20 +82,6 @@ namespace DF2D::Core
 		RectF GetRect() const;
 
 		Vector2F GetContentSize() const;
-
-		Vector2F GetScrollOffset() const;
-
-		void SetScrollOffset(Vector2F offset);
-
-		Vector2F GetScrollSize() const;
-
-		int AddDropdownOption(const std::string& text, const std::string& value);
-
-		void ClearDropdownOptions();
-
-		void SetDropdownSelection(int index);
-
-		int GetDropdownSelection() const;
 
 		void RegisterOwner(const Engine::ComponentHandle<Engine::UIComponent>& owner);
 
