@@ -73,11 +73,18 @@ namespace DF2D::Engine
 
 
 		/**
+		 * @brief Records what kind of element a UI GameObject in this canvas needs.
+		 *
+		 * Called by UIComponent during Init;
+		 */
+		void DeclareElementFor(const ObjectHandle<GameObject>& owner, Data::UIElementType type);
+
+		/**
 		 * @brief Returns the element backing a UI GameObject in this canvas, creating it if needed.
 		 *
-		 * Called by UIComponent during its own Init; there is no reason for game code to call it.
+		 * Called by UIComponent during Start;
 		 */
-		Data::UIElementID AcquireElementFor(const ObjectHandle<GameObject>& owner, Data::UIElementType type);
+		Data::UIElementID AcquireElementFor(const ObjectHandle<GameObject>& owner);
 
 		/**
 		 * @brief Applies a stylesheet on top of the ones already loaded.

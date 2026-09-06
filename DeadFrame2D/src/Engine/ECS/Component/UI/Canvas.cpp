@@ -123,7 +123,19 @@ namespace DF2D::Engine
 	}
 
 
-	UIElementID Canvas::AcquireElementFor(const ObjectHandle<GameObject>& owner, UIElementType type)
+	void Canvas::DeclareElementFor(const ObjectHandle<GameObject>& owner, UIElementType type)
+	{
+		if (uiManager == nullptr || context == 0)
+			return;
+
+		// The canvas object itself takes the context root, whose kind is not ours to choose.
+		if (owner == GetGameObject())
+			return;
+
+		uiManager->DeclareElementType(context, owner.operator->(), type);
+	}
+
+	UIElementID Canvas::AcquireElementFor(const ObjectHandle<GameObject>& owner)
 	{
 		if (uiManager == nullptr || context == 0)
 			return 0;
@@ -132,7 +144,7 @@ namespace DF2D::Engine
 		if (owner == GetGameObject())
 			return uiManager->GetRootElement(context);
 
-		return uiManager->AcquireElement(context, owner.operator->(), type);
+		return uiManager->AcquireElement(context, owner.operator->());
 	}
 
 	bool Canvas::LoadStyleSheet(std::string_view path)
