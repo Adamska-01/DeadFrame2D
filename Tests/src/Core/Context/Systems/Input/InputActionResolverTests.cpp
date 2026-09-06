@@ -1,5 +1,6 @@
 #include "Core/Context/Systems/Input/Actions/InputActionResolver.h"
 #include "Mocks/Context/Systems/Input/MockInputActionHandler.h"
+#include "Mocks/Context/Systems/Input/MockInputCaptureSource.h"
 #include "Mocks/Context/Systems/Input/MockInputDevice.h"
 #include "Mocks/Context/Systems/Input/MockUserDevicePairings.h"
 #include "Models/Input/ActionMap/InputActionMapBucket.h"
@@ -27,6 +28,10 @@ namespace
 
 	constexpr int DOWN_KEY = static_cast<int>(KeyboardKeyCode::S);
 
+	constexpr int FIRE_BUTTON = static_cast<int>(MouseButtonCode::LEFT);
+
+	constexpr int MENU_BUTTON = static_cast<int>(ControllerButtonCode::START);
+
 
 	InputActionMapBucket MakeBucket()
 	{
@@ -37,7 +42,9 @@ namespace
 			{
 				InputAction{ .name = "Jump", .valueType = ValueType::BOOL },
 				InputAction{ .name = "Move", .valueType = ValueType::FLOAT },
-				InputAction{ .name = "Look", .valueType = ValueType::VECTOR2 }
+				InputAction{ .name = "Look", .valueType = ValueType::VECTOR2 },
+				InputAction{ .name = "Fire", .valueType = ValueType::BOOL },
+				InputAction{ .name = "Menu", .valueType = ValueType::BOOL }
 			},
 			.bindings =
 			{
@@ -76,6 +83,30 @@ namespace
 						.controlType = InputControlType::DIGITAL,
 						.value = Composite2D{ .up = UP_KEY, .down = DOWN_KEY, .left = LEFT_KEY, .right = RIGHT_KEY }
 					}
+				},
+				Binding
+				{
+					.name = "FireMouse",
+					.action = "Fire",
+					.input = InputBinding
+					{
+						.inputDeviceType = InputDeviceType::MOUSE,
+						.bindingType = BindingType::SIMPLE,
+						.controlType = InputControlType::DIGITAL,
+						.value = FIRE_BUTTON
+					}
+				},
+				Binding
+				{
+					.name = "MenuPad",
+					.action = "Menu",
+					.input = InputBinding
+					{
+						.inputDeviceType = InputDeviceType::CONTROLLER,
+						.bindingType = BindingType::SIMPLE,
+						.controlType = InputControlType::DIGITAL,
+						.value = MENU_BUTTON
+					}
 				}
 			}
 		};
@@ -92,7 +123,9 @@ namespace
 
 		MockInputDevice device{ &deviceHandler };
 
-		InputActionResolver resolver{ MakeBucket(), pairings };
+		MockInputCaptureSource captureSource;
+
+		InputActionResolver resolver{ MakeBucket(), pairings, &captureSource };
 
 
 		ResolverFixture()
@@ -310,6 +343,95 @@ TEST_CASE("Registering with an invalid listener handle is rejected")
 	auto id = fx.resolver.RegisterAction(USER, "Default", "Jump", DF2D::Engine::ComponentHandleBase{}, [](const InputActionView&) {});
 
 	CHECK(id == -1);
+}
+
+
+TEST_CASE("A keyboard action still fires while the UI only owns the pointer")
+{
+	ResolverFixture fx;
+
+	fx.captureSource.capturesPointer = true;
+
+	fx.device.SetButton(JUMP_KEY, 1.0f);
+	fx.Frame({ JUMP_KEY });
+
+	// Hovering a panel must not disable the keyboard.
+	auto view = fx.resolver.GetActionState(USER, "Jump");
+
+	REQUIRE(view.has_value());
+	CHECK(view->IsStarted());
+}
+
+
+TEST_CASE("A keyboard action is suppressed while a UI element is taking typed input")
+{
+	ResolverFixture fx;
+
+	fx.captureSource.capturesKeyboard = true;
+
+	fx.device.SetButton(JUMP_KEY, 1.0f);
+	fx.Frame({ JUMP_KEY });
+
+	// Typing a "w" into a text field must not also drive the player. The action still exists, it
+	// simply never leaves its resting phase.
+	auto view = fx.resolver.GetActionState(USER, "Jump");
+
+	REQUIRE(view.has_value());
+	CHECK_FALSE(view->IsStarted());
+}
+
+
+TEST_CASE("A mouse action is suppressed while the pointer is over the UI")
+{
+	ResolverFixture fx;
+
+	fx.device.type = InputDeviceType::MOUSE;
+	fx.captureSource.capturesPointer = true;
+
+	fx.device.SetButton(FIRE_BUTTON, 1.0f);
+	fx.Frame({ FIRE_BUTTON });
+
+	auto view = fx.resolver.GetActionState(USER, "Fire");
+
+	REQUIRE(view.has_value());
+	CHECK_FALSE(view->IsStarted());
+}
+
+
+TEST_CASE("A mouse action still fires while the UI only owns the keyboard")
+{
+	ResolverFixture fx;
+
+	fx.device.type = InputDeviceType::MOUSE;
+	fx.captureSource.capturesKeyboard = true;
+
+	fx.device.SetButton(FIRE_BUTTON, 1.0f);
+	fx.Frame({ FIRE_BUTTON });
+
+	auto view = fx.resolver.GetActionState(USER, "Fire");
+
+	REQUIRE(view.has_value());
+	CHECK(view->IsStarted());
+}
+
+
+TEST_CASE("Controller actions are never suppressed by the UI")
+{
+	ResolverFixture fx;
+
+	fx.device.type = InputDeviceType::CONTROLLER;
+	fx.captureSource.capturesPointer = true;
+	fx.captureSource.capturesKeyboard = true;
+
+	fx.device.SetButton(MENU_BUTTON, 1.0f);
+	fx.Frame({ MENU_BUTTON });
+
+	// Menu navigation is driven through actions, so blocking the controller would disable the very
+	// inputs that move focus around a menu.
+	auto view = fx.resolver.GetActionState(USER, "Menu");
+
+	REQUIRE(view.has_value());
+	CHECK(view->IsStarted());
 }
 
 

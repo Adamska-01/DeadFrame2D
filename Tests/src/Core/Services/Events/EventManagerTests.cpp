@@ -148,4 +148,26 @@ TEST_CASE("RequestQuit pushes a quit through the source")
 }
 
 
+TEST_CASE("Every sink receives every event")
+{
+	MockEventSource* source = nullptr;
+	auto manager = MakeManager(source);
+
+	auto first = MockSystemEventSink();
+	auto second = MockSystemEventSink();
+
+	manager->AddSink(&first);
+	manager->AddSink(&second);
+
+	source->events.push_back(KeyEvent{});
+
+	manager->ProcessEvents();
+
+	// Sinks cannot consume, so registration order carries no meaning and no sink can starve another.
+	// The input devices depend on this: skipping one would leave its recorded state lying.
+	CHECK(first.receivedEvents.size() == 1);
+	CHECK(second.receivedEvents.size() == 1);
+}
+
+
 TEST_SUITE_END();

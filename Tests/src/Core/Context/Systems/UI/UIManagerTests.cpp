@@ -74,6 +74,11 @@ namespace
 	{
 		static_cast<IUIEventSink*>(&manager)->OnUIEvent(element, UIEventType::CLICK, UIEventPayload{});
 	}
+
+	void Feed(UIManager& manager, const DF2D::Data::SystemEvent& systemEvent)
+	{
+		static_cast<DF2D::Core::ISystemEventSink*>(&manager)->OnSystemEvent(systemEvent);
+	}
 }
 
 
@@ -321,6 +326,80 @@ TEST_CASE("An element with no remaining owners stops dispatching")
 
 	CHECK_NOTHROW(Dispatch(*fixture.manager, 42));
 	CHECK(only->eventCount == 0);
+}
+
+
+TEST_CASE("Pointer motion is fed to every live context")
+{
+	auto fixture = Fixture();
+
+	fixture.manager->CreateContext(Vector2I(800, 600));
+	fixture.manager->CreateContext(Vector2I(800, 600));
+
+	Feed(*fixture.manager, DF2D::Data::MouseMoveEvent{ .position = { 12.0f, 34.0f } });
+
+	CHECK(fixture.mock->mouseMoveCount == 2);
+	CHECK(fixture.mock->lastPointerPosition == Vector2F(12.0f, 34.0f));
+}
+
+
+TEST_CASE("Pointer events reach the backend regardless of what it reports")
+{
+	auto fixture = Fixture();
+
+	fixture.manager->CreateContext(Vector2I(800, 600));
+
+	// Nothing is withheld at this level any more: the devices must always be fed so their recorded
+	// state stays truthful. Suppression happens later, when actions are resolved.
+	Feed(*fixture.manager, DF2D::Data::MouseButtonEvent{});
+
+	CHECK(fixture.mock->mouseButtonCount == 1);
+}
+
+
+TEST_CASE("Key and text events are routed separately from pointer events")
+{
+	auto fixture = Fixture();
+
+	fixture.manager->CreateContext(Vector2I(800, 600));
+
+	Feed(*fixture.manager, DF2D::Data::KeyEvent{ .key = DF2D::Models::KeyboardKeyCode::A, .pressed = true });
+	Feed(*fixture.manager, DF2D::Data::TextInputEvent{ .text = "a" });
+
+	CHECK(fixture.mock->keyCount == 1);
+	CHECK(fixture.mock->lastKey == DF2D::Models::KeyboardKeyCode::A);
+	CHECK(fixture.mock->textInputCount == 1);
+	CHECK(fixture.mock->lastText == "a");
+}
+
+
+TEST_CASE("Nothing is routed anywhere when no canvas exists")
+{
+	auto fixture = Fixture();
+
+	Feed(*fixture.manager, DF2D::Data::MouseMoveEvent{});
+
+	CHECK(fixture.mock->mouseMoveCount == 0);
+}
+
+
+TEST_CASE("Capture state is reported to the input system from the backend")
+{
+	auto fixture = Fixture();
+
+	fixture.manager->CreateContext(Vector2I(800, 600));
+
+	// Reached through the interface the input system actually holds, not a second public accessor.
+	const auto& capture = static_cast<const DF2D::Core::IInputCaptureSource&>(*fixture.manager);
+
+	CHECK_FALSE(capture.CapturesPointer());
+	CHECK_FALSE(capture.CapturesKeyboard());
+
+	fixture.mock->pointerOverElement = true;
+	fixture.mock->keyboardFocused = true;
+
+	CHECK(capture.CapturesPointer());
+	CHECK(capture.CapturesKeyboard());
 }
 
 

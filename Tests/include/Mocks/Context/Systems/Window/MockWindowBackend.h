@@ -19,6 +19,17 @@ struct MockWindowBackend : DF2D::Core::IWindowBackend
 
 	DF2D::Data::WindowMode lastMode{DF2D::Data::WindowMode::WINDOWED};
 
+	// UI platform services
+	DF2D::Data::CursorType lastCursor{DF2D::Data::CursorType::ARROW};
+
+	int setCursorCount{0};
+
+	std::string clipboard;
+
+	bool textInputActive{false};
+
+	DF2D::Core::RectI lastCaretRect{};
+
 	DF2D::Core::Vector2I lastRequestedResolution{};
 
 
@@ -51,5 +62,32 @@ struct MockWindowBackend : DF2D::Core::IWindowBackend
 			resolution = newResolution;
 
 		return setResolutionResult;
+	}
+
+	void SetCursor(DF2D::Data::CursorType cursor) override
+	{
+		lastCursor = cursor;
+		setCursorCount++;
+	}
+
+	void SetClipboardText(const std::string& text) override
+	{
+		clipboard = text;
+	}
+
+	std::string GetClipboardText() override
+	{
+		return clipboard;
+	}
+
+	void StartTextInput(const DF2D::Core::RectI& caretRect) override
+	{
+		textInputActive = true;
+		lastCaretRect = caretRect;
+	}
+
+	void StopTextInput() override
+	{
+		textInputActive = false;
 	}
 };

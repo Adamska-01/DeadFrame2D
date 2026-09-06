@@ -56,7 +56,7 @@ namespace
 	{
 		EventDispatcher eventDispatcher;
 
-		Input input{ MakeBucket(), eventDispatcher };
+		Input input{ MakeBucket(), eventDispatcher, nullptr };
 
 		std::shared_ptr<FakeSceneHandleProvider> scene;
 

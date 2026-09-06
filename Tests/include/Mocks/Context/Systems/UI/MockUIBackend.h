@@ -21,6 +21,10 @@ struct MockUIBackend : DF2D::Core::IUIBackend
 
 	DF2D::Core::RectF elementRect{};
 
+	bool keyboardFocused{false};
+
+	bool pointerOverElement{false};
+
 
 	// Call tracking
 	DF2D::Core::IUIEventSink* sink{nullptr};
@@ -42,6 +46,28 @@ struct MockUIBackend : DF2D::Core::IUIBackend
 	std::vector<std::string> loadedFontFamilies;
 
 	std::vector<std::string> loadedStyleSheets;
+
+	int mouseMoveCount{0};
+
+	int mouseButtonCount{0};
+
+	int mouseWheelCount{0};
+
+	int keyCount{0};
+
+	int textInputCount{0};
+
+	DF2D::Core::Vector2F lastPointerPosition{};
+
+	DF2D::Models::MouseButtonCode lastButton{DF2D::Models::MouseButtonCode::UNKNOWN};
+
+	bool lastButtonPressed{false};
+
+	DF2D::Models::KeyboardKeyCode lastKey{DF2D::Models::KeyboardKeyCode::UNKNOWN};
+
+	bool lastKeyPressed{false};
+
+	std::string lastText;
 
 	std::unordered_set<DF2D::Data::UIContextID> liveContexts;
 
@@ -192,5 +218,51 @@ struct MockUIBackend : DF2D::Core::IUIBackend
 		loadedFontFamilies.push_back(family);
 
 		return !failNextFontLoad;
+	}
+
+	void ProcessMouseMove(DF2D::Data::UIContextID, DF2D::Core::Vector2F position, DF2D::Data::KeyModifiers) override
+	{
+		lastPointerPosition = position;
+		mouseMoveCount++;
+
+	}
+
+	void ProcessMouseButton(DF2D::Data::UIContextID, DF2D::Models::MouseButtonCode button, bool pressed, DF2D::Data::KeyModifiers) override
+	{
+		lastButton = button;
+		lastButtonPressed = pressed;
+		mouseButtonCount++;
+
+	}
+
+	void ProcessMouseWheel(DF2D::Data::UIContextID, DF2D::Core::Vector2F, DF2D::Data::KeyModifiers) override
+	{
+		mouseWheelCount++;
+
+	}
+
+	void ProcessKey(DF2D::Data::UIContextID, DF2D::Models::KeyboardKeyCode key, bool pressed, DF2D::Data::KeyModifiers) override
+	{
+		lastKey = key;
+		lastKeyPressed = pressed;
+		keyCount++;
+
+	}
+
+	void ProcessTextInput(DF2D::Data::UIContextID, const std::string& text) override
+	{
+		lastText = text;
+		textInputCount++;
+
+	}
+
+	bool HasKeyboardFocus(DF2D::Data::UIContextID) const override
+	{
+		return keyboardFocused;
+	}
+
+	bool IsPointerOverElement(DF2D::Data::UIContextID) const override
+	{
+		return pointerOverElement;
 	}
 };
