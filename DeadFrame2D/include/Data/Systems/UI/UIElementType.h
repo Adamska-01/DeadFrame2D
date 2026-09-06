@@ -35,9 +35,6 @@ namespace DF2D::Data
 		/** @brief Closed list of options, one of which is selected. */
 		DROPDOWN,
 
-		/** @brief One option inside a dropdown. */
-		DROPDOWN_OPTION,
-
 		/** @brief Container that clips its content and scrolls it. */
 		SCROLL_PANEL
 	};
