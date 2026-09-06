@@ -33,8 +33,6 @@ namespace DF2D::Core
 
 		auto coreCtx = systemInitializer->GetCoreContext();
 
-		// Order is irrelevant: sinks cannot consume, so both see every event. The UI needs them to do its
-		// hit testing and focus tracking, the input devices to mirror the hardware.
 		serviceCtx.eventManager->AddSink(coreCtx.uiManager);
 		serviceCtx.eventManager->AddSink(coreCtx.input);
 

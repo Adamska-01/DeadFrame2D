@@ -8,7 +8,6 @@
 #include "Core/Context/Systems/Rendering/Renderer.h"
 #include "Core/Context/Systems/UI/UIManager.h"
 #include "Core/Context/Systems/Window/Window.h"
-#include "Engine/ECS/System/Events/EventDispatcher.h"
 #include "Factories/Concretions/Context/Systems/Audio/AudioBackendFactory.h"
 #include "Factories/Concretions/Context/Systems/Graphics/GraphicsBackendFactory.h"
 #include "Factories/Concretions/Context/Systems/Physics/PhysicsBackendFactory.h"
@@ -40,7 +39,7 @@ namespace DF2D::Core
 		auto* textureManager = new TextureManager(std::move(graphicsBackends.textureBackend));
 
 		auto* window = new Window(std::move(graphicsBackends.windowBackend));
-		auto* uiManager = new UIManager(UIBackendFactory().CreateProduct(textureManager, window));
+		auto* uiManager = new UIManager(UIBackendFactory().CreateProduct(textureManager, window), serviceCtx.frameTimer);
 
 		ctx = CoreContext
 		{
