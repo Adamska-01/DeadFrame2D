@@ -25,8 +25,6 @@ namespace DF2D::Engine
 
 		int maxLength = -1;
 
-		bool multiline = false;
-
 
 		void ApplyText();
 
@@ -62,18 +60,6 @@ namespace DF2D::Engine
 
 		void SetMaxLength(int length);
 
-		/**
-		 * @brief Switches between a single line and a block of text.
-		 *
-		 * Takes effect only before the component is initialised, because the two are different kinds of
-		 * element and an element's kind is fixed when it is built. Scenes set this while building, which
-		 * runs first, so the ordinary authoring path is unaffected.
-		 */
-		void SetMultiline(bool value);
-
-
 		const std::string& GetText() const;
-
-		bool IsMultiline() const;
 	};
 }

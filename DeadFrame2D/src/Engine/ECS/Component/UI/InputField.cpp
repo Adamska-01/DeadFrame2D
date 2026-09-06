@@ -38,7 +38,7 @@ namespace DF2D::Engine
 
 	UIElementType InputField::GetElementType() const
 	{
-		return multiline ? UIElementType::TEXT_AREA : UIElementType::TEXT_INPUT;
+		return UIElementType::TEXT_INPUT;
 	}
 
 	void InputField::OnElementCreated()
@@ -109,25 +109,8 @@ namespace DF2D::Engine
 		ApplyMaxLength();
 	}
 
-	void InputField::SetMultiline(bool value)
-	{
-		// The element kind is chosen once, when the component initialises and declares what it needs.
-		// Changing the flag after that would leave this component describing something the tree does not
-		// contain, so it is refused rather than half-applied.
-		if (GetCanvas() != nullptr)
-			return;
-
-		multiline = value;
-	}
-
-
 	const std::string& InputField::GetText() const
 	{
 		return text;
-	}
-
-	bool InputField::IsMultiline() const
-	{
-		return multiline;
 	}
 }
