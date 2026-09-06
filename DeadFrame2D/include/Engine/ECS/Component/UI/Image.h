@@ -27,6 +27,13 @@ namespace DF2D::Engine
 
 		Core::Color color = Constants::CommonColors::WHITE;
 
+		/**
+		 * @brief Whether the game set a colour, as opposed to this being the untouched default.
+		 *
+		 * An unset colour is left out of the element entirely so stylesheets keep control of it.
+		 */
+		bool colorOverridden = false;
+
 		Data::UIImageType imageType = Data::UIImageType::SIMPLE;
 
 		Core::RectI sliceBorders{};

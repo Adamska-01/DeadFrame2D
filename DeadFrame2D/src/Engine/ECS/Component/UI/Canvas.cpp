@@ -64,6 +64,15 @@ namespace DF2D::Engine
 	{
 		// Engine defaults first so a game stylesheet loaded later layers on top of them.
 		LoadStyleSheet(std::string_view(Paths::Files::DEFAULT_UI_STYLESHEET));
+
+		auto queued = std::move(pendingStyleSheets);
+
+		pendingStyleSheets.clear();
+
+		for (const auto& path : queued)
+		{
+			LoadStyleSheet(path);
+		}
 	}
 
 	void Canvas::RenderTargetSizeChangedEventHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent)
@@ -128,8 +137,14 @@ namespace DF2D::Engine
 
 	bool Canvas::LoadStyleSheet(std::string_view path)
 	{
+		// Scenes load their theme in Enter, which runs before any component is initialised and so
+		// before the context exists. The request is queued and replayed once it does.
 		if (uiManager == nullptr || context == 0)
-			return false;
+		{
+			pendingStyleSheets.push_back(std::string(path));
+
+			return true;
+		}
 
 		return uiManager->Backend().LoadStyleSheet(context, std::string(path));
 	}

@@ -6,7 +6,9 @@
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
 #include <memory>
+#include <string>
 #include <string_view>
+#include <vector>
 
 
 namespace DF2D::Engine
@@ -47,6 +49,9 @@ namespace DF2D::Engine
 		Data::UIContextID context = 0;
 
 		Data::RenderTask renderTask;
+
+		/** @brief Stylesheets requested before the context existed, replayed once it does. */
+		std::vector<std::string> pendingStyleSheets;
 
 
 		void RenderTargetSizeChangedEventHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
@@ -92,7 +97,9 @@ namespace DF2D::Engine
 
 		void SetSortOrder(int value);
 
-		/** @brief Renders directly in screen space, independently of any camera. */
+		/** 
+		* @brief Renders directly in screen space, independently of any camera.
+		*/
 		void SetScreenSpaceOverlay();
 
 		/**

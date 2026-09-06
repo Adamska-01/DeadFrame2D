@@ -28,14 +28,25 @@ namespace DF2D::Engine
 			// No texture, so the element is a flat colour fill and needs no decorator at all.
 			ClearStyle(UIStyleProperty::DECORATOR);
 
-			SetStyle(UIStyleProperty::BACKGROUND_COLOR, color);
+			// Only written when the game actually chose a colour. Inline properties outrank every
+			// stylesheet rule, so stamping a default here would quietly make the element unthemeable
+			// and kill any :hover or class-based background the game defined.
+			if (colorOverridden)
+			{
+				SetStyle(UIStyleProperty::BACKGROUND_COLOR, color);
+			}
+			else
+			{
+				ClearStyle(UIStyleProperty::BACKGROUND_COLOR);
+			}
 
 			return;
 		}
 
 		// A decorator rather than an image element: it is the only form that supports slicing and
 		// tiling, so all three image types go through one code path.
-		SetStyle(UIStyleProperty::BACKGROUND_COLOR, Color{ 0, 0, 0, 0 });
+		// A decorator paints over the background, so any flat fill is cleared out of the way.
+		ClearStyle(UIStyleProperty::BACKGROUND_COLOR);
 
 		auto decorator = std::string();
 
@@ -59,7 +70,11 @@ namespace DF2D::Engine
 		}
 
 		SetStyle(UIStyleProperty::DECORATOR, decorator);
-		SetStyle(UIStyleProperty::IMAGE_COLOR, color);
+
+		if (colorOverridden)
+		{
+			SetStyle(UIStyleProperty::IMAGE_COLOR, color);
+		}
 	}
 
 
@@ -77,10 +92,11 @@ namespace DF2D::Engine
 
 	void Image::SetColor(const Color& newColor)
 	{
-		if (newColor == color)
+		if (newColor == color && colorOverridden)
 			return;
 
 		color = newColor;
+		colorOverridden = true;
 
 		ApplySprite();
 	}
