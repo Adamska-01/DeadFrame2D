@@ -17,9 +17,31 @@ namespace DF2D::Internal::RmlConversions
 	{
 		switch (type)
 		{
-		case Data::UIElementType::IMAGE:	return "img";
-		case Data::UIElementType::TEXT:		return "div";
-		default:							return "div";
+		case Data::UIElementType::IMAGE:			return "img";
+		case Data::UIElementType::CHECKBOX:			return "input";
+		case Data::UIElementType::RANGE:			return "input";
+		case Data::UIElementType::TEXT_INPUT:		return "input";
+		case Data::UIElementType::TEXT_AREA:		return "textarea";
+		case Data::UIElementType::DROPDOWN:			return "select";
+		case Data::UIElementType::DROPDOWN_OPTION:	return "option";
+		case Data::UIElementType::BUTTON:			return "button";
+		default:								return "div";
+		}
+	}
+
+	/**
+	 * @brief The input kind an element type needs, or null when the tag already says it.
+	 *
+	 * Several controls share one tag and are told apart by an attribute, so creating them takes both.
+	 */
+	inline const char* ToElementInputType(Data::UIElementType type)
+	{
+		switch (type)
+		{
+		case Data::UIElementType::CHECKBOX:		return "checkbox";
+		case Data::UIElementType::RANGE:		return "range";
+		case Data::UIElementType::TEXT_INPUT:	return "text";
+		default:								return nullptr;
 		}
 	}
 
