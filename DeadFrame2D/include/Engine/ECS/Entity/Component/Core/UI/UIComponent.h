@@ -104,6 +104,8 @@ namespace DF2D::Engine
 
 		void Init() override;
 
+		void Start() override;
+
 
 		/** @brief The canvas this component draws into, or null if it is not under one. */
 		ComponentHandle<Canvas> GetCanvas() const;

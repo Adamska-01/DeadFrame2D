@@ -86,7 +86,18 @@ namespace DF2D::Engine
 
 		Guard::AgainstNull(parentCanvas, NAME_OF(parentCanvas));
 
-		element = parentCanvas->AcquireElementFor(GetGameObject(), GetElementType());
+		// Only declared here, not created. Components on one object are initialised in an order the
+		// engine does not define, so the element is built in Start once every component has said what
+		// kind it needs.
+		parentCanvas->DeclareElementFor(GetGameObject(), GetElementType());
+	}
+
+	void UIComponent::Start()
+	{
+		if (parentCanvas == nullptr || element != 0)
+			return;
+
+		element = parentCanvas->AcquireElementFor(GetGameObject());
 
 		if (element == 0)
 			return;
