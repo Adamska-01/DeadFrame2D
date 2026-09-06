@@ -62,4 +62,29 @@ namespace DF2D::Core
 	{
 		return backend->SetResolution(resolution);
 	}
+
+	void Window::SetCursor(Data::CursorType cursor)
+	{
+		backend->SetCursor(cursor);
+	}
+
+	void Window::SetClipboardText(const std::string& text)
+	{
+		backend->SetClipboardText(text);
+	}
+
+	std::string Window::GetClipboardText()
+	{
+		return backend->GetClipboardText();
+	}
+
+	void Window::StartTextInput(const RectI& caretRect)
+	{
+		backend->StartTextInput(caretRect);
+	}
+
+	void Window::StopTextInput()
+	{
+		backend->StopTextInput();
+	}
 }
