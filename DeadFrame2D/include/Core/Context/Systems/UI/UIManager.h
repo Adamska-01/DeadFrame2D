@@ -11,6 +11,8 @@
 #include "Data/Systems/UI/UIElementType.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
+#include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
+#include "Utilities/Hashing/ObjectHandleHash.h"
 #include <memory>
 #include <string>
 #include <string_view>
@@ -21,6 +23,7 @@
 
 namespace DF2D::Engine
 {
+	class GameObject;
 	class UIComponent;
 
 	template<typename T>
@@ -60,7 +63,7 @@ namespace DF2D::Core
 		std::unordered_set<Data::UIContextID> activeContexts;
 
 		/** @brief One element per UI GameObject, shared by every UI component sitting on it. */
-		std::unordered_map<const void*, SharedElement> objectElements;
+		std::unordered_map<Engine::ObjectHandle<Engine::GameObject>, SharedElement, Utilities::ObjectHandleHash> objectElements;
 
 
 		void BeginFrame() override;
@@ -143,7 +146,7 @@ namespace DF2D::Core
 		 *
 		 * The most specific declaration wins; PANEL means no opinion.
 		 */
-		void DeclareElementType(Data::UIContextID context, const void* owningObject, Data::UIElementType type);
+		void DeclareElementType(Data::UIContextID context, const Engine::ObjectHandle<Engine::GameObject>& owningObject, Data::UIElementType type);
 
 		/**
 		 * @brief Returns the element backing a UI GameObject, creating it on first request.
@@ -151,12 +154,12 @@ namespace DF2D::Core
 		 * The element belongs to the GameObject, not to the component that asked: a single object
 		 * carrying a RectTransform, an Image and a Text is one styled element, not three siblings.
 		 */
-		Data::UIElementID AcquireElement(Data::UIContextID context, const void* owningObject);
+		Data::UIElementID AcquireElement(Data::UIContextID context, const Engine::ObjectHandle<Engine::GameObject>& owningObject);
 
 		/**
 		* @brief Drops one reference to a GameObject element, destroying it when the last one goes.
 		*/
-		void ReleaseElement(const void* owningObject);
+		void ReleaseElement(const Engine::ObjectHandle<Engine::GameObject>& owningObject);
 
 		/**
 		* @brief Adds a component to the list that receives events for an element.

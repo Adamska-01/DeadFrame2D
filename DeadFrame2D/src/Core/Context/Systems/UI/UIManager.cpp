@@ -1,6 +1,7 @@
 #include "Constants/Paths/ResourcePaths.h"
 #include "Core/Context/Systems/UI/UIManager.h"
 #include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
+#include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include <algorithm>
 #include <iostream>
 #include <type_traits>
@@ -217,7 +218,7 @@ namespace DF2D::Core
 		return backend->RenderContext(context);
 	}
 
-	void UIManager::DeclareElementType(UIContextID context, const void* owningObject, UIElementType type)
+	void UIManager::DeclareElementType(UIContextID context, const ObjectHandle<GameObject>& owningObject, UIElementType type)
 	{
 		if (context == 0 || owningObject == nullptr)
 			return;
@@ -239,7 +240,7 @@ namespace DF2D::Core
 		shared.type = type;
 	}
 
-	UIElementID UIManager::AcquireElement(UIContextID context, const void* owningObject)
+	UIElementID UIManager::AcquireElement(UIContextID context, const ObjectHandle<GameObject>& owningObject)
 	{
 		if (context == 0 || owningObject == nullptr)
 			return 0;
@@ -258,7 +259,7 @@ namespace DF2D::Core
 		return shared.element;
 	}
 
-	void UIManager::ReleaseElement(const void* owningObject)
+	void UIManager::ReleaseElement(const ObjectHandle<GameObject>& owningObject)
 	{
 		auto it = objectElements.find(owningObject);
 

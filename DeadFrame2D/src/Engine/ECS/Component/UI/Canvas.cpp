@@ -132,7 +132,7 @@ namespace DF2D::Engine
 		if (owner == GetGameObject())
 			return;
 
-		uiManager->DeclareElementType(context, owner.operator->(), type);
+		uiManager->DeclareElementType(context, owner, type);
 	}
 
 	UIElementID Canvas::AcquireElementFor(const ObjectHandle<GameObject>& owner)
@@ -144,7 +144,7 @@ namespace DF2D::Engine
 		if (owner == GetGameObject())
 			return uiManager->GetRootElement(context);
 
-		return uiManager->AcquireElement(context, owner.operator->());
+		return uiManager->AcquireElement(context, owner);
 	}
 
 	bool Canvas::LoadStyleSheet(std::string_view path)
