@@ -1,6 +1,6 @@
 #pragma once
 #include "Core/Context/Abstractions/ICoreSystem.h"
-#include "Core/Context/Systems/Input/Abstractions/IInputCaptureSource.h"
+#include "Core/Context/Systems/Input/Abstractions/IInputCaptureState.h"
 #include "Core/Context/Systems/UI/Abstractions/IUIBackend.h"
 #include "Core/Context/Systems/UI/Abstractions/IUIEventSink.h"
 #include "Core/Math/Vector2.h"
@@ -33,8 +33,11 @@ namespace DF2D::Core
 	/**
 	 * @brief Owns the UI backend and routes between it and the component layer.
 	 */
-	class DF2D_API UIManager : public ICoreSystem, public IUIEventSink, public ISystemEventSink, public IInputCaptureSource
+	class DF2D_API UIManager : public ICoreSystem, public IUIEventSink, public ISystemEventSink, public IInputCaptureState
 	{
+		friend class Engine::UIComponent;
+
+
 	private:
 		struct SharedElement
 		{
@@ -77,6 +80,9 @@ namespace DF2D::Core
 		bool CapturesKeyboard() const override;
 
 
+		IUIBackend& Backend();
+
+
 		void OnSystemEvent(const Data::SystemEvent& systemEvent) override;
 
 
@@ -95,9 +101,19 @@ namespace DF2D::Core
 
 
 		/**
-		* @brief Direct access to the backend for the UI components that drive it.
+		* @brief Resizes the surface a canvas lays out against.
 		*/
-		IUIBackend& Backend();
+		void SetContextSize(Data::UIContextID context, Vector2I size);
+
+		/**
+		* @brief Applies a stylesheet on top of the ones a canvas has already loaded.
+		*/
+		bool LoadStyleSheet(Data::UIContextID context, const std::string& path);
+
+		/** 
+		* @brief The root element of a canvas's context, which its own component adopts.
+		*/
+		Data::UIElementID GetRootElement(Data::UIContextID context) const;
 
 		/**
 		 * @brief Registers a font file so styling can select it by family name.

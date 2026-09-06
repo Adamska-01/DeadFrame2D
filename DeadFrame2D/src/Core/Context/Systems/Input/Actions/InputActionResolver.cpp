@@ -15,25 +15,25 @@ namespace DF2D::Core
 	InputActionResolver::InputActionResolver(
 		InputActionMapBucket actionMapBucket,
 		const IUserDevicePairings& userPairings,
-		const IInputCaptureSource* captureSource)
+		const IInputCaptureState* captureState)
 		: actionMapBucket(std::move(actionMapBucket)),
 		userPairings(&userPairings),
-		captureSource(captureSource)
+		captureState(captureState)
 	{
 	}
 
 	bool InputActionResolver::IsCapturedBy(const InputDevice& device) const
 	{
-		if (captureSource == nullptr)
+		if (captureState == nullptr)
 			return false;
 
 		switch (device.Type())
 		{
 		case InputDeviceType::MOUSE:
-			return captureSource->CapturesPointer();
+			return captureState->CapturesPointer();
 
 		case InputDeviceType::KEYBOARD:
-			return captureSource->CapturesKeyboard();
+			return captureState->CapturesKeyboard();
 
 		default:
 			// Controllers are deliberately never blocked. Menu navigation is driven through actions

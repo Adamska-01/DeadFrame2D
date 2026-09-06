@@ -101,7 +101,10 @@ namespace DF2D::Engine
 			current = current->parent;
 		}
 
-		for (auto& child : children)
+		// Iterated over a copy: destroying a child detaches it from this very vector.
+		auto childrenToDestroy = children;
+
+		for (auto& child : childrenToDestroy)
 		{
 			if (child == nullptr)
 				continue;
@@ -199,9 +202,14 @@ namespace DF2D::Engine
 
 		auto oldParent = parent;
 
-		// Attach to new parent
+		// Attach to new parent. A null parent is a detach, which promotes this object back to being a
+		// root of the scene; the scene picks that up from the hierarchy change event below.
 		parent = newParent;
-		newParent->children.push_back(thisGameObject);
+
+		if (newParent != nullptr)
+		{
+			newParent->children.push_back(thisGameObject);
+		}
 
 		// Restore world transform
 		transform->SetWorldPosition(worldPos);
@@ -209,7 +217,7 @@ namespace DF2D::Engine
 		transform->SetWorldRotation(worldRot);
 
 		// Active state propagation
-		hasActiveParent = newParent->IsActive();
+		hasActiveParent = newParent == nullptr || newParent->IsActive();
 		PropagateActiveStateToChildren();
 
 		// Notify parents up the chain

@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/Context/Systems/Input/Abstractions/IInputCaptureSource.h"
+#include "Core/Context/Systems/Input/Abstractions/IInputCaptureState.h"
 #include "Core/Context/Systems/Input/Abstractions/IInputFrameLifecycle.h"
 #include "Core/Context/Systems/Input/Actions/Abstractions/IInputActionHandler.h"
 #include "Core/Context/Systems/Input/Actions/Abstractions/IInputActions.h"
@@ -43,7 +43,7 @@ namespace DF2D::Core
 		/**
 		 * @brief Tells the resolver when the UI is claiming an input. Null means nothing ever claims.
 		 */
-		const IInputCaptureSource* captureSource = nullptr;
+		const IInputCaptureState* captureState = nullptr;
 
 		std::unordered_map<Data::InputUserID, ActionMapIndex> runtimeActionMaps;
 
@@ -76,7 +76,7 @@ namespace DF2D::Core
 		InputActionResolver(
 			Models::InputActionMapBucket actionMapBucket,
 			const IUserDevicePairings& userPairings,
-			const IInputCaptureSource* captureSource);
+			const IInputCaptureState* captureState);
 
 		~InputActionResolver() override = default;
 

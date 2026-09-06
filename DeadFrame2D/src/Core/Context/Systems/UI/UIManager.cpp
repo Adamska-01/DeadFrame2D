@@ -109,6 +109,11 @@ namespace DF2D::Core
 		return false;
 	}
 
+	IUIBackend& UIManager::Backend()
+	{
+		return *backend;
+	}
+
 	void UIManager::OnSystemEvent(const SystemEvent& systemEvent)
 	{
 		for (auto context : activeContexts)
@@ -143,9 +148,28 @@ namespace DF2D::Core
 		}
 	}
 
-	IUIBackend& UIManager::Backend()
+	void UIManager::SetContextSize(UIContextID context, Vector2I size)
 	{
-		return *backend;
+		if (context == 0)
+			return;
+
+		backend->SetContextSize(context, size);
+	}
+
+	bool UIManager::LoadStyleSheet(UIContextID context, const std::string& path)
+	{
+		if (context == 0)
+			return false;
+
+		return backend->LoadStyleSheet(context, path);
+	}
+
+	UIElementID UIManager::GetRootElement(UIContextID context) const
+	{
+		if (context == 0)
+			return 0;
+
+		return backend->GetRootElement(context);
 	}
 
 	bool UIManager::LoadFont(std::string_view path, std::string_view family, bool fallbackFace)

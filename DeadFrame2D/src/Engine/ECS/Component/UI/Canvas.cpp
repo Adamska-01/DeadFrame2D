@@ -82,7 +82,7 @@ namespace DF2D::Engine
 		if (resized == nullptr || uiManager == nullptr || context == 0)
 			return;
 
-		uiManager->Backend().SetContextSize(context, resized->renderTargetSize);
+		uiManager->SetContextSize(context, resized->renderTargetSize);
 	}
 
 
@@ -130,7 +130,7 @@ namespace DF2D::Engine
 
 		// The canvas object itself is the context root rather than a child element of it.
 		if (owner == GetGameObject())
-			return uiManager->Backend().GetRootElement(context);
+			return uiManager->GetRootElement(context);
 
 		return uiManager->AcquireElement(context, owner.operator->(), type);
 	}
@@ -146,7 +146,7 @@ namespace DF2D::Engine
 			return true;
 		}
 
-		return uiManager->Backend().LoadStyleSheet(context, std::string(path));
+		return uiManager->LoadStyleSheet(context, std::string(path));
 	}
 
 	UIContextID Canvas::GetContext() const
