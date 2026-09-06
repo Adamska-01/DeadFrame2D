@@ -3,6 +3,8 @@
 #include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
 #include <algorithm>
 #include <iostream>
+#include <type_traits>
+#include <variant>
 
 
 namespace DF2D::Core
@@ -85,6 +87,67 @@ namespace DF2D::Core
 	}
 
 
+	bool UIManager::CapturesPointer() const
+	{
+		for (auto context : activeContexts)
+		{
+			if (backend->IsPointerOverElement(context))
+				return true;
+		}
+
+		return false;
+	}
+
+	bool UIManager::CapturesKeyboard() const
+	{
+		for (auto context : activeContexts)
+		{
+			if (backend->HasKeyboardFocus(context))
+				return true;
+		}
+
+		return false;
+	}
+
+	void UIManager::OnSystemEvent(const SystemEvent& systemEvent)
+	{
+		for (auto context : activeContexts)
+		{
+			std::visit(
+				[&](const auto& event)
+				{
+					using T = std::decay_t<decltype(event)>;
+
+					if constexpr (std::is_same_v<T, MouseMoveEvent>)
+					{
+						backend->ProcessMouseMove(context, event.position, event.modifiers);
+					}
+					else if constexpr (std::is_same_v<T, MouseButtonEvent>)
+					{
+						backend->ProcessMouseButton(context, event.button, event.pressed, event.modifiers);
+					}
+					else if constexpr (std::is_same_v<T, MouseWheelEvent>)
+					{
+						backend->ProcessMouseWheel(context, event.delta, event.modifiers);
+					}
+					else if constexpr (std::is_same_v<T, KeyEvent>)
+					{
+						backend->ProcessKey(context, event.key, event.pressed, event.modifiers);
+					}
+					else if constexpr (std::is_same_v<T, TextInputEvent>)
+					{
+						backend->ProcessTextInput(context, event.text);
+					}
+				},
+				systemEvent);
+		}
+	}
+
+	IUIBackend& UIManager::Backend()
+	{
+		return *backend;
+	}
+
 	bool UIManager::LoadFont(std::string_view path, std::string_view family, bool fallbackFace)
 	{
 		auto pathString = std::string(path);
@@ -98,11 +161,6 @@ namespace DF2D::Core
 		loadedFonts.insert(std::move(pathString));
 
 		return true;
-	}
-
-	IUIBackend& UIManager::Backend()
-	{
-		return *backend;
 	}
 
 	UIContextID UIManager::CreateContext(Vector2I size)
