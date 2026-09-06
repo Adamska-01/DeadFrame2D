@@ -23,7 +23,6 @@ namespace DF2D::Internal::RmlConversions
 		case Data::UIElementType::TEXT_INPUT:		return "input";
 		case Data::UIElementType::TEXT_AREA:		return "textarea";
 		case Data::UIElementType::DROPDOWN:			return "select";
-		case Data::UIElementType::DROPDOWN_OPTION:	return "option";
 		case Data::UIElementType::BUTTON:			return "button";
 		default:								return "div";
 		}
@@ -110,10 +109,17 @@ namespace DF2D::Internal::RmlConversions
 	{
 		switch (attribute)
 		{
-		case Data::UIAttribute::SOURCE:		return "src";
-		case Data::UIAttribute::VALUE:		return "value";
-		case Data::UIAttribute::DISABLED:	return "disabled";
-		default:							return "id";
+		case Data::UIAttribute::SOURCE:			return "src";
+		case Data::UIAttribute::VALUE:			return "value";
+		case Data::UIAttribute::DISABLED:		return "disabled";
+		case Data::UIAttribute::CHECKED:		return "checked";
+		case Data::UIAttribute::MIN:			return "min";
+		case Data::UIAttribute::MAX:			return "max";
+		case Data::UIAttribute::STEP:			return "step";
+		case Data::UIAttribute::ORIENTATION:	return "orientation";
+		case Data::UIAttribute::MAX_LENGTH:		return "maxlength";
+		case Data::UIAttribute::PLACEHOLDER:	return "placeholder";
+		default:								return "id";
 		}
 	}
 
