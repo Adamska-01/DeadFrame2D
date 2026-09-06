@@ -97,6 +97,13 @@ namespace DF2D::Engine
 
 		SyncElementParent();
 
+		for (const auto& className : pendingClasses)
+		{
+			Backend()->SetElementClass(element, className, true);
+		}
+
+		pendingClasses.clear();
+
 		OnElementCreated();
 	}
 
@@ -153,18 +160,36 @@ namespace DF2D::Engine
 
 	void UIComponent::AddClass(std::string_view className)
 	{
-		if (auto* backend = Backend())
-		{
-			backend->SetElementClass(element, std::string(className), true);
-		}
+		SetClass(className, true);
 	}
 
 	void UIComponent::RemoveClass(std::string_view className)
 	{
-		if (auto* backend = Backend())
+		SetClass(className, false);
+	}
+
+	void UIComponent::SetClass(std::string_view className, bool enabled)
+	{
+		auto name = std::string(className);
+
+		// Scenes are built in Enter, which runs before any component is initialised, so there is no
+		// element to style yet. The intent is recorded and replayed once there is, the same way
+		// PlayerInput replays action registrations made before its own Init.
+		if (Backend() == nullptr)
 		{
-			backend->SetElementClass(element, std::string(className), false);
+			if (enabled)
+			{
+				pendingClasses.insert(std::move(name));
+			}
+			else
+			{
+				pendingClasses.erase(name);
+			}
+
+			return;
 		}
+
+		Backend()->SetElementClass(element, name, enabled);
 	}
 
 	bool UIComponent::HasClass(std::string_view className) const

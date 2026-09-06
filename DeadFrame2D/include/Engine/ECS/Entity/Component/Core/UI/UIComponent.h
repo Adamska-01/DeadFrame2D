@@ -13,6 +13,7 @@
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include <string>
 #include <string_view>
+#include <unordered_set>
 
 
 namespace DF2D::Core
@@ -65,6 +66,9 @@ namespace DF2D::Engine
 
 		ComponentHandle<UIComponent> selfUIHandle;
 
+		/** @brief Classes requested before the element existed, replayed once it does. */
+		std::unordered_set<std::string> pendingClasses;
+
 
 		/** @brief The element kind this component needs. Called once, during Init. */
 		virtual Data::UIElementType GetElementType() const;
@@ -110,6 +114,9 @@ namespace DF2D::Engine
 		void AddClass(std::string_view className);
 
 		void RemoveClass(std::string_view className);
+
+		/** @brief Adds or removes a style class. Safe to call before the component is initialised. */
+		void SetClass(std::string_view className, bool enabled);
 
 		bool HasClass(std::string_view className) const;
 
