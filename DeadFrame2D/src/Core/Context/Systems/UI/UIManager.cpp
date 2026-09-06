@@ -1,4 +1,5 @@
 #include "Constants/Paths/ResourcePaths.h"
+#include "Core/Context/Systems/UI/UIContext.h"
 #include "Core/Context/Systems/UI/UIManager.h"
 #include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
@@ -21,8 +22,9 @@ namespace DF2D::Core
 	}
 
 
-	UIManager::UIManager(std::unique_ptr<IUIBackend> backend)
-		: backend(std::move(backend))
+	UIManager::UIManager(std::unique_ptr<IUIBackend> backend, ITimeProvider* timeProvider)
+		: backend(std::move(backend)),
+		timeProvider(timeProvider)
 	{
 		this->backend->SetEventSink(this);
 
@@ -53,6 +55,15 @@ namespace DF2D::Core
 
 	void UIManager::EndUpdate(float deltaTime)
 	{
+		// The clock moves before layout does. The backend times smooth scrolling, transitions and the
+		// caret against it, and anything mid-animation only progresses on a clock that moved -- a frozen
+		// one leaves a smooth scroll stuck one frame in, silently swallowing every wheel notch after the
+		// first. Unscaled on purpose: a paused game still animates its UI.
+		if (timeProvider != nullptr)
+		{
+			backend->Advance(timeProvider->DeltaTimeUnscaled());
+		}
+
 		// Layout resolves here, after components have finished writing style properties in Update and
 		// before LateUpdate, which is where they read resolved rectangles back.
 		for (auto context : activeContexts)
@@ -88,33 +99,6 @@ namespace DF2D::Core
 	}
 
 
-	bool UIManager::CapturesPointer() const
-	{
-		for (auto context : activeContexts)
-		{
-			if (backend->IsPointerOverElement(context))
-				return true;
-		}
-
-		return false;
-	}
-
-	bool UIManager::CapturesKeyboard() const
-	{
-		for (auto context : activeContexts)
-		{
-			if (backend->HasKeyboardFocus(context))
-				return true;
-		}
-
-		return false;
-	}
-
-	IUIBackend& UIManager::Backend()
-	{
-		return *backend;
-	}
-
 	void UIManager::OnSystemEvent(const SystemEvent& systemEvent)
 	{
 		for (auto context : activeContexts)
@@ -149,30 +133,144 @@ namespace DF2D::Core
 		}
 	}
 
+
+	bool UIManager::CapturesPointer() const
+	{
+		for (auto context : activeContexts)
+		{
+			if (backend->IsPointerOverElement(context))
+				return true;
+		}
+
+		return false;
+	}
+
+	bool UIManager::CapturesKeyboard() const
+	{
+		for (auto context : activeContexts)
+		{
+			if (backend->HasKeyboardFocus(context))
+				return true;
+		}
+
+		return false;
+	}
+
+
 	void UIManager::SetContextSize(UIContextID context, Vector2I size)
 	{
-		if (context == 0)
-			return;
-
 		backend->SetContextSize(context, size);
 	}
 
 	bool UIManager::LoadStyleSheet(UIContextID context, const std::string& path)
 	{
-		if (context == 0)
-			return false;
-
 		return backend->LoadStyleSheet(context, path);
 	}
 
 	UIElementID UIManager::GetRootElement(UIContextID context) const
 	{
-		if (context == 0)
-			return 0;
-
 		return backend->GetRootElement(context);
 	}
 
+	GeometryDrawList UIManager::RenderContext(UIContextID context)
+	{
+		return backend->RenderContext(context);
+	}
+
+	void UIManager::SetElementProperty(UIElementID element, UIStyleProperty property, const std::string& value)
+	{
+		backend->SetElementProperty(element, property, value);
+	}
+
+	void UIManager::ClearElementProperty(UIElementID element, UIStyleProperty property)
+	{
+		backend->ClearElementProperty(element, property);
+	}
+
+	void UIManager::SetElementAttribute(UIElementID element, UIAttribute attribute, const std::string& value)
+	{
+		backend->SetElementAttribute(element, attribute, value);
+	}
+
+	void UIManager::RemoveElementAttribute(UIElementID element, UIAttribute attribute)
+	{
+		backend->RemoveElementAttribute(element, attribute);
+	}
+
+	void UIManager::SetElementText(UIElementID element, const std::string& text)
+	{
+		backend->SetElementText(element, text);
+	}
+
+	void UIManager::SetElementClass(UIElementID element, const std::string& className, bool enabled)
+	{
+		backend->SetElementClass(element, className, enabled);
+	}
+
+	bool UIManager::HasElementClass(UIElementID element, const std::string& className) const
+	{
+		return backend->HasElementClass(element, className);
+	}
+
+	bool UIManager::HasPseudoClass(UIElementID element, UIPseudoClass pseudoClass) const
+	{
+		return backend->HasPseudoClass(element, pseudoClass);
+	}
+
+	void UIManager::SetElementVisible(UIElementID element, bool visible)
+	{
+		backend->SetElementVisible(element, visible);
+	}
+
+	void UIManager::SetElementParent(UIElementID element, UIElementID parent, int siblingIndex)
+	{
+		backend->SetElementParent(element, parent, siblingIndex);
+	}
+
+	RectF UIManager::GetElementRect(UIElementID element) const
+	{
+		return backend->GetElementRect(element);
+	}
+
+	Vector2F UIManager::GetElementContentSize(UIElementID element) const
+	{
+		return backend->GetElementContentSize(element);
+	}
+
+	Vector2F UIManager::GetElementScrollOffset(UIElementID element) const
+	{
+		return backend->GetElementScrollOffset(element);
+	}
+
+	void UIManager::SetElementScrollOffset(UIElementID element, Vector2F offset)
+	{
+		backend->SetElementScrollOffset(element, offset);
+	}
+
+	Vector2F UIManager::GetElementScrollSize(UIElementID element) const
+	{
+		return backend->GetElementScrollSize(element);
+	}
+
+	int UIManager::AddDropdownOption(UIElementID dropdown, const std::string& text, const std::string& value)
+	{
+		return backend->AddDropdownOption(dropdown, text, value);
+	}
+
+	void UIManager::ClearDropdownOptions(UIElementID dropdown)
+	{
+		backend->ClearDropdownOptions(dropdown);
+	}
+
+	void UIManager::SetDropdownSelection(UIElementID dropdown, int index)
+	{
+		backend->SetDropdownSelection(dropdown, index);
+	}
+
+	int UIManager::GetDropdownSelection(UIElementID dropdown) const
+	{
+		return backend->GetDropdownSelection(dropdown);
+	}
 	bool UIManager::LoadFont(std::string_view path, std::string_view family, bool fallbackFace)
 	{
 		auto pathString = std::string(path);
@@ -188,16 +286,16 @@ namespace DF2D::Core
 		return true;
 	}
 
-	UIContextID UIManager::CreateContext(Vector2I size)
+	UIContext UIManager::CreateCanvasContext(Vector2I size)
 	{
 		auto context = backend->CreateContext(size);
 
 		if (context == 0)
-			return 0;
+			return UIContext();
 
 		activeContexts.insert(context);
 
-		return context;
+		return UIContext(this, context);
 	}
 
 	void UIManager::DestroyContext(UIContextID context)
@@ -208,14 +306,6 @@ namespace DF2D::Core
 		activeContexts.erase(context);
 
 		backend->DestroyContext(context);
-	}
-
-	GeometryDrawList UIManager::RenderContext(UIContextID context)
-	{
-		if (context == 0)
-			return {};
-
-		return backend->RenderContext(context);
 	}
 
 	void UIManager::DeclareElementType(UIContextID context, const ObjectHandle<GameObject>& owningObject, UIElementType type)
