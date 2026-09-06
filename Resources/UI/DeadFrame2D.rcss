@@ -25,3 +25,198 @@ img
 {
 	display: block;
 }
+
+
+/*
+	Interactive controls.
+
+	Plain colours and borders only, no textures: these have to look like something the moment a
+	component is added, before a game has any art or any theme of its own. Everything here is a bare
+	tag or a state selector, so a game stylesheet overrides any of it without fighting specificity.
+
+	Sub-element names are the backend's, not the engine's -- a range is built from a track and a bar,
+	a select from a value, an arrow and a box. They are styled here so a game never has to know that.
+*/
+
+input,
+select,
+textarea
+{
+	display: inline-block;
+	background-color: #1e1e28ff;
+	border: 2dp #4a4a5aff;
+	color: #e0e0e0ff;
+	font-size: 16dp;
+	padding: 6dp 10dp;
+}
+
+input:focus,
+select:focus,
+textarea:focus
+{
+	border-color: #ff8c00ff;
+}
+
+input.disabled,
+select.disabled,
+textarea.disabled
+{
+	color: #6a6a6aff;
+	border-color: #2a2a2aff;
+}
+
+
+/* --- Checkbox ---------------------------------------------------------------------------------- */
+
+input.checkbox
+{
+	width: 20dp;
+	height: 20dp;
+	padding: 0dp;
+	background-color: #1e1e28ff;
+}
+
+input.checkbox:hover
+{
+	border-color: #ff8c00ff;
+}
+
+input.checkbox:checked
+{
+	background-color: #ff8c00ff;
+}
+
+
+/* --- Range ------------------------------------------------------------------------------------- */
+
+input.range
+{
+	height: 20dp;
+	padding: 0dp;
+	border-width: 0dp;
+	background-color: transparent;
+}
+
+input.range slidertrack
+{
+	background-color: #1e1e28ff;
+	border: 2dp #4a4a5aff;
+}
+
+input.range sliderbar
+{
+	width: 16dp;
+	height: 20dp;
+	background-color: #b4b4c8ff;
+	border: 2dp #4a4a5aff;
+}
+
+input.range sliderbar:hover
+{
+	background-color: #ff8c00ff;
+}
+
+input.range sliderbar:active
+{
+	background-color: #ffa733ff;
+}
+
+/*
+	A range is laid out from a track and a bar alone. The stepper arrows belong to a scrollbar and
+	have no place on a slider, so they are taken out of the layout rather than merely hidden.
+*/
+input.range sliderarrowdec,
+input.range sliderarrowinc
+{
+	display: none;
+}
+
+
+/* --- Select ------------------------------------------------------------------------------------ */
+
+select
+{
+	width: 160dp;
+	padding: 4dp 8dp;
+}
+
+select selectvalue
+{
+	width: auto;
+	color: #e0e0e0ff;
+}
+
+select selectarrow
+{
+	width: 16dp;
+	height: 16dp;
+	background-color: #4a4a5aff;
+}
+
+select:hover selectarrow
+{
+	background-color: #ff8c00ff;
+}
+
+select selectbox
+{
+	background-color: #1e1e28ff;
+	border: 2dp #4a4a5aff;
+	margin-top: 2dp;
+}
+
+select selectbox option
+{
+	display: block;
+	padding: 4dp 8dp;
+	color: #e0e0e0ff;
+}
+
+select selectbox option:checked
+{
+	background-color: #3d3d50ff;
+}
+
+select selectbox option:hover
+{
+	background-color: #ff8c00ff;
+	color: #14141cff;
+}
+
+
+/* --- Scrollbars -------------------------------------------------------------------------------- */
+
+scrollbarvertical
+{
+	width: 12dp;
+	background-color: #14141cff;
+}
+
+scrollbarhorizontal
+{
+	height: 12dp;
+	background-color: #14141cff;
+}
+
+scrollbarvertical sliderbar,
+scrollbarhorizontal sliderbar
+{
+	background-color: #4a4a5aff;
+	min-height: 24dp;
+	min-width: 24dp;
+}
+
+scrollbarvertical sliderbar:hover,
+scrollbarhorizontal sliderbar:hover
+{
+	background-color: #ff8c00ff;
+}
+
+/* Same reasoning as the range: the engine gives scrollbars a bar and a track, and nothing else. */
+scrollbarvertical sliderarrowdec,
+scrollbarvertical sliderarrowinc,
+scrollbarhorizontal sliderarrowdec,
+scrollbarhorizontal sliderarrowinc
+{
+	display: none;
+}
