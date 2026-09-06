@@ -45,7 +45,15 @@ namespace DF2D::Engine
 
 	bool GameComponent::IsActive() const
 	{
-		return isActive && GetGameObject()->IsActive();
+		if (!isActive)
+			return false;
+
+		auto owner = GetGameObject();
+
+		if (owner == nullptr)
+			return true;
+
+		return owner->IsActive();
 	}
 
 	void GameComponent::SetActive(bool value)
