@@ -1,4 +1,3 @@
-#include "Core/Context/Systems/UI/Abstractions/IUIBackend.h"
 #include "Engine/ECS/Component/UI/Button.h"
 
 
@@ -20,10 +19,7 @@ namespace DF2D::Engine
 
 	void Button::OnElementCreated()
 	{
-		if (auto* backend = Backend())
-		{
-			backend->SetElementText(element, label);
-		}
+		SetElementText(label);
 	}
 
 
@@ -38,10 +34,7 @@ namespace DF2D::Engine
 
 		// Cached above and written here only once there is an element: scenes set the caption while
 		// building, which runs before this component is initialised.
-		if (auto* backend = Backend())
-		{
-			backend->SetElementText(element, label);
-		}
+		SetElementText(label);
 	}
 
 	const std::string& Button::GetText() const
