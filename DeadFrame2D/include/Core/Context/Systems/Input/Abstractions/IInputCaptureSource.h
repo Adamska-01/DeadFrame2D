@@ -13,10 +13,14 @@ namespace DF2D::Core
 		virtual ~IInputCaptureSource() = default;
 
 
-		/** @brief Whether the pointer is over UI, so mouse-driven actions should not fire. */
+		/**
+		* @brief Whether the pointer is over UI, so mouse-driven actions should not fire.
+		*/
 		virtual bool CapturesPointer() const = 0;
 
-		/** @brief Whether a UI element is taking typed input, so key-driven actions should not fire. */
+		/**
+		* @brief Whether a UI element is taking typed input, so key-driven actions should not fire.
+		*/
 		virtual bool CapturesKeyboard() const = 0;
 	};
 }
