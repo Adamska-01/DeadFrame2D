@@ -2,6 +2,7 @@
 #include "Core/Math/Rect.h"
 #include "Core/Math/Vector2.h"
 #include "Data/Systems/Rendering/Pipeline/GeometryDrawList.h"
+#include "Data/Systems/UI/KeyModifiers.h"
 #include "Data/Systems/UI/UIAttribute.h"
 #include "Data/Systems/UI/UIContextID.h"
 #include "Data/Systems/UI/UIElementID.h"
@@ -9,6 +10,8 @@
 #include "Data/Systems/UI/UIPseudoClass.h"
 #include "Data/Systems/UI/UIStyleProperty.h"
 #include "DF2D_API.h"
+#include "Models/Input/Controls/KeyboardKeyCode.h"
+#include "Models/Input/Controls/MouseButtonCode.h"
 #include <string>
 
 
@@ -35,11 +38,8 @@ namespace DF2D::Core
 		 */
 		virtual void SetEventSink(IUIEventSink* sink) = 0;
 
-
 		/**
-		 * @brief Creates an independent UI context with its own element tree and its own styling.
-		 *
-		 * Contexts share nothing, so one canvas cannot restyle or reach into another.
+		 * @brief Creates an independent UI context with its own element tree and its own styling (UI Canvas).
 		 *
 		 * @param size: Surface size in pixels that percentage lengths resolve against.
 		 * @return The new context, or 0 on failure.
@@ -59,7 +59,7 @@ namespace DF2D::Core
 		/**
 		 * @brief Resizes the surface the context lays out against.
 		 *
-		 * Called when the render target changes size, so percentage-anchored elements re-resolve.
+		 * Should be called when the render target changes size, so percentage-anchored elements re-resolve.
 		 *
 		 * @param size: New surface size in pixels.
 		 */
@@ -87,8 +87,7 @@ namespace DF2D::Core
 		/**
 		 * @brief Applies a stylesheet to the context, restyling everything already in it.
 		 *
-		 * Sheets accumulate rather than replace, so a game theme layers over the engine defaults and
-		 * later sheets win on equal specificity. Inline properties still beat both.
+		 * Sheets accumulate rather than replace.
 		 *
 		 * @param path: Stylesheet path, already resolved by the engine's path handling.
 		 * @return Whether the sheet was loaded and applied.
@@ -103,7 +102,6 @@ namespace DF2D::Core
 		 * @return The root element, or 0 if the context is unknown.
 		 */
 		virtual Data::UIElementID GetRootElement(Data::UIContextID context) const = 0;
-
 
 		/**
 		 * @brief Creates a detached element belonging to a context.
@@ -145,22 +143,21 @@ namespace DF2D::Core
 		 */
 		virtual void SetElementProperty(Data::UIElementID element, Data::UIStyleProperty property, const std::string& value) = 0;
 
-		/** @brief Drops a previously set inline property so the stylesheets decide the value again. */
+		/**
+		* @brief Drops a previously set inline property so the stylesheets decide the value again.
+		*/
 		virtual void ClearElementProperty(Data::UIElementID element, Data::UIStyleProperty property) = 0;
 
 		/**
 		 * @brief Sets a non-style attribute, such as an image source or an input's value.
 		 *
-		 * Separate from properties because attributes describe what an element *is*, not how it looks,
+		 * Separate from properties because attributes describe what an element is, not how it looks,
 		 * and are not part of the styling cascade.
 		 */
 		virtual void SetElementAttribute(Data::UIElementID element, Data::UIAttribute attribute, const std::string& value) = 0;
 
 		/**
 		 * @brief Replaces the element's text content.
-		 *
-		 * Implementations must treat the text as data and escape it: game strings reach this from
-		 * player input and save files, and must never be able to inject markup into the tree.
 		 */
 		virtual void SetElementText(Data::UIElementID element, const std::string& text) = 0;
 
@@ -174,7 +171,9 @@ namespace DF2D::Core
 		 */
 		virtual void SetElementClass(Data::UIElementID element, const std::string& className, bool enabled) = 0;
 
-		/** @brief Whether the element currently carries the given style class. */
+		/**
+		* @brief Whether the element currently carries the given style class.
+		*/
 		virtual bool HasElementClass(Data::UIElementID element, const std::string& className) const = 0;
 
 		/**
@@ -193,7 +192,9 @@ namespace DF2D::Core
 		 */
 		virtual void SetElementVisible(Data::UIElementID element, bool visible) = 0;
 
-		/** @brief Gives the element keyboard focus, taking it from whatever held it before. */
+		/**
+		* @brief Gives the element keyboard focus, taking it from whatever held it before.
+		*/
 		virtual void FocusElement(Data::UIElementID element) = 0;
 
 		/**
@@ -212,6 +213,42 @@ namespace DF2D::Core
 		 */
 		virtual Vector2F GetElementContentSize(Data::UIElementID element) const = 0;
 
+		/**
+		 * @brief Feeds pointer motion in, updating hover state.
+		 *
+		 * @param position: Pointer position in context space.
+		 */
+		virtual void ProcessMouseMove(Data::UIContextID context, Vector2F position, Data::KeyModifiers modifiers) = 0;
+
+		/**
+		* @brief Feeds a pointer button press or release in.
+		*/
+		virtual void ProcessMouseButton(Data::UIContextID context, Models::MouseButtonCode button, bool pressed, Data::KeyModifiers modifiers) = 0;
+
+		/**
+		* @brief Feeds wheel movement in, scrolling whatever sits under the pointer.
+		*/
+		virtual void ProcessMouseWheel(Data::UIContextID context, Vector2F delta, Data::KeyModifiers modifiers) = 0;
+
+		/**
+		* @brief Feeds a key press or release to the focused element.
+		*/
+		virtual void ProcessKey(Data::UIContextID context, Models::KeyboardKeyCode key, bool pressed, Data::KeyModifiers modifiers) = 0;
+
+		/**
+		* @brief Inserts composed text at the caret of the focused element.
+		*/
+		virtual void ProcessTextInput(Data::UIContextID context, const std::string& text) = 0;
+
+		/**
+		* @brief Whether an element currently holds keyboard focus and is consuming typing.
+		*/
+		virtual bool HasKeyboardFocus(Data::UIContextID context) const = 0;
+
+		/**
+		* @brief Whether an element sits under the pointer's last known position.
+		*/
+		virtual bool IsPointerOverElement(Data::UIContextID context) const = 0;
 
 		/**
 		 * @brief Registers a font file with the shared font database.

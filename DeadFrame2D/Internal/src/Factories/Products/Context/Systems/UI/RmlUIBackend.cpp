@@ -1,4 +1,5 @@
 #include "Converters/UI/RmlConversions.h"
+#include "Converters/UI/RmlInputConversions.h"
 #include "Factories/Products/Context/Systems/UI/RmlEventListener.h"
 #include "Factories/Products/Context/Systems/UI/RmlFileInterface.h"
 #include "Factories/Products/Context/Systems/UI/RmlRenderInterface.h"
@@ -13,6 +14,7 @@ namespace DF2D::Internal
 	using namespace DF2D::Core;
 	using namespace DF2D::Data;
 	using namespace DF2D::Internal::RmlConversions;
+	using namespace DF2D::Internal::RmlInputConversions;
 
 
 	namespace
@@ -480,6 +482,112 @@ namespace DF2D::Internal
 		auto size = raw->GetBox().GetSize(Rml::BoxArea::Content);
 
 		return Vector2F(size.x, size.y);
+	}
+
+
+	void RmlUIBackend::ProcessMouseMove(UIContextID context, Vector2F position, KeyModifiers modifiers)
+	{
+		const auto* entry = FindContext(context);
+
+		if (entry == nullptr)
+			return;
+
+		entry->context->ProcessMouseMove(
+			static_cast<int>(position.x),
+			static_cast<int>(position.y),
+			ToKeyModifierState(modifiers));
+	}
+
+	void RmlUIBackend::ProcessMouseButton(UIContextID context, Models::MouseButtonCode button, bool pressed, KeyModifiers modifiers)
+	{
+		const auto* entry = FindContext(context);
+
+		if (entry == nullptr)
+			return;
+
+		auto modifierState = ToKeyModifierState(modifiers);
+		auto buttonIndex = ToButtonIndex(button);
+
+		if (pressed)
+		{
+			entry->context->ProcessMouseButtonDown(buttonIndex, modifierState);
+		}
+		else
+		{
+			entry->context->ProcessMouseButtonUp(buttonIndex, modifierState);
+		}
+	}
+
+	void RmlUIBackend::ProcessMouseWheel(UIContextID context, Vector2F delta, KeyModifiers modifiers)
+	{
+		const auto* entry = FindContext(context);
+
+		if (entry == nullptr)
+			return;
+
+		// Wheel deltas point right and down here, matching the library's own convention.
+		entry->context->ProcessMouseWheel(
+			Rml::Vector2f(delta.x, -delta.y),
+			ToKeyModifierState(modifiers));
+	}
+
+	void RmlUIBackend::ProcessKey(UIContextID context, Models::KeyboardKeyCode key, bool pressed, KeyModifiers modifiers)
+	{
+		const auto* entry = FindContext(context);
+
+		if (entry == nullptr)
+			return;
+
+		auto identifier = ToKeyIdentifier(key);
+
+		if (identifier == Rml::Input::KI_UNKNOWN)
+			return;
+
+		auto modifierState = ToKeyModifierState(modifiers);
+
+		if (pressed)
+		{
+			entry->context->ProcessKeyDown(identifier, modifierState);
+		}
+		else
+		{
+			entry->context->ProcessKeyUp(identifier, modifierState);
+		}
+	}
+
+	void RmlUIBackend::ProcessTextInput(UIContextID context, const std::string& text)
+	{
+		const auto* entry = FindContext(context);
+
+		if (entry == nullptr)
+			return;
+
+		entry->context->ProcessTextInput(Rml::String(text));
+	}
+
+	bool RmlUIBackend::HasKeyboardFocus(UIContextID context) const
+	{
+		const auto* entry = FindContext(context);
+
+		if (entry == nullptr)
+			return false;
+
+		auto* focused = entry->context->GetFocusElement();
+
+		// The document itself always holds focus when nothing else does, so it does not count.
+		return focused != nullptr && focused != static_cast<Rml::Element*>(entry->document);
+	}
+
+	bool RmlUIBackend::IsPointerOverElement(UIContextID context) const
+	{
+		const auto* entry = FindContext(context);
+
+		if (entry == nullptr)
+			return false;
+
+		auto* hovered = entry->context->GetHoverElement();
+
+		return hovered != nullptr && hovered != static_cast<Rml::Element*>(entry->document);
 	}
 
 	bool RmlUIBackend::LoadFontFace(const std::string& path, const std::string& family, bool fallbackFace)

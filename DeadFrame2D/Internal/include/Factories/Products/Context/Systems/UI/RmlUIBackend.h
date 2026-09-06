@@ -150,6 +150,20 @@ namespace DF2D::Internal
 
 		Core::Vector2F GetElementContentSize(Data::UIElementID element) const override;
 
+		void ProcessMouseMove(Data::UIContextID context, Core::Vector2F position, Data::KeyModifiers modifiers) override;
+
+		void ProcessMouseButton(Data::UIContextID context, Models::MouseButtonCode button, bool pressed, Data::KeyModifiers modifiers) override;
+
+		void ProcessMouseWheel(Data::UIContextID context, Core::Vector2F delta, Data::KeyModifiers modifiers) override;
+
+		void ProcessKey(Data::UIContextID context, Models::KeyboardKeyCode key, bool pressed, Data::KeyModifiers modifiers) override;
+
+		void ProcessTextInput(Data::UIContextID context, const std::string& text) override;
+
+		bool HasKeyboardFocus(Data::UIContextID context) const override;
+
+		bool IsPointerOverElement(Data::UIContextID context) const override;
+
 		bool LoadFontFace(const std::string& path, const std::string& family, bool fallbackFace) override;
 	};
 }
