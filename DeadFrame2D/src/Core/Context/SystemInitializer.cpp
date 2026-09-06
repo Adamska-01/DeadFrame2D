@@ -37,25 +37,24 @@ namespace DF2D::Core
 
 		auto actionMapBucket = JsonSerializer::DeserializeFromFile<InputActionMapBucket>(Paths::Files::INPUT_CONTROLS);
 
-		// The UI backend needs an assembled texture manager rather than a raw backend, so that one is
-		// built up front and the context is filled from it.
 		auto* textureManager = new TextureManager(std::move(graphicsBackends.textureBackend));
+
+		auto* window = new Window(std::move(graphicsBackends.windowBackend));
+		auto* uiManager = new UIManager(UIBackendFactory().CreateProduct(textureManager, window));
 
 		ctx = CoreContext
 		{
 			.audioManager = new AudioManager(config.audio, AudioBackendFactory().CreateProduct(config.audio)),
 			.coroutineScheduler = new CoroutineScheduler(serviceCtx.frameTimer),
 			.textureManager = textureManager,
-			.input = new Input(actionMapBucket, eventDispatcher),
+			.input = new Input(actionMapBucket, eventDispatcher, uiManager),
 			.physicsEngine = new PhysicsEngine2D(
 				config.physics,
 				JsonSerializer::DeserializeFromFile<CollisionMasks>(Paths::Files::COLLISION_MASKS),
 				PhysicsBackendFactory().CreateProduct(config.physics)),
 			.renderer = new Renderer(std::move(graphicsBackends.renderBackend)),
-			// Platform services (cursor, clipboard, text entry) arrive with the input work; until then
-			// the UI backend runs without a platform and null-checks it.
-			.uiManager = new UIManager(UIBackendFactory().CreateProduct(textureManager, nullptr)),
-			.window = new Window(std::move(graphicsBackends.windowBackend))
+			.uiManager = uiManager,
+			.window = window
 		};
 	}
 

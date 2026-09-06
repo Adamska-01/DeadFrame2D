@@ -3,6 +3,7 @@
 #include "Core/Context/Systems/Graphics/TextureManager.h"
 #include "Core/Context/Systems/Input/Input.h"
 #include "Core/Context/Systems/Rendering/Renderer.h"
+#include "Core/Context/Systems/UI/UIManager.h"
 #include "Core/DeadFrameRuntime.h"
 #include "Core/Services/ServiceInitializer.h"
 #include "Data/Systems/Rendering/Pipeline/RenderTask.h"
@@ -32,6 +33,9 @@ namespace DF2D::Core
 
 		auto coreCtx = systemInitializer->GetCoreContext();
 
+		// Order is irrelevant: sinks cannot consume, so both see every event. The UI needs them to do its
+		// hit testing and focus tracking, the input devices to mirror the hardware.
+		serviceCtx.eventManager->AddSink(coreCtx.uiManager);
 		serviceCtx.eventManager->AddSink(coreCtx.input);
 
 		serviceCtx.sceneManager->SetContexts(coreCtx, serviceCtx);
