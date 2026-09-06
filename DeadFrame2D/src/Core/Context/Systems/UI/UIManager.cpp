@@ -79,7 +79,7 @@ namespace DF2D::Core
 
 		for (auto& owner : owners)
 		{
-			if (owner == nullptr)
+			if (owner == nullptr || !owner->IsActive())
 				continue;
 
 			owner->HandleUIEvent(eventType, payload);
@@ -217,39 +217,45 @@ namespace DF2D::Core
 		return backend->RenderContext(context);
 	}
 
-	UIElementID UIManager::AcquireElement(UIContextID context, const void* owningObject, UIElementType type)
+	void UIManager::DeclareElementType(UIContextID context, const void* owningObject, UIElementType type)
+	{
+		if (context == 0 || owningObject == nullptr)
+			return;
+
+		auto& shared = objectElements[owningObject];
+
+		// PANEL is the absence of an opinion (RectTransform), so it never overrides one that has already been made.
+		if (type == UIElementType::PANEL)
+			return;
+
+		if (shared.type != UIElementType::PANEL && shared.type != type)
+		{
+			std::cerr << "A UI object needs two different kinds of element at once; keeping the first."
+				<< " Split the components across two objects." << std::endl;
+
+			return;
+		}
+
+		shared.type = type;
+	}
+
+	UIElementID UIManager::AcquireElement(UIContextID context, const void* owningObject)
 	{
 		if (context == 0 || owningObject == nullptr)
 			return 0;
 
-		auto it = objectElements.find(owningObject);
+		auto& shared = objectElements[owningObject];
 
-		if (it != objectElements.end())
-		{
-			if (it->second.type != type)
-			{
-				std::cerr << "A UI object already has an element of a different kind; keeping the existing one."
-					<< " Split the components across two objects if both kinds are needed." << std::endl;
-			}
+		shared.referenceCount++;
 
-			it->second.referenceCount++;
+		if (shared.element != 0)
+			return shared.element;
 
-			return it->second.element;
-		}
+		// Built from whatever was declared during Init, which is why creation waits until Start: by
+		// now every component on this object has had its say about what kind of element it needs.
+		shared.element = backend->CreateElement(context, shared.type);
 
-		auto element = backend->CreateElement(context, type);
-
-		if (element == 0)
-			return 0;
-
-		objectElements[owningObject] = SharedElement
-		{
-			.element = element,
-			.type = type,
-			.referenceCount = 1
-		};
-
-		return element;
+		return shared.element;
 	}
 
 	void UIManager::ReleaseElement(const void* owningObject)
@@ -262,7 +268,10 @@ namespace DF2D::Core
 		if (--it->second.referenceCount > 0)
 			return;
 
-		backend->DestroyElement(it->second.element);
+		if (it->second.element != 0)
+		{
+			backend->DestroyElement(it->second.element);
+		}
 
 		objectElements.erase(it);
 	}

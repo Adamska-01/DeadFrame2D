@@ -139,13 +139,19 @@ namespace DF2D::Core
 		Data::GeometryDrawList RenderContext(Data::UIContextID context);
 
 		/**
+		 * @brief Records what kind of element a UI GameObject needs, without creating it yet.
+		 *
+		 * The most specific declaration wins; PANEL means no opinion.
+		 */
+		void DeclareElementType(Data::UIContextID context, const void* owningObject, Data::UIElementType type);
+
+		/**
 		 * @brief Returns the element backing a UI GameObject, creating it on first request.
 		 *
 		 * The element belongs to the GameObject, not to the component that asked: a single object
 		 * carrying a RectTransform, an Image and a Text is one styled element, not three siblings.
-		 * Its type is fixed by whichever UI component asks first.
 		 */
-		Data::UIElementID AcquireElement(Data::UIContextID context, const void* owningObject, Data::UIElementType type);
+		Data::UIElementID AcquireElement(Data::UIContextID context, const void* owningObject);
 
 		/**
 		* @brief Drops one reference to a GameObject element, destroying it when the last one goes.
