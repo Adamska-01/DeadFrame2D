@@ -2,6 +2,7 @@
 #include "Constants/Input/InputConstants.h"
 #include "Converters/Input/ControllerButtonConversions.h"
 #include "Converters/Input/KeyboardKeyCodeConversions.h"
+#include "Converters/Input/KeyModifierConversions.h"
 #include "Converters/Input/MouseButtonConversions.h"
 #include "Factories/Products/Services/Events/SDLEventSource.h"
 #include <algorithm>
@@ -94,7 +95,15 @@ namespace DF2D::Internal
 			return KeyEvent
 			{
 				.key = KeyboardKeyCodeConversions::ToKeyboardKeyCode(sdlEvent.key.keysym.scancode),
-				.pressed = sdlEvent.type == SDL_KEYDOWN
+				.pressed = sdlEvent.type == SDL_KEYDOWN,
+				.modifiers = KeyModifierConversions::ToKeyModifiers(sdlEvent.key.keysym.mod),
+				.repeat = sdlEvent.key.repeat != 0
+			};
+
+		case SDL_TEXTINPUT:
+			return TextInputEvent
+			{
+				.text = std::string(sdlEvent.text.text)
 			};
 
 		case SDL_MOUSEBUTTONDOWN:
@@ -103,20 +112,23 @@ namespace DF2D::Internal
 			{
 				.button = MouseButtonConversions::ToMouseButtonCode(sdlEvent.button.button),
 				.pressed = sdlEvent.type == SDL_MOUSEBUTTONDOWN,
-				.position = Vector2F(static_cast<float>(sdlEvent.button.x), static_cast<float>(sdlEvent.button.y))
+				.position = Vector2F(static_cast<float>(sdlEvent.button.x), static_cast<float>(sdlEvent.button.y)),
+				.modifiers = KeyModifierConversions::ToKeyModifiers(SDL_GetModState())
 			};
 
 		case SDL_MOUSEMOTION:
 			return MouseMoveEvent
 			{
 				.position = Vector2F(static_cast<float>(sdlEvent.motion.x), static_cast<float>(sdlEvent.motion.y)),
-				.delta = Vector2F(static_cast<float>(sdlEvent.motion.xrel), static_cast<float>(sdlEvent.motion.yrel))
+				.delta = Vector2F(static_cast<float>(sdlEvent.motion.xrel), static_cast<float>(sdlEvent.motion.yrel)),
+				.modifiers = KeyModifierConversions::ToKeyModifiers(SDL_GetModState())
 			};
 
 		case SDL_MOUSEWHEEL:
 			return MouseWheelEvent
 			{
-				.delta = Vector2F(static_cast<float>(sdlEvent.wheel.x), static_cast<float>(sdlEvent.wheel.y))
+				.delta = Vector2F(static_cast<float>(sdlEvent.wheel.x), static_cast<float>(sdlEvent.wheel.y)),
+				.modifiers = KeyModifierConversions::ToKeyModifiers(SDL_GetModState())
 			};
 
 		case SDL_CONTROLLERDEVICEADDED:
