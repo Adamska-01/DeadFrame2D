@@ -1,8 +1,8 @@
 #pragma once
-#include "Core/Context/Systems/Input/Abstractions/IInputCaptureSource.h"
+#include "Core/Context/Systems/Input/Abstractions/IInputCaptureState.h"
 
 
-struct MockInputCaptureSource : DF2D::Core::IInputCaptureSource
+struct MockInputCaptureState : DF2D::Core::IInputCaptureState
 {
 	bool capturesPointer{false};
 

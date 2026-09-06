@@ -239,4 +239,44 @@ TEST_CASE("GetComponentInParent(includeSelf=true) prefers the object's own compo
 }
 
 
+TEST_CASE("Destroying a parent destroys all of its children")
+{
+	auto scene = std::make_shared<FakeSceneHandleProvider>();
+	auto parent = scene->Create<TestGameObject>();
+
+	auto first = scene->Create<TestGameObject>();
+	auto second = scene->Create<TestGameObject>();
+	auto third = scene->Create<TestGameObject>();
+
+	first->SetParent(parent);
+	second->SetParent(parent);
+	third->SetParent(parent);
+
+	REQUIRE(parent->GetChildren().size() == 3);
+
+	parent->Destroy();
+
+	// A destroyed child detaches itself from its parent, so anything left behind is a child that was
+	// skipped rather than destroyed.
+	CHECK(parent->GetChildren().empty());
+}
+
+
+TEST_CASE("Destroying a parent destroys grandchildren too")
+{
+	auto scene = std::make_shared<FakeSceneHandleProvider>();
+	auto parent = scene->Create<TestGameObject>();
+	auto child = scene->Create<TestGameObject>();
+	auto grandchild = scene->Create<TestGameObject>();
+
+	child->SetParent(parent);
+	grandchild->SetParent(child);
+
+	parent->Destroy();
+
+	CHECK(parent->GetChildren().empty());
+	CHECK(child->GetChildren().empty());
+}
+
+
 TEST_SUITE_END();

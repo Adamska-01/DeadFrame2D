@@ -390,7 +390,7 @@ TEST_CASE("Capture state is reported to the input system from the backend")
 	fixture.manager->CreateContext(Vector2I(800, 600));
 
 	// Reached through the interface the input system actually holds, not a second public accessor.
-	const auto& capture = static_cast<const DF2D::Core::IInputCaptureSource&>(*fixture.manager);
+	const auto& capture = static_cast<const DF2D::Core::IInputCaptureState&>(*fixture.manager);
 
 	CHECK_FALSE(capture.CapturesPointer());
 	CHECK_FALSE(capture.CapturesKeyboard());

@@ -1,6 +1,6 @@
 #include "Core/Context/Systems/Input/Actions/InputActionResolver.h"
 #include "Mocks/Context/Systems/Input/MockInputActionHandler.h"
-#include "Mocks/Context/Systems/Input/MockInputCaptureSource.h"
+#include "Mocks/Context/Systems/Input/MockInputCaptureState.h"
 #include "Mocks/Context/Systems/Input/MockInputDevice.h"
 #include "Mocks/Context/Systems/Input/MockUserDevicePairings.h"
 #include "Models/Input/ActionMap/InputActionMapBucket.h"
@@ -123,9 +123,9 @@ namespace
 
 		MockInputDevice device{ &deviceHandler };
 
-		MockInputCaptureSource captureSource;
+		MockInputCaptureState captureState;
 
-		InputActionResolver resolver{ MakeBucket(), pairings, &captureSource };
+		InputActionResolver resolver{ MakeBucket(), pairings, &captureState };
 
 
 		ResolverFixture()
@@ -350,7 +350,7 @@ TEST_CASE("A keyboard action still fires while the UI only owns the pointer")
 {
 	ResolverFixture fx;
 
-	fx.captureSource.capturesPointer = true;
+	fx.captureState.capturesPointer = true;
 
 	fx.device.SetButton(JUMP_KEY, 1.0f);
 	fx.Frame({ JUMP_KEY });
@@ -367,7 +367,7 @@ TEST_CASE("A keyboard action is suppressed while a UI element is taking typed in
 {
 	ResolverFixture fx;
 
-	fx.captureSource.capturesKeyboard = true;
+	fx.captureState.capturesKeyboard = true;
 
 	fx.device.SetButton(JUMP_KEY, 1.0f);
 	fx.Frame({ JUMP_KEY });
@@ -386,7 +386,7 @@ TEST_CASE("A mouse action is suppressed while the pointer is over the UI")
 	ResolverFixture fx;
 
 	fx.device.type = InputDeviceType::MOUSE;
-	fx.captureSource.capturesPointer = true;
+	fx.captureState.capturesPointer = true;
 
 	fx.device.SetButton(FIRE_BUTTON, 1.0f);
 	fx.Frame({ FIRE_BUTTON });
@@ -403,7 +403,7 @@ TEST_CASE("A mouse action still fires while the UI only owns the keyboard")
 	ResolverFixture fx;
 
 	fx.device.type = InputDeviceType::MOUSE;
-	fx.captureSource.capturesKeyboard = true;
+	fx.captureState.capturesKeyboard = true;
 
 	fx.device.SetButton(FIRE_BUTTON, 1.0f);
 	fx.Frame({ FIRE_BUTTON });
@@ -420,8 +420,8 @@ TEST_CASE("Controller actions are never suppressed by the UI")
 	ResolverFixture fx;
 
 	fx.device.type = InputDeviceType::CONTROLLER;
-	fx.captureSource.capturesPointer = true;
-	fx.captureSource.capturesKeyboard = true;
+	fx.captureState.capturesPointer = true;
+	fx.captureState.capturesKeyboard = true;
 
 	fx.device.SetButton(MENU_BUTTON, 1.0f);
 	fx.Frame({ MENU_BUTTON });

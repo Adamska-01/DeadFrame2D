@@ -250,4 +250,69 @@ TEST_CASE("Update survives entries reallocating from a component that spawns dur
 }
 
 
+TEST_CASE("A child that survives its parent's destruction is still reachable by the scene")
+{
+	EventDispatcher dispatcher;
+	auto scene = std::make_shared<TestScene>(&dispatcher);
+
+	auto parent = scene->Spawn<TestGameObject>();
+
+	auto first = scene->Spawn<TestGameObject>();
+	auto second = scene->Spawn<TestGameObject>();
+	auto third = scene->Spawn<TestGameObject>();
+
+	first->SetParent(parent);
+	second->SetParent(parent);
+	third->SetParent(parent);
+
+	scene->Init();
+
+	parent->Destroy();
+
+	// A surviving child is an orphan: its parent handle has gone stale, so it now reports no parent
+	// and looks like a root, but it was never added to the scene's root list. Nothing would ever
+	// update, draw or destroy it again.
+	scene->Update(0.016f);
+
+	auto orphaned = 0;
+
+	for (const auto& child : { first, second, third })
+	{
+		if (child != nullptr && child->GetParent() == nullptr)
+		{
+			orphaned++;
+		}
+	}
+
+	CHECK(orphaned == 0);
+}
+
+
+TEST_CASE("Detaching an object promotes it back to a root of the scene")
+{
+	EventDispatcher dispatcher;
+	auto scene = std::make_shared<TestScene>(&dispatcher);
+
+	auto parent = scene->Spawn<TestGameObject>();
+	auto child = scene->Spawn<TestGameObject>();
+
+	child->SetParent(parent);
+
+	REQUIRE(child->GetParent() != nullptr);
+
+	// Until now this crashed on a null dereference, which left the scene's "child became a root"
+	// path unreachable. Detaching has to put the object back in the root list or it stops being
+	// updated and drawn.
+	child->SetParent(ObjectHandle<GameObject>());
+
+	CHECK(child->GetParent() == nullptr);
+	CHECK(parent->GetChildren().empty());
+
+	// Destroying the former parent must now leave the detached object completely alone.
+	parent->Destroy();
+
+	CHECK(child != nullptr);
+}
+
+
 TEST_SUITE_END();
