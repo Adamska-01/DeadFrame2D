@@ -73,17 +73,15 @@ namespace DF2D::Internal
 
 	RmlUIBackend::~RmlUIBackend()
 	{
-		// Elements first, then contexts, then the library: an element outliving its context would be
-		// dereferencing freed memory, and Shutdown frees everything the contexts still hold.
-		elements.clear();
-		contexts.clear();
-
 		if (initialised)
 		{
 			Rml::Shutdown();
 
 			std::cout << "[Info] UI backend successfully shut down." << std::endl;
 		}
+
+		elements.clear();
+		contexts.clear();
 
 		Rml::SetSystemInterface(nullptr);
 		Rml::SetFileInterface(nullptr);
@@ -186,17 +184,17 @@ namespace DF2D::Internal
 		if (it == contexts.end())
 			return;
 
-		// Every element in this context dies with it, so drop their handles before the memory goes.
+		if (it->second.context != nullptr)
+		{
+			Rml::RemoveContext(it->second.context->GetName());
+		}
+
+		// Now that the elements are gone, the handles pointing at them are safe to drop.
 		for (auto elementIt = elements.begin(); elementIt != elements.end(); )
 		{
 			elementIt = elementIt->second.context == context
 				? elements.erase(elementIt)
 				: std::next(elementIt);
-		}
-
-		if (it->second.context != nullptr)
-		{
-			Rml::RemoveContext(it->second.context->GetName());
 		}
 
 		contexts.erase(it);
@@ -287,6 +285,13 @@ namespace DF2D::Internal
 
 		if (element == nullptr)
 			return 0;
+
+		// Checkbox, range and text input share one tag and are told apart by this attribute, so it has
+		// to be set before the element is used rather than left to the component layer.
+		if (const auto* inputType = ToElementInputType(type))
+		{
+			element->SetAttribute("type", inputType);
+		}
 
 		auto* raw = element.get();
 
