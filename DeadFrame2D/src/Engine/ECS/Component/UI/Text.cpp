@@ -1,4 +1,4 @@
-#include "Core/Context/Systems/UI/Abstractions/IUIBackend.h"
+#include "Core/Context/Systems/UI/UIContext.h"
 #include "Engine/ECS/Component/UI/Text.h"
 #include "Utilities/Helpers/UI/StyleValues.h"
 
@@ -35,10 +35,7 @@ namespace DF2D::Engine
 	{
 		ApplyTextStyle();
 
-		if (auto* backend = Backend())
-		{
-			backend->SetElementText(element, text);
-		}
+		SetElementText(text);
 	}
 
 	void Text::ApplyTextStyle()
@@ -73,10 +70,7 @@ namespace DF2D::Engine
 
 		text = std::move(newText);
 
-		if (auto* backend = Backend())
-		{
-			backend->SetElementText(element, text);
-		}
+		SetElementText(text);
 	}
 
 	void Text::SetFontFamily(std::string_view family)
@@ -154,8 +148,6 @@ namespace DF2D::Engine
 
 	Vector2F Text::GetPreferredSize() const
 	{
-		auto* backend = Backend();
-
-		return backend != nullptr ? backend->GetElementContentSize(element) : Vector2F::Zero;
+		return element.GetContentSize();
 	}
 }
