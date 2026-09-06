@@ -1,3 +1,4 @@
+#include "Core/Context/Systems/Input/Abstractions/IInputCaptureSource.h"
 #include "Core/Context/Systems/Input/Actions/InputActionResolver.h"
 #include "Core/Context/Systems/Input/Devices/DeviceManager.h"
 #include "Core/Context/Systems/Input/Input.h"
@@ -12,7 +13,10 @@ namespace DF2D::Core
 	using namespace DF2D::Models;
 
 
-	Input::Input(InputActionMapBucket actionMapBucket, EventDispatcher& eventDispatcher)
+	Input::Input(
+		InputActionMapBucket actionMapBucket,
+		EventDispatcher& eventDispatcher,
+		const IInputCaptureSource* captureSource)
 	{
 		// Hooks capture this and are only invoked after construction completes.
 		// Per-user action tables are managed through direct calls, not the event bus,
@@ -28,7 +32,7 @@ namespace DF2D::Core
 				actionResolver->RemoveUser(userID);
 			});
 
-		actionResolver = std::make_unique<InputActionResolver>(std::move(actionMapBucket), *userManager);
+		actionResolver = std::make_unique<InputActionResolver>(std::move(actionMapBucket), *userManager, captureSource);
 
 		// Same for device pairings: unpaired before the DeviceRemovedEvent broadcast.
 		deviceManager = std::make_unique<DeviceManager>(

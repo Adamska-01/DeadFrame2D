@@ -20,6 +20,7 @@ namespace DF2D::Models
 namespace DF2D::Core
 {
 	class IInputActions;
+	class IInputCaptureSource;
 	class IInputDeviceProvider;
 	class IInputUsers;
 	class InputActionResolver;
@@ -50,7 +51,10 @@ namespace DF2D::Core
 
 
 	public:
-		Input(Models::InputActionMapBucket actionMapBucket, Engine::EventDispatcher& eventDispatcher);
+		Input(
+			Models::InputActionMapBucket actionMapBucket,
+			Engine::EventDispatcher& eventDispatcher,
+			const IInputCaptureSource* captureSource);
 
 		~Input() override;
 
