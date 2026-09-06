@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 
@@ -28,6 +29,16 @@ struct MockUIBackend : DF2D::Core::IUIBackend
 
 	// Call tracking
 	DF2D::Core::IUIEventSink* sink{nullptr};
+
+
+	int advanceCount{0};
+
+	float elapsedTime{0.0f};
+
+	float lastAdvanceDelta{0.0f};
+
+	/** @brief Advance calls seen when UpdateContext last ran, so ordering between them is testable. */
+	int advanceCountAtLastUpdateContext{-1};
 
 	int createContextCount{0};
 
@@ -77,6 +88,36 @@ struct MockUIBackend : DF2D::Core::IUIBackend
 
 	std::unordered_map<DF2D::Data::UIElementID, std::unordered_map<int, std::string>> properties;
 
+	std::unordered_map<DF2D::Data::UIElementID, std::unordered_map<int, std::string>> attributes;
+
+	std::unordered_map<DF2D::Data::UIElementID, std::vector<std::pair<std::string, std::string>>> dropdownOptions;
+
+	std::unordered_map<DF2D::Data::UIElementID, int> dropdownSelections;
+
+	std::unordered_map<DF2D::Data::UIElementID, DF2D::Core::Vector2F> scrollOffsets;
+
+	DF2D::Core::Vector2F scrollSize{};
+
+
+	std::string AttributeOf(DF2D::Data::UIElementID element, DF2D::Data::UIAttribute attribute) const
+	{
+		auto elementIt = attributes.find(element);
+
+		if (elementIt == attributes.end())
+			return {};
+
+		auto attributeIt = elementIt->second.find(static_cast<int>(attribute));
+
+		return attributeIt != elementIt->second.end() ? attributeIt->second : std::string();
+	}
+
+	bool HasAttribute(DF2D::Data::UIElementID element, DF2D::Data::UIAttribute attribute) const
+	{
+		auto elementIt = attributes.find(element);
+
+		return elementIt != attributes.end() && elementIt->second.contains(static_cast<int>(attribute));
+	}
+
 
 	std::string PropertyOf(DF2D::Data::UIElementID element, DF2D::Data::UIStyleProperty property) const
 	{
@@ -94,6 +135,13 @@ struct MockUIBackend : DF2D::Core::IUIBackend
 	void SetEventSink(DF2D::Core::IUIEventSink* newSink) override
 	{
 		sink = newSink;
+	}
+
+	void Advance(float deltaTime) override
+	{
+		advanceCount++;
+		elapsedTime += deltaTime;
+		lastAdvanceDelta = deltaTime;
 	}
 
 	DF2D::Data::UIContextID CreateContext(DF2D::Core::Vector2I) override
@@ -121,6 +169,7 @@ struct MockUIBackend : DF2D::Core::IUIBackend
 	void UpdateContext(DF2D::Data::UIContextID) override
 	{
 		updateContextCount++;
+		advanceCountAtLastUpdateContext = advanceCount;
 	}
 
 	DF2D::Data::GeometryDrawList RenderContext(DF2D::Data::UIContextID) override
@@ -175,8 +224,14 @@ struct MockUIBackend : DF2D::Core::IUIBackend
 		properties[element].erase(static_cast<int>(property));
 	}
 
-	void SetElementAttribute(DF2D::Data::UIElementID, DF2D::Data::UIAttribute, const std::string&) override
+	void SetElementAttribute(DF2D::Data::UIElementID element, DF2D::Data::UIAttribute attribute, const std::string& value) override
 	{
+		attributes[element][static_cast<int>(attribute)] = value;
+	}
+
+	void RemoveElementAttribute(DF2D::Data::UIElementID element, DF2D::Data::UIAttribute attribute) override
+	{
+		attributes[element].erase(static_cast<int>(attribute));
 	}
 
 	void SetElementText(DF2D::Data::UIElementID, const std::string&) override
@@ -213,6 +268,48 @@ struct MockUIBackend : DF2D::Core::IUIBackend
 	DF2D::Core::Vector2F GetElementContentSize(DF2D::Data::UIElementID) const override
 	{
 		return DF2D::Core::Vector2F::Zero;
+	}
+
+	int AddDropdownOption(DF2D::Data::UIElementID dropdown, const std::string& text, const std::string& value) override
+	{
+		dropdownOptions[dropdown].push_back({text, value});
+
+		return static_cast<int>(dropdownOptions[dropdown].size()) - 1;
+	}
+
+	void ClearDropdownOptions(DF2D::Data::UIElementID dropdown) override
+	{
+		dropdownOptions[dropdown].clear();
+		dropdownSelections[dropdown] = -1;
+	}
+
+	void SetDropdownSelection(DF2D::Data::UIElementID dropdown, int index) override
+	{
+		dropdownSelections[dropdown] = index;
+	}
+
+	int GetDropdownSelection(DF2D::Data::UIElementID dropdown) const override
+	{
+		auto it = dropdownSelections.find(dropdown);
+
+		return it != dropdownSelections.end() ? it->second : -1;
+	}
+
+	void SetElementScrollOffset(DF2D::Data::UIElementID element, DF2D::Core::Vector2F offset) override
+	{
+		scrollOffsets[element] = offset;
+	}
+
+	DF2D::Core::Vector2F GetElementScrollOffset(DF2D::Data::UIElementID element) const override
+	{
+		auto it = scrollOffsets.find(element);
+
+		return it != scrollOffsets.end() ? it->second : DF2D::Core::Vector2F::Zero;
+	}
+
+	DF2D::Core::Vector2F GetElementScrollSize(DF2D::Data::UIElementID) const override
+	{
+		return scrollSize;
 	}
 
 	bool LoadFontFace(const std::string& path, const std::string& family, bool) override

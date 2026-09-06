@@ -10,6 +10,7 @@
 #include "Mocks/Context/Systems/UI/MockUIBackend.h"
 #include "Mocks/Engine/ECS/Entity/TestGameObject.h"
 #include "Mocks/Engine/ECS/System/Scene/TestScene.h"
+#include "Mocks/Services/Time/MockTimeProvider.h"
 #include <doctest.h>
 #include <memory>
 
@@ -29,6 +30,8 @@ namespace
 
 		std::unique_ptr<Renderer> renderer;
 
+		MockTimeProvider time;
+
 		std::unique_ptr<UIManager> uiManager;
 
 		std::shared_ptr<TestScene> scene;
@@ -37,7 +40,7 @@ namespace
 		CanvasFixture()
 		{
 			renderer = std::make_unique<Renderer>(std::make_unique<MockRenderBackend>());
-			uiManager = std::make_unique<UIManager>(std::make_unique<MockUIBackend>());
+			uiManager = std::make_unique<UIManager>(std::make_unique<MockUIBackend>(), &time);
 
 			scene = std::make_shared<TestScene>(&dispatcher);
 			scene->SetCoreContext(CoreContext
