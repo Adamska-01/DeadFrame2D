@@ -1,7 +1,9 @@
 #pragma once
+#include "Core/Context/Systems/UI/UIContext.h"
 #include "Core/Math/Color.h"
 #include "Core/Math/Rect.h"
 #include "Core/Math/Vector2.h"
+#include "Data/Systems/UI/UIAttribute.h"
 #include "Data/Systems/UI/UIElementID.h"
 #include "Data/Systems/UI/UIElementType.h"
 #include "Data/Systems/UI/UIEventPayload.h"
@@ -14,13 +16,6 @@
 #include <string>
 #include <string_view>
 #include <unordered_set>
-
-
-namespace DF2D::Core
-{
-	class IUIBackend;
-	class UIManager;
-}
 
 
 namespace DF2D::Engine
@@ -58,11 +53,11 @@ namespace DF2D::Engine
 
 
 	protected:
-		Core::UIManager* uiManager = nullptr;
+		Core::UIContext context;
+
+		Core::UIElement element;
 
 		ComponentHandle<Canvas> parentCanvas;
-
-		Data::UIElementID element = 0;
 
 		ComponentHandle<UIComponent> selfUIHandle;
 
@@ -85,7 +80,19 @@ namespace DF2D::Engine
 		virtual void HandleUIEvent(Data::UIEventType eventType, const Data::UIEventPayload& payload);
 
 
-		Core::IUIBackend* Backend() const;
+		/**
+		 * @brief Sets a non-style attribute on this component's own element.
+		 *
+		 * Element operations go through the UI manager rather than the backend: components never hold
+		 * the UI library, and never address an element other than their own.
+		 */
+		void SetAttribute(Data::UIAttribute attribute, const std::string& value);
+
+		/** @brief Drops an attribute, for the ones whose presence alone is the state. */
+		void RemoveAttribute(Data::UIAttribute attribute);
+
+		/** @brief Replaces this element's text content. */
+		void SetElementText(const std::string& text);
 
 		void SetStyle(Data::UIStyleProperty property, const std::string& value);
 
@@ -111,7 +118,7 @@ namespace DF2D::Engine
 		ComponentHandle<Canvas> GetCanvas() const;
 
 		/** @brief This component's element, for other UI components that need to reference it. */
-		Data::UIElementID GetElement() const;
+		Core::UIElement GetElement() const;
 
 		void AddClass(std::string_view className);
 

@@ -2,7 +2,7 @@
 #include "Core/Math/Vector2.h"
 #include "Data/Components/UI/Canvas/CanvasRenderMode.h"
 #include "Data/Systems/Rendering/Pipeline/RenderTask.h"
-#include "Data/Systems/UI/UIContextID.h"
+#include "Core/Context/Systems/UI/UIContext.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
 #include <memory>
@@ -46,7 +46,7 @@ namespace DF2D::Engine
 		 */
 		ComponentHandle<Camera> renderCamera;
 
-		Data::UIContextID context = 0;
+		Core::UIContext context;
 
 		Data::RenderTask renderTask;
 
@@ -84,7 +84,7 @@ namespace DF2D::Engine
 		 *
 		 * Called by UIComponent during Start;
 		 */
-		Data::UIElementID AcquireElementFor(const ObjectHandle<GameObject>& owner);
+		Core::UIElement AcquireElementFor(const ObjectHandle<GameObject>& owner);
 
 		/**
 		 * @brief Applies a stylesheet on top of the ones already loaded.
@@ -94,7 +94,7 @@ namespace DF2D::Engine
 		 */
 		bool LoadStyleSheet(std::string_view path);
 
-		Data::UIContextID GetContext() const;
+		Core::UIContext GetContext() const;
 
 		Data::CanvasRenderMode GetRenderMode() const;
 

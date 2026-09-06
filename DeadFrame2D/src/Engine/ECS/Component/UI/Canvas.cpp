@@ -2,10 +2,11 @@
 #include "Constants/Rendering/DefaultSortOrders.h"
 #include "Core/Context/Systems/Rendering/RenderSystem.h"
 #include "Core/Context/Systems/Rendering/Renderer.h"
-#include "Core/Context/Systems/UI/UIManager.h"
+#include "Core/Context/Systems/UI/UIContext.h"
 #include "Engine/ECS/Component/Rendering/Camera/Camera.h"
 #include "Engine/ECS/Component/UI/Canvas.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
+#include "Core/Context/Systems/UI/UIManager.h"
 #include "Engine/ECS/System/Events/EventDispatcher.h"
 #include "Engine/Events/Context/Renderer/RenderTargetSizeChangedEvent.h"
 #include "Utilities/Debugging/Guards.h"
@@ -28,10 +29,7 @@ namespace DF2D::Engine
 
 	Canvas::~Canvas()
 	{
-		if (uiManager == nullptr || context == 0)
-			return;
-
-		uiManager->DestroyContext(context);
+		context.Destroy();
 	}
 
 
@@ -39,11 +37,11 @@ namespace DF2D::Engine
 	{
 		auto* renderer = Guard::AgainstNullAssignment(GetGameObject()->CoreContext().renderer, NAME_OF(renderer));
 
-		uiManager = Guard::AgainstNullAssignment(GetGameObject()->CoreContext().uiManager, NAME_OF(uiManager));
+		auto* uiManager = Guard::AgainstNullAssignment(GetGameObject()->CoreContext().uiManager, NAME_OF(uiManager));
 
 		auto resolution = renderer->GetResolutionTarget();
 
-		context = uiManager->CreateContext(resolution);
+		context = uiManager->CreateCanvasContext(resolution);
 
 		// TODO: Don't really like calling base function after some code. See if it can be polished.
 		// The context must exist before UIComponent::Init runs, because that is what resolves this
@@ -79,10 +77,10 @@ namespace DF2D::Engine
 	{
 		auto resized = DispatchableEvent::SafeCast<RenderTargetSizeChangedEvent>(dispatchableEvent);
 
-		if (resized == nullptr || uiManager == nullptr || context == 0)
+		if (resized == nullptr)
 			return;
 
-		uiManager->SetContextSize(context, resized->renderTargetSize);
+		context.SetSize(resized->renderTargetSize);
 	}
 
 
@@ -97,10 +95,10 @@ namespace DF2D::Engine
 		// ("Should I throw here?" comment), then remove the check, since it being 0 wouldn't be possible.
 		// Also, is the "IsActive()" check necessary? before calling draw, the Scene::Draw() already 
 		// checks if the gameObject and component are active.
-		if (uiManager == nullptr || context == 0 || !IsActive())
+		if (!context.IsValid() || !IsActive())
 			return;
 
-		auto drawList = uiManager->RenderContext(context);
+		auto drawList = context.Render();
 
 		if (drawList.commands.empty())
 			return;
@@ -125,43 +123,37 @@ namespace DF2D::Engine
 
 	void Canvas::DeclareElementFor(const ObjectHandle<GameObject>& owner, UIElementType type)
 	{
-		if (uiManager == nullptr || context == 0)
-			return;
-
 		// The canvas object itself takes the context root, whose kind is not ours to choose.
 		if (owner == GetGameObject())
 			return;
 
-		uiManager->DeclareElementType(context, owner, type);
+		context.DeclareElementType(owner, type);
 	}
 
-	UIElementID Canvas::AcquireElementFor(const ObjectHandle<GameObject>& owner)
+	UIElement Canvas::AcquireElementFor(const ObjectHandle<GameObject>& owner)
 	{
-		if (uiManager == nullptr || context == 0)
-			return 0;
-
 		// The canvas object itself is the context root rather than a child element of it.
 		if (owner == GetGameObject())
-			return uiManager->GetRootElement(context);
+			return context.GetRootElement();
 
-		return uiManager->AcquireElement(context, owner);
+		return context.AcquireElement(owner);
 	}
 
 	bool Canvas::LoadStyleSheet(std::string_view path)
 	{
 		// Scenes load their theme in Enter, which runs before any component is initialised and so
 		// before the context exists. The request is queued and replayed once it does.
-		if (uiManager == nullptr || context == 0)
+		if (!context.IsValid())
 		{
 			pendingStyleSheets.push_back(std::string(path));
 
 			return true;
 		}
 
-		return uiManager->LoadStyleSheet(context, std::string(path));
+		return context.LoadStyleSheet(std::string(path));
 	}
 
-	UIContextID Canvas::GetContext() const
+	UIContext Canvas::GetContext() const
 	{
 		return context;
 	}
