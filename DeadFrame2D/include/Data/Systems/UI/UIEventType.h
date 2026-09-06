@@ -20,6 +20,8 @@ namespace DF2D::Data
 
 		SUBMIT,
 
+		SCROLL,
+
 		FOCUS_GAINED,
 
 		FOCUS_LOST
