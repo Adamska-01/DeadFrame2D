@@ -235,21 +235,6 @@ TEST_CASE("The clock is advanced before layout is resolved")
 }
 
 
-TEST_CASE("A destroyed context stops being updated")
-{
-	auto fixture = Fixture();
-
-	auto context = fixture.manager->CreateCanvasContext(Vector2I(800, 600));
-
-	context.Destroy();
-
-	static_cast<ICoreSystem*>(fixture.manager.get())->EndUpdate(0.016f);
-
-	CHECK(fixture.mock->destroyContextCount == 1);
-	CHECK(fixture.mock->updateContextCount == 0);
-}
-
-
 TEST_CASE("Two UI components on one object share a single element")
 {
 	auto fixture = Fixture();

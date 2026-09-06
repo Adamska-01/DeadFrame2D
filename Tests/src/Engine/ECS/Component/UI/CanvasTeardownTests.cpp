@@ -1,4 +1,5 @@
 #include "Core/Context/Systems/Rendering/Renderer.h"
+#include "Core/Context/Abstractions/ICoreSystem.h"
 #include "Core/Context/Systems/UI/UIManager.h"
 #include "Engine/ECS/Component/UI/Button.h"
 #include "Engine/ECS/Component/UI/Canvas.h"
@@ -32,6 +33,8 @@ namespace
 
 		MockTimeProvider time;
 
+		MockUIBackend* mock = nullptr;
+
 		std::unique_ptr<UIManager> uiManager;
 
 		std::shared_ptr<TestScene> scene;
@@ -40,7 +43,10 @@ namespace
 		CanvasFixture()
 		{
 			renderer = std::make_unique<Renderer>(std::make_unique<MockRenderBackend>());
-			uiManager = std::make_unique<UIManager>(std::make_unique<MockUIBackend>(), &time);
+			auto ownedBackend = std::make_unique<MockUIBackend>();
+
+			mock = ownedBackend.get();
+			uiManager = std::make_unique<UIManager>(std::move(ownedBackend), &time);
 
 			scene = std::make_shared<TestScene>(&dispatcher);
 			scene->SetCoreContext(CoreContext
@@ -98,6 +104,29 @@ TEST_CASE("Destroying the canvas object while its children live does not strand 
 
 	CHECK_NOTHROW(canvasObject->Destroy());
 	CHECK_NOTHROW(fixture.scene->Update(0.016f));
+}
+
+
+TEST_CASE("A destroyed canvas takes its surface with it and stops being updated")
+{
+	auto fixture = CanvasFixture();
+
+	auto canvasObject = fixture.scene->Spawn<TestGameObject>();
+	canvasObject->AddComponent<Canvas>();
+
+	fixture.scene->Init();
+
+	CHECK(fixture.mock->createContextCount == 1);
+
+	canvasObject->Destroy();
+	fixture.scene->Update(0.016f);
+
+	static_cast<DF2D::Core::ICoreSystem*>(fixture.uiManager.get())->EndUpdate(0.016f);
+
+	// Destroying the surface is the canvas's job alone, which is why UIContext::Destroy is private to
+	// it. What matters here is that the manager stops treating a dead surface as live.
+	CHECK(fixture.mock->destroyContextCount == 1);
+	CHECK(fixture.mock->updateContextCount == 0);
 }
 
 
