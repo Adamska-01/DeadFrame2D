@@ -1,4 +1,4 @@
-#include "Core/Context/Systems/UI/UIContext.h"
+#include "Core/Context/Systems/UI/Context/UIContext.h"
 #include "Engine/ECS/Component/UI/Dropdown.h"
 
 
@@ -37,7 +37,7 @@ namespace DF2D::Engine
 
 		// Asked for rather than read out of the payload: the event reports the option's value, and the
 		// index is what this component's API is written in.
-		auto newIndex = element.GetDropdownSelection();
+		auto newIndex = element.AsDropdown().GetSelection();
 
 		if (newIndex == selectedIndex)
 			return;
@@ -63,7 +63,7 @@ namespace DF2D::Engine
 
 		auto index = static_cast<int>(options.size()) - 1;
 
-		element.AddDropdownOption(options.back(), options.back());
+		element.AsDropdown().AddOption(options.back(), options.back());
 
 		return index;
 	}
@@ -72,7 +72,7 @@ namespace DF2D::Engine
 	{
 		options.clear();
 
-		element.ClearDropdownOptions();
+		element.AsDropdown().ClearOptions();
 
 		SetSelectedIndex(-1);
 	}
@@ -114,16 +114,18 @@ namespace DF2D::Engine
 
 	void Dropdown::ApplyOptions()
 	{
-		element.ClearDropdownOptions();
+		auto dropdown = element.AsDropdown();
+
+		dropdown.ClearOptions();
 
 		for (const auto& option : options)
 		{
-			element.AddDropdownOption(option, option);
+			dropdown.AddOption(option, option);
 		}
 	}
 
 	void Dropdown::ApplySelection()
 	{
-		element.SetDropdownSelection(selectedIndex);
+		element.AsDropdown().SetSelection(selectedIndex);
 	}
 }

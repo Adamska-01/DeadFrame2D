@@ -1,4 +1,4 @@
-#include "Core/Context/Systems/UI/UIContext.h"
+#include "Core/Context/Systems/UI/Context/UIContext.h"
 #include "Engine/ECS/Component/UI/ScrollView.h"
 
 
@@ -54,7 +54,7 @@ namespace DF2D::Engine
 
 	void ScrollView::SetScrollPosition(Vector2F position)
 	{
-		element.SetScrollOffset(position);
+		element.AsScrollable().SetScrollOffset(position);
 	}
 
 
@@ -70,12 +70,12 @@ namespace DF2D::Engine
 
 	Vector2F ScrollView::GetScrollPosition() const
 	{
-		return element.GetScrollOffset();
+		return element.AsScrollable().GetScrollOffset();
 	}
 
 	Vector2F ScrollView::GetContentSize() const
 	{
-		return element.GetScrollSize();
+		return element.AsScrollable().GetScrollSize();
 	}
 
 
