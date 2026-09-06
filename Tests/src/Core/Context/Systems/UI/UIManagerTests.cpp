@@ -3,12 +3,15 @@
 #include "Engine/ECS/Entity/Component/Storage/ComponentBucket.h"
 #include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
 #include "Mocks/Context/Systems/UI/MockUIBackend.h"
+#include "Mocks/Engine/ECS/Entity/FakeSceneHandleProvider.h"
+#include "Mocks/Engine/ECS/Entity/TestGameObject.h"
 #include <doctest.h>
 #include <memory>
 
 
 using namespace DF2D::Core;
 using namespace DF2D::Data;
+using namespace DF2D::Engine;
 
 
 namespace
@@ -36,9 +39,10 @@ namespace
 	};
 
 
-	// Stand-ins for GameObjects: AcquireElement only ever uses the address as an identity.
-	int firstObject = 0;
-	int secondObject = 0;
+	std::shared_ptr<FakeSceneHandleProvider> objectScene = std::make_shared<FakeSceneHandleProvider>();
+
+	ObjectHandle<GameObject> firstObject = objectScene->Create<TestGameObject>();
+	ObjectHandle<GameObject> secondObject = objectScene->Create<TestGameObject>();
 
 	/** @brief Minimal UI component that records the events routed to it. */
 	struct TestUIComponent : DF2D::Engine::UIComponent
@@ -183,8 +187,8 @@ TEST_CASE("Two UI components on one object share a single element")
 
 	auto context = fixture.manager->CreateContext(Vector2I(800, 600));
 
-	auto first = fixture.manager->AcquireElement(context, &firstObject, UIElementType::PANEL);
-	auto second = fixture.manager->AcquireElement(context, &firstObject, UIElementType::PANEL);
+	auto first = fixture.manager->AcquireElement(context, firstObject);
+	auto second = fixture.manager->AcquireElement(context, firstObject);
 
 	CHECK(first == second);
 	CHECK(fixture.mock->createElementCount == 1);
@@ -197,8 +201,8 @@ TEST_CASE("Different objects get different elements")
 
 	auto context = fixture.manager->CreateContext(Vector2I(800, 600));
 
-	auto first = fixture.manager->AcquireElement(context, &firstObject, UIElementType::PANEL);
-	auto second = fixture.manager->AcquireElement(context, &secondObject, UIElementType::PANEL);
+	auto first = fixture.manager->AcquireElement(context, firstObject);
+	auto second = fixture.manager->AcquireElement(context, secondObject);
 
 	CHECK(first != second);
 	CHECK(fixture.mock->createElementCount == 2);
@@ -211,14 +215,14 @@ TEST_CASE("A shared element survives until its last holder releases it")
 
 	auto context = fixture.manager->CreateContext(Vector2I(800, 600));
 
-	fixture.manager->AcquireElement(context, &firstObject, UIElementType::PANEL);
-	fixture.manager->AcquireElement(context, &firstObject, UIElementType::PANEL);
+	fixture.manager->AcquireElement(context, firstObject);
+	fixture.manager->AcquireElement(context, firstObject);
 
-	fixture.manager->ReleaseElement(&firstObject);
+	fixture.manager->ReleaseElement(firstObject);
 
 	CHECK(fixture.mock->destroyElementCount == 0);
 
-	fixture.manager->ReleaseElement(&firstObject);
+	fixture.manager->ReleaseElement(firstObject);
 
 	CHECK(fixture.mock->destroyElementCount == 1);
 }
@@ -228,7 +232,7 @@ TEST_CASE("Releasing an object that never acquired anything is a no-op")
 {
 	auto fixture = Fixture();
 
-	fixture.manager->ReleaseElement(&firstObject);
+	fixture.manager->ReleaseElement(firstObject);
 
 	CHECK(fixture.mock->destroyElementCount == 0);
 }
@@ -238,7 +242,7 @@ TEST_CASE("AcquireElement refuses an invalid context")
 {
 	auto fixture = Fixture();
 
-	CHECK(fixture.manager->AcquireElement(0, &firstObject, UIElementType::PANEL) == 0);
+	CHECK(fixture.manager->AcquireElement(0, firstObject) == 0);
 	CHECK(fixture.mock->createElementCount == 0);
 }
 
@@ -400,6 +404,173 @@ TEST_CASE("Capture state is reported to the input system from the backend")
 
 	CHECK(capture.CapturesPointer());
 	CHECK(capture.CapturesKeyboard());
+}
+
+
+TEST_CASE("A widget's element kind wins regardless of which component declared first")
+{
+	auto fixture = Fixture();
+
+	auto context = fixture.manager->CreateContext(Vector2I(800, 600));
+
+	// A positioning component declares first and has no opinion; the widget declares afterwards.
+	fixture.manager->DeclareElementType(context, firstObject, UIElementType::PANEL);
+	fixture.manager->DeclareElementType(context, firstObject, UIElementType::BUTTON);
+
+	fixture.manager->AcquireElement(context, firstObject);
+
+	CHECK(fixture.mock->lastCreatedType == UIElementType::BUTTON);
+}
+
+
+TEST_CASE("Declaration order does not matter")
+{
+	auto fixture = Fixture();
+
+	auto context = fixture.manager->CreateContext(Vector2I(800, 600));
+
+	// The reverse order of the previous case: the widget is initialised before its RectTransform.
+	fixture.manager->DeclareElementType(context, firstObject, UIElementType::BUTTON);
+	fixture.manager->DeclareElementType(context, firstObject, UIElementType::PANEL);
+
+	fixture.manager->AcquireElement(context, firstObject);
+
+	CHECK(fixture.mock->lastCreatedType == UIElementType::BUTTON);
+}
+
+
+TEST_CASE("An object nobody has an opinion about gets a plain panel")
+{
+	auto fixture = Fixture();
+
+	auto context = fixture.manager->CreateContext(Vector2I(800, 600));
+
+	fixture.manager->DeclareElementType(context, firstObject, UIElementType::PANEL);
+	fixture.manager->AcquireElement(context, firstObject);
+
+	CHECK(fixture.mock->lastCreatedType == UIElementType::PANEL);
+}
+
+
+TEST_CASE("Two conflicting widget kinds keep the first and warn")
+{
+	auto fixture = Fixture();
+
+	auto context = fixture.manager->CreateContext(Vector2I(800, 600));
+
+	fixture.manager->DeclareElementType(context, firstObject, UIElementType::BUTTON);
+	fixture.manager->DeclareElementType(context, firstObject, UIElementType::DROPDOWN);
+
+	fixture.manager->AcquireElement(context, firstObject);
+
+	CHECK(fixture.mock->lastCreatedType == UIElementType::BUTTON);
+}
+
+
+TEST_CASE("The element is only built once, however many components share it")
+{
+	auto fixture = Fixture();
+
+	auto context = fixture.manager->CreateContext(Vector2I(800, 600));
+
+	fixture.manager->DeclareElementType(context, firstObject, UIElementType::BUTTON);
+
+	auto first = fixture.manager->AcquireElement(context, firstObject);
+	auto second = fixture.manager->AcquireElement(context, firstObject);
+
+	CHECK(first == second);
+	CHECK(fixture.mock->createElementCount == 1);
+}
+
+
+TEST_CASE("A deactivated component stops receiving UI events")
+{
+	auto fixture = Fixture();
+	std::shared_ptr<DF2D::Engine::ComponentBucket> bucket;
+
+	auto active = MakeComponent(bucket);
+	auto inactive = MakeComponent(bucket);
+
+	fixture.manager->RegisterElementOwner(42, active);
+	fixture.manager->RegisterElementOwner(42, inactive);
+
+	// Everywhere else in the engine, deactivating a component stops it running. Events reach the UI
+	// directly rather than through the scene traversal that enforces that, so it is enforced here.
+	inactive->SetActive(false);
+
+	Dispatch(*fixture.manager, 42);
+
+	CHECK(active->eventCount == 1);
+	CHECK(inactive->eventCount == 0);
+}
+
+
+TEST_CASE("Reactivating a component makes it responsive again")
+{
+	auto fixture = Fixture();
+	std::shared_ptr<DF2D::Engine::ComponentBucket> bucket;
+
+	auto component = MakeComponent(bucket);
+
+	fixture.manager->RegisterElementOwner(42, component);
+
+	component->SetActive(false);
+	Dispatch(*fixture.manager, 42);
+
+	component->SetActive(true);
+	Dispatch(*fixture.manager, 42);
+
+	CHECK(component->eventCount == 1);
+}
+
+
+TEST_SUITE_END();
+
+
+TEST_SUITE_BEGIN("UIManager");
+
+
+TEST_CASE("A released object leaves nothing behind for a later object to inherit")
+{
+	auto fixture = Fixture();
+	auto context = fixture.manager->CreateContext(Vector2I(800, 600));
+
+	auto scene = std::make_shared<FakeSceneHandleProvider>();
+	auto original = scene->Create<TestGameObject>();
+
+	fixture.manager->DeclareElementType(context, original, UIElementType::BUTTON);
+
+	auto originalElement = fixture.manager->AcquireElement(context, original);
+
+	fixture.manager->ReleaseElement(original);
+
+	// A different object, which under an address-keyed map could land on the freed slot and be handed
+	// the element that has just been destroyed. Handles carry a generation, so it gets its own.
+	auto replacement = scene->Create<TestGameObject>();
+
+	auto replacementElement = fixture.manager->AcquireElement(context, replacement);
+
+	CHECK(replacementElement != originalElement);
+	CHECK(fixture.mock->createElementCount == 2);
+}
+
+
+TEST_CASE("Releasing through a handle works even once the object is gone")
+{
+	auto fixture = Fixture();
+	auto context = fixture.manager->CreateContext(Vector2I(800, 600));
+
+	auto scene = std::make_shared<FakeSceneHandleProvider>();
+	auto owner = scene->Create<TestGameObject>();
+
+	fixture.manager->AcquireElement(context, owner);
+
+	owner->Destroy();
+
+	// The handle is still a usable key after the object it names has been destroyed, which is the whole
+	// reason the map is not keyed by a raw pointer: this is exactly when a component's destructor runs.
+	CHECK_NOTHROW(fixture.manager->ReleaseElement(owner));
+	CHECK(fixture.mock->destroyElementCount == 1);
 }
 
 

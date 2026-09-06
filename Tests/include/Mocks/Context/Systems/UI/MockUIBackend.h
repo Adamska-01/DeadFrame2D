@@ -39,6 +39,8 @@ struct MockUIBackend : DF2D::Core::IUIBackend
 
 	int createElementCount{0};
 
+	DF2D::Data::UIElementType lastCreatedType{DF2D::Data::UIElementType::PANEL};
+
 	int destroyElementCount{0};
 
 	std::vector<std::string> loadedFonts;
@@ -140,9 +142,10 @@ struct MockUIBackend : DF2D::Core::IUIBackend
 		return liveContexts.contains(context) ? context : 0;
 	}
 
-	DF2D::Data::UIElementID CreateElement(DF2D::Data::UIContextID, DF2D::Data::UIElementType) override
+	DF2D::Data::UIElementID CreateElement(DF2D::Data::UIContextID, DF2D::Data::UIElementType type) override
 	{
 		createElementCount++;
+		lastCreatedType = type;
 
 		if (failNextElement) return 0;
 
