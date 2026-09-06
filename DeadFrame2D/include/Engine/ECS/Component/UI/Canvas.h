@@ -1,8 +1,8 @@
 #pragma once
+#include "Core/Context/Systems/UI/Context/UIContext.h"
 #include "Core/Math/Vector2.h"
 #include "Data/Components/UI/Canvas/CanvasRenderMode.h"
 #include "Data/Systems/Rendering/Pipeline/RenderTask.h"
-#include "Core/Context/Systems/UI/UIContext.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
 #include <memory>
@@ -30,11 +30,7 @@ namespace DF2D::Engine
 
 
 	private:
-		/**
-		 * @brief Rendering order of this canvas relative to other canvases.
-		 *
-		 * Higher values are drawn on top of lower ones.
-		 */
+		/** @brief Rendering order of this canvas relative to other canvases. */
 		int sortOrder;
 
 		Data::CanvasRenderMode renderMode;
@@ -45,8 +41,6 @@ namespace DF2D::Engine
 		 * If null, the canvas behaves as if it were in screen space overlay mode.
 		 */
 		ComponentHandle<Camera> renderCamera;
-
-		Core::UIContext context;
 
 		Data::RenderTask renderTask;
 
