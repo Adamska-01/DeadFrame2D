@@ -47,10 +47,6 @@ namespace DF2D::Engine
 		/** @brief Re-parents this element under whichever UI ancestor the GameObject now sits below. */
 		void SyncElementParent();
 
-		void OnParentGameObjectChangedHandler(const ObjectHandle<GameObject>& obj) override;
-
-		void OnGameObjectActiveStateChangedHandler(const ObjectHandle<GameObject>& obj, bool activeState) override;
-
 
 	protected:
 		Core::UIContext context;
@@ -63,6 +59,11 @@ namespace DF2D::Engine
 
 		/** @brief Classes requested before the element existed, replayed once it does. */
 		std::unordered_set<std::string> pendingClasses;
+
+
+		void OnParentGameObjectChangedHandler(const ObjectHandle<GameObject>& obj) override;
+
+		void OnGameObjectActiveStateChangedHandler(const ObjectHandle<GameObject>& obj, bool activeState) override;
 
 
 		/** @brief The element kind this component needs. Called once, during Init. */

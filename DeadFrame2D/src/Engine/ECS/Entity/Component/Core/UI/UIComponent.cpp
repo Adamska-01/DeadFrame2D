@@ -33,6 +33,21 @@ namespace DF2D::Engine
 	}
 
 
+	void UIComponent::OnParentGameObjectChangedHandler(const ObjectHandle<GameObject>& obj)
+	{
+		parentCanvas = GetGameObject()->GetComponentInParent<Canvas>(true, true);
+
+		SyncElementParent();
+
+		MarkDirty();
+	}
+
+	void UIComponent::OnGameObjectActiveStateChangedHandler(const ObjectHandle<GameObject>& obj, bool activeState)
+	{
+		element.SetVisible(activeState);
+	}
+
+
 	Data::UIElementType UIComponent::GetElementType() const
 	{
 		return UIElementType::PANEL;
@@ -144,20 +159,6 @@ namespace DF2D::Engine
 			return;
 
 		element.SetParent(parentElement, -1);
-	}
-
-	void UIComponent::OnParentGameObjectChangedHandler(const ObjectHandle<GameObject>& obj)
-	{
-		parentCanvas = GetGameObject()->GetComponentInParent<Canvas>(true, true);
-
-		SyncElementParent();
-
-		MarkDirty();
-	}
-
-	void UIComponent::OnGameObjectActiveStateChangedHandler(const ObjectHandle<GameObject>& obj, bool activeState)
-	{
-		element.SetVisible(activeState);
 	}
 
 
