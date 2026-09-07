@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Math/Vector2.h"
 #include "Data/Components/UI/Layout/UIAnchor.h"
+#include "Data/Components/UI/Layout/LayoutMode.h"
 #include "Data/Components/UI/RectTransform/RectTransformProperties.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
@@ -31,10 +32,12 @@ namespace DF2D::Engine
 
 		ComponentHandle<Transform> transform;
 
-		float localRotation = 0.0f;
+		float localRotation;
 
-		Core::Vector2F localScale = Core::Vector2F::One;
+		Core::Vector2F localScale;
 
+
+		Data::LayoutMode ResolveLayoutMode() const;
 
 		void ApplyPlacement();
 
@@ -43,6 +46,9 @@ namespace DF2D::Engine
 
 	protected:
 		void OnElementCreated() override;
+
+
+		void OnParentGameObjectChangedHandler(const ObjectHandle<GameObject>& obj) override;
 
 
 	public:

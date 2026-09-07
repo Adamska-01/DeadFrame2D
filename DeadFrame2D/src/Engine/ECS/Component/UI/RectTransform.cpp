@@ -1,4 +1,5 @@
 #include "Engine/ECS/Component/Transform.h"
+#include "Engine/ECS/Component/UI/Layout/LayoutGroup.h"
 #include "Engine/ECS/Component/UI/RectTransform.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include "Utilities/Helpers/UI/StyleValues.h"
@@ -13,21 +14,22 @@ namespace DF2D::Engine
 
 
 	RectTransform::RectTransform()
+		: localRotation(0.0f),
+		localScale(Core::Vector2F::One)
 	{
 	}
 
 
-	void RectTransform::OnElementCreated()
+	LayoutMode RectTransform::ResolveLayoutMode() const
 	{
-		transform = GetGameObject()->GetTransform();
+		auto parentGroup = GetGameObject()->GetComponentInParent<LayoutGroup>();
 
-		ApplyPlacement();
-		ApplyTransform();
+		return parentGroup != nullptr ? LayoutMode::PARENT_DRIVEN : LayoutMode::SELF_POSITIONED;
 	}
 
 	void RectTransform::ApplyPlacement()
 	{
-		for (const auto& resolved : RectTransformResolver::ResolveRectTransform(properties))
+		for (const auto& resolved : RectTransformResolver::ResolveRectTransform(properties, ResolveLayoutMode()))
 		{
 			SetStyle(resolved.property, resolved.value);
 		}
@@ -51,6 +53,23 @@ namespace DF2D::Engine
 			+ std::to_string(localScale.x) + ", " + std::to_string(localScale.y) + ")";
 
 		SetStyle(UIStyleProperty::TRANSFORM, value);
+	}
+
+
+	void RectTransform::OnElementCreated()
+	{
+		transform = GetGameObject()->GetTransform();
+
+		ApplyPlacement();
+		ApplyTransform();
+	}
+
+
+	void RectTransform::OnParentGameObjectChangedHandler(const ObjectHandle<GameObject>& obj)
+	{
+		UIComponent::OnParentGameObjectChangedHandler(obj);
+
+		ApplyPlacement();
 	}
 
 

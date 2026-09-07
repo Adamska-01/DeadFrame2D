@@ -7,10 +7,43 @@ namespace DF2D::Utilities::RectTransformResolver
 	using namespace DF2D::Data;
 
 
-	std::vector<ResolvedStyleProperty> ResolveRectTransform(const RectTransformProperties& properties)
+	std::vector<ResolvedStyleProperty> ResolveRectTransform(const RectTransformProperties& properties, LayoutMode mode)
 	{
 		auto resolved = std::vector<ResolvedStyleProperty>();
-		resolved.reserve(10);
+		resolved.reserve(12);
+
+		if (mode == LayoutMode::PARENT_DRIVEN)
+		{
+			// Everything is written, including the values being cleared, because these are inline
+			// properties: an element reparented into a layout group still carries whatever it set
+			// while it was placing itself, and only an explicit reset takes those back off.
+			resolved.push_back({ UIStyleProperty::POSITION, "relative" });
+			resolved.push_back({ UIStyleProperty::LEFT, "auto" });
+			resolved.push_back({ UIStyleProperty::RIGHT, "auto" });
+			resolved.push_back({ UIStyleProperty::TOP, "auto" });
+			resolved.push_back({ UIStyleProperty::BOTTOM, "auto" });
+			resolved.push_back({ UIStyleProperty::MARGIN_LEFT, "0px" });
+			resolved.push_back({ UIStyleProperty::MARGIN_RIGHT, "0px" });
+			resolved.push_back({ UIStyleProperty::MARGIN_TOP, "0px" });
+			resolved.push_back({ UIStyleProperty::MARGIN_BOTTOM, "0px" });
+
+			// Flex shrinks its children to fit by default, which would quietly resize an element to
+			// something other than the size it asked for -- and stop a scrolling container ever
+			// overflowing, since its content would shrink to the box instead of running past it.
+			resolved.push_back({ UIStyleProperty::FLEX_SHRINK, "0" });
+
+			// A stretched axis means "as much as the parent gives me", which in flow is the parent's
+			// business to hand out rather than a fraction this element can name.
+			resolved.push_back({
+				UIStyleProperty::WIDTH,
+				properties.StretchesHorizontally() ? "auto" : StyleValues::ToPixels(properties.sizeDelta.x) });
+
+			resolved.push_back({
+				UIStyleProperty::HEIGHT,
+				properties.StretchesVertically() ? "auto" : StyleValues::ToPixels(properties.sizeDelta.y) });
+
+			return resolved;
+		}
 
 		resolved.push_back({ UIStyleProperty::POSITION, "absolute" });
 
