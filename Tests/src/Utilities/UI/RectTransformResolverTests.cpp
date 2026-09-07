@@ -171,4 +171,67 @@ TEST_CASE("Stretching both axes fills the parent with an inset on every side")
 }
 
 
+TEST_CASE("A parent-driven element stays in the flow its parent arranges")
+{
+	auto properties = Pinned(Vector2F(0.5f, 0.5f), Vector2F(0.5f, 0.5f), Vector2F(40.0f, 90.0f), Vector2F(120.0f, 32.0f));
+
+	auto resolved = RectTransformResolver::ResolveRectTransform(properties, LayoutMode::PARENT_DRIVEN);
+
+	// Absolute positioning would take it out of flow, which is exactly where a layout group needs it.
+	CHECK(ValueOf(resolved, UIStyleProperty::POSITION) == "relative");
+
+	// The size it asks for survives; where it wanted to sit does not.
+	CHECK(NumberIn(ValueOf(resolved, UIStyleProperty::WIDTH)) == doctest::Approx(120.0f));
+	CHECK(NumberIn(ValueOf(resolved, UIStyleProperty::HEIGHT)) == doctest::Approx(32.0f));
+
+	// And it is a size, not a suggestion: flex shrinks children to fit by default, which would both
+	// resize the element behind the author's back and stop a scrolling container ever overflowing.
+	CHECK(NumberIn(ValueOf(resolved, UIStyleProperty::FLEX_SHRINK)) == doctest::Approx(0.0f));
+}
+
+
+TEST_CASE("A parent-driven element clears the placement it set while positioning itself")
+{
+	auto properties = Pinned(Vector2F(1.0f, 1.0f), Vector2F(1.0f, 1.0f), Vector2F(-24.0f, -24.0f), Vector2F(200.0f, 40.0f));
+
+	auto resolved = RectTransformResolver::ResolveRectTransform(properties, LayoutMode::PARENT_DRIVEN);
+
+	// These are inline properties, so an element reparented into a group still carries whatever it
+	// wrote while it was placing itself. Only writing them back off actually removes them.
+	CHECK(ValueOf(resolved, UIStyleProperty::LEFT) == "auto");
+	CHECK(ValueOf(resolved, UIStyleProperty::RIGHT) == "auto");
+	CHECK(ValueOf(resolved, UIStyleProperty::TOP) == "auto");
+	CHECK(ValueOf(resolved, UIStyleProperty::BOTTOM) == "auto");
+
+	CHECK(NumberIn(ValueOf(resolved, UIStyleProperty::MARGIN_LEFT)) == doctest::Approx(0.0f));
+	CHECK(NumberIn(ValueOf(resolved, UIStyleProperty::MARGIN_TOP)) == doctest::Approx(0.0f));
+}
+
+
+TEST_CASE("A parent-driven element that stretches lets the parent decide that axis")
+{
+	auto properties = RectTransformProperties
+	{
+		.anchorMin = Vector2F(0.0f, 0.5f),
+		.anchorMax = Vector2F(1.0f, 0.5f),
+		.sizeDelta = Vector2F(0.0f, 56.0f)
+	};
+
+	auto resolved = RectTransformResolver::ResolveRectTransform(properties, LayoutMode::PARENT_DRIVEN);
+
+	// "As much as the parent gives me" is the parent's to hand out in flow, not a fraction this
+	// element can name for itself.
+	CHECK(ValueOf(resolved, UIStyleProperty::WIDTH) == "auto");
+	CHECK(NumberIn(ValueOf(resolved, UIStyleProperty::HEIGHT)) == doctest::Approx(56.0f));
+}
+
+
+TEST_CASE("Placing itself is what an element does unless told otherwise")
+{
+	auto properties = Pinned(Vector2F(0.5f, 0.5f), Vector2F(0.5f, 0.5f), Vector2F::Zero, Vector2F(100.0f, 100.0f));
+
+	CHECK(ValueOf(RectTransformResolver::ResolveRectTransform(properties), UIStyleProperty::POSITION) == "absolute");
+}
+
+
 TEST_SUITE_END();
