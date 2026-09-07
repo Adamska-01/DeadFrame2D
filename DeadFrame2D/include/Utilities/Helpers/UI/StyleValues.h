@@ -38,6 +38,23 @@ namespace DF2D::Utilities::StyleValues
 		return text + "px";
 	}
 
+	/** @brief Formats a plain number, for the unitless properties such as the flex factors. */
+	inline std::string ToNumber(float value)
+	{
+		auto text = std::to_string(value);
+
+		auto lastDigit = text.find_last_not_of('0');
+
+		if (lastDigit != std::string::npos && text[lastDigit] == '.')
+		{
+			lastDigit--;
+		}
+
+		text.erase(lastDigit + 1);
+
+		return text;
+	}
+
 	/** @brief Formats a 0-1 ratio as a percentage length. */
 	inline std::string ToPercent(float normalized)
 	{
