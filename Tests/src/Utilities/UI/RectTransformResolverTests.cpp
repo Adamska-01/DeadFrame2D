@@ -233,5 +233,50 @@ TEST_CASE("Placing itself is what an element does unless told otherwise")
 	CHECK(ValueOf(RectTransformResolver::ResolveRectTransform(properties), UIStyleProperty::POSITION) == "absolute");
 }
 
+TEST_CASE("A layout element takes the size and flex properties off the rect transform")
+{
+	auto properties = Pinned(Vector2F(0.5f, 0.5f), Vector2F(0.5f, 0.5f), Vector2F::Zero, Vector2F(120.0f, 32.0f));
+
+	auto resolved = RectTransformResolver::ResolveRectTransform(
+		properties,
+		LayoutMode::PARENT_DRIVEN,
+		LayoutSizeSource::LAYOUT_ELEMENT);
+
+	// Two components describing one box, with whichever applied last winning, is the failure this
+	// ownership exists to prevent.
+	CHECK(ValueOf(resolved, UIStyleProperty::WIDTH).empty());
+	CHECK(ValueOf(resolved, UIStyleProperty::HEIGHT).empty());
+	CHECK(ValueOf(resolved, UIStyleProperty::FLEX_SHRINK).empty());
+
+	// Position stays this component's job either way.
+	CHECK(ValueOf(resolved, UIStyleProperty::POSITION) == "relative");
+	CHECK(ValueOf(resolved, UIStyleProperty::LEFT) == "auto");
+}
+
+
+TEST_CASE("Sizing belongs to the rect transform when nothing overrides it")
+{
+	auto properties = Pinned(Vector2F(0.5f, 0.5f), Vector2F(0.5f, 0.5f), Vector2F::Zero, Vector2F(120.0f, 32.0f));
+
+	auto resolved = RectTransformResolver::ResolveRectTransform(properties, LayoutMode::PARENT_DRIVEN);
+
+	CHECK(NumberIn(ValueOf(resolved, UIStyleProperty::WIDTH)) == doctest::Approx(120.0f));
+}
+
+
+TEST_CASE("An element placing itself is unaffected by who owns its size")
+{
+	auto properties = Pinned(Vector2F(0.0f, 0.0f), Vector2F(0.0f, 0.0f), Vector2F(16.0f, 16.0f), Vector2F(64.0f, 64.0f));
+
+	auto owned = RectTransformResolver::ResolveRectTransform(
+		properties,
+		LayoutMode::SELF_POSITIONED,
+		LayoutSizeSource::LAYOUT_ELEMENT);
+
+	// There is no group to override, so the anchor model still resolves in full.
+	CHECK(ValueOf(owned, UIStyleProperty::POSITION) == "absolute");
+	CHECK(NumberIn(ValueOf(owned, UIStyleProperty::WIDTH)) == doctest::Approx(64.0f));
+}
+
 
 TEST_SUITE_END();
