@@ -7,7 +7,10 @@ namespace DF2D::Utilities::RectTransformResolver
 	using namespace DF2D::Data;
 
 
-	std::vector<ResolvedStyleProperty> ResolveRectTransform(const RectTransformProperties& properties, LayoutMode mode)
+	std::vector<ResolvedStyleProperty> ResolveRectTransform(
+		const RectTransformProperties& properties,
+		LayoutMode mode,
+		LayoutSizeSource sizeSource)
 	{
 		auto resolved = std::vector<ResolvedStyleProperty>();
 		resolved.reserve(12);
@@ -26,6 +29,12 @@ namespace DF2D::Utilities::RectTransformResolver
 			resolved.push_back({ UIStyleProperty::MARGIN_RIGHT, "0px" });
 			resolved.push_back({ UIStyleProperty::MARGIN_TOP, "0px" });
 			resolved.push_back({ UIStyleProperty::MARGIN_BOTTOM, "0px" });
+
+			// A LayoutElement is the deliberate override, so when there is one it owns the size and the
+			// flex properties outright. Writing them here too would leave two components describing one
+			// box, with whichever applied last quietly winning.
+			if (sizeSource == LayoutSizeSource::LAYOUT_ELEMENT)
+				return resolved;
 
 			// Flex shrinks its children to fit by default, which would quietly resize an element to
 			// something other than the size it asked for -- and stop a scrolling container ever
