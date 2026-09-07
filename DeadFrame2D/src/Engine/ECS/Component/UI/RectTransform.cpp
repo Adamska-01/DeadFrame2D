@@ -1,4 +1,5 @@
 #include "Engine/ECS/Component/Transform.h"
+#include "Engine/ECS/Component/UI/Layout/LayoutElement.h"
 #include "Engine/ECS/Component/UI/Layout/LayoutGroup.h"
 #include "Engine/ECS/Component/UI/RectTransform.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
@@ -22,14 +23,35 @@ namespace DF2D::Engine
 
 	LayoutMode RectTransform::ResolveLayoutMode() const
 	{
+		// Only the immediate parent counts: a group arranges the children it holds, not every descendant.
 		auto parentGroup = GetGameObject()->GetComponentInParent<LayoutGroup>();
 
-		return parentGroup != nullptr ? LayoutMode::PARENT_DRIVEN : LayoutMode::SELF_POSITIONED;
+		if (parentGroup == nullptr)
+			return LayoutMode::SELF_POSITIONED;
+
+		auto layoutElement = GetGameObject()->GetComponent<LayoutElement>();
+
+		return layoutElement != nullptr && layoutElement->IsIgnoringLayout()
+			? LayoutMode::SELF_POSITIONED
+			: LayoutMode::PARENT_DRIVEN;
+	}
+
+	LayoutSizeSource RectTransform::ResolveSizeSource() const
+	{
+		// A LayoutElement is the deliberate override, so its presence alone hands it the size.
+		return GetGameObject()->GetComponent<LayoutElement>() != nullptr
+			? LayoutSizeSource::LAYOUT_ELEMENT
+			: LayoutSizeSource::RECT_TRANSFORM;
+	}
+
+	void RectTransform::RefreshPlacement()
+	{
+		ApplyPlacement();
 	}
 
 	void RectTransform::ApplyPlacement()
 	{
-		for (const auto& resolved : RectTransformResolver::ResolveRectTransform(properties, ResolveLayoutMode()))
+		for (const auto& resolved : RectTransformResolver::ResolveRectTransform(properties, ResolveLayoutMode(), ResolveSizeSource()))
 		{
 			SetStyle(resolved.property, resolved.value);
 		}

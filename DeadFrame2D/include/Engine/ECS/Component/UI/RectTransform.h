@@ -2,6 +2,7 @@
 #include "Core/Math/Vector2.h"
 #include "Data/Components/UI/Layout/UIAnchor.h"
 #include "Data/Components/UI/Layout/LayoutMode.h"
+#include "Data/Components/UI/Layout/LayoutSizeSource.h"
 #include "Data/Components/UI/RectTransform/RectTransformProperties.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
@@ -38,6 +39,8 @@ namespace DF2D::Engine
 
 
 		Data::LayoutMode ResolveLayoutMode() const;
+
+		Data::LayoutSizeSource ResolveSizeSource() const;
 
 		void ApplyPlacement();
 
@@ -79,6 +82,8 @@ namespace DF2D::Engine
 		void SetLocalRotation(float degrees);
 
 		void SetLocalScale(const Core::Vector2F& scale);
+
+		void RefreshPlacement();
 
 
 		const Data::RectTransformProperties& GetProperties() const;
