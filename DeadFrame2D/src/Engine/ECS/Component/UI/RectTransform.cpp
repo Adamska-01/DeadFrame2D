@@ -1,4 +1,5 @@
 #include "Engine/ECS/Component/Transform.h"
+#include "Engine/ECS/Component/UI/Layout/ContentSizeFitter.h"
 #include "Engine/ECS/Component/UI/Layout/LayoutElement.h"
 #include "Engine/ECS/Component/UI/Layout/LayoutGroup.h"
 #include "Engine/ECS/Component/UI/RectTransform.h"
@@ -21,27 +22,32 @@ namespace DF2D::Engine
 	}
 
 
-	LayoutMode RectTransform::ResolveLayoutMode() const
+	LayoutContext RectTransform::ResolveLayoutContext() const
 	{
+		auto context = LayoutContext();
+
 		// Only the immediate parent counts: a group arranges the children it holds, not every descendant.
 		auto parentGroup = GetGameObject()->GetComponentInParent<LayoutGroup>();
-
-		if (parentGroup == nullptr)
-			return LayoutMode::SELF_POSITIONED;
-
 		auto layoutElement = GetGameObject()->GetComponent<LayoutElement>();
 
-		return layoutElement != nullptr && layoutElement->IsIgnoringLayout()
-			? LayoutMode::SELF_POSITIONED
-			: LayoutMode::PARENT_DRIVEN;
-	}
+		auto ignoresGroup = layoutElement != nullptr && layoutElement->IsIgnoringLayout();
 
-	LayoutSizeSource RectTransform::ResolveSizeSource() const
-	{
-		// A LayoutElement is the deliberate override, so its presence alone hands it the size.
-		return GetGameObject()->GetComponent<LayoutElement>() != nullptr
+		context.mode = parentGroup != nullptr && !ignoresGroup
+			? LayoutMode::PARENT_DRIVEN
+			: LayoutMode::SELF_POSITIONED;
+
+		// Having a LayoutElement at all is enough: it writes the size.
+		context.sizeSource = layoutElement != nullptr
 			? LayoutSizeSource::LAYOUT_ELEMENT
 			: LayoutSizeSource::RECT_TRANSFORM;
+
+		if (auto fitter = GetGameObject()->GetComponent<ContentSizeFitter>())
+		{
+			context.horizontalFit = fitter->GetHorizontalFit();
+			context.verticalFit = fitter->GetVerticalFit();
+		}
+
+		return context;
 	}
 
 	void RectTransform::RefreshPlacement()
@@ -51,7 +57,7 @@ namespace DF2D::Engine
 
 	void RectTransform::ApplyPlacement()
 	{
-		for (const auto& resolved : RectTransformResolver::ResolveRectTransform(properties, ResolveLayoutMode(), ResolveSizeSource()))
+		for (const auto& resolved : RectTransformResolver::ResolveRectTransform(properties, ResolveLayoutContext()))
 		{
 			SetStyle(resolved.property, resolved.value);
 		}

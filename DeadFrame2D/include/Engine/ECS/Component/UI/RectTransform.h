@@ -1,8 +1,7 @@
 #pragma once
 #include "Core/Math/Vector2.h"
 #include "Data/Components/UI/Layout/UIAnchor.h"
-#include "Data/Components/UI/Layout/LayoutMode.h"
-#include "Data/Components/UI/Layout/LayoutSizeSource.h"
+#include "Data/Components/UI/Layout/LayoutContext.h"
 #include "Data/Components/UI/RectTransform/RectTransformProperties.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
@@ -38,9 +37,10 @@ namespace DF2D::Engine
 		Core::Vector2F localScale;
 
 
-		Data::LayoutMode ResolveLayoutMode() const;
-
-		Data::LayoutSizeSource ResolveSizeSource() const;
+		/**
+		 * @brief Reads the surrounding tree for everything that bears on how this element is laid out.
+		 */
+		Data::LayoutContext ResolveLayoutContext() const;
 
 		void ApplyPlacement();
 
