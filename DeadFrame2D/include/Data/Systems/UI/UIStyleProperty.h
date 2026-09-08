@@ -110,6 +110,9 @@ namespace DF2D::Data
 		// Interaction and navigation
 		POINTER_EVENTS,
 
+		/** @brief Whether the element can take keyboard focus, and so be navigated to. */
+		TAB_INDEX,
+
 		NAV_UP,
 
 		NAV_DOWN,
