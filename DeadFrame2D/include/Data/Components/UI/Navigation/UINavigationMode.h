@@ -4,13 +4,13 @@
 namespace DF2D::Data
 {
 	/**
-	 * @brief How focus decides where to go next from a widget, for one direction.
+	 * @brief How focus decides where to go next from a widget.
 	 *
-	 * A direction may instead name a particular widget outright, which is what SetNavigation does.
+	 * A widget may instead name its neighbours outright, which is what SetNavigationTarget does.
 	 */
 	enum class UINavigationMode
 	{
-		/** @brief Focus does not leave this widget in that direction. */
+		/** @brief Focus does not leave this widget in any direction. */
 		NONE,
 
 		/** @brief The nearest widget that way on screen, worked out from where things ended up. */
@@ -23,6 +23,14 @@ namespace DF2D::Data
 		VERTICAL,
 
 		/** @brief The next widget in the order they were added, regardless of where it sits. */
-		TREE_ORDER
+		TREE_ORDER,
+
+		/**
+		 * @brief Only the neighbours named with SetNavigationTarget are reachable.
+		 *
+		 * A direction with no target set goes nowhere, which is what keeps a menu's edges from
+		 * wandering into whatever happens to be laid out beyond them.
+		 */
+		EXPLICIT
 	};
 }
