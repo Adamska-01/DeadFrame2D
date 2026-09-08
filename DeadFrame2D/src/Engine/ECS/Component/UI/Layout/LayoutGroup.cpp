@@ -53,9 +53,9 @@ namespace DF2D::Engine
 
 	void LayoutGroup::ApplySpacing()
 	{
-		// Both axes, so the same value serves whichever direction the derived group arranges in, and
-		// keeps working when a grid wraps onto a second line. A gap rather than margins on each child:
-		// a margin would also appear outside the first and last, which is padding's job, not spacing's.
+		// Both axes, so the value works whichever direction the group arranges in, and still works when
+		// a grid wraps. A gap rather than child margins, which would also show outside the first and
+		// last child.
 		SetStyle(UIStyleProperty::ROW_GAP, StyleValues::ToPixels(spacing));
 		SetStyle(UIStyleProperty::COLUMN_GAP, StyleValues::ToPixels(spacing));
 	}

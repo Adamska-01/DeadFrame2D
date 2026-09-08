@@ -9,8 +9,8 @@ namespace DF2D::Engine
 	/**
 	 * @brief Base for containers that arrange their children instead of letting each place itself.
 	 *
-	 * A child under one of these becomes parent-driven: its RectTransform stops placing it and
-	 * contributes only the size it asks for.
+	 * A child of one of these no longer places itself: its RectTransform supplies the size and the
+	 * group decides the position.
 	 */
 	class DF2D_API LayoutGroup : public UIComponent
 	{

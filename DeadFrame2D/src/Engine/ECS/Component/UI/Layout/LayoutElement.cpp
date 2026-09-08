@@ -21,8 +21,8 @@ namespace DF2D::Engine
 		ApplyFlex();
 		ApplySizes();
 
-		// The rect transform may have resolved before this component existed, in which case it wrote
-		// the size properties this one now owns.
+		// The rect transform may have run first, before this component existed, and written the size
+		// properties this one now writes.
 		RefreshPlacement();
 	}
 
@@ -68,8 +68,8 @@ namespace DF2D::Engine
 
 		ignoreLayout = value;
 
-		// Position belongs to the rect transform, so this only records the intent and asks it to
-		// resolve again. Writing the position here would be the same two-owner problem in reverse.
+		// The rect transform writes the position, so this only records the flag and makes it re-apply.
+		// Writing the position here would mean two writers again.
 		RefreshPlacement();
 	}
 
@@ -111,8 +111,7 @@ namespace DF2D::Engine
 		SetStyle(UIStyleProperty::MIN_WIDTH, StyleValues::ToPixels(minSize.x));
 		SetStyle(UIStyleProperty::MIN_HEIGHT, StyleValues::ToPixels(minSize.y));
 
-		// A negative component means "no opinion", which is not the same as zero: the axis is left to
-		// the content rather than collapsed.
+		// A negative component means "unset", not zero: the axis is left to the content.
 		if (preferredSize.x >= 0.0f)
 		{
 			SetStyle(UIStyleProperty::WIDTH, StyleValues::ToPixels(preferredSize.x));

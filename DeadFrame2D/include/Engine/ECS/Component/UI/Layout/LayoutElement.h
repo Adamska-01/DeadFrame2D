@@ -33,7 +33,6 @@ namespace DF2D::Engine
 
 		void ApplySizes();
 
-		/** @brief Asks the rect transform to reconsider who places this element. */
 		void RefreshPlacement();
 
 
@@ -60,10 +59,9 @@ namespace DF2D::Engine
 		void SetPreferredSize(const Core::Vector2F& value);
 
 		/**
-		 * @brief Takes this element out of the group's arrangement, letting it place itself again.
+		 * @brief Takes this element out of the group's arrangement, so it places itself again.
 		 *
-		 * The rect transform goes back to positioning it against the parent's box, so it overlays the
-		 * laid-out children rather than taking a place among them.
+		 * Its RectTransform positions it against the parent's box, on top of the arranged children.
 		 */
 		void SetIgnoreLayout(bool value);
 
