@@ -7,6 +7,44 @@ namespace DF2D::Engine
 	using namespace DF2D::Data;
 
 
+	void IInteractableUI::ApplyNavigability()
+	{
+		// Keyboard focus is what navigation moves around, and what makes Enter activate this element.
+		SetStyle(UIStyleProperty::TAB_INDEX, interactable ? "auto" : "none");
+
+		// "auto" lets the backend work the neighbour out from where things actually ended up on screen,
+		// rather than the game maintaining four links per widget that break whenever a menu changes.
+		auto reachable = interactable ? "auto" : "none";
+
+		SetStyle(UIStyleProperty::NAV_UP, reachable);
+		SetStyle(UIStyleProperty::NAV_DOWN, reachable);
+		SetStyle(UIStyleProperty::NAV_LEFT, reachable);
+		SetStyle(UIStyleProperty::NAV_RIGHT, reachable);
+	}
+
+
+	void IInteractableUI::OnElementCreated()
+	{
+		ApplyNavigability();
+
+		if (focusRequested)
+		{
+			focusRequested = false;
+
+			element.Focus();
+		}
+
+		OnInteractableCreated();
+	}
+
+	void IInteractableUI::OnInteractableCreated()
+	{
+	}
+
+	void IInteractableUI::OnInteraction(UIEventType eventType, const UIEventPayload& payload)
+	{
+	}
+
 	void IInteractableUI::HandleUIEvent(UIEventType eventType, const UIEventPayload& payload)
 	{
 		// One rule, applied in one place: a widget that is not interactable takes part in no interaction
@@ -44,10 +82,6 @@ namespace DF2D::Engine
 		OnInteraction(eventType, payload);
 	}
 
-	void IInteractableUI::OnInteraction(UIEventType eventType, const UIEventPayload& payload)
-	{
-	}
-
 
 	void IInteractableUI::SetInteractable(bool value)
 	{
@@ -63,11 +97,30 @@ namespace DF2D::Engine
 		// Mirrored onto a class rather than relying on the backend's own disabled state, so a stylesheet
 		// can select it on any element kind, not just the ones with native disabled support.
 		SetClass("disabled", !value);
+
+		// A disabled widget must also drop out of navigation, or focus would still land on something
+		// that refuses every interaction once it gets there.
+		ApplyNavigability();
 	}
 
 	bool IInteractableUI::IsInteractable() const
 	{
 		return interactable;
+	}
+
+	void IInteractableUI::Focus()
+	{
+		// Components start in an order the engine does not define, so whoever wants focus first may ask
+		// before this widget has an element to give it. The request is kept and taken once there is one,
+		// the same way classes and stylesheets are replayed.
+		if (!element.IsValid())
+		{
+			focusRequested = true;
+
+			return;
+		}
+
+		element.Focus();
 	}
 
 	bool IInteractableUI::IsHovered() const

@@ -17,7 +17,7 @@ namespace DF2D::Engine
 		return UIElementType::CHECKBOX;
 	}
 
-	void Toggle::OnElementCreated()
+	void Toggle::OnInteractableCreated()
 	{
 		ApplyState();
 	}

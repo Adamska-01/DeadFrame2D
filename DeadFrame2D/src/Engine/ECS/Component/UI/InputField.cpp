@@ -41,7 +41,7 @@ namespace DF2D::Engine
 		return UIElementType::TEXT_INPUT;
 	}
 
-	void InputField::OnElementCreated()
+	void InputField::OnInteractableCreated()
 	{
 		ApplyMaxLength();
 		ApplyPlaceholder();

@@ -21,14 +21,25 @@ namespace DF2D::Engine
 	private:
 		bool interactable = true;
 
+		bool focusRequested = false;
+
+
+		/** @brief Writes whether focus, and so navigation, may land on this widget. */
+		void ApplyNavigability();
+
 
 	protected:
-		void HandleUIEvent(Data::UIEventType eventType, const Data::UIEventPayload& payload) override;
+		/** @brief Sealed: every interactable widget must end up focusable, whatever else it sets up. */
+		void OnElementCreated() final;
 
-		/**
-		 * @brief Called after UI events have been dispatched to add custom behavior.
-		 */
+		/** @brief Called once the element exists and is navigable, for a widget's own setup. */
+		virtual void OnInteractableCreated();
+
+		/** @brief Called after UI events have been dispatched to add custom behavior. */
 		virtual void OnInteraction(Data::UIEventType eventType, const Data::UIEventPayload& payload);
+
+
+		void HandleUIEvent(Data::UIEventType eventType, const Data::UIEventPayload& payload) override;
 
 
 	public:
@@ -60,6 +71,9 @@ namespace DF2D::Engine
 		void SetInteractable(bool value);
 
 		bool IsInteractable() const;
+
+		/** @brief Gives this widget keyboard focus, taking it from whatever held it before. */
+		void Focus();
 
 		/** @brief Whether the pointer is currently over this element. */
 		bool IsHovered() const;

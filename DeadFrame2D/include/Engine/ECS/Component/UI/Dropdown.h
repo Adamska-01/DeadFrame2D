@@ -34,7 +34,7 @@ namespace DF2D::Engine
 	protected:
 		Data::UIElementType GetElementType() const override;
 
-		void OnElementCreated() override;
+		void OnInteractableCreated() override;
 
 		void OnInteraction(Data::UIEventType eventType, const Data::UIEventPayload& payload) override;
 

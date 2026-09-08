@@ -19,7 +19,7 @@ namespace DF2D::Engine
 		return UIElementType::RANGE;
 	}
 
-	void Slider::OnElementCreated()
+	void Slider::OnInteractableCreated()
 	{
 		// Bounds before value: the backend clamps what it is given against the range it knows about, so
 		// a value written first would be measured against the default 0..100 and land somewhere else.

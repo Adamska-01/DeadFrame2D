@@ -24,7 +24,7 @@ namespace DF2D::Engine
 		return UIElementType::DROPDOWN;
 	}
 
-	void Dropdown::OnElementCreated()
+	void Dropdown::OnInteractableCreated()
 	{
 		ApplyOptions();
 		ApplySelection();

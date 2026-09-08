@@ -17,7 +17,7 @@ namespace DF2D::Engine
 		return UIElementType::BUTTON;
 	}
 
-	void Button::OnElementCreated()
+	void Button::OnInteractableCreated()
 	{
 		SetElementText(label);
 	}
