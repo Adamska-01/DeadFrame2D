@@ -4,18 +4,16 @@
 namespace DF2D::Data
 {
 	/**
-	 * @brief Which component decides how big a parent-driven element is.
+	 * @brief Which component writes the size of a parent-driven element.
 	 *
-	 * Two components can describe a size, and only one of them may write it. A RectTransform's
-	 * sizeDelta is the ordinary answer; when a LayoutElement is present, is the deliberate
-	 * override and takes the size and flex properties for itself.
+	 * Only one may write it.
 	 */
 	enum class LayoutSizeSource
 	{
-		/** @brief The rect transform's own sizeDelta, and a size that flex may not shrink. */
+		/** @brief The rect transform writes the size, from its sizeDelta. */
 		RECT_TRANSFORM,
 
-		/** @brief A LayoutElement on the same object, which the rect transform leaves alone. */
+		/** @brief A LayoutElement writes the size and the flex properties. The rect transform writes neither. */
 		LAYOUT_ELEMENT
 	};
 }
