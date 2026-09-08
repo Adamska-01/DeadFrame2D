@@ -97,6 +97,7 @@ namespace DF2D::Internal::RmlConversions
 		case Data::UIStyleProperty::TRANSFORM_ORIGIN_X:	return "transform-origin-x";
 		case Data::UIStyleProperty::TRANSFORM_ORIGIN_Y:	return "transform-origin-y";
 		case Data::UIStyleProperty::POINTER_EVENTS:		return "pointer-events";
+		case Data::UIStyleProperty::TAB_INDEX:			return "tab-index";
 		case Data::UIStyleProperty::NAV_UP:				return "nav-up";
 		case Data::UIStyleProperty::NAV_DOWN:			return "nav-down";
 		case Data::UIStyleProperty::NAV_LEFT:			return "nav-left";
