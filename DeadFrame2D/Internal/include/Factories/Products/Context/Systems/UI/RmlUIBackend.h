@@ -174,6 +174,10 @@ namespace DF2D::Internal
 
 		void ProcessTextInput(Data::UIContextID context, const std::string& text) override;
 
+		void Navigate(Data::UIContextID context, Data::UINavigationDirection direction) override;
+
+		void ActivateFocused(Data::UIContextID context) override;
+
 		bool HasKeyboardFocus(Data::UIContextID context) const override;
 
 		bool IsPointerOverElement(Data::UIContextID context) const override;

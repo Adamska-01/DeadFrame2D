@@ -652,6 +652,33 @@ namespace DF2D::Internal
 		entry->context->ProcessTextInput(Rml::String(text));
 	}
 
+	void RmlUIBackend::Navigate(UIContextID context, UINavigationDirection direction)
+	{
+		const auto* entry = FindContext(context);
+
+		if (entry == nullptr)
+			return;
+
+		// The library navigates from the arrow keys rather than from a call, so this is expressed as the
+		// key it already understands. Keeping that here is the point of the boundary: a gamepad stick
+		// has no business knowing it turns into a key press.
+		auto identifier = ToNavigationKey(direction);
+
+		entry->context->ProcessKeyDown(identifier, 0);
+		entry->context->ProcessKeyUp(identifier, 0);
+	}
+
+	void RmlUIBackend::ActivateFocused(UIContextID context)
+	{
+		const auto* entry = FindContext(context);
+
+		if (entry == nullptr)
+			return;
+
+		entry->context->ProcessKeyDown(Rml::Input::KI_RETURN, 0);
+		entry->context->ProcessKeyUp(Rml::Input::KI_RETURN, 0);
+	}
+
 	bool RmlUIBackend::HasKeyboardFocus(UIContextID context) const
 	{
 		const auto* entry = FindContext(context);

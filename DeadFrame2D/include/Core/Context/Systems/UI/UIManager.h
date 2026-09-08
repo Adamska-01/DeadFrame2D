@@ -11,6 +11,7 @@
 #include "Data/Systems/UI/UIContextID.h"
 #include "Data/Systems/UI/UIElementID.h"
 #include "Data/Systems/UI/UIElementType.h"
+#include "Data/Systems/UI/UINavigationDirection.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
@@ -103,6 +104,12 @@ namespace DF2D::Core
 		/** @brief The root element of a surface, which its canvas component adopts. */
 		Data::UIElementID GetRootElement(Data::UIContextID context) const;
 
+		/** @brief Moves keyboard focus to the nearest element in a direction. */
+		void Navigate(Data::UIContextID context, Data::UINavigationDirection direction);
+
+		/** @brief Activates whatever holds focus, as though it had been clicked. */
+		void ActivateFocused(Data::UIContextID context);
+
 		/** @brief Renders one surface into a draw list, ready to submit as a render task. */
 		Data::GeometryDrawList RenderContext(Data::UIContextID context);
 
@@ -132,6 +139,9 @@ namespace DF2D::Core
 
 		/** @brief Shows or hides the element, taking it out of layout entirely while hidden. */
 		void SetElementVisible(Data::UIElementID element, bool visible);
+
+		/** @brief Gives the element keyboard focus, taking it from whatever held it before. */
+		void FocusElement(Data::UIElementID element);
 
 		/** @brief Moves an element under a new parent. A negative index appends. */
 		void SetElementParent(Data::UIElementID element, Data::UIElementID parent, int siblingIndex);

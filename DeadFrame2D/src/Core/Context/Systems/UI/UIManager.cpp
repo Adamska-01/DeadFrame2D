@@ -172,6 +172,16 @@ namespace DF2D::Core
 		return backend->GetRootElement(context);
 	}
 
+	void UIManager::Navigate(UIContextID context, UINavigationDirection direction)
+	{
+		backend->Navigate(context, direction);
+	}
+
+	void UIManager::ActivateFocused(UIContextID context)
+	{
+		backend->ActivateFocused(context);
+	}
+
 	GeometryDrawList UIManager::RenderContext(UIContextID context)
 	{
 		return backend->RenderContext(context);
@@ -220,6 +230,11 @@ namespace DF2D::Core
 	void UIManager::SetElementVisible(UIElementID element, bool visible)
 	{
 		backend->SetElementVisible(element, visible);
+	}
+
+	void UIManager::FocusElement(UIElementID element)
+	{
+		backend->FocusElement(element);
 	}
 
 	void UIManager::SetElementParent(UIElementID element, UIElementID parent, int siblingIndex)

@@ -4,6 +4,7 @@
 #include "Data/Systems/Rendering/Pipeline/GeometryDrawList.h"
 #include "Data/Systems/UI/UIContextID.h"
 #include "Data/Systems/UI/UIElementType.h"
+#include "Data/Systems/UI/UINavigationDirection.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
 #include <string>
@@ -74,6 +75,12 @@ namespace DF2D::Core
 
 		/** @brief The root element every other element in this surface hangs from. */
 		UIElement GetRootElement() const;
+
+		/** @brief Moves keyboard focus to the nearest element in a direction. */
+		void Navigate(Data::UINavigationDirection direction);
+
+		/** @brief Activates whatever holds focus, as though it had been clicked. */
+		void ActivateFocused();
 
 		/** @brief Renders the surface into an ordered draw list, ready to submit as a render task. */
 		Data::GeometryDrawList Render();

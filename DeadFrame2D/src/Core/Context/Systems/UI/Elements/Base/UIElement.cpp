@@ -112,6 +112,14 @@ namespace DF2D::Core
 		}
 	}
 
+	void UIElement::Focus()
+	{
+		if (IsValid())
+		{
+			manager->FocusElement(id);
+		}
+	}
+
 	void UIElement::SetParent(const UIElement& parent, int siblingIndex)
 	{
 		if (IsValid() && parent.IsValid())

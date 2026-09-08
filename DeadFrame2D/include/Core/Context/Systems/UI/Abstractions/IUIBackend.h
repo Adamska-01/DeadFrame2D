@@ -7,6 +7,7 @@
 #include "Data/Systems/UI/UIContextID.h"
 #include "Data/Systems/UI/UIElementID.h"
 #include "Data/Systems/UI/UIElementType.h"
+#include "Data/Systems/UI/UINavigationDirection.h"
 #include "Data/Systems/UI/UIPseudoClass.h"
 #include "Data/Systems/UI/UIStyleProperty.h"
 #include "DF2D_API.h"
@@ -281,6 +282,20 @@ namespace DF2D::Core
 		* @brief Inserts composed text at the caret of the focused element.
 		*/
 		virtual void ProcessTextInput(Data::UIContextID context, const std::string& text) = 0;
+
+		/**
+		/**
+		 * @brief Moves keyboard focus to the nearest element in a direction.
+		 *
+		 * How the neighbour is chosen is the backend's business: it knows where everything ended up on
+		 * screen, which the component layer does not.
+		 */
+		virtual void Navigate(Data::UIContextID context, Data::UINavigationDirection direction) = 0;
+
+		/**
+		 * @brief Activates whatever currently holds focus, as though it had been clicked.
+		 */
+		virtual void ActivateFocused(Data::UIContextID context) = 0;
 
 		/**
 		* @brief Whether an element currently holds keyboard focus and is consuming typing.

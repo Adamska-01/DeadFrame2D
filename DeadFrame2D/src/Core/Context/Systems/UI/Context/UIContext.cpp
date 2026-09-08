@@ -55,6 +55,22 @@ namespace DF2D::Core
 		return IsValid() ? UIElement(manager, manager->GetRootElement(id)) : UIElement();
 	}
 
+	void UIContext::Navigate(UINavigationDirection direction)
+	{
+		if (IsValid())
+		{
+			manager->Navigate(id, direction);
+		}
+	}
+
+	void UIContext::ActivateFocused()
+	{
+		if (IsValid())
+		{
+			manager->ActivateFocused(id);
+		}
+	}
+
 	GeometryDrawList UIContext::Render()
 	{
 		return IsValid() ? manager->RenderContext(id) : GeometryDrawList{};

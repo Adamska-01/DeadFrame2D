@@ -77,6 +77,8 @@ namespace DF2D::Core
 
 		void SetVisible(bool visible);
 
+		void Focus();
+
 		void SetParent(const UIElement& parent, int siblingIndex);
 
 		RectF GetRect() const;
