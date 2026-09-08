@@ -175,7 +175,7 @@ TEST_CASE("A parent-driven element stays in the flow its parent arranges")
 {
 	auto properties = Pinned(Vector2F(0.5f, 0.5f), Vector2F(0.5f, 0.5f), Vector2F(40.0f, 90.0f), Vector2F(120.0f, 32.0f));
 
-	auto resolved = RectTransformResolver::ResolveRectTransform(properties, LayoutMode::PARENT_DRIVEN);
+	auto resolved = RectTransformResolver::ResolveRectTransform(properties, LayoutContext{ .mode = LayoutMode::PARENT_DRIVEN });
 
 	// Absolute positioning would take it out of flow, which is exactly where a layout group needs it.
 	CHECK(ValueOf(resolved, UIStyleProperty::POSITION) == "relative");
@@ -194,7 +194,7 @@ TEST_CASE("A parent-driven element clears the placement it set while positioning
 {
 	auto properties = Pinned(Vector2F(1.0f, 1.0f), Vector2F(1.0f, 1.0f), Vector2F(-24.0f, -24.0f), Vector2F(200.0f, 40.0f));
 
-	auto resolved = RectTransformResolver::ResolveRectTransform(properties, LayoutMode::PARENT_DRIVEN);
+	auto resolved = RectTransformResolver::ResolveRectTransform(properties, LayoutContext{ .mode = LayoutMode::PARENT_DRIVEN });
 
 	// These are inline properties, so an element reparented into a group still carries whatever it
 	// wrote while it was placing itself. Only writing them back off actually removes them.
@@ -217,7 +217,7 @@ TEST_CASE("A parent-driven element that stretches lets the parent decide that ax
 		.sizeDelta = Vector2F(0.0f, 56.0f)
 	};
 
-	auto resolved = RectTransformResolver::ResolveRectTransform(properties, LayoutMode::PARENT_DRIVEN);
+	auto resolved = RectTransformResolver::ResolveRectTransform(properties, LayoutContext{ .mode = LayoutMode::PARENT_DRIVEN });
 
 	// "As much as the parent gives me" is the parent's to hand out in flow, not a fraction this
 	// element can name for itself.
@@ -233,14 +233,12 @@ TEST_CASE("Placing itself is what an element does unless told otherwise")
 	CHECK(ValueOf(RectTransformResolver::ResolveRectTransform(properties), UIStyleProperty::POSITION) == "absolute");
 }
 
+
 TEST_CASE("A layout element takes the size and flex properties off the rect transform")
 {
 	auto properties = Pinned(Vector2F(0.5f, 0.5f), Vector2F(0.5f, 0.5f), Vector2F::Zero, Vector2F(120.0f, 32.0f));
 
-	auto resolved = RectTransformResolver::ResolveRectTransform(
-		properties,
-		LayoutMode::PARENT_DRIVEN,
-		LayoutSizeSource::LAYOUT_ELEMENT);
+	auto resolved = RectTransformResolver::ResolveRectTransform(properties, LayoutContext{ .mode = LayoutMode::PARENT_DRIVEN, .sizeSource = LayoutSizeSource::LAYOUT_ELEMENT });
 
 	// Two components describing one box, with whichever applied last winning, is the failure this
 	// ownership exists to prevent.
@@ -258,7 +256,7 @@ TEST_CASE("Sizing belongs to the rect transform when nothing overrides it")
 {
 	auto properties = Pinned(Vector2F(0.5f, 0.5f), Vector2F(0.5f, 0.5f), Vector2F::Zero, Vector2F(120.0f, 32.0f));
 
-	auto resolved = RectTransformResolver::ResolveRectTransform(properties, LayoutMode::PARENT_DRIVEN);
+	auto resolved = RectTransformResolver::ResolveRectTransform(properties, LayoutContext{ .mode = LayoutMode::PARENT_DRIVEN });
 
 	CHECK(NumberIn(ValueOf(resolved, UIStyleProperty::WIDTH)) == doctest::Approx(120.0f));
 }
@@ -268,14 +266,57 @@ TEST_CASE("An element placing itself is unaffected by who owns its size")
 {
 	auto properties = Pinned(Vector2F(0.0f, 0.0f), Vector2F(0.0f, 0.0f), Vector2F(16.0f, 16.0f), Vector2F(64.0f, 64.0f));
 
-	auto owned = RectTransformResolver::ResolveRectTransform(
-		properties,
-		LayoutMode::SELF_POSITIONED,
-		LayoutSizeSource::LAYOUT_ELEMENT);
+	auto owned = RectTransformResolver::ResolveRectTransform(properties, LayoutContext{ .mode = LayoutMode::SELF_POSITIONED, .sizeSource = LayoutSizeSource::LAYOUT_ELEMENT });
 
 	// There is no group to override, so the anchor model still resolves in full.
 	CHECK(ValueOf(owned, UIStyleProperty::POSITION) == "absolute");
 	CHECK(NumberIn(ValueOf(owned, UIStyleProperty::WIDTH)) == doctest::Approx(64.0f));
+}
+
+
+TEST_CASE("A fitted axis follows its content while the other keeps the size it was given")
+{
+	auto properties = Pinned(Vector2F(0.5f, 0.5f), Vector2F(0.5f, 0.5f), Vector2F::Zero, Vector2F(200.0f, 40.0f));
+
+	auto resolved = RectTransformResolver::ResolveRectTransform(
+		properties,
+		LayoutContext{ .verticalFit = SizeFitMode::FIT_CONTENT });
+
+	// "Fixed width, height follows the text" is the ordinary case, so fitting is per axis.
+	CHECK(NumberIn(ValueOf(resolved, UIStyleProperty::WIDTH)) == doctest::Approx(200.0f));
+	CHECK(ValueOf(resolved, UIStyleProperty::HEIGHT) == "auto");
+}
+
+
+TEST_CASE("Content fitting applies while a parent lays the element out too")
+{
+	auto properties = Pinned(Vector2F(0.5f, 0.5f), Vector2F(0.5f, 0.5f), Vector2F::Zero, Vector2F(200.0f, 40.0f));
+
+	auto resolved = RectTransformResolver::ResolveRectTransform(
+		properties,
+		LayoutContext{ .mode = LayoutMode::PARENT_DRIVEN, .horizontalFit = SizeFitMode::FIT_CONTENT });
+
+	CHECK(ValueOf(resolved, UIStyleProperty::WIDTH) == "auto");
+	CHECK(NumberIn(ValueOf(resolved, UIStyleProperty::HEIGHT)) == doctest::Approx(40.0f));
+}
+
+
+TEST_CASE("A layout element leaves content fitting nothing to modify")
+{
+	auto properties = Pinned(Vector2F(0.5f, 0.5f), Vector2F(0.5f, 0.5f), Vector2F::Zero, Vector2F(200.0f, 40.0f));
+
+	auto resolved = RectTransformResolver::ResolveRectTransform(
+		properties,
+		LayoutContext
+		{
+			.mode = LayoutMode::PARENT_DRIVEN,
+			.sizeSource = LayoutSizeSource::LAYOUT_ELEMENT,
+			.horizontalFit = SizeFitMode::FIT_CONTENT
+		});
+
+	// The override owns the size outright, so no size is written here at all.
+	CHECK(ValueOf(resolved, UIStyleProperty::WIDTH).empty());
+	CHECK(ValueOf(resolved, UIStyleProperty::HEIGHT).empty());
 }
 
 
