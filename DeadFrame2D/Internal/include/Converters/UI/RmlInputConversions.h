@@ -1,5 +1,6 @@
 #pragma once
 #include "Data/Systems/UI/KeyModifiers.h"
+#include "Data/Systems/UI/UINavigationDirection.h"
 #include "Models/Input/Controls/KeyboardKeyCode.h"
 #include "Models/Input/Controls/MouseButtonCode.h"
 #include <RmlUi/Core/Input.h>
@@ -7,7 +8,23 @@
 
 namespace DF2D::Internal::RmlInputConversions
 {
-	/** @brief Translates the engine's modifier flags into the bitmask the UI library expects. */
+	/**
+	* @brief The arrow key the UI library navigates with for a given direction.
+	*/
+	inline Rml::Input::KeyIdentifier ToNavigationKey(Data::UINavigationDirection direction)
+	{
+		switch (direction)
+		{
+		case Data::UINavigationDirection::UP:		return Rml::Input::KI_UP;
+		case Data::UINavigationDirection::DOWN:		return Rml::Input::KI_DOWN;
+		case Data::UINavigationDirection::LEFT:		return Rml::Input::KI_LEFT;
+		default:									return Rml::Input::KI_RIGHT;
+		}
+	}
+
+	/**
+	* @brief Translates the engine's modifier flags into the bitmask the UI library expects.
+	*/
 	inline int ToKeyModifierState(Data::KeyModifiers modifiers)
 	{
 		auto state = 0;
@@ -27,7 +44,9 @@ namespace DF2D::Internal::RmlInputConversions
 		return state;
 	}
 
-	/** @brief Button indices the UI library uses: left 0, right 1, middle 2. */
+	/**
+	* @brief Button indices the UI library uses: left 0, right 1, middle 2.
+	*/
 	inline int ToButtonIndex(Models::MouseButtonCode button)
 	{
 		switch (button)
