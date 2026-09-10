@@ -19,6 +19,30 @@ namespace DF2D::Core
 	{
 		// Must match the font-family in the engine default stylesheet.
 		constexpr std::string_view DefaultFontFamily = "DeadFrame";
+
+		/**
+		 * @brief Keys used by the UI for navigation or activation.
+		 *
+		 * These are handled by the action layer, so forwarding them to the UI as well would trigger
+		 * the same action twice.
+		 */
+		bool IsNavigationKey(Models::KeyboardKeyCode key)
+		{
+			switch (key)
+			{
+			case Models::KeyboardKeyCode::UP:
+			case Models::KeyboardKeyCode::DOWN:
+			case Models::KeyboardKeyCode::LEFT:
+			case Models::KeyboardKeyCode::RIGHT:
+			case Models::KeyboardKeyCode::ENTER:
+			case Models::KeyboardKeyCode::KP_ENTER:
+			case Models::KeyboardKeyCode::SPACE:
+				return true;
+
+			default:
+				return false;
+			}
+		}
 	}
 
 
@@ -122,7 +146,12 @@ namespace DF2D::Core
 					}
 					else if constexpr (std::is_same_v<T, KeyEvent>)
 					{
-						backend->ProcessKey(context, event.key, event.pressed, event.modifiers);
+						// Text fields need all keys, including arrows and Enter.
+						// Other navigation keys are handled by the action layer.
+						if (backend->HasKeyboardFocus(context) || !IsNavigationKey(event.key))
+						{
+							backend->ProcessKey(context, event.key, event.pressed, event.modifiers);
+						}
 					}
 					else if constexpr (std::is_same_v<T, TextInputEvent>)
 					{
