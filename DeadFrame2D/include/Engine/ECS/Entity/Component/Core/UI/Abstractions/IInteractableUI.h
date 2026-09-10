@@ -1,8 +1,12 @@
 #pragma once
+#include "Data/Components/UI/Navigation/UINavigationMode.h"
+#include "Data/Systems/UI/UINavigationDirection.h"
 #include "Data/Systems/UI/UIPseudoClass.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/UI/UIComponent.h"
 #include "Utilities/Delegates/MulticastDelegate.h"
+#include <array>
+#include <string>
 
 
 namespace DF2D::Engine
@@ -22,6 +26,14 @@ namespace DF2D::Engine
 		bool interactable = true;
 
 		bool focusRequested = false;
+
+		Data::UINavigationMode navigationMode = Data::UINavigationMode::AUTOMATIC;
+
+		/** @brief Named neighbour per direction, indexed by UINavigationDirection. Empty means unset. */
+		std::array<std::string, 4> navigationTargets;
+
+		/** @brief This widget's element id, assigned only once something navigates to it. */
+		std::string navigationId;
 
 
 		/** @brief Writes whether focus, and so navigation, may land on this widget. */
@@ -74,6 +86,21 @@ namespace DF2D::Engine
 
 		/** @brief Gives this widget keyboard focus, taking it from whatever held it before. */
 		void Focus();
+
+		/** @brief Sets how focus moves away from this widget. */
+		void SetNavigationMode(Data::UINavigationMode mode);
+
+		/**
+		 * @brief Sets the widget to focus in the given direction.
+		 *
+		 * Setting a target switches the navigation mode to EXPLICIT. Passing a null handle clears the target.
+		 */
+		void SetNavigationTarget(Data::UINavigationDirection direction, const ComponentHandle<IInteractableUI>& target);
+
+		Data::UINavigationMode GetNavigationMode() const;
+
+		/** @brief The element id other widgets navigate to this one by, assigned on first use. */
+		const std::string& NavigationId();
 
 		/** @brief Whether the pointer is currently over this element. */
 		bool IsHovered() const;
