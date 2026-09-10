@@ -1,8 +1,3 @@
-// Input Keys:
-// Keyboard -> SDL_Scancode (https://wiki.libsdl.org/SDL2/SDL_Scancode)
-// Mouse -> SDL_MouseButtonFlags (https://wiki.libsdl.org/SDL3/SDL_MouseButtonFlags)
-// Controller -> SDL_GameControllerButton (https://wiki.libsdl.org/SDL2/SDL_GameControllerButton)
-
 {
 	"actionMaps": [
 		{
@@ -25,16 +20,6 @@
 				},
 				{
 					"name": "Pause",
-					"type": "Button",
-					"valueType": "Bool"
-				},
-				{
-					"name": "Confirm",
-					"type": "Button",
-					"valueType": "Bool"
-				},
-				{
-					"name": "Back",
 					"type": "Button",
 					"valueType": "Bool"
 				}
@@ -129,12 +114,67 @@
 						"controlType": "Digital",
 						"value": "Start"
 					}
+				}
+			]
+		},
+		{
+			// Drives a controller around the UI. The keyboard needs no bindings here: arrows, Tab and
+			// Enter already reach the UI as ordinary key events, which is also why input capture blocks
+			// keyboard actions but never controller ones.
+			"name": "UI",
+			"actions": [
+				{
+					"name": "Navigate",
+					"type": "Value",
+					"valueType": "Vector2"
+				},
+				{
+					"name": "Submit",
+					"type": "Button",
+					"valueType": "Bool"
+				},
+				{
+					"name": "Cancel",
+					"type": "Button",
+					"valueType": "Bool"
+				}
+			],
+			"bindings": [
+				{
+					"name": "Navigate_Keyboard",
+					"action": "Navigate",
+					"input": {
+						"inputDeviceType": "Keyboard",
+						"bindingType": "Composite2D",
+						"controlType": "Digital",
+						"value": {
+							"up": "Up",
+							"down": "Down",
+							"left": "Left",
+							"right": "Right"
+						}
+					}
+				},
+				{
+					"name": "Navigate_ControllerDPad",
+					"action": "Navigate",
+					"input": {
+						"inputDeviceType": "Controller",
+						"bindingType": "Composite2D",
+						"controlType": "Digital",
+						"value": {
+							"up": "DpadUp",
+							"down": "DpadDown",
+							"left": "DpadLeft",
+							"right": "DpadRight"
+						}
+					}
 				},
 
-				/* CONFIRM */
+				/* SUBMIT */
 				{
-					"name": "Confirm_Keyboard",
-					"action": "Confirm",
+					"name": "Submit_Keyboard",
+					"action": "Submit",
 					"input": {
 						"inputDeviceType": "Keyboard",
 						"bindingType": "Simple",
@@ -143,8 +183,18 @@
 					}
 				},
 				{
-					"name": "Confirm_Controller",
-					"action": "Confirm",
+					"name": "Submit_Keyboard2",
+					"action": "Submit",
+					"input": {
+						"inputDeviceType": "Keyboard",
+						"bindingType": "Simple",
+						"controlType": "Digital",
+						"value": "Space"
+					}
+				},
+				{
+					"name": "Submit_Controller",
+					"action": "Submit",
 					"input": {
 						"inputDeviceType": "Controller",
 						"bindingType": "Simple",
@@ -153,10 +203,10 @@
 					}
 				},
 
-				/* BACK */
+				/* CANCEL */
 				{
-					"name": "Back_Keyboard",
-					"action": "Back",
+					"name": "Cancel_Keyboard",
+					"action": "Cancel",
 					"input": {
 						"inputDeviceType": "Keyboard",
 						"bindingType": "Simple",
@@ -165,8 +215,8 @@
 					}
 				},
 				{
-					"name": "Back_Controller",
-					"action": "Back",
+					"name": "Cancel_Controller",
+					"action": "Cancel",
 					"input": {
 						"inputDeviceType": "Controller",
 						"bindingType": "Simple",
