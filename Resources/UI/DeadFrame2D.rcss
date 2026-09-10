@@ -131,6 +131,14 @@ input.range sliderarrowinc
 	display: none;
 }
 
+/*
+	A range draws no border of its own, so a border colour has nothing to colour. Its bar is what the
+	eye follows, so that is what says the slider has focus.
+*/
+input.range:focus sliderbar
+{
+	background-color: #ff8c00ff;
+}
 
 /* --- Select ------------------------------------------------------------------------------------ */
 
@@ -233,15 +241,6 @@ input.checkbox:focus,
 input.range:focus
 {
 	border-color: #ff8c00ff;
-}
-
-/*
-	A range draws no border of its own, so a border colour has nothing to colour. Its bar is what the
-	eye follows, so that is what says the slider has focus.
-*/
-input.range:focus sliderbar
-{
-	background-color: #ff8c00ff;
 }
 
 button:focus
