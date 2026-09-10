@@ -688,8 +688,22 @@ namespace DF2D::Internal
 
 		auto* focused = entry->context->GetFocusElement();
 
-		// The document itself always holds focus when nothing else does, so it does not count.
-		return focused != nullptr && focused != static_cast<Rml::Element*>(entry->document);
+		// The document has focus when nothing else is focused.
+		if (focused == nullptr || focused == static_cast<Rml::Element*>(entry->document))
+			return false;
+
+		// Only text fields should take keyboard input away from the game.
+		auto tag = focused->GetTagName();
+
+		if (tag == "textarea")
+			return true;
+
+		if (tag != "input")
+			return false;
+
+		auto type = focused->GetAttribute<Rml::String>("type", "text");
+
+		return type == "text" || type == "password";
 	}
 
 	bool RmlUIBackend::IsPointerOverElement(UIContextID context) const
