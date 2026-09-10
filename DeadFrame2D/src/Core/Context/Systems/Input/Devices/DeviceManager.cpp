@@ -20,8 +20,13 @@ namespace DF2D::Core
 	using namespace DF2D::Utilities;
 
 
-	DeviceManager::DeviceManager(IInputActionHandler* actionHandler, EventDispatcher& eventDispatcher, std::function<void(InputDeviceID)> onDeviceRemoved)
+	DeviceManager::DeviceManager(
+		IInputActionHandler* actionHandler,
+		EventDispatcher& eventDispatcher,
+		std::function<void(InputDeviceID)> onDeviceAdded,
+		std::function<void(InputDeviceID)> onDeviceRemoved)
 		: eventDispatcher(eventDispatcher),
+		onDeviceAdded(std::move(onDeviceAdded)),
 		onDeviceRemoved(std::move(onDeviceRemoved))
 	{
 		this->actionHandler = Guard::AgainstNullAssignment(actionHandler, NAME_OF(actionHandler));
@@ -91,6 +96,12 @@ namespace DF2D::Core
 		if (currentController == nullptr)
 		{
 			currentController = devicePtr;
+		}
+
+		// Paired before the event goes out, so a listener that asks who owns the device gets an answer.
+		if (onDeviceAdded)
+		{
+			onDeviceAdded(devicePtr->ID());
 		}
 
 		std::cout << "[Input] Device added: " << devicePtr->Name() << " (ID: " << devicePtr->ID() << ")" << std::endl;

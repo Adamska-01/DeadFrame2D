@@ -37,17 +37,13 @@ namespace DF2D::Engine
 
 	void UINavigator::NavigateHandler(const InputActionView& action)
 	{
+		if (!action.IsStarted())
+			return;
+
 		auto value = action.ReadValue<Vector2F>();
 
-		// A stick that is merely resting somewhere is not a request to keep moving, so focus travels on
-		// the push rather than every frame the stick is held. Holding a direction to repeat would need a
-		// delay and a rate, which is a decision for whoever wants it.
 		if (std::abs(value.x) < NavigationDeadzone && std::abs(value.y) < NavigationDeadzone)
-		{
-			wasNavigating = false;
-
 			return;
-		}
 
 		// The larger axis wins outright: a diagonal push means one of the two, never both.
 		//
@@ -57,21 +53,14 @@ namespace DF2D::Engine
 			? (value.x > 0.0f ? UINavigationDirection::RIGHT : UINavigationDirection::LEFT)
 			: (value.y > 0.0f ? UINavigationDirection::UP : UINavigationDirection::DOWN);
 
-		if (wasNavigating && direction == lastDirection)
-			return;
-
-		wasNavigating = true;
-		lastDirection = direction;
-
 		if (canvas != nullptr)
 		{
 			canvas->GetContext().Navigate(direction);
 		}
 	}
-
 	void UINavigator::SubmitHandler(const InputActionView& action)
 	{
-		if (canvas != nullptr && action.ReadValue<bool>())
+		if (canvas != nullptr && action.IsStarted())
 		{
 			canvas->GetContext().ActivateFocused();
 		}
@@ -79,7 +68,7 @@ namespace DF2D::Engine
 
 	void UINavigator::CancelHandler(const InputActionView& action)
 	{
-		if (action.ReadValue<bool>())
+		if (action.IsStarted())
 		{
 			OnCancel.Broadcast();
 		}

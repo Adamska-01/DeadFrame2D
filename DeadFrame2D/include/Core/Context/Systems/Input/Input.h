@@ -1,6 +1,8 @@
 #pragma once
 #include "Core/Context/Abstractions/ICoreSystem.h"
 #include "Core/Services/Events/Abstractions/ISystemEventSink.h"
+#include "Data/Systems/Input/InputDeviceID.h"
+#include "Data/Systems/Input/InputUserID.h"
 #include "DF2D_API.h"
 #include <memory>
 
@@ -36,6 +38,13 @@ namespace DF2D::Core
 		std::unique_ptr<DeviceManager> deviceManager;
 
 		std::unique_ptr<InputUserManager> userManager;
+
+
+		/** @brief Gives a newly created user any controller that nobody has claimed yet. */
+		void PairUnpairedControllers(Data::InputUserID userID);
+
+		/** @brief Gives a newly connected controller to the first user that has none. */
+		void PairControllerToFreeUser(Data::InputDeviceID deviceID);
 
 
 		void BeginFrame() override;

@@ -33,10 +33,6 @@ namespace DF2D::Engine
 
 		Data::UINavigationActions actions;
 
-		/** @brief Last direction acted on, so holding a stick moves focus once rather than every frame. */
-		Data::UINavigationDirection lastDirection = Data::UINavigationDirection::UP;
-
-		bool wasNavigating = false;
 
 
 		/** @brief Registers one action and says so plainly if the name does not resolve to anything. */

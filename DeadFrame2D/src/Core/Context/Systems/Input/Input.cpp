@@ -1,7 +1,9 @@
 #include "Core/Context/Systems/Input/Abstractions/IInputCaptureState.h"
 #include "Core/Context/Systems/Input/Actions/InputActionResolver.h"
 #include "Core/Context/Systems/Input/Devices/DeviceManager.h"
+#include "Core/Context/Systems/Input/Devices/DeviceTypes/Abstractions/InputDevice.h"
 #include "Core/Context/Systems/Input/Input.h"
+#include "Core/Context/Systems/Input/User/InputUser.h"
 #include "Core/Context/Systems/Input/User/InputUserManager.h"
 #include "Models/Input/ActionMap/InputActionMapBucket.h"
 
@@ -26,6 +28,9 @@ namespace DF2D::Core
 			[this](InputUserID userID)
 			{
 				actionResolver->AddUser(userID);
+
+				// A controller already plugged in when the user appears belongs to that user.
+				PairUnpairedControllers(userID);
 			},
 			[this](InputUserID userID)
 			{
@@ -40,6 +45,10 @@ namespace DF2D::Core
 			eventDispatcher,
 			[this](InputDeviceID deviceID)
 			{
+				PairControllerToFreeUser(deviceID);
+			},
+			[this](InputDeviceID deviceID)
+			{
 				userManager->UnpairDevice(userManager->GetUserFromPairedDevice(deviceID), deviceID);
 			});
 	}
@@ -47,6 +56,59 @@ namespace DF2D::Core
 	Input::~Input()
 	{
 	}
+
+
+	void Input::PairUnpairedControllers(InputUserID userID)
+	{
+		auto* user = userManager->GetUser(userID);
+
+		if (user == nullptr || deviceManager == nullptr)
+			return;
+
+		for (auto* device : deviceManager->GetAllDevices())
+		{
+			if (device == nullptr || device->Type() != Models::InputDeviceType::CONTROLLER)
+				continue;
+
+			if (userManager->GetUserFromPairedDevice(device->ID()) != nullptr)
+				continue;
+
+			userManager->PairDeviceToUser(user, device->ID());
+		}
+	}
+
+	void Input::PairControllerToFreeUser(InputDeviceID deviceID)
+	{
+		auto* device = deviceManager != nullptr ? deviceManager->GetDevice(deviceID) : nullptr;
+
+		if (device == nullptr || device->Type() != Models::InputDeviceType::CONTROLLER)
+			return;
+
+		if (userManager->GetUserFromPairedDevice(deviceID) != nullptr)
+			return;
+
+		// The first user without a controller takes it, so plugging one in mid-game reaches whoever is
+		// playing rather than waiting for a user that will never be created.
+		for (auto* user : userManager->GetAllUsers())
+		{
+			auto hasController = false;
+
+			for (auto pairedID : userManager->GetDevicesPairedToUser(user->ID()))
+			{
+				auto* paired = deviceManager->GetDevice(pairedID);
+
+				hasController = hasController || (paired != nullptr && paired->Type() == Models::InputDeviceType::CONTROLLER);
+			}
+
+			if (!hasController)
+			{
+				userManager->PairDeviceToUser(user, deviceID);
+
+				return;
+			}
+		}
+	}
+
 
 	void Input::OnSystemEvent(const SystemEvent& systemEvent)
 	{

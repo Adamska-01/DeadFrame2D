@@ -42,6 +42,8 @@ namespace DF2D::Core
 
 		IInputActionHandler* actionHandler = nullptr;
 
+		std::function<void(Data::InputDeviceID)> onDeviceAdded;
+
 		std::function<void(Data::InputDeviceID)> onDeviceRemoved;
 
 
@@ -58,7 +60,11 @@ namespace DF2D::Core
 
 
 	public:
-		DeviceManager(IInputActionHandler* actionHandler, Engine::EventDispatcher& eventDispatcher, std::function<void(Data::InputDeviceID)> onDeviceRemoved = {});
+		DeviceManager(
+			IInputActionHandler* actionHandler,
+			Engine::EventDispatcher& eventDispatcher,
+			std::function<void(Data::InputDeviceID)> onDeviceAdded = {},
+			std::function<void(Data::InputDeviceID)> onDeviceRemoved = {});
 
 		~DeviceManager() override;
 

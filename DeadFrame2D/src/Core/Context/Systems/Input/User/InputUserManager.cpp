@@ -173,6 +173,8 @@ namespace DF2D::Core
 		if (std::find(devices.begin(), devices.end(), deviceID) == devices.end())
 		{
 			devices.push_back(deviceID);
+
+			std::cout << "[Input] Device " << deviceID << " paired to " << user->Name() << "." << std::endl;
 		}
 	}
 
