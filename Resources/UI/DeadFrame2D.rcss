@@ -235,6 +235,15 @@ input.range:focus
 	border-color: #ff8c00ff;
 }
 
+/*
+	A range draws no border of its own, so a border colour has nothing to colour. Its bar is what the
+	eye follows, so that is what says the slider has focus.
+*/
+input.range:focus sliderbar
+{
+	background-color: #ff8c00ff;
+}
+
 button:focus
 {
 	background-color: #3d3d50ff;
