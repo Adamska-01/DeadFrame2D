@@ -220,3 +220,22 @@ scrollbarhorizontal sliderarrowinc
 {
 	display: none;
 }
+
+
+/* --- Focus ------------------------------------------------------------------------------------- */
+
+/*
+	Navigation that cannot be seen is navigation nobody can use, so anything reachable by keyboard or
+	gamepad says so. A game theme is expected to replace this; what it must not do is remove it.
+*/
+button:focus,
+input.checkbox:focus,
+input.range:focus
+{
+	border-color: #ff8c00ff;
+}
+
+button:focus
+{
+	background-color: #3d3d50ff;
+}
