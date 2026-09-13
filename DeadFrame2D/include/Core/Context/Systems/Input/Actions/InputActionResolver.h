@@ -6,6 +6,7 @@
 #include "Core/Context/Systems/Input/Actions/ActionMapIndex.h"
 #include "Core/Context/Systems/Input/Actions/ActionPhase.h"
 #include "Core/Context/Systems/Input/User/Abstractions/IUserDevicePairings.h"
+#include "Data/Systems/Input/InputControlState.h"
 #include "Data/Systems/Input/InputUserID.h"
 #include "DF2D_API.h"
 #include "Models/Input/ActionMap/InputActionMapBucket.h"
@@ -45,6 +46,14 @@ namespace DF2D::Core
 		 */
 		const IInputCaptureState* captureState = nullptr;
 
+		bool keyboardCapturedThisFrame = false;
+
+		bool pointerCapturedThisFrame = false;
+
+		std::unordered_map<int, bool> keyboardControlCapture;
+
+		std::unordered_map<int, bool> pointerControlCapture;
+
 		std::unordered_map<Data::InputUserID, ActionMapIndex> runtimeActionMaps;
 
 		std::unordered_map<Data::InputUserID, std::unordered_set<RuntimeInputAction*>> activeActions;
@@ -53,7 +62,20 @@ namespace DF2D::Core
 
 
 		/** @brief Whether the UI has claimed the kind of input this device produces. */
-		bool IsCapturedBy(const InputDevice& device) const;
+		bool IsCapturedBy(const InputDevice& device, int controlID);
+
+		/**
+		 * @brief Resolves and latches the capture decision for one physical control across its press.
+		 * @param latch Per-control latch for this device's kind of capture (keyboard or pointer).
+		 * @param controlID The physical control this call concerns.
+		 * @param liveCapturedThisFrame This frame's capture snapshot, used only on a fresh press edge.
+		 * @param state The control's current edge state (pressed/held/released).
+		 */
+		bool ResolveLatchedCapture(
+			std::unordered_map<int, bool>& latch,
+			int controlID,
+			bool liveCapturedThisFrame,
+			const Data::InputControlState& state);
 
 		ActionPhase ResolvePhase(bool started, bool held, bool cancelled);
 

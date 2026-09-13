@@ -9,6 +9,7 @@
 #include "Engine/ECS/Entity/Component/Core/UI/Abstractions/IInteractableUI.h"
 #include "Utilities/Delegates/MulticastDelegate.h"
 #include <functional>
+#include <optional>
 #include <string>
 
 
@@ -33,6 +34,18 @@ namespace DF2D::Engine
 
 		Data::UINavigationActions actions;
 
+		/** @brief The direction currently being held, if any. Empty means nothing is pushed. */
+		std::optional<Data::UINavigationDirection> heldDirection;
+
+		/** @brief Seconds left before the held direction moves focus again. */
+		float repeatTimer;
+
+		/** @brief Seconds a direction must be held before it starts repeating. */
+		float repeatDelay;
+
+		/** @brief Seconds between repeats once one has started. */
+		float repeatRate;
+
 
 
 		/** @brief Registers one action and says so plainly if the name does not resolve to anything. */
@@ -45,6 +58,9 @@ namespace DF2D::Engine
 
 		void CancelHandler(const Core::InputActionView& action);
 
+		/** @brief Moves focus one step, if there is a canvas to move it on. */
+		void Move(Data::UINavigationDirection direction);
+
 
 	public:
 		UINavigator();
@@ -55,6 +71,8 @@ namespace DF2D::Engine
 		void Init() override;
 
 		void Start() override;
+
+		void Update(float deltaTime) override;
 
 
 		/** @brief Fired when the player asks to back out. What that means is the game's to decide. */
@@ -73,5 +91,12 @@ namespace DF2D::Engine
 		void SetActions(const Data::UINavigationActions& value);
 
 		const Data::UINavigationActions& GetActions() const;
+
+		/**
+		 * @brief Sets how long a held direction waits before repeating, and how fast it repeats after.
+		 *
+		 * A press always moves focus once immediately; these only govern what holding does next.
+		 */
+		void SetRepeatTiming(float delaySeconds, float rateSeconds);
 	};
 }

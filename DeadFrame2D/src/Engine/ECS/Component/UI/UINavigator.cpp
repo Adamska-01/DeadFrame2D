@@ -2,6 +2,7 @@
 #include "Engine/ECS/Component/UI/UINavigator.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include "Utilities/Debugging/Guards.h"
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 
@@ -15,10 +16,15 @@ namespace DF2D::Engine
 	namespace
 	{
 		constexpr auto NavigationDeadzone = 0.5f;
+
+		constexpr auto MinimumRepeatRate = 0.001f;
 	}
 
 
 	UINavigator::UINavigator()
+		: repeatTimer(0.0f),
+		repeatDelay(0.4f),
+		repeatRate(0.1f)
 	{
 	}
 
@@ -35,15 +41,25 @@ namespace DF2D::Engine
 	}
 
 
+	void UINavigator::Move(UINavigationDirection direction)
+	{
+		if (canvas != nullptr)
+		{
+			canvas->GetContext().Navigate(direction);
+		}
+	}
+
+
 	void UINavigator::NavigateHandler(const InputActionView& action)
 	{
-		if (!action.IsStarted())
-			return;
-
 		auto value = action.ReadValue<Vector2F>();
 
 		if (std::abs(value.x) < NavigationDeadzone && std::abs(value.y) < NavigationDeadzone)
+		{
+			heldDirection.reset();
+
 			return;
+		}
 
 		// The larger axis wins outright: a diagonal push means one of the two, never both.
 		//
@@ -53,11 +69,20 @@ namespace DF2D::Engine
 			? (value.x > 0.0f ? UINavigationDirection::RIGHT : UINavigationDirection::LEFT)
 			: (value.y > 0.0f ? UINavigationDirection::UP : UINavigationDirection::DOWN);
 
-		if (canvas != nullptr)
-		{
-			canvas->GetContext().Navigate(direction);
-		}
+		// A fresh press always moves once, right away. Only what happens afterwards is paced, so
+		// pressing a direction repeatedly and quickly registers every press.
+		//
+		// A new direction counts as a fresh press too, even without the action restarting: pushing from
+		// one direction into another should move at once rather than finish the old direction's wait.
+		if (!action.IsStarted() && heldDirection == direction)
+			return;
+
+		heldDirection = direction;
+		repeatTimer = repeatDelay;
+
+		Move(direction);
 	}
+
 	void UINavigator::SubmitHandler(const InputActionView& action)
 	{
 		if (canvas != nullptr && action.IsStarted())
@@ -103,6 +128,23 @@ namespace DF2D::Engine
 		}
 	}
 
+	void UINavigator::Update(float deltaTime)
+	{
+		if (!heldDirection.has_value())
+			return;
+
+		repeatTimer -= deltaTime;
+
+		// A loop rather than a single step, so a rate faster than the frame keeps up instead of
+		// quietly slowing to one move per frame.
+		while (repeatTimer <= 0.0f)
+		{
+			Move(*heldDirection);
+
+			repeatTimer += repeatRate;
+		}
+	}
+
 
 	void UINavigator::SetFirstSelected(const ComponentHandle<IInteractableUI>& widget)
 	{
@@ -117,5 +159,14 @@ namespace DF2D::Engine
 	const UINavigationActions& UINavigator::GetActions() const
 	{
 		return actions;
+	}
+
+	void UINavigator::SetRepeatTiming(float delaySeconds, float rateSeconds)
+	{
+		repeatDelay = delaySeconds;
+
+		// A rate of zero would mean an infinite number of moves in one frame, so it is floored at
+		// something a frame can actually deliver.
+		repeatRate = std::max(rateSeconds, MinimumRepeatRate);
 	}
 }

@@ -22,18 +22,15 @@ namespace DF2D::Core
 	{
 	}
 
-	bool InputActionResolver::IsCapturedBy(const InputDevice& device) const
+	bool InputActionResolver::IsCapturedBy(const InputDevice& device, int controlID)
 	{
-		if (captureState == nullptr)
-			return false;
-
 		switch (device.Type())
 		{
 		case InputDeviceType::MOUSE:
-			return captureState->CapturesPointer();
+			return ResolveLatchedCapture(pointerControlCapture, controlID, pointerCapturedThisFrame, device.GetButtonState(controlID));
 
 		case InputDeviceType::KEYBOARD:
-			return captureState->CapturesKeyboard();
+			return ResolveLatchedCapture(keyboardControlCapture, controlID, keyboardCapturedThisFrame, device.GetButtonState(controlID));
 
 		default:
 			// Controllers are deliberately never blocked. Menu navigation is driven through actions
@@ -41,6 +38,40 @@ namespace DF2D::Core
 			// move focus around a menu.
 			return false;
 		}
+	}
+
+	bool InputActionResolver::ResolveLatchedCapture(
+		std::unordered_map<int, bool>& latch,
+		int controlID,
+		bool liveCapturedThisFrame,
+		const InputControlState& state)
+	{
+		// A fresh press decides for the whole press: latch it now.
+		if (state.pressed)
+		{
+			latch[controlID] = liveCapturedThisFrame;
+
+			return liveCapturedThisFrame;
+		}
+
+		auto it = latch.find(controlID);
+
+		// The release ends the press this latch was tracking, so it is judged by that same decision
+		// and then forgotten -- an untracked release (nothing was ever latched for it) falls back to
+		// the live state, same as before this fix existed.
+		if (state.released)
+		{
+			auto captured = it != latch.end() ? it->second : liveCapturedThisFrame;
+
+			latch.erase(controlID);
+
+			return captured;
+		}
+
+		// Continuation of an already-tracked press: honour what was decided when it began, regardless
+		// of what capture looks like now. Anything untracked (an axis, or a control this frame never
+		// saw an edge for) just reads the live snapshot.
+		return it != latch.end() ? it->second : liveCapturedThisFrame;
 	}
 
 
@@ -184,6 +215,9 @@ namespace DF2D::Core
 
 	void InputActionResolver::BeginFrame()
 	{
+		keyboardCapturedThisFrame = captureState != nullptr && captureState->CapturesKeyboard();
+		pointerCapturedThisFrame = captureState != nullptr && captureState->CapturesPointer();
+
 		for (auto& [userID, actionSet] : activeActions)
 		{
 			for (auto action : actionSet)
@@ -274,7 +308,7 @@ namespace DF2D::Core
 	{
 		// The device has already recorded this input, so its state stays truthful; what is suppressed
 		// here is only the gameplay action the input would otherwise fire.
-		if (IsCapturedBy(device))
+		if (IsCapturedBy(device, controlID))
 			return;
 
 		auto userID = userPairings->GetUserIDFromPairedDevice(device.ID());
