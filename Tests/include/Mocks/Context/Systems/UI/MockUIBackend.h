@@ -88,7 +88,6 @@ struct MockUIBackend : DF2D::Core::IUIBackend
 
 	std::unordered_map<DF2D::Data::UIElementID, std::unordered_map<int, std::string>> properties;
 
-	std::unordered_map<DF2D::Data::UIElementID, std::unordered_map<int, std::string>> attributes;
 
 	std::unordered_map<DF2D::Data::UIElementID, std::vector<std::pair<std::string, std::string>>> dropdownOptions;
 
@@ -98,25 +97,9 @@ struct MockUIBackend : DF2D::Core::IUIBackend
 
 	DF2D::Core::Vector2F scrollSize{};
 
+	std::vector<DF2D::Data::UINavigationDirection> navigations;
 
-	std::string AttributeOf(DF2D::Data::UIElementID element, DF2D::Data::UIAttribute attribute) const
-	{
-		auto elementIt = attributes.find(element);
-
-		if (elementIt == attributes.end())
-			return {};
-
-		auto attributeIt = elementIt->second.find(static_cast<int>(attribute));
-
-		return attributeIt != elementIt->second.end() ? attributeIt->second : std::string();
-	}
-
-	bool HasAttribute(DF2D::Data::UIElementID element, DF2D::Data::UIAttribute attribute) const
-	{
-		auto elementIt = attributes.find(element);
-
-		return elementIt != attributes.end() && elementIt->second.contains(static_cast<int>(attribute));
-	}
+	int activateFocusedCount{ 0 };
 
 
 	std::string PropertyOf(DF2D::Data::UIElementID element, DF2D::Data::UIStyleProperty property) const
@@ -224,14 +207,12 @@ struct MockUIBackend : DF2D::Core::IUIBackend
 		properties[element].erase(static_cast<int>(property));
 	}
 
-	void SetElementAttribute(DF2D::Data::UIElementID element, DF2D::Data::UIAttribute attribute, const std::string& value) override
+	void SetElementAttribute(DF2D::Data::UIElementID, DF2D::Data::UIAttribute, const std::string&) override
 	{
-		attributes[element][static_cast<int>(attribute)] = value;
 	}
 
-	void RemoveElementAttribute(DF2D::Data::UIElementID element, DF2D::Data::UIAttribute attribute) override
+	void RemoveElementAttribute(DF2D::Data::UIElementID, DF2D::Data::UIAttribute) override
 	{
-		attributes[element].erase(static_cast<int>(attribute));
 	}
 
 	void SetElementText(DF2D::Data::UIElementID, const std::string&) override
@@ -354,6 +335,16 @@ struct MockUIBackend : DF2D::Core::IUIBackend
 		lastText = text;
 		textInputCount++;
 
+	}
+
+	void Navigate(DF2D::Data::UIContextID, DF2D::Data::UINavigationDirection direction) override
+	{
+		navigations.push_back(direction);
+	}
+
+	void ActivateFocused(DF2D::Data::UIContextID) override
+	{
+		activateFocusedCount++;
 	}
 
 	bool HasKeyboardFocus(DF2D::Data::UIContextID) const override

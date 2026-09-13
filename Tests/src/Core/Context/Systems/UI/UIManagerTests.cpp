@@ -624,4 +624,43 @@ TEST_CASE("Releasing through a handle works even once the object is gone")
 }
 
 
+TEST_CASE("Navigating a surface asks the backend to move focus in that direction")
+{
+	auto fixture = Fixture();
+
+	auto context = fixture.manager->CreateCanvasContext(Vector2I(800, 600));
+
+	context.Navigate(UINavigationDirection::DOWN);
+	context.Navigate(UINavigationDirection::LEFT);
+
+	REQUIRE(fixture.mock->navigations.size() == 2);
+	CHECK(fixture.mock->navigations[0] == UINavigationDirection::DOWN);
+	CHECK(fixture.mock->navigations[1] == UINavigationDirection::LEFT);
+}
+
+
+TEST_CASE("Activating the focused widget reaches the backend")
+{
+	auto fixture = Fixture();
+
+	auto context = fixture.manager->CreateCanvasContext(Vector2I(800, 600));
+
+	context.ActivateFocused();
+
+	CHECK(fixture.mock->activateFocusedCount == 1);
+}
+
+
+TEST_CASE("An inert surface handle navigates nothing")
+{
+	auto fixture = Fixture();
+
+	UIContext().Navigate(UINavigationDirection::UP);
+	UIContext().ActivateFocused();
+
+	CHECK(fixture.mock->navigations.empty());
+	CHECK(fixture.mock->activateFocusedCount == 0);
+}
+
+
 TEST_SUITE_END();
