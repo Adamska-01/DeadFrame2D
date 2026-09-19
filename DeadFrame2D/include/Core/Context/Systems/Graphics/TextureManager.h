@@ -68,6 +68,15 @@ namespace DF2D::Core
 		 */
 		Data::TextureID CreateTexture(std::span<const uint8_t> rgba, Vector2I size);
 
+		/**
+		 * @brief Creates a texture from raw pixels and gives it a synthetic path
+		 *
+		 * @param rgba: Tightly packed RGBA8 pixels.
+		 * @param size: size.x * size.y * 4 bytes.
+		 * @return The synthetic path to the texture.
+		 */
+		std::string RegisterGeneratedTexture(std::span<const uint8_t> rgba, Vector2I size);
+
 		/** @brief Releases a single texture. Cached file textures are also dropped from the cache. */
 		void UnloadTexture(Data::TextureID id);
 

@@ -76,6 +76,23 @@ namespace DF2D::Core
 		return id;
 	}
 
+	std::string TextureManager::RegisterGeneratedTexture(std::span<const uint8_t> rgba, Vector2I size)
+	{
+		auto id = CreateTexture(rgba, size);
+
+		if (id == 0)
+			return {};
+
+		// The id is already unique for the manager's lifetime, so building the path from it needs no
+		// separate counter and can never collide with one a caller picks by hand.
+		auto path = "generated://" + std::to_string(id);
+
+		textures[id].source = path;
+		sourceToID[path] = id;
+
+		return path;
+	}
+
 	void TextureManager::UnloadTexture(Data::TextureID id)
 	{
 		auto it = textures.find(id);
