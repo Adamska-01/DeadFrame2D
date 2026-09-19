@@ -20,5 +20,10 @@ namespace DF2D::Data
 		SizeFitMode horizontalFit = SizeFitMode::UNCONSTRAINED;
 
 		SizeFitMode verticalFit = SizeFitMode::UNCONSTRAINED;
+
+		/** 
+		* @brief The canvas's dp-to-pixel multiplier (Canvas::GetUIScaleFactor). 1 leaves dp as pixels
+		*/
+		float uiScaleFactor = 1.0f;
 	};
 }
