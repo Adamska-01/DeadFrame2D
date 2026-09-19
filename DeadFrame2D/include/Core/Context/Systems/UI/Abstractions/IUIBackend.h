@@ -79,6 +79,16 @@ namespace DF2D::Core
 		virtual void SetContextSize(Data::UIContextID context, Vector2I size) = 0;
 
 		/**
+		 * @brief Sets how many pixels one stylesheet "dp" unit represents.
+		 *
+		 * "px" values are unaffected. This only scales values authored in "dp",
+		 * such as font sizes, padding, and borders.
+		 *
+		 * @param ratio Pixels per "dp". A value of 1 makes "dp" and "px" equivalent.
+		 */
+		virtual void SetContextDensityIndependentPixelRatio(Data::UIContextID context, float ratio) = 0;
+
+		/**
 		 * @brief Advances animations and resolves layout for the context.
 		 *
 		 * Must run after components have finished writing properties for the frame and before anything

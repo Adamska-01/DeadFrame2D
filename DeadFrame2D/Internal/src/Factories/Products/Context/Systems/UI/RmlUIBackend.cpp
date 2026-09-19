@@ -212,6 +212,16 @@ namespace DF2D::Internal
 		entry->context->SetDimensions(Rml::Vector2i(size.x, size.y));
 	}
 
+	void RmlUIBackend::SetContextDensityIndependentPixelRatio(UIContextID context, float ratio)
+	{
+		const auto* entry = FindContext(context);
+
+		if (entry == nullptr)
+			return;
+
+		entry->context->SetDensityIndependentPixelRatio(ratio);
+	}
+
 	void RmlUIBackend::UpdateContext(UIContextID context)
 	{
 		const auto* entry = FindContext(context);

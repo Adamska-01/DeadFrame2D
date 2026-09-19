@@ -112,6 +112,8 @@ namespace DF2D::Internal
 
 		void SetContextSize(Data::UIContextID context, Core::Vector2I size) override;
 
+		void SetContextDensityIndependentPixelRatio(Data::UIContextID context, float ratio) override;
+
 		void UpdateContext(Data::UIContextID context) override;
 
 		Data::GeometryDrawList RenderContext(Data::UIContextID context) override;
