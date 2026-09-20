@@ -302,4 +302,93 @@ TEST_CASE("ClearCache forgets sizes for every texture it released")
 }
 
 
+TEST_CASE("RegisterGeneratedTexture creates a texture and returns a non-empty path")
+{
+	auto mock = std::make_unique<MockTextureBackend>();
+	auto mockPtr = mock.get();
+
+	auto manager = std::make_unique<TextureManager>(std::move(mock));
+
+	auto pixels = std::vector<uint8_t>(4 * 2 * 4, 0xFF);
+
+	auto path = manager->RegisterGeneratedTexture(pixels, Vector2I(4, 2));
+
+	CHECK_FALSE(path.empty());
+	CHECK(mockPtr->createFromPixelsCount == 1);
+	CHECK(mockPtr->lastCreatedSize == Vector2I(4, 2));
+	CHECK(mockPtr->lastCreatedByteCount == pixels.size());
+}
+
+
+TEST_CASE("RegisterGeneratedTexture returns an empty path when the backend fails")
+{
+	auto mock = std::make_unique<MockTextureBackend>();
+	auto mockPtr = mock.get();
+
+	mockPtr->failNextCreate = true;
+
+	auto manager = std::make_unique<TextureManager>(std::move(mock));
+
+	auto pixels = std::vector<uint8_t>(4, 0);
+
+	CHECK(manager->RegisterGeneratedTexture(pixels, Vector2I(1, 1)).empty());
+}
+
+
+TEST_CASE("The path RegisterGeneratedTexture returns round-trips through LoadTexture")
+{
+	auto mock = std::make_unique<MockTextureBackend>();
+	auto mockPtr = mock.get();
+
+	auto manager = std::make_unique<TextureManager>(std::move(mock));
+
+	auto pixels = std::vector<uint8_t>(4, 0);
+	auto path = manager->RegisterGeneratedTexture(pixels, Vector2I(1, 1));
+
+	// LoadTexture must resolve the registered texture instead of creating it again.
+	auto viaLoadTexture = manager->LoadTexture(path);
+
+	CHECK(mockPtr->createFromPixelsCount == 1);
+	CHECK(mockPtr->loadCount == 0);
+	CHECK(manager->GetTextureSize(viaLoadTexture) == Vector2I(1, 1));
+}
+
+
+TEST_CASE("Two registered textures never collide on the same path")
+{
+	auto mock = std::make_unique<MockTextureBackend>();
+
+	auto manager = std::make_unique<TextureManager>(std::move(mock));
+
+	auto pixels = std::vector<uint8_t>(4, 0);
+
+	auto first = manager->RegisterGeneratedTexture(pixels, Vector2I(1, 1));
+	auto second = manager->RegisterGeneratedTexture(pixels, Vector2I(1, 1));
+
+	CHECK(first != second);
+}
+
+
+TEST_CASE("UnloadTexture drops a registered texture from the path cache")
+{
+	auto mock = std::make_unique<MockTextureBackend>();
+	auto mockPtr = mock.get();
+
+	auto manager = std::make_unique<TextureManager>(std::move(mock));
+
+	auto pixels = std::vector<uint8_t>(4, 0);
+	auto path = manager->RegisterGeneratedTexture(pixels, Vector2I(1, 1));
+	auto id = manager->LoadTexture(path);
+
+	manager->UnloadTexture(id);
+
+	// The next load must go through the backend and create a new texture.
+	auto reloaded = manager->LoadTexture(path);
+
+	CHECK(mockPtr->createFromPixelsCount == 1);
+	CHECK(mockPtr->loadCount == 1);
+	CHECK(reloaded != id);
+}
+
+
 TEST_SUITE_END();
