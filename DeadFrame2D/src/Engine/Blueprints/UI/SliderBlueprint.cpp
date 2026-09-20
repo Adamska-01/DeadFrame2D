@@ -125,6 +125,16 @@ namespace DF2D::Engine
 		});
 	}
 
+	SliderBlueprint::SliderBlueprint(
+		const Vector2F& size,
+		float minValue,
+		float maxValue,
+		float initialValue,
+		ComponentHandle<UINavigator> navigatorHandle)
+		: SliderBlueprint(size, "", "", minValue, maxValue, initialValue, navigatorHandle)
+	{
+	}
+
 	void SliderBlueprint::Refresh(float value)
 	{
 		auto range = slider->GetMaximum() - slider->GetMinimum();

@@ -12,10 +12,10 @@
 namespace DF2D::Engine
 {
 	/**
-	 * @brief A slider whose fill is two swappable textures (unfilled background, filled foreground
-	 * clipped to the value's fraction) instead of a track/handle. The real <input type="range"> still
-	 * drives dragging/keyboard input; style its track/progress/handle to nothing so only the two
-	 * textures draw.
+	 * @brief A slider whose fill is two swappable layers (unfilled background, filled foreground
+	 * clipped to the value's fraction) instead of a track/handle. Each layer can be a texture or,
+	 * with the no-texture constructor, a flat colour fill. The real <input type="range"> still drives
+	 * dragging/keyboard input; style its track/progress/handle to nothing so only the two layers draw.
 	 */
 	class DF2D_API SliderBlueprint : public GameObject
 	{
@@ -47,6 +47,14 @@ namespace DF2D::Engine
 			const Core::Vector2F& size,
 			std::string_view unfilledTexturePath,
 			std::string_view filledTexturePath,
+			float minValue,
+			float maxValue,
+			float initialValue,
+			ComponentHandle<UINavigator> navigatorHandle = ComponentHandle<UINavigator>());
+
+		/** @brief Same widget with no textures -- background/foreground are flat colour fills instead. */
+		SliderBlueprint(
+			const Core::Vector2F& size,
 			float minValue,
 			float maxValue,
 			float initialValue,
