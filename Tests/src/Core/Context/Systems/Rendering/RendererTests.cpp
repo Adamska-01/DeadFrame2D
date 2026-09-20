@@ -83,6 +83,21 @@ TEST_CASE("SetResolutionTarget forwards and GetResolutionTarget reads back")
 }
 
 
+TEST_CASE("GetSupportedResolutions forwards the backend's list")
+{
+	MockRenderBackend* mock = nullptr;
+	auto renderer = MakeRenderer(mock);
+
+	mock->supportedResolutions = { {1280, 720}, {1920, 1080} };
+
+	auto resolutions = renderer->GetSupportedResolutions();
+
+	REQUIRE(resolutions.size() == 2);
+	CHECK(resolutions[0] == Vector2I{1280, 720});
+	CHECK(resolutions[1] == Vector2I{1920, 1080});
+}
+
+
 TEST_CASE("SetViewport delegates rect to backend")
 {
 	MockRenderBackend* mock = nullptr;
