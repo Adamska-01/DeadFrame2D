@@ -45,6 +45,14 @@ namespace DF2D::Core
 		}
 	}
 
+	void UIContext::SetDensityIndependentPixelRatio(float ratio)
+	{
+		if (IsValid())
+		{
+			manager->SetContextDensityIndependentPixelRatio(id, ratio);
+		}
+	}
+
 	bool UIContext::LoadStyleSheet(const std::string& path)
 	{
 		return IsValid() && manager->LoadStyleSheet(id, path);

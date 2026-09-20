@@ -70,6 +70,9 @@ namespace DF2D::Core
 		/** @brief Resizes the surface that percentage lengths resolve against. */
 		void SetSize(Vector2I size);
 
+		/** @breif Sets how many pixels one stylesheet "dp" unit represents. */
+		void SetDensityIndependentPixelRatio(float ratio);
+
 		/** @brief Applies a stylesheet on top of the ones already loaded, restyling everything in it. */
 		bool LoadStyleSheet(const std::string& path);
 
