@@ -55,7 +55,6 @@ TEST_CASE("Every element is absolutely positioned so the layout engine owns the 
 	CHECK(ValueOf(resolved, UIStyleProperty::POSITION) == "absolute");
 }
 
-
 TEST_CASE("A point anchor places the anchor as a percentage of the parent")
 {
 	auto resolved = RectTransformResolver::ResolveRectTransform(Pinned({ 0.25f, 0.75f }, Vector2F::Zero, Vector2F::Zero, { 100.0f, 50.0f }));
@@ -63,7 +62,6 @@ TEST_CASE("A point anchor places the anchor as a percentage of the parent")
 	CHECK(NumberIn(ValueOf(resolved, UIStyleProperty::LEFT)) == doctest::Approx(25.000000));
 	CHECK(NumberIn(ValueOf(resolved, UIStyleProperty::TOP)) == doctest::Approx(75.000000));
 }
-
 
 TEST_CASE("A point anchor sizes the element from sizeDelta")
 {
@@ -73,7 +71,6 @@ TEST_CASE("A point anchor sizes the element from sizeDelta")
 	CHECK(ValueOf(resolved, UIStyleProperty::HEIGHT) == "40px");
 }
 
-
 TEST_CASE("A top-left pivot leaves the element hanging off the anchor with no correction")
 {
 	auto resolved = RectTransformResolver::ResolveRectTransform(Pinned({ 0.5f, 0.5f }, { 0.0f, 0.0f }, Vector2F::Zero, { 100.0f, 60.0f }));
@@ -82,7 +79,6 @@ TEST_CASE("A top-left pivot leaves the element hanging off the anchor with no co
 	CHECK(ValueOf(resolved, UIStyleProperty::MARGIN_TOP) == "0px");
 }
 
-
 TEST_CASE("A centre pivot pulls the element back by half its size so the pivot lands on the anchor")
 {
 	auto resolved = RectTransformResolver::ResolveRectTransform(Pinned({ 0.5f, 0.5f }, { 0.5f, 0.5f }, Vector2F::Zero, { 100.0f, 60.0f }));
@@ -90,7 +86,6 @@ TEST_CASE("A centre pivot pulls the element back by half its size so the pivot l
 	CHECK(ValueOf(resolved, UIStyleProperty::MARGIN_LEFT) == "-50px");
 	CHECK(ValueOf(resolved, UIStyleProperty::MARGIN_TOP) == "-30px");
 }
-
 
 TEST_CASE("A bottom-right pivot pulls the element back by its full size")
 {
@@ -101,7 +96,6 @@ TEST_CASE("A bottom-right pivot pulls the element back by its full size")
 	CHECK(NumberIn(ValueOf(resolved, UIStyleProperty::LEFT)) == doctest::Approx(100.000000));
 }
 
-
 TEST_CASE("anchoredPosition offsets the element on top of the pivot correction")
 {
 	auto resolved = RectTransformResolver::ResolveRectTransform(Pinned({ 0.5f, 0.5f }, { 0.5f, 0.5f }, { 10.0f, -4.0f }, { 100.0f, 60.0f }));
@@ -109,7 +103,6 @@ TEST_CASE("anchoredPosition offsets the element on top of the pivot correction")
 	CHECK(ValueOf(resolved, UIStyleProperty::MARGIN_LEFT) == "-40px");
 	CHECK(ValueOf(resolved, UIStyleProperty::MARGIN_TOP) == "-34px");
 }
-
 
 TEST_CASE("Stretching an axis pins both its edges and lets the size fall out of them")
 {
@@ -131,7 +124,6 @@ TEST_CASE("Stretching an axis pins both its edges and lets the size fall out of 
 	CHECK(ValueOf(resolved, UIStyleProperty::WIDTH) == "auto");
 }
 
-
 TEST_CASE("Axes are resolved independently, so one can stretch while the other stays pinned")
 {
 	auto properties = RectTransformProperties
@@ -148,7 +140,6 @@ TEST_CASE("Axes are resolved independently, so one can stretch while the other s
 	CHECK(ValueOf(resolved, UIStyleProperty::HEIGHT) == "50px");
 	CHECK(ValueOf(resolved, UIStyleProperty::BOTTOM) == "auto");
 }
-
 
 TEST_CASE("Stretching both axes fills the parent with an inset on every side")
 {
@@ -170,7 +161,6 @@ TEST_CASE("Stretching both axes fills the parent with an inset on every side")
 	CHECK(ValueOf(resolved, UIStyleProperty::HEIGHT) == "auto");
 }
 
-
 TEST_CASE("A parent-driven element stays in the flow its parent arranges")
 {
 	auto properties = Pinned(Vector2F(0.5f, 0.5f), Vector2F(0.5f, 0.5f), Vector2F(40.0f, 90.0f), Vector2F(120.0f, 32.0f));
@@ -189,7 +179,6 @@ TEST_CASE("A parent-driven element stays in the flow its parent arranges")
 	CHECK(NumberIn(ValueOf(resolved, UIStyleProperty::FLEX_SHRINK)) == doctest::Approx(0.0f));
 }
 
-
 TEST_CASE("A parent-driven element clears the placement it set while positioning itself")
 {
 	auto properties = Pinned(Vector2F(1.0f, 1.0f), Vector2F(1.0f, 1.0f), Vector2F(-24.0f, -24.0f), Vector2F(200.0f, 40.0f));
@@ -206,7 +195,6 @@ TEST_CASE("A parent-driven element clears the placement it set while positioning
 	CHECK(NumberIn(ValueOf(resolved, UIStyleProperty::MARGIN_LEFT)) == doctest::Approx(0.0f));
 	CHECK(NumberIn(ValueOf(resolved, UIStyleProperty::MARGIN_TOP)) == doctest::Approx(0.0f));
 }
-
 
 TEST_CASE("A parent-driven element that stretches lets the parent decide that axis")
 {
@@ -225,14 +213,12 @@ TEST_CASE("A parent-driven element that stretches lets the parent decide that ax
 	CHECK(NumberIn(ValueOf(resolved, UIStyleProperty::HEIGHT)) == doctest::Approx(56.0f));
 }
 
-
 TEST_CASE("Placing itself is what an element does unless told otherwise")
 {
 	auto properties = Pinned(Vector2F(0.5f, 0.5f), Vector2F(0.5f, 0.5f), Vector2F::Zero, Vector2F(100.0f, 100.0f));
 
 	CHECK(ValueOf(RectTransformResolver::ResolveRectTransform(properties), UIStyleProperty::POSITION) == "absolute");
 }
-
 
 TEST_CASE("A layout element takes the size and flex properties off the rect transform")
 {
@@ -251,7 +237,6 @@ TEST_CASE("A layout element takes the size and flex properties off the rect tran
 	CHECK(ValueOf(resolved, UIStyleProperty::LEFT) == "auto");
 }
 
-
 TEST_CASE("Sizing belongs to the rect transform when nothing overrides it")
 {
 	auto properties = Pinned(Vector2F(0.5f, 0.5f), Vector2F(0.5f, 0.5f), Vector2F::Zero, Vector2F(120.0f, 32.0f));
@@ -260,7 +245,6 @@ TEST_CASE("Sizing belongs to the rect transform when nothing overrides it")
 
 	CHECK(NumberIn(ValueOf(resolved, UIStyleProperty::WIDTH)) == doctest::Approx(120.0f));
 }
-
 
 TEST_CASE("An element placing itself is unaffected by who owns its size")
 {
@@ -272,7 +256,6 @@ TEST_CASE("An element placing itself is unaffected by who owns its size")
 	CHECK(ValueOf(owned, UIStyleProperty::POSITION) == "absolute");
 	CHECK(NumberIn(ValueOf(owned, UIStyleProperty::WIDTH)) == doctest::Approx(64.0f));
 }
-
 
 TEST_CASE("A fitted axis follows its content while the other keeps the size it was given")
 {
@@ -287,7 +270,6 @@ TEST_CASE("A fitted axis follows its content while the other keeps the size it w
 	CHECK(ValueOf(resolved, UIStyleProperty::HEIGHT) == "auto");
 }
 
-
 TEST_CASE("Content fitting applies while a parent lays the element out too")
 {
 	auto properties = Pinned(Vector2F(0.5f, 0.5f), Vector2F(0.5f, 0.5f), Vector2F::Zero, Vector2F(200.0f, 40.0f));
@@ -299,7 +281,6 @@ TEST_CASE("Content fitting applies while a parent lays the element out too")
 	CHECK(ValueOf(resolved, UIStyleProperty::WIDTH) == "auto");
 	CHECK(NumberIn(ValueOf(resolved, UIStyleProperty::HEIGHT)) == doctest::Approx(40.0f));
 }
-
 
 TEST_CASE("A layout element leaves content fitting nothing to modify")
 {
@@ -317,6 +298,56 @@ TEST_CASE("A layout element leaves content fitting nothing to modify")
 	// The override owns the size outright, so no size is written here at all.
 	CHECK(ValueOf(resolved, UIStyleProperty::WIDTH).empty());
 	CHECK(ValueOf(resolved, UIStyleProperty::HEIGHT).empty());
+}
+
+TEST_CASE("uiScaleFactor scales sizeDelta before it becomes a pixel length")
+{
+	auto resolved = RectTransformResolver::ResolveRectTransform(
+		Pinned({ 0.5f, 0.5f }, Vector2F::Zero, Vector2F::Zero, { 100.0f, 50.0f }),
+		LayoutContext{ .uiScaleFactor = 2.0f });
+
+	CHECK(ValueOf(resolved, UIStyleProperty::WIDTH) == "200px");
+	CHECK(ValueOf(resolved, UIStyleProperty::HEIGHT) == "100px");
+}
+
+TEST_CASE("uiScaleFactor scales anchoredPosition and the pivot correction together, so the pivot still lands on the anchor")
+{
+	auto resolved = RectTransformResolver::ResolveRectTransform(
+		Pinned({ 0.5f, 0.5f }, { 0.5f, 0.5f }, { 10.0f, -4.0f }, { 100.0f, 60.0f }),
+		LayoutContext{ .uiScaleFactor = 2.0f });
+
+	// Both the offset and pivot correction must use the same scale.
+	CHECK(ValueOf(resolved, UIStyleProperty::MARGIN_LEFT) == "-80px");
+	CHECK(ValueOf(resolved, UIStyleProperty::MARGIN_TOP) == "-68px");
+}
+
+TEST_CASE("uiScaleFactor scales the inset on a stretched axis")
+{
+	auto properties = RectTransformProperties
+	{
+		.anchorMin = { 0.1f, 0.5f },
+		.anchorMax = { 0.9f, 0.5f },
+		.sizeDelta = { 8.0f, 30.0f }
+	};
+
+	auto resolved = RectTransformResolver::ResolveRectTransform(properties, LayoutContext{ .uiScaleFactor = 1.5f });
+
+	CHECK(ValueOf(resolved, UIStyleProperty::MARGIN_LEFT) == "12px");
+	CHECK(ValueOf(resolved, UIStyleProperty::MARGIN_RIGHT) == "12px");
+
+	// Anchors are normalized fractions of the parent, not a dp length, so they are unaffected.
+	CHECK(NumberIn(ValueOf(resolved, UIStyleProperty::LEFT)) == doctest::Approx(10.000000));
+}
+
+TEST_CASE("uiScaleFactor of 1 leaves every length exactly as it resolved before this feature existed")
+{
+	auto properties = Pinned({ 0.5f, 0.5f }, { 0.5f, 0.5f }, { 10.0f, -4.0f }, { 100.0f, 60.0f });
+
+	auto unscaled = RectTransformResolver::ResolveRectTransform(properties);
+	auto explicitlyUnscaled = RectTransformResolver::ResolveRectTransform(properties, LayoutContext{ .uiScaleFactor = 1.0f });
+
+	CHECK(ValueOf(unscaled, UIStyleProperty::MARGIN_LEFT) == ValueOf(explicitlyUnscaled, UIStyleProperty::MARGIN_LEFT));
+	CHECK(ValueOf(unscaled, UIStyleProperty::WIDTH) == ValueOf(explicitlyUnscaled, UIStyleProperty::WIDTH));
 }
 
 
