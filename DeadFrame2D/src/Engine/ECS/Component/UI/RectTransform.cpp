@@ -1,4 +1,5 @@
 #include "Engine/ECS/Component/Transform.h"
+#include "Engine/ECS/Component/UI/Canvas.h"
 #include "Engine/ECS/Component/UI/Layout/ContentSizeFitter.h"
 #include "Engine/ECS/Component/UI/Layout/LayoutElement.h"
 #include "Engine/ECS/Component/UI/Layout/LayoutGroup.h"
@@ -46,6 +47,10 @@ namespace DF2D::Engine
 			context.horizontalFit = fitter->GetHorizontalFit();
 			context.verticalFit = fitter->GetVerticalFit();
 		}
+
+		auto canvas = GetCanvas();
+
+		context.uiScaleFactor = canvas != nullptr ? canvas->GetUIScaleFactor() : 1.0f;
 
 		return context;
 	}

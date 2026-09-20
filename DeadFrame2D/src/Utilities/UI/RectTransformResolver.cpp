@@ -29,6 +29,10 @@ namespace DF2D::Utilities::RectTransformResolver
 		auto resolved = std::vector<ResolvedStyleProperty>();
 		resolved.reserve(12);
 
+		// Scale dp values with the canvas. Anchors are normalized 0-1 values and need no scaling.
+		auto sizeDelta = properties.sizeDelta * context.uiScaleFactor;
+		auto anchoredPosition = properties.anchoredPosition * context.uiScaleFactor;
+
 		if (context.mode == LayoutMode::PARENT_DRIVEN)
 		{
 			// The cleared values are written too, not just skipped. These are inline properties, so an
@@ -55,11 +59,11 @@ namespace DF2D::Utilities::RectTransformResolver
 			// A stretched axis means "fill the parent", which in flow the parent decides, not the child.
 			resolved.push_back({
 				UIStyleProperty::WIDTH,
-				ResolveLength(properties.sizeDelta.x, properties.StretchesHorizontally(), context.horizontalFit) });
+				ResolveLength(sizeDelta.x, properties.StretchesHorizontally(), context.horizontalFit) });
 
 			resolved.push_back({
 				UIStyleProperty::HEIGHT,
-				ResolveLength(properties.sizeDelta.y, properties.StretchesVertically(), context.verticalFit) });
+				ResolveLength(sizeDelta.y, properties.StretchesVertically(), context.verticalFit) });
 
 			return resolved;
 		}
@@ -72,8 +76,8 @@ namespace DF2D::Utilities::RectTransformResolver
 			// Both edges are pinned, so the width falls out of the two insets and must not be set.
 			resolved.push_back({ UIStyleProperty::LEFT, StyleValues::ToPercent(properties.anchorMin.x) });
 			resolved.push_back({ UIStyleProperty::RIGHT, StyleValues::ToPercent(1.0f - properties.anchorMax.x) });
-			resolved.push_back({ UIStyleProperty::MARGIN_LEFT, StyleValues::ToPixels(properties.sizeDelta.x) });
-			resolved.push_back({ UIStyleProperty::MARGIN_RIGHT, StyleValues::ToPixels(properties.sizeDelta.x) });
+			resolved.push_back({ UIStyleProperty::MARGIN_LEFT, StyleValues::ToPixels(sizeDelta.x) });
+			resolved.push_back({ UIStyleProperty::MARGIN_RIGHT, StyleValues::ToPixels(sizeDelta.x) });
 			resolved.push_back({ UIStyleProperty::WIDTH, "auto" });
 		}
 		else
@@ -81,10 +85,10 @@ namespace DF2D::Utilities::RectTransformResolver
 			// Pinned to a point: place the anchor, then pull back by the pivot so the pivot lands on it.
 			resolved.push_back({ UIStyleProperty::LEFT, StyleValues::ToPercent(properties.anchorMin.x) });
 			resolved.push_back({ UIStyleProperty::RIGHT, "auto" });
-			resolved.push_back({ UIStyleProperty::WIDTH, ResolveLength(properties.sizeDelta.x, false, context.horizontalFit) });
+			resolved.push_back({ UIStyleProperty::WIDTH, ResolveLength(sizeDelta.x, false, context.horizontalFit) });
 			resolved.push_back({
 				UIStyleProperty::MARGIN_LEFT,
-				StyleValues::ToPixels(properties.anchoredPosition.x - properties.pivot.x * properties.sizeDelta.x) });
+				StyleValues::ToPixels(anchoredPosition.x - properties.pivot.x * sizeDelta.x) });
 			resolved.push_back({ UIStyleProperty::MARGIN_RIGHT, "0px" });
 		}
 
@@ -93,18 +97,18 @@ namespace DF2D::Utilities::RectTransformResolver
 		{
 			resolved.push_back({ UIStyleProperty::TOP, StyleValues::ToPercent(properties.anchorMin.y) });
 			resolved.push_back({ UIStyleProperty::BOTTOM, StyleValues::ToPercent(1.0f - properties.anchorMax.y) });
-			resolved.push_back({ UIStyleProperty::MARGIN_TOP, StyleValues::ToPixels(properties.sizeDelta.y) });
-			resolved.push_back({ UIStyleProperty::MARGIN_BOTTOM, StyleValues::ToPixels(properties.sizeDelta.y) });
+			resolved.push_back({ UIStyleProperty::MARGIN_TOP, StyleValues::ToPixels(sizeDelta.y) });
+			resolved.push_back({ UIStyleProperty::MARGIN_BOTTOM, StyleValues::ToPixels(sizeDelta.y) });
 			resolved.push_back({ UIStyleProperty::HEIGHT, "auto" });
 		}
 		else
 		{
 			resolved.push_back({ UIStyleProperty::TOP, StyleValues::ToPercent(properties.anchorMin.y) });
 			resolved.push_back({ UIStyleProperty::BOTTOM, "auto" });
-			resolved.push_back({ UIStyleProperty::HEIGHT, ResolveLength(properties.sizeDelta.y, false, context.verticalFit) });
+			resolved.push_back({ UIStyleProperty::HEIGHT, ResolveLength(sizeDelta.y, false, context.verticalFit) });
 			resolved.push_back({
 				UIStyleProperty::MARGIN_TOP,
-				StyleValues::ToPixels(properties.anchoredPosition.y - properties.pivot.y * properties.sizeDelta.y) });
+				StyleValues::ToPixels(anchoredPosition.y - properties.pivot.y * sizeDelta.y) });
 			resolved.push_back({ UIStyleProperty::MARGIN_BOTTOM, "0px" });
 		}
 

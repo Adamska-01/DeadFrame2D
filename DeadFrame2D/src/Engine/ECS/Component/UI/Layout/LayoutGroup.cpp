@@ -53,18 +53,18 @@ namespace DF2D::Engine
 
 	void LayoutGroup::ApplySpacing()
 	{
-		// Both axes, so the value works whichever direction the group arranges in, and still works when
-		// a grid wraps. A gap rather than child margins, which would also show outside the first and
-		// last child.
-		SetStyle(UIStyleProperty::ROW_GAP, StyleValues::ToPixels(spacing));
-		SetStyle(UIStyleProperty::COLUMN_GAP, StyleValues::ToPixels(spacing));
+		// Apply the spacing to both axes so it works for rows, columns, and grids.
+		// Use a gap instead of child margins so the first and last child are not offset.
+		SetStyle(UIStyleProperty::ROW_GAP, StyleValues::ToDp(spacing));
+		SetStyle(UIStyleProperty::COLUMN_GAP, StyleValues::ToDp(spacing));
 	}
 
 	void LayoutGroup::ApplyPadding()
 	{
-		SetStyle(UIStyleProperty::PADDING_LEFT, StyleValues::ToPixels(padding.left));
-		SetStyle(UIStyleProperty::PADDING_RIGHT, StyleValues::ToPixels(padding.right));
-		SetStyle(UIStyleProperty::PADDING_TOP, StyleValues::ToPixels(padding.top));
-		SetStyle(UIStyleProperty::PADDING_BOTTOM, StyleValues::ToPixels(padding.bottom));
+		// Use dp so the padding scales with the children and the rest of the layout.
+		SetStyle(UIStyleProperty::PADDING_LEFT, StyleValues::ToDp(padding.left));
+		SetStyle(UIStyleProperty::PADDING_RIGHT, StyleValues::ToDp(padding.right));
+		SetStyle(UIStyleProperty::PADDING_TOP, StyleValues::ToDp(padding.top));
+		SetStyle(UIStyleProperty::PADDING_BOTTOM, StyleValues::ToDp(padding.bottom));
 	}
 }

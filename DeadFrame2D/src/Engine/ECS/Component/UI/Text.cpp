@@ -40,7 +40,8 @@ namespace DF2D::Engine
 
 	void Text::ApplyTextStyle()
 	{
-		SetStyle(UIStyleProperty::FONT_SIZE, fontSize);
+		// Use dp so the font size scales with the canvas like stylesheet-defined sizes.
+		SetStyle(UIStyleProperty::FONT_SIZE, StyleValues::ToDp(fontSize));
 		SetStyle(UIStyleProperty::COLOR, color);
 		SetStyle(UIStyleProperty::TEXT_ALIGN, ToAlignmentValue(alignment));
 		SetStyle(UIStyleProperty::WHITE_SPACE, wordWrap ? "normal" : "nowrap");

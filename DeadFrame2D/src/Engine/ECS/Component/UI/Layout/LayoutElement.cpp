@@ -68,8 +68,7 @@ namespace DF2D::Engine
 
 		ignoreLayout = value;
 
-		// The rect transform writes the position, so this only records the flag and makes it re-apply.
-		// Writing the position here would mean two writers again.
+		// RectTransform owns the position, so only refresh the layout here.
 		RefreshPlacement();
 	}
 
@@ -108,13 +107,14 @@ namespace DF2D::Engine
 
 	void LayoutElement::ApplySizes()
 	{
-		SetStyle(UIStyleProperty::MIN_WIDTH, StyleValues::ToPixels(minSize.x));
-		SetStyle(UIStyleProperty::MIN_HEIGHT, StyleValues::ToPixels(minSize.y));
+		// Use dp so these sizes scale with the canvas like RectTransform-driven sizes.
+		SetStyle(UIStyleProperty::MIN_WIDTH, StyleValues::ToDp(minSize.x));
+		SetStyle(UIStyleProperty::MIN_HEIGHT, StyleValues::ToDp(minSize.y));
 
-		// A negative component means "unset", not zero: the axis is left to the content.
+		// A negative value means "unset", so let the content determine the size.
 		if (preferredSize.x >= 0.0f)
 		{
-			SetStyle(UIStyleProperty::WIDTH, StyleValues::ToPixels(preferredSize.x));
+			SetStyle(UIStyleProperty::WIDTH, StyleValues::ToDp(preferredSize.x));
 		}
 		else
 		{
@@ -123,7 +123,7 @@ namespace DF2D::Engine
 
 		if (preferredSize.y >= 0.0f)
 		{
-			SetStyle(UIStyleProperty::HEIGHT, StyleValues::ToPixels(preferredSize.y));
+			SetStyle(UIStyleProperty::HEIGHT, StyleValues::ToDp(preferredSize.y));
 		}
 		else
 		{
