@@ -6,6 +6,7 @@
 #include "Engine/Events/Context/Renderer/RenderTargetSizeChangedEvent.h"
 #include "Utilities/Debugging/Guards.h"
 #include "Utilities/Helpers/Events/EventHelpers.h"
+#include <algorithm>
 
 
 namespace DF2D::Engine
@@ -22,7 +23,10 @@ namespace DF2D::Engine
 		: renderer(nullptr),
 		normalizedViewport({ 0.0f, 0.0f, 1.0f, 1.0f }),
 		renderTarget(0),
-		zoom(1.0f)
+		zoom(1.0f),
+		fitMode(CameraFitMode::ENVELOPE),
+		referenceResolution(1920, 1080),
+		viewScale(1.0f)
 	{
 	}
 
@@ -49,6 +53,8 @@ namespace DF2D::Engine
 
 		resolutionTarget = renderTargetSizeChangeEvent->renderTargetSize;
 
+		RecomputeViewScale();
+
 		if (renderer == nullptr)
 			return;
 
@@ -58,6 +64,40 @@ namespace DF2D::Engine
 		}
 
 		renderTarget = renderer->CreateRenderTarget(resolutionTarget.x, resolutionTarget.y);
+	}
+
+	void Camera::RecomputeViewScale()
+	{
+		// ENVELOPE ignores the reference resolution, so the view scale stays at 1.
+		if (fitMode == CameraFitMode::ENVELOPE || referenceResolution.x <= 0 || referenceResolution.y <= 0)
+		{
+			viewScale = 1.0f;
+
+			return;
+		}
+
+		auto scaleX = static_cast<float>(resolutionTarget.x) / static_cast<float>(referenceResolution.x);
+		auto scaleY = static_cast<float>(resolutionTarget.y) / static_cast<float>(referenceResolution.y);
+
+		switch (fitMode)
+		{
+		case CameraFitMode::MATCH_WIDTH:
+			viewScale = scaleX;
+			break;
+
+		case CameraFitMode::MATCH_HEIGHT:
+			viewScale = scaleY;
+			break;
+
+		case CameraFitMode::LETTERBOX:
+			// Use the smaller scale so the full reference view remains visible.
+			viewScale = std::min(scaleX, scaleY);
+			break;
+
+		default:
+			viewScale = 1.0f;
+			break;
+		}
 	}
 
 	void Camera::Init()
@@ -80,6 +120,8 @@ namespace DF2D::Engine
 			}
 		}
 
+		RecomputeViewScale();
+
 		cameras.push_back(GetHandleAs<Camera>());
 	}
 
@@ -94,9 +136,38 @@ namespace DF2D::Engine
 		this->normalizedViewport = normalizedViewport;
 	}
 
+	void Camera::SetFitMode(CameraFitMode fitMode)
+	{
+		this->fitMode = fitMode;
+
+		RecomputeViewScale();
+	}
+
+	void Camera::SetReferenceResolution(const Vector2I& referenceResolution)
+	{
+		this->referenceResolution = referenceResolution;
+
+		RecomputeViewScale();
+	}
+
 	float Camera::GetZoom() const
 	{
 		return zoom;
+	}
+
+	CameraFitMode Camera::GetFitMode() const
+	{
+		return fitMode;
+	}
+
+	const Vector2I& Camera::GetReferenceResolution() const
+	{
+		return referenceResolution;
+	}
+
+	float Camera::GetViewScale() const
+	{
+		return viewScale;
 	}
 
 	const RectF& Camera::GetViewport() const
@@ -136,17 +207,20 @@ namespace DF2D::Engine
 	{
 		auto cameraWorldPos = transform->GetWorldPosition();
 		auto offset = worldPos - cameraWorldPos;
+		auto scale = zoom * viewScale;
 
-		auto screenPosX = (offset.x * zoom) + resolutionTarget.x * 0.5f;
-		auto screenPosY = (offset.y * zoom) + resolutionTarget.y * 0.5f;
+		auto screenPosX = (offset.x * scale) + resolutionTarget.x * 0.5f;
+		auto screenPosY = (offset.y * scale) + resolutionTarget.y * 0.5f;
 
 		return Vector2F(screenPosX, screenPosY);
 	}
 
 	Vector2F Camera::ScreenToWorld(const Vector2F& screenPos) const
 	{
-		auto localX = (screenPos.x - resolutionTarget.x * 0.5f) / zoom;
-		auto localY = (screenPos.y - resolutionTarget.y * 0.5f) / zoom;
+		auto scale = zoom * viewScale;
+
+		auto localX = (screenPos.x - resolutionTarget.x * 0.5f) / scale;
+		auto localY = (screenPos.y - resolutionTarget.y * 0.5f) / scale;
 
 		return transform->GetWorldPosition() + Vector2(localX, localY);
 	}

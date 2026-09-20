@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Math/Rect.h"
 #include "Core/Math/Vector2.h"
+#include "Data/Components/Rendering/Camera/CameraFitMode.h"
 #include "Data/Systems/Graphics/TextureID.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Entity/Component/Core/GameComponent.h"
@@ -44,8 +45,18 @@ namespace DF2D::Engine
 
 		float zoom;
 
+		Data::CameraFitMode fitMode;
+
+		Core::Vector2I referenceResolution;
+
+		/** @brief Additional scale applied when the render target differs from the reference resolution. */
+		float viewScale;
+
 
 		void RenderTargetSizeChangedEventHandler(std::shared_ptr<DispatchableEvent> dispatchableEvent);
+
+		/** @brief Recomputes viewScale from the current fit mode, reference resolution and target size. */
+		void RecomputeViewScale();
 
 
 	public:
@@ -61,7 +72,20 @@ namespace DF2D::Engine
 
 		void SetViewport(const Core::RectF& normalizedViewport);
 
+		/** @brief Sets how the view scales when the render target's resolution isn't referenceResolution. */
+		void SetFitMode(Data::CameraFitMode fitMode);
+
+		/** @brief Sets the resolution the world is authored to look correct at. Ignored by ENVELOPE. */
+		void SetReferenceResolution(const Core::Vector2I& referenceResolution);
+
 		float GetZoom() const;
+
+		Data::CameraFitMode GetFitMode() const;
+
+		const Core::Vector2I& GetReferenceResolution() const;
+
+		/** @brief The multiplier fit mode currently folds into zoom. 1 under ENVELOPE. */
+		float GetViewScale() const;
 
 		/** @brief Sets the normalized viewport (0-1 range). */
 		const Core::RectF& GetViewport() const;

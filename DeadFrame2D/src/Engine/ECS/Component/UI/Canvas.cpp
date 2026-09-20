@@ -5,12 +5,14 @@
 #include "Core/Context/Systems/UI/Context/UIContext.h"
 #include "Engine/ECS/Component/Rendering/Camera/Camera.h"
 #include "Engine/ECS/Component/UI/Canvas.h"
+#include "Engine/ECS/Component/UI/RectTransform.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include "Core/Context/Systems/UI/UIManager.h"
 #include "Engine/ECS/System/Events/EventDispatcher.h"
 #include "Engine/Events/Context/Renderer/RenderTargetSizeChangedEvent.h"
 #include "Utilities/Debugging/Guards.h"
 #include "Utilities/Helpers/Events/EventHelpers.h"
+#include <cmath>
 
 
 namespace DF2D::Engine
@@ -23,7 +25,11 @@ namespace DF2D::Engine
 
 	Canvas::Canvas()
 		: sortOrder(DefaultSortOrders::UI_RENDERER),
-		renderMode(CanvasRenderMode::SCREEN_SPACE_OVERLAY)
+		renderMode(CanvasRenderMode::SCREEN_SPACE_OVERLAY),
+		scaleMode(UIScaleMode::SCALE_WITH_SCREEN_SIZE),
+		referenceResolution(1920, 1080),
+		matchWidthOrHeight(0.5f),
+		uiScaleFactor(1.0f)
 	{
 	}
 
@@ -42,6 +48,10 @@ namespace DF2D::Engine
 		auto resolution = renderer->GetResolutionTarget();
 
 		context = uiManager->CreateCanvasContext(resolution);
+
+		targetSize = resolution;
+
+		RecomputeUIScaleFactor();
 
 		// TODO: Don't really like calling base function after some code. See if it can be polished.
 		// The context must exist before UIComponent::Init runs, because that is what resolves this
@@ -81,6 +91,42 @@ namespace DF2D::Engine
 			return;
 
 		context.SetSize(resized->renderTargetSize);
+
+		targetSize = resized->renderTargetSize;
+
+		RecomputeUIScaleFactor();
+	}
+
+	void Canvas::RecomputeUIScaleFactor()
+	{
+		auto factor = 1.0f;
+
+		// CONSTANT_PIXEL_SIZE ignores the reference resolution, so 1 dp stays 1 pixel.
+		if (scaleMode == UIScaleMode::SCALE_WITH_SCREEN_SIZE
+			&& referenceResolution.x > 0 && referenceResolution.y > 0
+			&& targetSize.x > 0 && targetSize.y > 0)
+		{
+			// Blend the width and height scales in log space so the result interpolates between them
+			// proportionally. With 0.5, this produces their geometric mean.
+			auto logWidth = std::log2(static_cast<float>(targetSize.x) / static_cast<float>(referenceResolution.x));
+			auto logHeight = std::log2(static_cast<float>(targetSize.y) / static_cast<float>(referenceResolution.y));
+			auto blended = logWidth + (logHeight - logWidth) * matchWidthOrHeight;
+
+			factor = std::pow(2.0f, blended);
+		}
+
+		if (factor == uiScaleFactor)
+			return;
+
+		uiScaleFactor = factor;
+
+		// Applies the same scale to stylesheet-authored dp values as RectTransform sizes.
+		context.SetDensityIndependentPixelRatio(uiScaleFactor);
+
+		for (const auto& rectTransform : GetGameObject()->GetComponentsInChildren<RectTransform>(true))
+		{
+			rectTransform->RefreshPlacement();
+		}
 	}
 
 
@@ -173,9 +219,45 @@ namespace DF2D::Engine
 		return renderCamera;
 	}
 
+	UIScaleMode Canvas::GetUIScaleMode() const
+	{
+		return scaleMode;
+	}
+
+	const Vector2I& Canvas::GetReferenceResolution() const
+	{
+		return referenceResolution;
+	}
+
+	float Canvas::GetUIScaleFactor() const
+	{
+		return uiScaleFactor;
+	}
+
 	void Canvas::SetSortOrder(int value)
 	{
 		sortOrder = value;
+	}
+
+	void Canvas::SetUIScaleMode(UIScaleMode mode)
+	{
+		scaleMode = mode;
+
+		RecomputeUIScaleFactor();
+	}
+
+	void Canvas::SetReferenceResolution(const Vector2I& referenceResolution)
+	{
+		this->referenceResolution = referenceResolution;
+
+		RecomputeUIScaleFactor();
+	}
+
+	void Canvas::SetMatchWidthOrHeight(float matchWidthOrHeight)
+	{
+		this->matchWidthOrHeight = matchWidthOrHeight;
+
+		RecomputeUIScaleFactor();
 	}
 
 	void Canvas::SetScreenSpaceOverlay()
