@@ -78,6 +78,11 @@ namespace DF2D::Core
 		return renderBackend->GetResolutionTarget();
 	}
 
+	std::vector<Vector2I> Renderer::GetSupportedResolutions()
+	{
+		return renderBackend->GetSupportedResolutions();
+	}
+
 	void Renderer::SetViewport(RectI viewPort)
 	{
 		renderBackend->SetViewport(viewPort);
