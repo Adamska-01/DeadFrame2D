@@ -88,6 +88,8 @@ struct MockUIBackend : DF2D::Core::IUIBackend
 
 	std::unordered_map<DF2D::Data::UIElementID, std::unordered_map<int, std::string>> properties;
 
+	std::unordered_map<DF2D::Data::UIContextID, float> densityRatios;
+
 
 	std::unordered_map<DF2D::Data::UIElementID, std::vector<std::pair<std::string, std::string>>> dropdownOptions;
 
@@ -147,6 +149,11 @@ struct MockUIBackend : DF2D::Core::IUIBackend
 
 	void SetContextSize(DF2D::Data::UIContextID, DF2D::Core::Vector2I) override
 	{
+	}
+
+	void SetContextDensityIndependentPixelRatio(DF2D::Data::UIContextID context, float ratio) override
+	{
+		densityRatios[context] = ratio;
 	}
 
 	void UpdateContext(DF2D::Data::UIContextID) override

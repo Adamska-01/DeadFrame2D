@@ -15,6 +15,8 @@ struct MockRenderBackend : DF2D::Core::IRenderBackend
 
 	DF2D::Core::Vector2I resolutionTarget{1920, 1080};
 
+	std::vector<DF2D::Core::Vector2I> supportedResolutions{ {1280, 720}, {1920, 1080}, {2560, 1440}, {3840, 2160} };
+
 
 	// Call tracking
 	int createRenderTargetCount{0};
@@ -158,6 +160,11 @@ struct MockRenderBackend : DF2D::Core::IRenderBackend
 	DF2D::Core::Vector2I GetResolutionTarget() override
 	{
 		return resolutionTarget;
+	}
+
+	std::vector<DF2D::Core::Vector2I> GetSupportedResolutions() override
+	{
+		return supportedResolutions;
 	}
 
 	void SetViewport(DF2D::Core::RectI viewPort) override
