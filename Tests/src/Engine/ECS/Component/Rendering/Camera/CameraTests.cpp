@@ -153,6 +153,94 @@ TEST_CASE("ScreenToWorld is the inverse of WorldToScreen")
 	CHECK(roundTripped.y == doctest::Approx(worldPos.y));
 }
 
+TEST_CASE("Default fit mode is ENVELOPE, which leaves the view scale at 1")
+{
+	CameraFixture fixture;
+
+	CHECK(fixture.camera->GetFitMode() == CameraFitMode::ENVELOPE);
+	CHECK(fixture.camera->GetViewScale() == doctest::Approx(1.0f));
+}
+
+TEST_CASE("ENVELOPE ignores the reference resolution entirely")
+{
+	CameraFixture fixture;
+
+	fixture.camera->SetReferenceResolution(Vector2I{ 480, 270 });
+
+	CHECK(fixture.camera->GetViewScale() == doctest::Approx(1.0f));
+}
+
+TEST_CASE("MATCH_WIDTH scales the view by the target's width over the reference width")
+{
+	CameraFixture fixture;
+
+	// Render target is 1920x1080 (MockRenderBackend's default); a 960-wide reference doubles the scale.
+	fixture.camera->SetReferenceResolution(Vector2I{ 960, 1080 });
+	fixture.camera->SetFitMode(CameraFitMode::MATCH_WIDTH);
+
+	CHECK(fixture.camera->GetViewScale() == doctest::Approx(2.0f));
+}
+
+TEST_CASE("MATCH_HEIGHT scales the view by the target's height over the reference height")
+{
+	CameraFixture fixture;
+
+	fixture.camera->SetReferenceResolution(Vector2I{ 1920, 540 });
+	fixture.camera->SetFitMode(CameraFitMode::MATCH_HEIGHT);
+
+	CHECK(fixture.camera->GetViewScale() == doctest::Approx(2.0f));
+}
+
+TEST_CASE("LETTERBOX takes whichever axis would reveal less of the reference view")
+{
+	CameraFixture fixture;
+
+	// Width ratio is 2, height ratio is 1: LETTERBOX must pick the smaller so the full reference
+	// height still fits, at the cost of not filling the width.
+	fixture.camera->SetReferenceResolution(Vector2I{ 960, 1080 });
+	fixture.camera->SetFitMode(CameraFitMode::LETTERBOX);
+
+	CHECK(fixture.camera->GetViewScale() == doctest::Approx(1.0f));
+}
+
+TEST_CASE("Setting the fit mode recomputes the view scale immediately")
+{
+	CameraFixture fixture;
+
+	fixture.camera->SetReferenceResolution(Vector2I{ 960, 1080 });
+	CHECK(fixture.camera->GetViewScale() == doctest::Approx(1.0f));
+
+	fixture.camera->SetFitMode(CameraFitMode::MATCH_WIDTH);
+	CHECK(fixture.camera->GetViewScale() == doctest::Approx(2.0f));
+}
+
+TEST_CASE("A render-target-size-changed event recomputes the view scale under a non-ENVELOPE fit mode")
+{
+	CameraFixture fixture;
+
+	fixture.camera->SetReferenceResolution(Vector2I{ 1920, 1080 });
+	fixture.camera->SetFitMode(CameraFitMode::MATCH_WIDTH);
+	CHECK(fixture.camera->GetViewScale() == doctest::Approx(1.0f));
+
+	fixture.eventDispatcher.SendEvent(std::make_shared<RenderTargetSizeChangedEvent>(Vector2I{ 3840, 2160 }));
+
+	CHECK(fixture.camera->GetViewScale() == doctest::Approx(2.0f));
+}
+
+TEST_CASE("The view scale multiplies with zoom in WorldToScreen")
+{
+	CameraFixture fixture;
+
+	fixture.camera->SetReferenceResolution(Vector2I{ 960, 1080 });
+	fixture.camera->SetFitMode(CameraFitMode::MATCH_WIDTH);
+	fixture.camera->SetZoom(2.0f);
+
+	// Combined scale is zoom(2) * viewScale(2) = 4.
+	auto screenPos = fixture.camera->WorldToScreen(Vector2F{ 10.0f, 0.0f });
+
+	CHECK(screenPos.x == doctest::Approx(960.0f + 40.0f));
+}
+
 TEST_CASE("GetCameras includes a camera while it is alive")
 {
 	CameraFixture fixture;
