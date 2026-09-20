@@ -69,13 +69,24 @@ namespace DF2D::Core
 		auto renderTask = RenderTask();
 		renderTask.renderPhase = RenderPhase::SCREEN_SPACE_OVERLAY_UI;
 
+		// Size relative to the render target so it scales with the resolution.
+		// Keep the texture's aspect ratio to avoid stretching.
+		constexpr auto SPLASH_WIDTH_FRACTION = 0.38f;
+
+		auto aspectRatio = size.x > 0
+			? static_cast<float>(size.y) / static_cast<float>(size.x)
+			: 9.0f / 16.0f;
+
+		auto width = static_cast<float>(renderTargetSize.x) * SPLASH_WIDTH_FRACTION;
+		auto height = width * aspectRatio;
+
 		auto renderData = SpriteRenderData();
 		renderData.texture = splashTexture;
 		renderData.destRect = Core::RectF(
-			renderTargetSize.x * 0.5f - size.x * 0.2f,
-			renderTargetSize.y * 0.5f - size.y * 0.2f,
-			size.x * 0.4f,
-			size.y * 0.4f);
+			(renderTargetSize.x * 0.5f) - (width * 0.5f),
+			(renderTargetSize.y * 0.5f) - (height * 0.5f),
+			width,
+			height);
 
 		auto serviceCtx = serviceInitializer->GetServiceContext();
 		auto frameTimer = serviceCtx.frameTimer;
