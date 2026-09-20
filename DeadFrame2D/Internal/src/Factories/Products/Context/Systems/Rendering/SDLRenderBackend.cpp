@@ -456,6 +456,46 @@ namespace DF2D::Internal
 		return Vector2I(width, height);
 	}
 
+	std::vector<Vector2I> SDLRenderBackend::GetSupportedResolutions()
+	{
+		auto resolutions = std::vector<Vector2I>();
+
+		if (renderer == nullptr)
+			return resolutions;
+
+		// The renderer owns no SDL_Window of its own to ask -- SDL_RenderGetWindow recovers the one it
+		// was created against, which is what SDL_GetDisplayMode needs to know which physical display's
+		// modes to report.
+		auto* window = SDL_RenderGetWindow(renderer);
+
+		if (window == nullptr)
+			return resolutions;
+
+		auto displayIndex = SDL_GetWindowDisplayIndex(window);
+
+		if (displayIndex < 0)
+			return resolutions;
+
+		auto modeCount = SDL_GetNumDisplayModes(displayIndex);
+
+		for (auto i = 0; i < modeCount; ++i)
+		{
+			SDL_DisplayMode mode{};
+
+			if (SDL_GetDisplayMode(displayIndex, i, &mode) != 0)
+				continue;
+
+			auto resolution = Vector2I(mode.w, mode.h);
+
+			if (std::find(resolutions.begin(), resolutions.end(), resolution) == resolutions.end())
+			{
+				resolutions.push_back(resolution);
+			}
+		}
+
+		return resolutions;
+	}
+
 	void SDLRenderBackend::SetViewport(RectI viewPort)
 	{
 		auto sdlRect = RenderingConversions::ToSDLRect(viewPort);

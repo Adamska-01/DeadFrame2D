@@ -12,6 +12,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <vector>
 
 
 namespace DF2D::Engine
@@ -70,6 +71,8 @@ namespace DF2D::Core
 		Color GetDisplayColor();
 
 		Vector2I GetResolutionTarget();
+
+		std::vector<Vector2I> GetSupportedResolutions();
 
 		void SetViewport(RectI viewPort);
 

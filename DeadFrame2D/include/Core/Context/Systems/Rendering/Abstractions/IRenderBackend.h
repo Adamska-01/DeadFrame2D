@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <optional>
 #include <span>
+#include <vector>
 
 
 namespace DF2D::Core
@@ -127,6 +128,15 @@ namespace DF2D::Core
 
 		/** @brief Returns the logical resolution every coordinate passed to this interface is in. */
 		virtual Core::Vector2I GetResolutionTarget() = 0;
+
+		/**
+		 * @brief Returns the display's own supported resolutions, deduplicated and sized largest to
+		 * smallest.
+		 *
+		 * The OS may not reliably report its display modes until the window has been through at least
+		 * one real frame, so this can come back empty if called too early.
+		 */
+		virtual std::vector<Core::Vector2I> GetSupportedResolutions() = 0;
 
 		/**
 		 * @brief Restricts drawing to a sub-rectangle of the target and moves the coordinate origin.
