@@ -191,6 +191,11 @@ namespace DF2D::Core
 		backend->SetContextSize(context, size);
 	}
 
+	void UIManager::SetContextDensityIndependentPixelRatio(UIContextID context, float ratio)
+	{
+		backend->SetContextDensityIndependentPixelRatio(context, ratio);
+	}
+
 	bool UIManager::LoadStyleSheet(UIContextID context, const std::string& path)
 	{
 		return backend->LoadStyleSheet(context, path);

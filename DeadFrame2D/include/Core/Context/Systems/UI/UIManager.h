@@ -98,6 +98,9 @@ namespace DF2D::Core
 		/** @brief Resizes the surface that percentage lengths resolve against. */
 		void SetContextSize(Data::UIContextID context, Vector2I size);
 
+		/** @breif Sets how many pixels one stylesheet "dp" unit represents. */
+		void SetContextDensityIndependentPixelRatio(Data::UIContextID context, float ratio);
+
 		/** @brief Applies a stylesheet on top of the ones a surface has already loaded. */
 		bool LoadStyleSheet(Data::UIContextID context, const std::string& path);
 
