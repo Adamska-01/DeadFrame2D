@@ -46,6 +46,11 @@ namespace DF2D::Engine
 		/** @brief Seconds between repeats once one has started. */
 		float repeatRate;
 
+		/** @brief While true, LEFT/RIGHT presses are swallowed instead of moving focus. */
+		bool horizontalSuppressed = false;
+
+		/** @brief While true, UP/DOWN presses are swallowed instead of moving focus. */
+		bool verticalSuppressed = false;
 
 
 		/** @brief Registers one action and says so plainly if the name does not resolve to anything. */
@@ -60,6 +65,9 @@ namespace DF2D::Engine
 
 		/** @brief Moves focus one step, if there is a canvas to move it on. */
 		void Move(Data::UINavigationDirection direction);
+
+		/** @brief Whether the axis `direction` falls on is currently gated off. */
+		bool IsSuppressed(Data::UINavigationDirection direction) const;
 
 
 	public:
@@ -98,5 +106,21 @@ namespace DF2D::Engine
 		 * A press always moves focus once immediately; these only govern what holding does next.
 		 */
 		void SetRepeatTiming(float delaySeconds, float rateSeconds);
+
+		/**
+		 * @brief Prevents one navigation axis from moving focus.
+		 *
+		 * Useful when a focused widget uses that axis for its own input, such as a Slider using
+		 * LEFT/RIGHT to change its value. Changing the suppression state also clears any held direction.
+		 */
+		void SetHorizontalNavigationSuppressed(bool suppressed);
+
+		/**
+		 * @brief Prevents vertical navigation from moving focus.
+		 *
+		 * Useful when a focused widget uses UP/DOWN for its own input. Changing the suppression state also
+		 * clears any held direction.
+		 */
+		void SetVerticalNavigationSuppressed(bool suppressed);
 	};
 }

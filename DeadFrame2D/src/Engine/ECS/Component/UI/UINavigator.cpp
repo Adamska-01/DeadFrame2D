@@ -50,6 +50,13 @@ namespace DF2D::Engine
 	}
 
 
+	bool UINavigator::IsSuppressed(UINavigationDirection direction) const
+	{
+		auto isHorizontal = direction == UINavigationDirection::LEFT || direction == UINavigationDirection::RIGHT;
+
+		return (isHorizontal && horizontalSuppressed) || (!isHorizontal && verticalSuppressed);
+	}
+
 	void UINavigator::NavigateHandler(const InputActionView& action)
 	{
 		auto value = action.ReadValue<Vector2F>();
@@ -61,26 +68,25 @@ namespace DF2D::Engine
 			return;
 		}
 
-		// The larger axis wins outright: a diagonal push means one of the two, never both.
-		//
-		// Up reads as a positive y here, while the screen counts y downwards, so the vertical axis is
-		// read the way the input describes it rather than the way the layout is measured.
+		// Use the dominant axis, so a diagonal input moves in one direction only.
+		// Input uses positive Y for up, while the layout uses positive Y for down.
 		auto direction = std::abs(value.x) > std::abs(value.y)
 			? (value.x > 0.0f ? UINavigationDirection::RIGHT : UINavigationDirection::LEFT)
 			: (value.y > 0.0f ? UINavigationDirection::UP : UINavigationDirection::DOWN);
 
-		// A fresh press always moves once, right away. Only what happens afterwards is paced, so
-		// pressing a direction repeatedly and quickly registers every press.
-		//
-		// A new direction counts as a fresh press too, even without the action restarting: pushing from
-		// one direction into another should move at once rather than finish the old direction's wait.
+		// A fresh press moves immediately. Holding the same direction is handled by the repeat timer.
+		// Changing direction also counts as a fresh press.
 		if (!action.IsStarted() && heldDirection == direction)
 			return;
 
+		// Keep track of the held direction even when navigation is suppressed.
 		heldDirection = direction;
 		repeatTimer = repeatDelay;
 
-		Move(direction);
+		if (!IsSuppressed(direction))
+		{
+			Move(direction);
+		}
 	}
 
 	void UINavigator::SubmitHandler(const InputActionView& action)
@@ -139,7 +145,8 @@ namespace DF2D::Engine
 		// quietly slowing to one move per frame.
 		while (repeatTimer <= 0.0f)
 		{
-			Move(*heldDirection);
+			if (!IsSuppressed(*heldDirection))
+				Move(*heldDirection);
 
 			repeatTimer += repeatRate;
 		}
@@ -168,5 +175,15 @@ namespace DF2D::Engine
 		// A rate of zero would mean an infinite number of moves in one frame, so it is floored at
 		// something a frame can actually deliver.
 		repeatRate = std::max(rateSeconds, MinimumRepeatRate);
+	}
+
+	void UINavigator::SetHorizontalNavigationSuppressed(bool suppressed)
+	{
+		horizontalSuppressed = suppressed;
+	}
+
+	void UINavigator::SetVerticalNavigationSuppressed(bool suppressed)
+	{
+		verticalSuppressed = suppressed;
 	}
 }
