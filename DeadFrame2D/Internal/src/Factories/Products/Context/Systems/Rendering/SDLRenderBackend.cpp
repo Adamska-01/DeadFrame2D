@@ -9,6 +9,7 @@
 #include "Engine/Events/Context/Renderer/RenderTargetSizeChangedEvent.h"
 #include "Factories/Products/Context/Systems/Rendering/SDLRenderBackend.h"
 #include <SDL.h>
+#include <algorithm>
 #include <cstddef>
 #include <iostream>
 
