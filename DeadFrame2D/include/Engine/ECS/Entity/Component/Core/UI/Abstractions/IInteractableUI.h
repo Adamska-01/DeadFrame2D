@@ -73,6 +73,9 @@ namespace DF2D::Engine
 		/** @brief Fired when a pointer button is released over this element. */
 		Utilities::MultiCastVoid OnPointerUp;
 
+		/** @brief Fired when this element gains or loses keyboard focus; true means gained. */
+		Utilities::MulticastDelegate<bool> OnFocusChanged;
+
 
 		/**
 		 * @brief Enables or disables interaction.

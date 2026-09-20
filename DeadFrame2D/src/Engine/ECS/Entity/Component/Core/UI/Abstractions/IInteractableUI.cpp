@@ -172,6 +172,14 @@ namespace DF2D::Engine
 			OnPointerUp.Broadcast();
 			break;
 
+		case UIEventType::FOCUS_GAINED:
+			OnFocusChanged.Broadcast(true);
+			break;
+
+		case UIEventType::FOCUS_LOST:
+			OnFocusChanged.Broadcast(false);
+			break;
+
 		default:
 			break;
 		}
