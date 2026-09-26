@@ -216,6 +216,23 @@ namespace DF2D::Core
 		backend->ActivateFocused(context);
 	}
 
+	std::vector<ComponentHandle<UIComponent>> UIManager::GetFocusedOwners(UIContextID context) const
+	{
+		auto element = backend->GetFocusedElement(context);
+
+		if (element == 0)
+			return {};
+
+		auto it = elementOwners.find(element);
+
+		if (it == elementOwners.end())
+			return {};
+
+		// Every component on the focused object, not just one: an element is shared, so which of its
+		// owners the caller means is the caller's to decide.
+		return it->second;
+	}
+
 	GeometryDrawList UIManager::RenderContext(UIContextID context)
 	{
 		return backend->RenderContext(context);

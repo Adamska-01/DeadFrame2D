@@ -113,6 +113,9 @@ namespace DF2D::Core
 		/** @brief Activates whatever holds focus, as though it had been clicked. */
 		void ActivateFocused(Data::UIContextID context);
 
+		/** @brief The components behind the element that currently holds focus, if any. */
+		std::vector<Engine::ComponentHandle<Engine::UIComponent>> GetFocusedOwners(Data::UIContextID context) const;
+
 		/** @brief Renders one surface into a draw list, ready to submit as a render task. */
 		Data::GeometryDrawList RenderContext(Data::UIContextID context);
 
