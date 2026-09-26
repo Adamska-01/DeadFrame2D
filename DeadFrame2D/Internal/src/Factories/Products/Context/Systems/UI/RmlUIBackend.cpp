@@ -75,6 +75,12 @@ namespace DF2D::Internal
 
 	RmlUIBackend::~RmlUIBackend()
 	{
+		// Never-parented elements go first, while the library that allocated them is still running.
+		for (auto& [id, entry] : elements)
+		{
+			entry.detached.reset();
+		}
+
 		if (initialised)
 		{
 			Rml::Shutdown();
@@ -185,6 +191,16 @@ namespace DF2D::Internal
 
 		if (it == contexts.end())
 			return;
+
+		// Never-parented elements belong to this context too, but its document doesn't know about them,
+		// so they are freed here, before the context they were created from goes away.
+		for (auto& [id, entry] : elements)
+		{
+			if (entry.context == context)
+			{
+				entry.detached.reset();
+			}
+		}
 
 		if (it->second.context != nullptr)
 		{

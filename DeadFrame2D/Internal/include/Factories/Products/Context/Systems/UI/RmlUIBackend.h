@@ -54,10 +54,12 @@ namespace DF2D::Internal
 
 			Data::UIContextID context = 0;
 
+			// Declared before `detached` on purpose: members die in reverse order, and a detached
+			// element's destructor still calls OnDetach on this listener, so it must outlive the element.
+			std::unique_ptr<RmlEventListener> listener;
+
 			/** @brief Owns the element while it is detached; null once a parent has taken it. */
 			Rml::ElementPtr detached;
-
-			std::unique_ptr<RmlEventListener> listener;
 		};
 
 
