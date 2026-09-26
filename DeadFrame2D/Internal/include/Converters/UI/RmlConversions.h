@@ -83,6 +83,8 @@ namespace DF2D::Internal::RmlConversions
 		case Data::UIStyleProperty::BACKGROUND_COLOR:	return "background-color";
 		case Data::UIStyleProperty::DECORATOR:			return "decorator";
 		case Data::UIStyleProperty::IMAGE_COLOR:		return "image-color";
+		case Data::UIStyleProperty::IMAGE_FIT:			return "image-fit";
+		case Data::UIStyleProperty::IMAGE_ALIGN_X:		return "image-align-x";
 		case Data::UIStyleProperty::OPACITY:			return "opacity";
 		case Data::UIStyleProperty::COLOR:				return "color";
 		case Data::UIStyleProperty::FONT_FAMILY:		return "font-family";
