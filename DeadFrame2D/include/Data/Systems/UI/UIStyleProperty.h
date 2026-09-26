@@ -79,6 +79,10 @@ namespace DF2D::Data
 
 		IMAGE_COLOR,
 
+		IMAGE_FIT,
+
+		IMAGE_ALIGN_X,
+
 		OPACITY,
 
 		// Text
