@@ -6,8 +6,10 @@
 #include "Data/Systems/UI/UIElementType.h"
 #include "Data/Systems/UI/UINavigationDirection.h"
 #include "DF2D_API.h"
+#include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
 #include <string>
+#include <vector>
 
 
 namespace DF2D::Engine
@@ -15,6 +17,8 @@ namespace DF2D::Engine
 	class Canvas;
 
 	class GameObject;
+
+	class UIComponent;
 }
 
 
@@ -84,6 +88,9 @@ namespace DF2D::Core
 
 		/** @brief Activates whatever holds focus, as though it had been clicked. */
 		void ActivateFocused();
+
+		/** @brief The components behind the focused element, or nothing when nothing is focused. */
+		std::vector<Engine::ComponentHandle<Engine::UIComponent>> GetFocusedOwners() const;
 
 		/** @brief Renders the surface into an ordered draw list, ready to submit as a render task. */
 		Data::GeometryDrawList Render();

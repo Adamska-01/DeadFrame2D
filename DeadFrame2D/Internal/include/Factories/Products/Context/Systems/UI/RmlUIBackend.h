@@ -77,6 +77,8 @@ namespace DF2D::Internal
 
 		std::unordered_map<Data::UIElementID, ElementEntry> elements;
 
+		std::unordered_map<const Rml::Element*, Data::UIElementID> elementIDs;
+
 		Data::UIElementID nextElementID = 1;
 
 		bool initialised = false;
@@ -181,6 +183,8 @@ namespace DF2D::Internal
 		void Navigate(Data::UIContextID context, Data::UINavigationDirection direction) override;
 
 		void ActivateFocused(Data::UIContextID context) override;
+
+		Data::UIElementID GetFocusedElement(Data::UIContextID context) const override;
 
 		bool HasKeyboardFocus(Data::UIContextID context) const override;
 

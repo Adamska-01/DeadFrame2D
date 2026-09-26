@@ -89,6 +89,7 @@ namespace DF2D::Internal
 		}
 
 		elements.clear();
+		elementIDs.clear();
 		contexts.clear();
 
 		Rml::SetSystemInterface(nullptr);
@@ -122,6 +123,8 @@ namespace DF2D::Internal
 		entry.element = element;
 		entry.context = context;
 		entry.detached = std::move(owned);
+
+		elementIDs[element] = id;
 
 		entry.listener = std::make_unique<RmlEventListener>(eventSink, id);
 
@@ -210,9 +213,16 @@ namespace DF2D::Internal
 		// Now that the elements are gone, the handles pointing at them are safe to drop.
 		for (auto elementIt = elements.begin(); elementIt != elements.end(); )
 		{
-			elementIt = elementIt->second.context == context
-				? elements.erase(elementIt)
-				: std::next(elementIt);
+			if (elementIt->second.context != context)
+			{
+				elementIt = std::next(elementIt);
+
+				continue;
+			}
+
+			elementIDs.erase(elementIt->second.element);
+
+			elementIt = elements.erase(elementIt);
 		}
 
 		contexts.erase(it);
@@ -346,6 +356,8 @@ namespace DF2D::Internal
 				parent->RemoveChild(raw);
 			}
 		}
+
+		elementIDs.erase(raw);
 
 		elements.erase(it);
 	}
@@ -703,6 +715,24 @@ namespace DF2D::Internal
 
 		entry->context->ProcessKeyDown(Rml::Input::KI_RETURN, 0);
 		entry->context->ProcessKeyUp(Rml::Input::KI_RETURN, 0);
+	}
+
+	UIElementID RmlUIBackend::GetFocusedElement(UIContextID context) const
+	{
+		const auto* entry = FindContext(context);
+
+		if (entry == nullptr)
+			return 0;
+
+		auto* focused = entry->context->GetFocusElement();
+
+		// The document holds focus when nothing else does, and it is the surface rather than a widget.
+		if (focused == nullptr || focused == static_cast<Rml::Element*>(entry->document))
+			return 0;
+
+		auto it = elementIDs.find(focused);
+
+		return it != elementIDs.end() ? it->second : 0;
 	}
 
 	bool RmlUIBackend::HasKeyboardFocus(UIContextID context) const

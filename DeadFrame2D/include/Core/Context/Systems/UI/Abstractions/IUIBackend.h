@@ -308,6 +308,11 @@ namespace DF2D::Core
 		virtual void ActivateFocused(Data::UIContextID context) = 0;
 
 		/**
+		 * @brief The element that currently holds keyboard focus, or 0 when only the surface itself does.
+		 */
+		virtual Data::UIElementID GetFocusedElement(Data::UIContextID context) const = 0;
+
+		/**
 		* @brief Whether an element currently holds keyboard focus and is consuming typing.
 		*/
 		virtual bool HasKeyboardFocus(Data::UIContextID context) const = 0;

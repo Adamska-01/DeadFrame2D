@@ -79,6 +79,11 @@ namespace DF2D::Core
 		}
 	}
 
+	std::vector<ComponentHandle<UIComponent>> UIContext::GetFocusedOwners() const
+	{
+		return IsValid() ? manager->GetFocusedOwners(id) : std::vector<ComponentHandle<UIComponent>>();
+	}
+
 	GeometryDrawList UIContext::Render()
 	{
 		return IsValid() ? manager->RenderContext(id) : GeometryDrawList{};
