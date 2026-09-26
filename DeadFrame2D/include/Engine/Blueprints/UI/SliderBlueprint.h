@@ -4,7 +4,6 @@
 #include "Engine/ECS/Component/UI/Image.h"
 #include "Engine/ECS/Component/UI/RectTransform.h"
 #include "Engine/ECS/Component/UI/Slider.h"
-#include "Engine/ECS/Component/UI/UINavigator.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
 #include <string_view>
 
@@ -12,10 +11,9 @@
 namespace DF2D::Engine
 {
 	/**
-	 * @brief A slider whose fill is two swappable layers (unfilled background, filled foreground
-	 * clipped to the value's fraction) instead of a track/handle. Each layer can be a texture or,
-	 * with the no-texture constructor, a flat colour fill. The real <input type="range"> still drives
-	 * dragging/keyboard input; style its track/progress/handle to nothing so only the two layers draw.
+	 * @brief A slider rendered as separate unfilled and filled layers.
+	 *
+	 * The layers can use textures or flat colours. The underlying Slider handles input and state.
 	 */
 	class DF2D_API SliderBlueprint : public GameObject
 	{
@@ -28,18 +26,10 @@ namespace DF2D::Engine
 
 		ComponentHandle<RectTransform> clipRect;
 
-		ComponentHandle<UINavigator> navigator;
-
 		Core::Vector2F size;
 
-		int tier = 0;
 
-		bool editing = false;
-
-
-		void Refresh(float value);
-
-		void EnterEditing();
+		void Refresh();
 
 
 	public:
@@ -49,24 +39,17 @@ namespace DF2D::Engine
 			std::string_view filledTexturePath,
 			float minValue,
 			float maxValue,
-			float initialValue,
-			ComponentHandle<UINavigator> navigatorHandle = ComponentHandle<UINavigator>());
+			float initialValue);
 
 		/** @brief Same widget with no textures -- background/foreground are flat colour fills instead. */
 		SliderBlueprint(
 			const Core::Vector2F& size,
 			float minValue,
 			float maxValue,
-			float initialValue,
-			ComponentHandle<UINavigator> navigatorHandle = ComponentHandle<UINavigator>());
+			float initialValue);
 
 
 		/** @brief The underlying range widget, for the owner's own OnValueChanged binding. */
 		ComponentHandle<Slider> GetSlider() const;
-
-		bool IsEditing() const;
-
-		/** @brief Exits editing mode. Safe to call whether or not this slider is currently editing. */
-		void ExitEditing();
 	};
 }

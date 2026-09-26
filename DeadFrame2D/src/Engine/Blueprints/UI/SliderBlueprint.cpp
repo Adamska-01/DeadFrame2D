@@ -20,14 +20,15 @@ namespace DF2D::Engine
 			Color filled;
 		};
 
-		TierColors GetTierColors(int tier)
+		TierColors GetTierColors(bool activated, bool focused)
 		{
-			switch (tier)
-			{
-			case 2:  return { Color{ 0x4a, 0x4a, 0x52, 255 }, Color{ 0xff, 0xff, 0xff, 255 } }; // editing
-			case 1:  return { Color{ 0x3a, 0x3a, 0x40, 255 }, Color{ 0xcf, 0xcf, 0xd6, 255 } }; // focused
-			default: return { Color{ 0x2a, 0x2a, 0x2e, 255 }, Color{ 0x8a, 0x8a, 0x92, 255 } }; // resting
-			}
+			if (activated)
+				return { Color{ 0x4a, 0x4a, 0x52, 255 }, Color{ 0xff, 0xff, 0xff, 255 } };
+
+			if (focused)
+				return { Color{ 0x3a, 0x3a, 0x40, 255 }, Color{ 0xcf, 0xcf, 0xd6, 255 } };
+
+			return { Color{ 0x2a, 0x2a, 0x2e, 255 }, Color{ 0x8a, 0x8a, 0x92, 255 } };
 		}
 	}
 
@@ -38,9 +39,8 @@ namespace DF2D::Engine
 		std::string_view filledTexturePath,
 		float minValue,
 		float maxValue,
-		float initialValue,
-		ComponentHandle<UINavigator> navigatorHandle)
-		: navigator(navigatorHandle), size(size)
+		float initialValue)
+		: size(size)
 	{
 		AddComponent<RectTransform>()->SetSizeDelta(size);
 
@@ -83,111 +83,38 @@ namespace DF2D::Engine
 		slider->SetRange(minValue, maxValue);
 		slider->SetValue(initialValue);
 
-		Refresh(initialValue);
+		Refresh();
 
-		slider->OnValueChanged.AddHandle(slider, [this](float value) { Refresh(value); });
-
-		// Focus alone only reaches tier 1 (LEFT/RIGHT blocked); Submit/click enters tier 2 editing.
-		slider->OnFocusChanged.AddHandle(slider, [this](bool focused)
-		{
-			if (focused)
-			{
-				tier = 1;
-
-				if (navigator)
-				{
-					navigator->SetHorizontalNavigationSuppressed(true);
-				}
-			}
-			else
-			{
-				tier = 0;
-
-				ExitEditing();
-
-				// ExitEditing alone leaves LEFT/RIGHT blocked (correct while still focused); losing
-				// focus entirely needs both axes freed.
-				if (navigator)
-				{
-					navigator->SetHorizontalNavigationSuppressed(false);
-				}
-			}
-
-			Refresh(slider->GetValue());
-		});
-
-		slider->OnClick.AddHandle(slider, [this]()
-		{
-			if (editing)
-				ExitEditing();
-			else
-				EnterEditing();
-		});
+		// The three looks are just the slider's own states drawn differently, so each state change is
+		// the same repaint. Which state the slider is in is not this blueprint's business.
+		slider->OnValueChanged.AddHandle(slider, [this](float) { Refresh(); });
+		slider->OnFocusChanged.AddHandle(slider, [this](bool) { Refresh(); });
+		slider->OnActivationChanged.AddHandle(slider, [this](bool) { Refresh(); });
 	}
 
 	SliderBlueprint::SliderBlueprint(
 		const Vector2F& size,
 		float minValue,
 		float maxValue,
-		float initialValue,
-		ComponentHandle<UINavigator> navigatorHandle)
-		: SliderBlueprint(size, "", "", minValue, maxValue, initialValue, navigatorHandle)
+		float initialValue)
+		: SliderBlueprint(size, "", "", minValue, maxValue, initialValue)
 	{
 	}
 
-	void SliderBlueprint::Refresh(float value)
+	void SliderBlueprint::Refresh()
 	{
 		auto range = slider->GetMaximum() - slider->GetMinimum();
+		auto value = slider->GetValue();
 		auto fraction = range > 0.0f ? MathUtils::Clamp((value - slider->GetMinimum()) / range, 0.0f, 1.0f) : 0.0f;
-		auto colors = GetTierColors(tier);
+		auto colors = GetTierColors(slider->IsActivated(), slider->IsFocused());
 
 		clipRect->SetSizeDelta(Vector2F(size.x * fraction, size.y));
 		backgroundImage->SetColor(colors.unfilled);
 		foregroundImage->SetColor(colors.filled);
 	}
 
-	void SliderBlueprint::EnterEditing()
-	{
-		if (editing)
-			return;
-
-		editing = true;
-		tier = 2;
-
-		// Editing hands LEFT/RIGHT to the slider; UP/DOWN parked to avoid walking the value by accident.
-		if (navigator)
-		{
-			navigator->SetVerticalNavigationSuppressed(true);
-			navigator->SetHorizontalNavigationSuppressed(false);
-		}
-
-		Refresh(slider->GetValue());
-	}
-
 	ComponentHandle<Slider> SliderBlueprint::GetSlider() const
 	{
 		return slider;
-	}
-
-	bool SliderBlueprint::IsEditing() const
-	{
-		return editing;
-	}
-
-	void SliderBlueprint::ExitEditing()
-	{
-		if (!editing)
-			return;
-
-		editing = false;
-		tier = slider->IsFocused() ? 1 : 0;
-
-		if (navigator)
-		{
-			navigator->SetVerticalNavigationSuppressed(false);
-			navigator->SetHorizontalNavigationSuppressed(true);
-		}
-
-		Refresh(slider->GetValue());
 	}
 }
