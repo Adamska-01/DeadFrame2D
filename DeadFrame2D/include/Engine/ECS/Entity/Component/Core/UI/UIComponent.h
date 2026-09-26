@@ -15,6 +15,7 @@
 #include "Engine/ECS/Entity/Component/Handle/ComponentHandle.h"
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <unordered_set>
 
 
@@ -59,6 +60,9 @@ namespace DF2D::Engine
 
 		/** @brief Classes requested before the element existed, replayed once it does. */
 		std::unordered_set<std::string> pendingClasses;
+
+		/** @brief Style properties set through SetStyleProperty before the element existed, replayed once it does. */
+		std::unordered_map<Data::UIStyleProperty, std::string> pendingStyleProperties;
 
 
 		void OnParentGameObjectChangedHandler(const ObjectHandle<GameObject>& obj) override;

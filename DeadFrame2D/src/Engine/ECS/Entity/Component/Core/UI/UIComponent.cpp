@@ -138,6 +138,15 @@ namespace DF2D::Engine
 		pendingClasses.clear();
 
 		OnElementCreated();
+
+		// After the component's own setup, so a property the game asked for explicitly wins over the
+		// component's defaults.
+		for (const auto& [property, value] : pendingStyleProperties)
+		{
+			SetStyle(property, value);
+		}
+
+		pendingStyleProperties.clear();
 	}
 
 	void UIComponent::SyncElementParent()
@@ -222,6 +231,15 @@ namespace DF2D::Engine
 
 	void UIComponent::SetStyleProperty(UIStyleProperty property, const std::string& value)
 	{
+		// Same reason as SetClass: a scene built in Enter has no element yet, and writing to an invalid
+		// one is silently dropped.
+		if (!element.IsValid())
+		{
+			pendingStyleProperties[property] = value;
+
+			return;
+		}
+
 		SetStyle(property, value);
 	}
 
