@@ -40,6 +40,8 @@ namespace DF2D::Engine
 
 		void OnInteraction(Data::UIEventType eventType, const Data::UIEventPayload& payload) override;
 
+		void OnActivationStateChanged(bool isActivated) override;
+
 
 	public:
 		Slider();
@@ -66,6 +68,11 @@ namespace DF2D::Engine
 
 		/** @brief Lays the slider out down the screen instead of across it. */
 		void SetVertical(bool isVertical);
+
+
+		bool HasActivationState() const override;
+
+		Data::UINavigationResponse ResolveNavigation(Data::UINavigationDirection direction) const override;
 
 
 		float GetValue() const;

@@ -41,12 +41,39 @@ namespace DF2D::Engine
 	}
 
 
+	ComponentHandle<IInteractableUI> UINavigator::GetFocused() const
+	{
+		if (canvas == nullptr)
+			return {};
+
+		// Multiple components can own the same element, but only the widget handles
+		for (const auto& owner : canvas->GetContext().GetFocusedOwners())
+		{
+			auto widget = ComponentHandle<IInteractableUI>::SafeCast(owner);
+
+			if (widget != nullptr)
+				return widget;
+		}
+
+		return {};
+	}
+
 	void UINavigator::Move(UINavigationDirection direction)
 	{
-		if (canvas != nullptr)
-		{
-			canvas->GetContext().Navigate(direction);
-		}
+		if (canvas == nullptr)
+			return;
+
+		// Let the focused widget decide whether to block, consume, or pass on the input.
+		auto focusedWidget = GetFocused();
+
+		auto response = focusedWidget != nullptr
+			? focusedWidget->ResolveNavigation(direction)
+			: UINavigationResponse::MOVE_FOCUS;
+
+		if (response == UINavigationResponse::BLOCK)
+			return;
+
+		canvas->GetContext().Navigate(direction);
 	}
 
 
@@ -91,18 +118,45 @@ namespace DF2D::Engine
 
 	void UINavigator::SubmitHandler(const InputActionView& action)
 	{
-		if (canvas != nullptr && action.IsStarted())
+		if (canvas == nullptr || !action.IsStarted())
+			return;
+
+		auto focusedWidget = GetFocused();
+
+		// Widgets with an activation state toggle it; other widgets handle Submit normally.
+		if (focusedWidget != nullptr && focusedWidget->HasActivationState())
 		{
-			canvas->GetContext().ActivateFocused();
+			if (focusedWidget->IsActivated())
+			{
+				focusedWidget->Deactivate();
+			}
+			else
+			{
+				focusedWidget->Activate();
+			}
+
+			return;
 		}
+
+		canvas->GetContext().ActivateFocused();
 	}
 
 	void UINavigator::CancelHandler(const InputActionView& action)
 	{
-		if (action.IsStarted())
+		if (!action.IsStarted())
+			return;
+
+		// Backing out of an activated widget first: the player is leaving the control, not the screen.
+		auto focusedWidget = GetFocused();
+
+		if (focusedWidget != nullptr && focusedWidget->IsActivated())
 		{
-			OnCancel.Broadcast();
+			focusedWidget->Deactivate();
+
+			return;
 		}
+
+		OnCancel.Broadcast();
 	}
 
 

@@ -30,6 +30,14 @@ namespace DF2D::Engine
 
 	void Slider::OnInteraction(UIEventType eventType, const UIEventPayload& payload)
 	{
+		// A pointer click should immediately activate the slider.
+		if (eventType == UIEventType::CLICK)
+		{
+			Activate();
+
+			return;
+		}
+
 		if (eventType != UIEventType::VALUE_CHANGED)
 			return;
 
@@ -39,6 +47,15 @@ namespace DF2D::Engine
 		value = payload.numericValue;
 
 		OnValueChanged.Broadcast(value);
+	}
+
+	void Slider::OnActivationStateChanged(bool isActivated)
+	{
+		// Activation must focus the slider so arrow-key input can change its value.
+		if (isActivated && !IsFocused())
+		{
+			Focus();
+		}
 	}
 
 
@@ -105,6 +122,30 @@ namespace DF2D::Engine
 	bool Slider::IsVertical() const
 	{
 		return vertical;
+	}
+
+	bool Slider::HasActivationState() const
+	{
+		return true;
+	}
+
+	UINavigationResponse Slider::ResolveNavigation(UINavigationDirection direction) const
+	{
+		auto isHorizontal = direction == UINavigationDirection::LEFT || direction == UINavigationDirection::RIGHT;
+		auto isOwnAxis = isHorizontal != vertical;
+
+		if (isOwnAxis)
+		{
+			// Before activation, block the input so reaching the slider does not change its value.
+			return IsActivated()
+				? UINavigationResponse::CONSUME
+				: UINavigationResponse::BLOCK;
+		}
+
+		// Once activated, block navigation on the cross axis while adjusting the slider.
+		return IsActivated()
+			? UINavigationResponse::BLOCK
+			: UINavigationResponse::MOVE_FOCUS;
 	}
 
 

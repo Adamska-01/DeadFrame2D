@@ -71,48 +71,6 @@ namespace DF2D::Engine
 		}
 	}
 
-	const std::string& IInteractableUI::NavigationId()
-	{
-		// Assigned on first use rather than to everything: an id only matters to a widget something
-		// else navigates to, and the rest are better left without one for a stylesheet to use.
-		if (navigationId.empty())
-		{
-			static auto nextId = 0;
-
-			navigationId = "df2d-nav-" + std::to_string(++nextId);
-
-			SetAttribute(UIAttribute::ID, navigationId);
-		}
-
-		return navigationId;
-	}
-
-	void IInteractableUI::SetNavigationMode(UINavigationMode mode)
-	{
-		if (mode == navigationMode)
-			return;
-
-		navigationMode = mode;
-
-		ApplyNavigability();
-	}
-
-	void IInteractableUI::SetNavigationTarget(UINavigationDirection direction, const ComponentHandle<IInteractableUI>& target)
-	{
-		// Naming a neighbour is only meaningful when this widget's own links are what decide, so saying
-		// so switches the mode rather than being quietly ignored under AUTOMATIC.
-		navigationMode = UINavigationMode::EXPLICIT;
-
-		navigationTargets[ToIndex(direction)] = target != nullptr ? target->NavigationId() : std::string();
-
-		ApplyNavigability();
-	}
-
-	UINavigationMode IInteractableUI::GetNavigationMode() const
-	{
-		return navigationMode;
-	}
-
 	void IInteractableUI::OnElementCreated()
 	{
 		// The id may have been handed out while something else was wiring up its navigation, before this
@@ -139,6 +97,10 @@ namespace DF2D::Engine
 	}
 
 	void IInteractableUI::OnInteraction(UIEventType eventType, const UIEventPayload& payload)
+	{
+	}
+
+	void IInteractableUI::OnActivationStateChanged(bool isActivated)
 	{
 	}
 
@@ -173,10 +135,18 @@ namespace DF2D::Engine
 			break;
 
 		case UIEventType::FOCUS_GAINED:
+			focused = true;
+
 			OnFocusChanged.Broadcast(true);
 			break;
 
 		case UIEventType::FOCUS_LOST:
+			focused = false;
+
+			// Activation is the step after focus, so it cannot outlive it: without this, a widget the
+			// player has moved on from keeps showing itself as the selected one.
+			Deactivate();
+
 			OnFocusChanged.Broadcast(false);
 			break;
 
@@ -185,6 +155,17 @@ namespace DF2D::Engine
 		}
 
 		OnInteraction(eventType, payload);
+	}
+
+
+	bool IInteractableUI::HasActivationState() const
+	{
+		return false;
+	}
+
+	UINavigationResponse IInteractableUI::ResolveNavigation(UINavigationDirection direction) const
+	{
+		return UINavigationResponse::MOVE_FOCUS;
 	}
 
 
@@ -206,6 +187,11 @@ namespace DF2D::Engine
 		// A disabled widget must also drop out of navigation, or focus would still land on something
 		// that refuses every interaction once it gets there.
 		ApplyNavigability();
+
+		if (!value)
+		{
+			Deactivate();
+		}
 	}
 
 	bool IInteractableUI::IsInteractable() const
@@ -228,6 +214,83 @@ namespace DF2D::Engine
 		element.Focus();
 	}
 
+	void IInteractableUI::Activate()
+	{
+		if (activated || !HasActivationState() || !interactable)
+			return;
+
+		activated = true;
+
+		// A class rather than a backend state: "selected" is an engine idea the UI library has no
+		// pseudo-class for, and a stylesheet still needs to be able to select on it.
+		SetClass("activated", true);
+
+		OnActivationStateChanged(true);
+
+		OnActivationChanged.Broadcast(true);
+	}
+
+	void IInteractableUI::Deactivate()
+	{
+		if (!activated)
+			return;
+
+		activated = false;
+
+		SetClass("activated", false);
+
+		OnActivationStateChanged(false);
+
+		OnActivationChanged.Broadcast(false);
+	}
+
+	bool IInteractableUI::IsActivated() const
+	{
+		return activated;
+	}
+
+	void IInteractableUI::SetNavigationMode(UINavigationMode mode)
+	{
+		if (mode == navigationMode)
+			return;
+
+		navigationMode = mode;
+
+		ApplyNavigability();
+	}
+
+	void IInteractableUI::SetNavigationTarget(UINavigationDirection direction, const ComponentHandle<IInteractableUI>& target)
+	{
+		// Naming a neighbour is only meaningful when this widget's own links are what decide, so saying
+		// so switches the mode rather than being quietly ignored under AUTOMATIC.
+		navigationMode = UINavigationMode::EXPLICIT;
+
+		navigationTargets[ToIndex(direction)] = target != nullptr ? target->NavigationId() : std::string();
+
+		ApplyNavigability();
+	}
+
+	UINavigationMode IInteractableUI::GetNavigationMode() const
+	{
+		return navigationMode;
+	}
+
+	const std::string& IInteractableUI::NavigationId()
+	{
+		// Assigned on first use rather than to everything: an id only matters to a widget something
+		// else navigates to, and the rest are better left without one for a stylesheet to use.
+		if (navigationId.empty())
+		{
+			static auto nextId = 0;
+
+			navigationId = "df2d-nav-" + std::to_string(++nextId);
+
+			SetAttribute(UIAttribute::ID, navigationId);
+		}
+
+		return navigationId;
+	}
+
 	bool IInteractableUI::IsHovered() const
 	{
 		return HasState(UIPseudoClass::HOVER);
@@ -240,6 +303,6 @@ namespace DF2D::Engine
 
 	bool IInteractableUI::IsFocused() const
 	{
-		return HasState(UIPseudoClass::FOCUS);
+		return focused;
 	}
 }

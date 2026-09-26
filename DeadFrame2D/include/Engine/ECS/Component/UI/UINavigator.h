@@ -63,7 +63,10 @@ namespace DF2D::Engine
 
 		void CancelHandler(const Core::InputActionView& action);
 
-		/** @brief Moves focus one step, if there is a canvas to move it on. */
+		/** @brief The widget holding focus on this canvas, or an empty handle if none does. */
+		ComponentHandle<IInteractableUI> GetFocused() const;
+
+		/** @brief Moves focus one step, unless the focused widget wants the input for itself. */
 		void Move(Data::UINavigationDirection direction);
 
 		/** @brief Whether the axis `direction` falls on is currently gated off. */

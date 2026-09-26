@@ -1,5 +1,6 @@
 #pragma once
 #include "Data/Components/UI/Navigation/UINavigationMode.h"
+#include "Data/Components/UI/Navigation/UINavigationResponse.h"
 #include "Data/Systems/UI/UINavigationDirection.h"
 #include "Data/Systems/UI/UIPseudoClass.h"
 #include "DF2D_API.h"
@@ -27,6 +28,10 @@ namespace DF2D::Engine
 
 		bool focusRequested = false;
 
+		bool focused = false;
+
+		bool activated = false;
+
 		Data::UINavigationMode navigationMode = Data::UINavigationMode::AUTOMATIC;
 
 		/** @brief Named neighbour per direction, indexed by UINavigationDirection. Empty means unset. */
@@ -49,6 +54,9 @@ namespace DF2D::Engine
 
 		/** @brief Called after UI events have been dispatched to add custom behavior. */
 		virtual void OnInteraction(Data::UIEventType eventType, const Data::UIEventPayload& payload);
+
+		/** @brief Called when this widget is activated or deactivated, for a widget's own handling. */
+		virtual void OnActivationStateChanged(bool isActivated);
 
 
 		void HandleUIEvent(Data::UIEventType eventType, const Data::UIEventPayload& payload) override;
@@ -76,6 +84,21 @@ namespace DF2D::Engine
 		/** @brief Fired when this element gains or loses keyboard focus; true means gained. */
 		Utilities::MulticastDelegate<bool> OnFocusChanged;
 
+		/** @brief Fired when this widget is activated or deactivated; true means activated. */
+		Utilities::MulticastDelegate<bool> OnActivationChanged;
+
+
+		/** @brief Whether the widget requires activation after gaining focus. */
+		virtual bool HasActivationState() const;
+
+		/** 
+		 * @brief Defines how the widget handles navigation while focused.
+		 *
+		 * This lets widgets consume or block their own input instead of requiring special handling in
+		 * the navigator.
+		 */
+		virtual Data::UINavigationResponse ResolveNavigation(Data::UINavigationDirection direction) const;
+
 
 		/**
 		 * @brief Enables or disables interaction.
@@ -89,6 +112,13 @@ namespace DF2D::Engine
 
 		/** @brief Gives this widget keyboard focus, taking it from whatever held it before. */
 		void Focus();
+
+		/** @brief Activates the widget. */
+		void Activate();
+
+		void Deactivate();
+
+		bool IsActivated() const;
 
 		/** @brief Sets how focus moves away from this widget. */
 		void SetNavigationMode(Data::UINavigationMode mode);
