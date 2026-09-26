@@ -145,6 +145,14 @@ namespace DF2D::Engine
 
 		GameObjectConstructionContext constructionContext(handle, coreCtx, serviceCtx);
 
+		// Queued before construction, not after
+		gameObjectRoots.push_back(index);
+
+		if (!isRunning)
+		{
+			gameObjectsToInitialize.push_back(index);
+		}
+
 		try
 		{
 			new (storage) T(std::forward<Args>(args)...);
@@ -154,20 +162,20 @@ namespace DF2D::Engine
 			// The already-constructed base subobjects were destroyed by the language
 			// as part of unwinding out of the placement-new expression above; only
 			// release the raw storage, don't run GameObject's destructor a second time.
-			entry.object.release();
+			// Re-fetched: children spawned by the constructor may have grown `entries` since.
+			auto& failedEntry = entries[index];
+			failedEntry.object.release();
+
 			::operator delete(storage);
 
-			entry.state = ObjectEntryState::DEAD;
+			std::erase(gameObjectRoots, index);
+			std::erase(gameObjectsToInitialize, index);
+
+			failedEntry.state = ObjectEntryState::DEAD;
+
 			freeSlots.push_back(index);
 
 			throw;
-		}
-
-		gameObjectRoots.push_back(index);
-
-		if (!isRunning)
-		{
-			gameObjectsToInitialize.push_back(index);
 		}
 
 		SendGameObjectCreatedEvent(handle);
