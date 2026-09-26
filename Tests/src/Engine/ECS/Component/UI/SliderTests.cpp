@@ -3,6 +3,7 @@
 #include "Engine/ECS/Entity/Object/Handle/ObjectHandle.h"
 #include <doctest.h>
 #include <memory>
+#include <vector>
 
 
 using namespace DF2D::Data;
@@ -161,6 +162,92 @@ TEST_CASE("A slider that is not interactable ignores value changes")
 
 	CHECK(reported == 0);
 	CHECK(slider->GetValue() == doctest::Approx(0.0f));
+}
+
+
+TEST_CASE("Reaching a slider does not hand it its own axis; activating it does")
+{
+	std::shared_ptr<ComponentBucket> bucket;
+	auto slider = MakeSlider(bucket);
+
+	slider->Deliver(UIEventType::FOCUS_GAINED, UIEventPayload{});
+
+	REQUIRE(slider->IsFocused());
+	REQUIRE_FALSE(slider->IsActivated());
+
+	// Focused only: the axis the slider would use is held, so navigating onto it leaves it untouched.
+	CHECK(slider->ResolveNavigation(UINavigationDirection::LEFT) == UINavigationResponse::BLOCK);
+	CHECK(slider->ResolveNavigation(UINavigationDirection::RIGHT) == UINavigationResponse::BLOCK);
+
+	// The other axis still moves focus away, the way it does from any other widget.
+	CHECK(slider->ResolveNavigation(UINavigationDirection::UP) == UINavigationResponse::MOVE_FOCUS);
+
+	slider->Activate();
+
+	REQUIRE(slider->IsActivated());
+
+	CHECK(slider->ResolveNavigation(UINavigationDirection::LEFT) == UINavigationResponse::CONSUME);
+	CHECK(slider->ResolveNavigation(UINavigationDirection::UP) == UINavigationResponse::BLOCK);
+}
+
+
+TEST_CASE("A vertical slider claims the vertical axis instead")
+{
+	std::shared_ptr<ComponentBucket> bucket;
+	auto slider = MakeSlider(bucket);
+
+	slider->SetVertical(true);
+	slider->Activate();
+
+	CHECK(slider->ResolveNavigation(UINavigationDirection::UP) == UINavigationResponse::CONSUME);
+	CHECK(slider->ResolveNavigation(UINavigationDirection::LEFT) == UINavigationResponse::BLOCK);
+}
+
+
+TEST_CASE("Losing focus drops the activation with it")
+{
+	std::shared_ptr<ComponentBucket> bucket;
+	auto slider = MakeSlider(bucket);
+
+	auto activations = std::vector<bool>();
+	slider->OnActivationChanged.AddLambda([&activations](bool isActivated) { activations.push_back(isActivated); });
+
+	slider->Deliver(UIEventType::FOCUS_GAINED, UIEventPayload{});
+	slider->Activate();
+
+	// Interacting with another widget takes focus away from this one, which must take the selection
+	// with it: two sliders must never both look selected.
+	slider->Deliver(UIEventType::FOCUS_LOST, UIEventPayload{});
+
+	CHECK_FALSE(slider->IsActivated());
+	CHECK_FALSE(slider->IsFocused());
+
+	REQUIRE(activations.size() == 2);
+	CHECK(activations[0] == true);
+	CHECK(activations[1] == false);
+}
+
+
+TEST_CASE("Clicking a slider selects it outright")
+{
+	std::shared_ptr<ComponentBucket> bucket;
+	auto slider = MakeSlider(bucket);
+
+	slider->Deliver(UIEventType::CLICK, UIEventPayload{});
+
+	CHECK(slider->IsActivated());
+}
+
+
+TEST_CASE("A slider that is not interactable cannot be selected")
+{
+	std::shared_ptr<ComponentBucket> bucket;
+	auto slider = MakeSlider(bucket);
+
+	slider->SetInteractable(false);
+	slider->Activate();
+
+	CHECK_FALSE(slider->IsActivated());
 }
 
 

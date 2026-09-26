@@ -132,4 +132,23 @@ TEST_CASE("A toggle that is not interactable ignores value changes")
 }
 
 
+TEST_CASE("A widget with no second step is never selected, and never holds an axis")
+{
+	std::shared_ptr<ComponentBucket> bucket;
+	auto toggle = MakeToggle(bucket);
+
+	toggle->Deliver(UIEventType::FOCUS_GAINED, UIEventPayload{});
+
+	// Pressing a toggle is the whole interaction, so there is nothing to activate into and navigation
+	// keeps working in every direction while it holds focus.
+	CHECK_FALSE(toggle->HasActivationState());
+
+	toggle->Activate();
+
+	CHECK_FALSE(toggle->IsActivated());
+	CHECK(toggle->ResolveNavigation(UINavigationDirection::LEFT) == UINavigationResponse::MOVE_FOCUS);
+	CHECK(toggle->ResolveNavigation(UINavigationDirection::DOWN) == UINavigationResponse::MOVE_FOCUS);
+}
+
+
 TEST_SUITE_END();

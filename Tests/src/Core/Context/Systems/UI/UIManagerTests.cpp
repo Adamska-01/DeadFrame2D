@@ -663,4 +663,30 @@ TEST_CASE("An inert surface handle navigates nothing")
 }
 
 
+TEST_CASE("The focused element leads back to the components that own it")
+{
+	auto fixture = Fixture();
+
+	std::shared_ptr<DF2D::Engine::ComponentBucket> bucket;
+	auto first = MakeComponent(bucket);
+	auto second = MakeComponent(bucket);
+
+	auto element = fixture.ElementFor(firstObject);
+	element.RegisterOwner(first);
+	element.RegisterOwner(second);
+
+	// Nothing focused yet: the surface itself holding focus is not a widget.
+	CHECK(fixture.context.GetFocusedOwners().empty());
+
+	element.Focus();
+
+	auto owners = fixture.context.GetFocusedOwners();
+
+	// Both of them, not one: an element is shared, and picking which owner matters is the caller's job.
+	REQUIRE(owners.size() == 2);
+	CHECK(owners[0] == first);
+	CHECK(owners[1] == second);
+}
+
+
 TEST_SUITE_END();
