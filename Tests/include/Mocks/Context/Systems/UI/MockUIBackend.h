@@ -93,6 +93,9 @@ struct MockUIBackend : DF2D::Core::IUIBackend
 	/** @brief The last parent each element was attached to; absent means it was never attached. */
 	std::unordered_map<DF2D::Data::UIElementID, DF2D::Data::UIElementID> parents;
 
+	/** @brief Whatever FocusElement was last called with; 0 means the surface itself holds focus. */
+	DF2D::Data::UIElementID focusedElement{0};
+
 
 	std::unordered_map<DF2D::Data::UIElementID, std::vector<std::pair<std::string, std::string>>> dropdownOptions;
 
@@ -248,8 +251,14 @@ struct MockUIBackend : DF2D::Core::IUIBackend
 	{
 	}
 
-	void FocusElement(DF2D::Data::UIElementID) override
+	void FocusElement(DF2D::Data::UIElementID element) override
 	{
+		focusedElement = element;
+	}
+
+	DF2D::Data::UIElementID GetFocusedElement(DF2D::Data::UIContextID) const override
+	{
+		return focusedElement;
 	}
 
 	DF2D::Core::RectF GetElementRect(DF2D::Data::UIElementID) const override
