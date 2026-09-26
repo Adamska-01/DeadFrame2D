@@ -56,6 +56,23 @@ namespace
 				});
 		}
 	};
+
+	// A blueprint-style widget: builds its own UI child from its constructor.
+	class SelfBuildingWidget : public TestGameObject
+	{
+	public:
+		ObjectHandle<TestGameObject> child;
+
+		SelfBuildingWidget(TestScene& scene)
+		{
+			AddComponent<RectTransform>();
+
+			child = scene.Spawn<TestGameObject>();
+			child->SetParent(thisGameObject);
+			child->AddComponent<RectTransform>();
+			child->AddComponent<Image>();
+		}
+	};
 }
 
 
@@ -127,6 +144,51 @@ TEST_CASE("A destroyed canvas takes its surface with it and stops being updated"
 	// it. What matters here is that the manager stops treating a dead surface as live.
 	CHECK(fixture.mock->destroyContextCount == 1);
 	CHECK(fixture.mock->updateContextCount == 0);
+}
+
+
+TEST_CASE("UI children built from a constructor attach to their builder's element")
+{
+	auto fixture = CanvasFixture();
+
+	auto canvasObject = fixture.scene->Spawn<TestGameObject>();
+	canvasObject->AddComponent<Canvas>();
+
+	auto widget = fixture.scene->Spawn<SelfBuildingWidget>(*fixture.scene);
+	widget->SetParent(canvasObject);
+
+	fixture.scene->Init();
+
+	auto widgetElement = widget->GetComponent<RectTransform>()->GetElement().Id();
+	auto childElement = widget->child->GetComponent<RectTransform>()->GetElement().Id();
+
+	REQUIRE(widgetElement != 0);
+	REQUIRE(childElement != 0);
+
+	// A child left detached is never part of the document, so it never renders.
+	REQUIRE(fixture.mock->parents.contains(childElement));
+	CHECK(fixture.mock->parents[childElement] == widgetElement);
+
+	CHECK_NOTHROW(fixture.scene.reset());
+}
+
+
+TEST_CASE("A style property set before the element exists is applied once it does")
+{
+	auto fixture = CanvasFixture();
+
+	auto canvasObject = fixture.scene->Spawn<TestGameObject>();
+	canvasObject->AddComponent<Canvas>();
+
+	auto panel = fixture.scene->Spawn<TestGameObject>();
+	panel->SetParent(canvasObject);
+
+	auto rect = panel->AddComponent<RectTransform>();
+	rect->SetStyleProperty(UIStyleProperty::OVERFLOW_X, "hidden");
+
+	fixture.scene->Init();
+
+	CHECK(fixture.mock->PropertyOf(rect->GetElement().Id(), UIStyleProperty::OVERFLOW_X) == "hidden");
 }
 
 

@@ -90,6 +90,9 @@ struct MockUIBackend : DF2D::Core::IUIBackend
 
 	std::unordered_map<DF2D::Data::UIContextID, float> densityRatios;
 
+	/** @brief The last parent each element was attached to; absent means it was never attached. */
+	std::unordered_map<DF2D::Data::UIElementID, DF2D::Data::UIElementID> parents;
+
 
 	std::unordered_map<DF2D::Data::UIElementID, std::vector<std::pair<std::string, std::string>>> dropdownOptions;
 
@@ -200,8 +203,9 @@ struct MockUIBackend : DF2D::Core::IUIBackend
 		liveElements.erase(element);
 	}
 
-	void SetElementParent(DF2D::Data::UIElementID, DF2D::Data::UIElementID, int) override
+	void SetElementParent(DF2D::Data::UIElementID element, DF2D::Data::UIElementID parent, int) override
 	{
+		parents[element] = parent;
 	}
 
 	void SetElementProperty(DF2D::Data::UIElementID element, DF2D::Data::UIStyleProperty property, const std::string& value) override

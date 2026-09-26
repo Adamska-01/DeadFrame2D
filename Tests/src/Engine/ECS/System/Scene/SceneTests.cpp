@@ -7,6 +7,8 @@
 #include <doctest.h>
 #include <memory>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 
 using namespace DF2D::Engine;
@@ -83,6 +85,55 @@ namespace
 			scene->Spawn<TestGameObject>();
 		}
 	};
+
+	// Appends its tag to a shared log on Start, so a test can read back the order objects started in.
+	class StartOrderComponent : public GameComponent
+	{
+		TYPE_INFO(StartOrderComponent, GameComponent);
+
+	public:
+		std::vector<std::string>* log = nullptr;
+
+		std::string tag;
+
+		void Start() override
+		{
+			log->push_back(tag);
+		}
+	};
+
+	// Builds its own child from its constructor, the way a blueprint does.
+	class SelfBuildingGameObject : public GameObject
+	{
+	public:
+		ObjectHandle<TestGameObject> child;
+
+		SelfBuildingGameObject(TestScene& scene, std::vector<std::string>& log)
+		{
+			auto own = AddComponent<StartOrderComponent>();
+			own->log = &log;
+			own->tag = "parent";
+
+			child = scene.Spawn<TestGameObject>();
+			child->SetParent(thisGameObject);
+
+			auto childMarker = child->AddComponent<StartOrderComponent>();
+			childMarker->log = &log;
+			childMarker->tag = "child";
+		}
+	};
+
+	// Spawns a child from its constructor and then fails, leaving that slot to be recycled.
+	class SpawnsThenThrowsGameObject : public GameObject
+	{
+	public:
+		SpawnsThenThrowsGameObject(TestScene& scene)
+		{
+			scene.Spawn<TestGameObject>();
+
+			throw std::runtime_error("boom after spawning");
+		}
+	};
 }
 
 
@@ -143,6 +194,38 @@ TEST_CASE("Instantiate cleans up and rethrows when the constructor throws")
 
 	REQUIRE(obj != nullptr);
 	CHECK(obj.GetIndex() == 0);
+}
+
+TEST_CASE("A constructor that throws leaves no stale entry in the init queue")
+{
+	EventDispatcher dispatcher;
+	auto scene = std::make_shared<TestScene>(&dispatcher);
+
+	CHECK_THROWS_AS(scene->Spawn<SpawnsThenThrowsGameObject>(*scene), std::runtime_error);
+
+	// Reuses the failed object's slot. Were that slot still queued from the failed attempt, this
+	// object would be initialised twice.
+	auto obj = scene->Spawn<TestGameObject>();
+	auto marker = obj->AddComponent<MarkerComponent>();
+
+	scene->Init();
+
+	CHECK(marker->initCallCount == 1);
+}
+
+TEST_CASE("An object that builds children in its constructor starts before them")
+{
+	EventDispatcher dispatcher;
+	auto scene = std::make_shared<TestScene>(&dispatcher);
+	auto log = std::vector<std::string>();
+
+	auto parent = scene->Spawn<SelfBuildingGameObject>(*scene, log);
+
+	scene->Init();
+
+	REQUIRE(log.size() == 2);
+	CHECK(log[0] == "parent");
+	CHECK(log[1] == "child");
 }
 
 TEST_CASE("SetParent removes the child from the scene's root set")
