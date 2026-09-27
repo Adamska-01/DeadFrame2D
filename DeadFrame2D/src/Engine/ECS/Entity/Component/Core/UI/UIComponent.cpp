@@ -130,6 +130,12 @@ namespace DF2D::Engine
 
 		SyncElementParent();
 
+		// An object switched off before it had an element would otherwise keep drawing
+		if (!GetGameObject()->IsActive())
+		{
+			element.SetVisible(false);
+		}
+
 		for (const auto& className : pendingClasses)
 		{
 			element.SetClass(className, true);
