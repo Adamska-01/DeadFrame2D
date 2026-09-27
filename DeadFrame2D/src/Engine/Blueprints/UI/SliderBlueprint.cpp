@@ -1,9 +1,9 @@
 #include "Engine/Blueprints/UI/SliderBlueprint.h"
 #include "Core/Math/Color.h"
-#include "Core/Math/MathUtils.h"
 #include "Data/Components/UI/Layout/UIAnchor.h"
 #include "Data/Systems/UI/UIStyleProperty.h"
 #include "Engine/ECS/Component/UI/Layout/HorizontalLayoutGroup.h"
+#include <cmath>
 
 
 namespace DF2D::Engine
@@ -14,21 +14,18 @@ namespace DF2D::Engine
 
 	namespace
 	{
-		struct TierColors
+		/** @brief Width of the value handle. */
+		constexpr auto HandleWidth = 5.0f;
+
+		constexpr auto ValueLabelWidth = 46.0f;
+
+		constexpr auto ValueLabelFontSize = 14.0f;
+
+
+		/** @brief Prevents the element from intercepting pointer input. */
+		void MakeNonInteractive(const ComponentHandle<RectTransform>& rect)
 		{
-			Color unfilled;
-			Color filled;
-		};
-
-		TierColors GetTierColors(bool activated, bool focused)
-		{
-			if (activated)
-				return { Color{ 0x4a, 0x4a, 0x52, 255 }, Color{ 0xff, 0xff, 0xff, 255 } };
-
-			if (focused)
-				return { Color{ 0x3a, 0x3a, 0x40, 255 }, Color{ 0xcf, 0xcf, 0xd6, 255 } };
-
-			return { Color{ 0x2a, 0x2a, 0x2e, 255 }, Color{ 0x8a, 0x8a, 0x92, 255 } };
+			rect->SetStyleProperty(UIStyleProperty::POINTER_EVENTS, "none");
 		}
 	}
 
@@ -40,56 +37,96 @@ namespace DF2D::Engine
 		float minValue,
 		float maxValue,
 		float initialValue)
-		: size(size)
 	{
 		AddComponent<RectTransform>()->SetSizeDelta(size);
 
-		// Background: always fully visible underneath everything else.
-		auto backgroundObj = GameObject::Instantiate<GameObject>();
-		backgroundObj->SetParent(GetObjectHandle());
-		backgroundObj->AddComponent<RectTransform>()->SetSizeDelta(size);
-		backgroundImage = backgroundObj->AddComponent<Image>();
-		backgroundImage->SetSprite(unfilledTexturePath);
+		// The Slider handles input and layout; the child elements provide its visuals.
+		slider = AddComponent<Slider>();
 
-		// Foreground: full-size, but inside a container clipped to the value's fraction of the width.
-		auto clipObj = GameObject::Instantiate<GameObject>();
-		clipObj->SetParent(GetObjectHandle());
+		// Hide the backend's built-in visuals because this slider draws its own layers.
+		slider->AddClass("layered-slider");
 
-		clipRect = clipObj->AddComponent<RectTransform>();
-		clipRect->SetAnchorPreset(UIAnchor::TOP_LEFT);
-		clipRect->SetAnchoredPosition(Vector2F::Zero);
-		clipRect->SetSizeDelta(Vector2F(0.0f, size.y));
-
-		// Set directly, not via a stylesheet class: this widget has no stylesheet to depend on.
-		clipRect->SetStyleProperty(UIStyleProperty::OVERFLOW_X, "hidden");
-		clipRect->SetStyleProperty(UIStyleProperty::OVERFLOW_Y, "hidden");
-
-		// RmlUi's overflow:hidden never clips an absolutely positioned child, so this forces the
-		// foreground into a real flex child (only one, not for arranging anything) that actually can.
-		clipObj->AddComponent<HorizontalLayoutGroup>();
-
-		auto foregroundObj = GameObject::Instantiate<GameObject>();
-		foregroundObj->SetParent(clipObj);
-		foregroundObj->AddComponent<RectTransform>()->SetSizeDelta(size);
-		foregroundImage = foregroundObj->AddComponent<Image>();
-		foregroundImage->SetSprite(filledTexturePath);
-
-		// Created last so it paints on top of the two texture layers.
-		auto sliderObj = GameObject::Instantiate<GameObject>();
-		sliderObj->SetParent(GetObjectHandle());
-		sliderObj->AddComponent<RectTransform>()->SetSizeDelta(size);
-
-		slider = sliderObj->AddComponent<Slider>();
 		slider->SetRange(minValue, maxValue);
 		slider->SetValue(initialValue);
 
-		Refresh();
+		// Background: the whole bar, always fully visible underneath everything else.
+		auto backgroundObj = GameObject::Instantiate<GameObject>();
+		backgroundObj->SetParent(GetObjectHandle());
 
-		// The three looks are just the slider's own states drawn differently, so each state change is
-		// the same repaint. Which state the slider is in is not this blueprint's business.
-		slider->OnValueChanged.AddHandle(slider, [this](float) { Refresh(); });
-		slider->OnFocusChanged.AddHandle(slider, [this](bool) { Refresh(); });
-		slider->OnActivationChanged.AddHandle(slider, [this](bool) { Refresh(); });
+		auto backgroundRect = backgroundObj->AddComponent<RectTransform>();
+		backgroundRect->SetAnchorMin(Vector2F::Zero);
+		backgroundRect->SetAnchorMax(Vector2F::One);
+		backgroundRect->SetSizeDelta(Vector2F::Zero);
+
+		MakeNonInteractive(backgroundRect);
+
+		auto backgroundImage = backgroundObj->AddComponent<Image>();
+		backgroundImage->SetSprite(unfilledTexturePath);
+
+		auto fillAreaObj = GameObject::Instantiate<GameObject>();
+		fillAreaObj->SetParent(GetObjectHandle());
+
+		auto fillAreaRect = fillAreaObj->AddComponent<RectTransform>();
+		fillAreaRect->SetAnchorMin(Vector2F::Zero);
+		fillAreaRect->SetAnchorMax(Vector2F(0.0f, 1.0f));
+		fillAreaRect->SetSizeDelta(Vector2F::Zero);
+
+		MakeNonInteractive(fillAreaRect);
+
+		// Apply clipping directly because this blueprint does not rely on a game stylesheet.
+		fillAreaRect->SetStyleProperty(UIStyleProperty::OVERFLOW_X, "hidden");
+		fillAreaRect->SetStyleProperty(UIStyleProperty::OVERFLOW_Y, "hidden");
+
+		// The fill must be a layout child for the clipping container to affect it.
+		fillAreaObj->AddComponent<HorizontalLayoutGroup>();
+
+		auto fillObj = GameObject::Instantiate<GameObject>();
+		fillObj->SetParent(fillAreaObj);
+		fillObj->AddComponent<RectTransform>()->SetSizeDelta(size);
+
+		MakeNonInteractive(fillObj->GetComponent<RectTransform>());
+
+		auto fillImage = fillObj->AddComponent<Image>();
+		fillImage->SetSprite(filledTexturePath);
+
+		// Keep the handle outside the clipped fill area so it remains visible at the edges.
+		handleObject = GameObject::Instantiate<GameObject>();
+		handleObject->SetParent(GetObjectHandle());
+
+		auto handleRect = handleObject->AddComponent<RectTransform>();
+		handleRect->SetSizeDelta(Vector2F(HandleWidth, size.y));
+
+		MakeNonInteractive(handleRect);
+
+		auto handleImage = handleObject->AddComponent<Image>();
+
+		valueObject = GameObject::Instantiate<GameObject>();
+		valueObject->SetParent(GetObjectHandle());
+
+		auto valueRect = valueObject->AddComponent<RectTransform>();
+		valueRect->SetAnchorPreset(UIAnchor::CENTER_RIGHT);
+		valueRect->SetAnchoredPosition(Vector2F(-4.0f, 0.0f));
+		valueRect->SetSizeDelta(Vector2F(ValueLabelWidth, ValueLabelFontSize * 1.4f));
+
+		MakeNonInteractive(valueRect);
+
+		valueObject->AddComponent<Image>()->SetColor(Color{ 0x10, 0x10, 0x14, 210 });
+
+		valueText = valueObject->AddComponent<Text>();
+		valueText->SetFontSize(ValueLabelFontSize);
+		valueText->SetAlignment(TextAlignment::RIGHT);
+		valueText->SetWordWrap(false);
+
+		// Slider owns the visual state and updates these elements as the value changes.
+		slider->SetFillRect(fillAreaRect);
+		slider->SetHandleRect(handleRect);
+		slider->SetBackgroundImage(backgroundImage);
+		slider->SetFillImage(fillImage);
+		slider->SetHandleImage(handleImage);
+
+		RefreshValueText();
+
+		slider->OnValueChanged.AddHandle(slider, [this](float) { RefreshValueText(); });
 	}
 
 	SliderBlueprint::SliderBlueprint(
@@ -101,20 +138,44 @@ namespace DF2D::Engine
 	{
 	}
 
-	void SliderBlueprint::Refresh()
+	void SliderBlueprint::RefreshValueText()
 	{
-		auto range = slider->GetMaximum() - slider->GetMinimum();
-		auto value = slider->GetValue();
-		auto fraction = range > 0.0f ? MathUtils::Clamp((value - slider->GetMinimum()) / range, 0.0f, 1.0f) : 0.0f;
-		auto colors = GetTierColors(slider->IsActivated(), slider->IsFocused());
+		if (valueText == nullptr)
+			return;
 
-		clipRect->SetSizeDelta(Vector2F(size.x * fraction, size.y));
-		backgroundImage->SetColor(colors.unfilled);
-		foregroundImage->SetColor(colors.filled);
+		valueText->SetText(std::to_string(static_cast<int>(std::lround(slider->GetValue()))) + valueSuffix);
 	}
 
 	ComponentHandle<Slider> SliderBlueprint::GetSlider() const
 	{
 		return slider;
+	}
+
+	void SliderBlueprint::SetHandleVisible(bool value)
+	{
+		if (handleObject != nullptr)
+		{
+			handleObject->SetActive(value);
+		}
+	}
+
+	void SliderBlueprint::SetValueLabelVisible(bool value)
+	{
+		if (valueObject != nullptr)
+		{
+			valueObject->SetActive(value);
+		}
+	}
+
+	void SliderBlueprint::SetValueSuffix(std::string_view value)
+	{
+		valueSuffix = std::string(value);
+
+		RefreshValueText();
+	}
+
+	void SliderBlueprint::SetColors(const SliderColors& value)
+	{
+		slider->SetColors(value);
 	}
 }

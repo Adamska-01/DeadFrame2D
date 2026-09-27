@@ -1,35 +1,51 @@
 #pragma once
 #include "Core/Math/Vector2.h"
+#include "Data/Components/UI/Slider/SliderColors.h"
 #include "DF2D_API.h"
 #include "Engine/ECS/Component/UI/Image.h"
 #include "Engine/ECS/Component/UI/RectTransform.h"
 #include "Engine/ECS/Component/UI/Slider.h"
+#include "Engine/ECS/Component/UI/Text.h"
 #include "Engine/ECS/Entity/Object/Core/GameObject.h"
+#include <string>
 #include <string_view>
 
 
 namespace DF2D::Engine
 {
 	/**
-	 * @brief A slider rendered as separate unfilled and filled layers.
+	 * @brief Builds a layered slider with an unfilled background and a filled foreground.
 	 *
-	 * The layers can use textures or flat colours. The underlying Slider handles input and state.
+	 * The widget is composed of:
+	 *
+	 *     slider
+	 *     +- background
+	 *     +- fill area
+	 *        +- fill
+	 *     +- handle
+	 *     +- value
+	 *
+	 * Textures can be provided for the background and fill, or omitted to use flat colour fills.
+	 * SliderBlueprint only builds the hierarchy; Slider controls the value, layout and colours.
+	 *
+	 * Handle and value label are optional and can be hidden without affecting slider behaviour.
 	 */
 	class DF2D_API SliderBlueprint : public GameObject
 	{
 	private:
 		ComponentHandle<Slider> slider;
 
-		ComponentHandle<Image> backgroundImage;
+		ObjectHandle<GameObject> handleObject;
 
-		ComponentHandle<Image> foregroundImage;
+		ObjectHandle<GameObject> valueObject;
 
-		ComponentHandle<RectTransform> clipRect;
+		ComponentHandle<Text> valueText;
 
-		Core::Vector2F size;
+		std::string valueSuffix;
 
 
-		void Refresh();
+		/** @brief Updates the value label with the current slider value and suffix. */
+		void RefreshValueText();
 
 
 	public:
@@ -41,7 +57,7 @@ namespace DF2D::Engine
 			float maxValue,
 			float initialValue);
 
-		/** @brief Same widget with no textures -- background/foreground are flat colour fills instead. */
+		/** @brief Creates the same layered slider using flat colour fills instead of textures. */
 		SliderBlueprint(
 			const Core::Vector2F& size,
 			float minValue,
@@ -49,7 +65,19 @@ namespace DF2D::Engine
 			float initialValue);
 
 
-		/** @brief The underlying range widget, for the owner's own OnValueChanged binding. */
+		/** @brief Returns the underlying slider for value changes and other configuration. */
 		ComponentHandle<Slider> GetSlider() const;
+
+		/** @brief Shows or hides the value handle. */
+		void SetHandleVisible(bool value);
+
+		/** @brief Shows or hides the value label. */
+		void SetValueLabelVisible(bool value);
+
+		/** @brief Appends a suffix to the displayed value, such as "%" or "px". */
+		void SetValueSuffix(std::string_view value);
+
+		/** @brief Sets the colours used by the slider's visual layers. */
+		void SetColors(const Data::SliderColors& value);
 	};
 }
