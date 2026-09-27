@@ -1,23 +1,37 @@
 /*
-	Engine defaults for the element tree the UI components build.
+	Engine defaults for the UI element tree.
 
-	Loaded into every canvas before any game stylesheet, so a game theme layers on top of this and
-	inline properties set by components still win over both.
+	Loaded before game styles, so themes can override these defaults while component inline styles
+	still take precedence.
+
+	All controls share the same palette, borders and flat fills so they feel like one UI system.
+	Game styles only need to replace these values, not redefine the controls from scratch.
+
+	Palette:
+
+		#101014  ink, the base background
+		#1a1a1f  surface, default control fill
+		#24242b  raised, hover/open state
+		#33333d  border, default border
+		#55555f  border strong, interactive border
+		#e8e8ec  text
+		#9a9aa4  muted text and secondary elements
+		#5a5a63  disabled text
+		#e0a030  accent, used for focus, selection and active values
+
+	Use dp instead of px so the UI scales with the canvas (see Canvas::RecomputeUIScaleFactor).
 */
 
 body
 {
 	font-family: DeadFrame;
 	font-size: 16dp;
-	color: #ffffffff;
+	color: #e8e8ecff;
 }
 
 div
 {
-	/*
-		Components position themselves absolutely through RectTransform. Blocks that do not carry a
-		RectTransform still need a sane default, and this keeps a bare container out of the way.
-	*/
+	/* Containers without a RectTransform need a neutral block layout. */
 	display: block;
 }
 
@@ -30,39 +44,96 @@ img
 /*
 	Interactive controls.
 
-	Plain colours and borders only, no textures: these have to look like something the moment a
-	component is added, before a game has any art or any theme of its own. Everything here is a bare
-	tag or a state selector, so a game stylesheet overrides any of it without fighting specificity.
+	These defaults provide a complete baseline appearance without requiring a game theme.
+	Components can override them without fighting high-specificity selectors.
 
-	Sub-element names are the backend's, not the engine's -- a range is built from a track and a bar,
-	a select from a value, an arrow and a box. They are styled here so a game never has to know that.
+	Sub-elements such as slidertrack and selectarrow are engine-generated and are styled here so
+	game styles do not need to depend on the UI backend's internal structure.
 */
 
 input,
 select,
 textarea
 {
+	box-sizing: border-box;
 	display: inline-block;
-	background-color: #1e1e28ff;
-	border: 2dp #4a4a5aff;
-	color: #e0e0e0ff;
+	background-color: #1a1a1fff;
+	border: 1dp #33333dff;
+	color: #e8e8ecff;
 	font-size: 16dp;
 	padding: 6dp 10dp;
+	transition: border-color 0.08s linear, background-color 0.08s linear, color 0.08s linear;
 }
 
+input:hover,
+select:hover,
+textarea:hover
+{
+	background-color: #24242bff;
+	border-color: #55555fff;
+}
+
+/* Focus uses the accent so keyboard and gamepad navigation is always visible. */
 input:focus,
 select:focus,
-textarea:focus
+textarea:focus,
+button:focus
 {
-	border-color: #ff8c00ff;
+	border-color: #e0a030ff;
+}
+
+/*
+	Activated controls keep the focus border and use the raised fill to distinguish "in use"
+	from simple focus.
+*/
+input.activated,
+select.activated,
+textarea.activated
+{
+	background-color: #24242bff;
+	border-color: #e0a030ff;
 }
 
 input.disabled,
 select.disabled,
-textarea.disabled
+textarea.disabled,
+button.disabled
 {
-	color: #6a6a6aff;
-	border-color: #2a2a2aff;
+	background-color: #16161aff;
+	border-color: #2a2a31ff;
+	color: #5a5a63ff;
+	cursor: unavailable;
+}
+
+
+/* --- Button ------------------------------------------------------------------------------------ */
+
+button
+{
+	box-sizing: border-box;
+	display: block;
+	background-color: #1a1a1fff;
+	border: 1dp #33333dff;
+	color: #e8e8ecff;
+	font-size: 16dp;
+	padding: 10dp 18dp;
+	text-align: center;
+	cursor: pointer;
+	transition: border-color 0.08s linear, background-color 0.08s linear, color 0.08s linear;
+}
+
+button:hover
+{
+	background-color: #24242bff;
+	border-color: #55555fff;
+}
+
+/* Pressed buttons invert their colours to provide a clear click state. */
+button:active
+{
+	background-color: #e8e8ecff;
+	border-color: #e8e8ecff;
+	color: #101014ff;
 }
 
 
@@ -73,21 +144,27 @@ input.checkbox
 	width: 20dp;
 	height: 20dp;
 	padding: 0dp;
-	background-color: #1e1e28ff;
 }
 
-input.checkbox:hover
-{
-	border-color: #ff8c00ff;
-}
-
+/* Keep the centre dark so the checked state still reads as a checkbox. */
 input.checkbox:checked
 {
-	background-color: #ff8c00ff;
+	background-color: #e0a030ff;
+	border: 4dp #1a1a1fff;
+}
+
+input.checkbox:checked:hover
+{
+	background-color: #f2b855ff;
 }
 
 
 /* --- Range ------------------------------------------------------------------------------------- */
+
+/*
+	The range uses a flat track, progress fill and rectangular handle.
+	The handle stays rectangular to match the rest of the UI.
+*/
 
 input.range
 {
@@ -99,32 +176,41 @@ input.range
 
 input.range slidertrack
 {
-	background-color: #1e1e28ff;
-	border: 2dp #4a4a5aff;
+	background-color: #1a1a1fff;
+	border: 1dp #33333dff;
+}
+
+input.range sliderprogress
+{
+	background-color: #55555fff;
 }
 
 input.range sliderbar
 {
-	width: 16dp;
+	width: 12dp;
 	height: 20dp;
-	background-color: #b4b4c8ff;
-	border: 2dp #4a4a5aff;
+	background-color: #9a9aa4ff;
+	border: 1dp #33333dff;
+	transition: background-color 0.08s linear;
 }
 
 input.range sliderbar:hover
 {
-	background-color: #ff8c00ff;
+	background-color: #e8e8ecff;
 }
 
-input.range sliderbar:active
+input.range sliderbar:active,
+input.range:focus sliderbar
 {
-	background-color: #ffa733ff;
+	background-color: #e0a030ff;
 }
 
-/*
-	A range is laid out from a track and a bar alone. The stepper arrows belong to a scrollbar and
-	have no place on a slider, so they are taken out of the layout rather than merely hidden.
-*/
+input.range.activated sliderprogress
+{
+	background-color: #e0a030ff;
+}
+
+/* Sliders do not use the stepper arrows provided by the shared range implementation. */
 input.range sliderarrowdec,
 input.range sliderarrowinc
 {
@@ -132,63 +218,86 @@ input.range sliderarrowinc
 }
 
 /*
-	A range draws no border of its own, so a border colour has nothing to colour. Its bar is what the
-	eye follows, so that is what says the slider has focus.
+	Layered sliders keep the real input for interaction but let the component draw its own visuals.
+	Only colours and borders are overridden: track and handle dimensions must remain unchanged because
+	they determine click and drag positions.
 */
-input.range:focus sliderbar
+input.range.layered-slider,
+input.range.layered-slider slidertrack,
+input.range.layered-slider sliderprogress,
+input.range.layered-slider sliderbar
 {
-	background-color: #ff8c00ff;
+	background-color: transparent;
+	border-width: 0dp;
 }
+
+/* Override the more specific interaction states as well. */
+input.range.layered-slider sliderbar:hover,
+input.range.layered-slider sliderbar:active,
+input.range.layered-slider:focus sliderbar,
+input.range.layered-slider.activated sliderprogress
+{
+	background-color: transparent;
+}
+
 
 /* --- Select ------------------------------------------------------------------------------------ */
 
 select
 {
 	width: 160dp;
-	padding: 4dp 8dp;
+	padding: 4dp 10dp;
+	cursor: pointer;
 }
 
 select selectvalue
 {
 	width: auto;
-	color: #e0e0e0ff;
+	color: #e8e8ecff;
 }
 
+/*
+	The backend provides no chevron glyph, so the arrow is represented by a thin horizontal bar.
+	It remains in the normal layout flow because transforms or negative margins would move it
+	outside the control rather than repositioning it in place.
+*/
 select selectarrow
 {
-	width: 16dp;
-	height: 16dp;
-	background-color: #4a4a5aff;
+	width: 12dp;
+	height: 2dp;
+	margin-top: 9dp;
+	background-color: #9a9aa4ff;
+	transition: background-color 0.08s linear;
 }
 
-select:hover selectarrow
+select:hover selectarrow,
+select:focus selectarrow
 {
-	background-color: #ff8c00ff;
+	background-color: #e0a030ff;
 }
 
 select selectbox
 {
-	background-color: #1e1e28ff;
-	border: 2dp #4a4a5aff;
+	background-color: #16161aff;
+	border: 1dp #55555fff;
 	margin-top: 2dp;
 }
 
 select selectbox option
 {
 	display: block;
-	padding: 4dp 8dp;
-	color: #e0e0e0ff;
+	padding: 6dp 10dp;
+	color: #e8e8ecff;
 }
 
 select selectbox option:checked
 {
-	background-color: #3d3d50ff;
+	color: #e0a030ff;
 }
 
 select selectbox option:hover
 {
-	background-color: #ff8c00ff;
-	color: #14141cff;
+	background-color: #24242bff;
 }
 
 
@@ -196,54 +305,42 @@ select selectbox option:hover
 
 scrollbarvertical
 {
-	width: 12dp;
-	background-color: #14141cff;
+	width: 10dp;
+	background-color: #16161aff;
 }
 
 scrollbarhorizontal
 {
-	height: 12dp;
-	background-color: #14141cff;
+	height: 10dp;
+	background-color: #16161aff;
 }
 
 scrollbarvertical sliderbar,
 scrollbarhorizontal sliderbar
 {
-	background-color: #4a4a5aff;
+	background-color: #33333dff;
 	min-height: 24dp;
 	min-width: 24dp;
+	transition: background-color 0.08s linear;
 }
 
 scrollbarvertical sliderbar:hover,
 scrollbarhorizontal sliderbar:hover
 {
-	background-color: #ff8c00ff;
+	background-color: #55555fff;
 }
 
-/* Same reasoning as the range: the engine gives scrollbars a bar and a track, and nothing else. */
+scrollbarvertical sliderbar:active,
+scrollbarhorizontal sliderbar:active
+{
+	background-color: #e0a030ff;
+}
+
+/* Scrollbars use only the track and handle; the range stepper arrows are not needed. */
 scrollbarvertical sliderarrowdec,
 scrollbarvertical sliderarrowinc,
 scrollbarhorizontal sliderarrowdec,
 scrollbarhorizontal sliderarrowinc
 {
 	display: none;
-}
-
-
-/* --- Focus ------------------------------------------------------------------------------------- */
-
-/*
-	Navigation that cannot be seen is navigation nobody can use, so anything reachable by keyboard or
-	gamepad says so. A game theme is expected to replace this; what it must not do is remove it.
-*/
-button:focus,
-input.checkbox:focus,
-input.range:focus
-{
-	border-color: #ff8c00ff;
-}
-
-button:focus
-{
-	background-color: #3d3d50ff;
 }
