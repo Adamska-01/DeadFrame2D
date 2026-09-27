@@ -24,23 +24,23 @@ namespace DF2D::Data
 	{
 		SliderStateColors resting
 		{
-			.background = Core::Color{ 0x1a, 0x1a, 0x1f, 255 },
-			.fill = Core::Color{ 0x55, 0x55, 0x5f, 255 },
-			.handle = Core::Color{ 0x9a, 0x9a, 0xa4, 255 } 
+			.background = Core::Color{ 0x2a, 0x2a, 0x33, 255 },
+			.fill = Core::Color{ 0x7c, 0x7c, 0x8a, 255 },
+			.handle = Core::Color{ 0xc8, 0xc8, 0xd2, 255 }
 		};
 
 		SliderStateColors focused
 		{
-			.background = Core::Color{ 0x24, 0x24, 0x2b, 255 },
-			.fill = Core::Color{ 0x9a, 0x9a, 0xa4, 255 },
-			.handle = Core::Color{ 0xe8, 0xe8, 0xec, 255 }
+			.background = Core::Color{ 0x33, 0x33, 0x3d, 255 },
+			.fill = Core::Color{ 0xbc, 0xbc, 0xc6, 255 },
+			.handle = Core::Color{ 0xff, 0xff, 0xff, 255 }
 		};
 
 		SliderStateColors activated
 		{
-			.background = Core::Color{ 0x24, 0x24, 0x2b, 255 },
-			.fill = Core::Color{ 0xc4, 0x88, 0x1f, 255 },
-			.handle = Core::Color{ 0xe0, 0xa0, 0x30, 255 }
+			.background = Core::Color{ 0x33, 0x33, 0x3d, 255 },
+			.fill = Core::Color{ 0xe0, 0xa0, 0x30, 255 },
+			.handle = Core::Color{ 0xff, 0xd2, 0x7a, 255 }
 		};
 	};
 }

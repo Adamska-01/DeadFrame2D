@@ -1,9 +1,8 @@
-#include "Engine/Blueprints/UI/SliderBlueprint.h"
-#include "Core/Math/Color.h"
-#include "Data/Components/UI/Layout/UIAnchor.h"
 #include "Data/Systems/UI/UIStyleProperty.h"
+#include "Engine/Blueprints/UI/SliderBlueprint.h"
 #include "Engine/ECS/Component/UI/Layout/HorizontalLayoutGroup.h"
 #include <cmath>
+#include <string>
 
 
 namespace DF2D::Engine
@@ -17,9 +16,12 @@ namespace DF2D::Engine
 		/** @brief Width of the value handle. */
 		constexpr auto HandleWidth = 5.0f;
 
-		constexpr auto ValueLabelWidth = 46.0f;
+		/** @brief How far past the end of the bar the number sits. */
+		constexpr auto ValueLabelGap = 12.0f;
 
-		constexpr auto ValueLabelFontSize = 14.0f;
+		constexpr auto ValueLabelWidth = 56.0f;
+
+		constexpr auto ValueLabelFontSize = 15.0f;
 
 
 		/** @brief Prevents the element from intercepting pointer input. */
@@ -104,17 +106,18 @@ namespace DF2D::Engine
 		valueObject->SetParent(GetObjectHandle());
 
 		auto valueRect = valueObject->AddComponent<RectTransform>();
-		valueRect->SetAnchorPreset(UIAnchor::CENTER_RIGHT);
-		valueRect->SetAnchoredPosition(Vector2F(-4.0f, 0.0f));
+		valueRect->SetAnchorMin(Vector2F(1.0f, 0.5f));
+		valueRect->SetAnchorMax(Vector2F(1.0f, 0.5f));
+		valueRect->SetPivot(Vector2F(0.0f, 0.5f));
+		valueRect->SetAnchoredPosition(Vector2F(ValueLabelGap, 0.0f));
 		valueRect->SetSizeDelta(Vector2F(ValueLabelWidth, ValueLabelFontSize * 1.4f));
+		valueRect->AddClass("slider-value");
 
 		MakeNonInteractive(valueRect);
 
-		valueObject->AddComponent<Image>()->SetColor(Color{ 0x10, 0x10, 0x14, 210 });
-
 		valueText = valueObject->AddComponent<Text>();
 		valueText->SetFontSize(ValueLabelFontSize);
-		valueText->SetAlignment(TextAlignment::RIGHT);
+		valueText->SetAlignment(TextAlignment::LEFT);
 		valueText->SetWordWrap(false);
 
 		// Slider owns the visual state and updates these elements as the value changes.

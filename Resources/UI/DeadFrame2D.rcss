@@ -231,6 +231,22 @@ input.range.layered-slider sliderbar
 	border-width: 0dp;
 }
 
+/*
+	The backend reserves space for its handle when mapping pointer positions to values. The layered
+	slider draws its own handle, so the backend handle must have zero width to keep the full track
+	reachable and the value aligned with the cursor.
+*/
+input.range.layered-slider sliderbar
+{
+	width: 0dp;
+}
+
+/* Secondary text used to display the slider value. */
+.slider-value
+{
+	color: #9a9aa4ff;
+}
+
 /* Override the more specific interaction states as well. */
 input.range.layered-slider sliderbar:hover,
 input.range.layered-slider sliderbar:active,
