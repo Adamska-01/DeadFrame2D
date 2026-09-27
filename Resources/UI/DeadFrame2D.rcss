@@ -62,7 +62,7 @@ textarea
 	color: #e8e8ecff;
 	font-size: 16dp;
 	padding: 6dp 10dp;
-	transition: border-color 0.08s linear, background-color 0.08s linear, color 0.08s linear;
+	transition: border-color background-color color 0.08s linear-in-out;
 }
 
 input:hover,
@@ -119,7 +119,7 @@ button
 	padding: 10dp 18dp;
 	text-align: center;
 	cursor: pointer;
-	transition: border-color 0.08s linear, background-color 0.08s linear, color 0.08s linear;
+	transition: border-color background-color color 0.08s linear-in-out;
 }
 
 button:hover
@@ -191,7 +191,7 @@ input.range sliderbar
 	height: 20dp;
 	background-color: #9a9aa4ff;
 	border: 1dp #33333dff;
-	transition: background-color 0.08s linear;
+	transition: background-color 0.08s linear-in-out;
 }
 
 input.range sliderbar:hover
@@ -267,7 +267,7 @@ select selectarrow
 	height: 2dp;
 	margin-top: 9dp;
 	background-color: #9a9aa4ff;
-	transition: background-color 0.08s linear;
+	transition: background-color 0.08s linear-in-out;
 }
 
 select:hover selectarrow,
@@ -321,7 +321,7 @@ scrollbarhorizontal sliderbar
 	background-color: #33333dff;
 	min-height: 24dp;
 	min-width: 24dp;
-	transition: background-color 0.08s linear;
+	transition: background-color 0.08s linear-in-out;
 }
 
 scrollbarvertical sliderbar:hover,
